@@ -1,13 +1,29 @@
 package model
 
+import (
+	"math/rand"
+	"time"
+)
+
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
 type Plan struct {
-	// Seed is a pseudo-randomly generated unsigned integer that should be used to drive randomiser input.
-	Seed uint `json:"seed"`
+	// Creation marks the time at which the plan was created.
+	Creation time.Time `json:"created"`
+
+	// Seed is a pseudo-randomly generated integer that should be used to drive randomiser input.
+	Seed int64 `json:"seed"`
 
 	// Machines contains the per-machine plans for this overall test plan.
 	Machines []MachinePlan `json:"machines"`
+}
+
+// Init initialises the creation-sensitive parts of plan p.
+// It randomises the seed using the top-level random number generator;
+// and also updates the creation time.
+func (p *Plan) Init() {
+	p.Creation = time.Now()
+	p.Seed = rand.Int63()
 }
 
 // MachinePlan represents a test plan for a single machine.

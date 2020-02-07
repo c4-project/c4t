@@ -12,6 +12,7 @@ type Compiler struct {
 	Service
 }
 
+// ParseCompilerList parses a compiler list from the reader rd.
 func ParseCompilerList(rd io.Reader) ([]*Compiler, error) {
 	var cs []*Compiler
 
@@ -27,14 +28,7 @@ func ParseCompilerList(rd io.Reader) ([]*Compiler, error) {
 	return cs, s.Err()
 }
 
-type CompilerFieldMissingError struct {
-	line  []byte
-	field string
-}
-func (e CompilerFieldMissingError) Error() string {
-	return fmt.Sprintf("no %s in compiler record %q", e.field, string(e.line))
-}
-
+// ParseCompiler parses a single line from byte slice bs.
 func ParseCompiler(bs []byte) (*Compiler, error) {
 	s := bufio.NewScanner(bytes.NewReader(bs))
 	s.Split(bufio.ScanWords)
@@ -64,3 +58,13 @@ func ParseCompiler(bs []byte) (*Compiler, error) {
 
 	return &c, nil
 }
+
+// CompilerFieldMissingError is an error caused when a compiler list line is missing an expected field.
+type CompilerFieldMissingError struct {
+	line  []byte
+	field string
+}
+func (e CompilerFieldMissingError) Error() string {
+	return fmt.Sprintf("no %s in compiler record %q", e.field, string(e.line))
+}
+
