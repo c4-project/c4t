@@ -25,6 +25,7 @@ type StandardArgs struct {
 	// Whether verbosity is enabled.
 	Verbose bool
 }
+
 func (s StandardArgs) ToArgv() []string {
 	var argv []string
 	if s.Verbose {

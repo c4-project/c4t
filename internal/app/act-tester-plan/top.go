@@ -4,10 +4,11 @@ package act_tester_plan
 import (
 	"encoding/json"
 	"errors"
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 var (

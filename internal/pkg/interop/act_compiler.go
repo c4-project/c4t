@@ -2,6 +2,7 @@ package interop
 
 import (
 	"bytes"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -12,7 +13,7 @@ type CompilerInspectable interface {
 }
 
 func (a *ActRunner) List(f model.CompilerFilter) ([]*model.Compiler, error) {
-	argv := append([]string{"list"},f.ToArgv()...)
+	argv := append([]string{"list"}, f.ToArgv()...)
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer

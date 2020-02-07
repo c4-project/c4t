@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/MattWindsor91/act-tester/internal/app/act-tester-plan"
 	"os"
+
+	"github.com/MattWindsor91/act-tester/internal/app/act-tester-plan"
 )
 
 // The configuration parsed from the command-line arguments.
@@ -16,8 +17,8 @@ const (
 )
 
 func init() {
-	flag.StringVar(&cfg.Filter.CompPred, "c", "", compPredUsage + " (shorthand)")
-	flag.StringVar(&cfg.Filter.MachPred, "m", "", machPredUsage + " (shorthand)")
+	flag.StringVar(&cfg.Filter.CompPred, "c", "", compPredUsage+" (shorthand)")
+	flag.StringVar(&cfg.Filter.MachPred, "m", "", machPredUsage+" (shorthand)")
 	flag.StringVar(&cfg.Filter.CompPred, "compiler-predicate", "", compPredUsage)
 	flag.StringVar(&cfg.Filter.MachPred, "machine-predicate", "", machPredUsage)
 }

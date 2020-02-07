@@ -35,7 +35,7 @@ func ParseCompiler(bs []byte) (*Compiler, error) {
 
 	var c Compiler
 
-	fields := []struct{
+	fields := []struct {
 		name     string
 		inserter func(*Compiler, string)
 	}{
@@ -64,7 +64,7 @@ type CompilerFieldMissingError struct {
 	line  []byte
 	field string
 }
+
 func (e CompilerFieldMissingError) Error() string {
 	return fmt.Sprintf("no %s in compiler record %q", e.field, string(e.line))
 }
-
