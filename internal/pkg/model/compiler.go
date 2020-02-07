@@ -1,0 +1,66 @@
+package model
+
+import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"io"
+)
+
+// Compiler collects the test-relevant information about a compiler.
+type Compiler struct {
+	Service
+}
+
+func ParseCompilerList(rd io.Reader) ([]*Compiler, error) {
+	var cs []*Compiler
+
+	s := bufio.NewScanner(rd)
+	for s.Scan() {
+		c, err := ParseCompiler(s.Bytes())
+		if err != nil {
+			return nil, err
+		}
+		cs = append(cs, c)
+	}
+
+	return cs, s.Err()
+}
+
+type CompilerFieldMissingError struct {
+	line  []byte
+	field string
+}
+func (e CompilerFieldMissingError) Error() string {
+	return fmt.Sprintf("no %s in compiler record %q", e.field, string(e.line))
+}
+
+func ParseCompiler(bs []byte) (*Compiler, error) {
+	s := bufio.NewScanner(bytes.NewReader(bs))
+	s.Split(bufio.ScanWords)
+
+	var c Compiler
+
+	fields := []struct{
+		name     string
+		inserter func(*Compiler, string)
+	}{
+		{"machine Id", func(c *Compiler, s string) { c.MachineId = IdFromString(s) }},
+		{"compiler Id", func(c *Compiler, s string) { c.Id = IdFromString(s) }},
+		{"style", func(c *Compiler, s string) { c.Style = IdFromString(s) }},
+		// arch
+		// enabled
+	}
+
+	for _, f := range fields {
+		if !s.Scan() {
+			return nil, CompilerFieldMissingError{
+				line:  nil,
+				field: f.name,
+			}
+		}
+		f.inserter(&c, s.Text())
+	}
+
+	return &c, nil
+}
