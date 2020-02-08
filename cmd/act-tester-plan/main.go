@@ -5,22 +5,29 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+
 	"github.com/MattWindsor91/act-tester/internal/app/act-tester-plan"
 )
 
 // The configuration parsed from the command-line arguments.
-var cfg act_tester_plan.Planner
+var cfg = act_tester_plan.Planner{
+	Source: &interop.ActRunner{},
+}
 
 const (
+	corpusSizeUsage = "The `number` of corpus files to select for this test plan.\n" +
+		"If non-positive, the planner will use all viable provided corpus files."
 	compPredUsage = "The predicate `sexp` used to filter compilers for this test plan."
 	machPredUsage = "The predicate `sexp` used to filter machines for this test plan."
 )
 
 func init() {
-	flag.StringVar(&cfg.Filter.CompPred, "c", "", compPredUsage+" (shorthand)")
-	flag.StringVar(&cfg.Filter.MachPred, "m", "", machPredUsage+" (shorthand)")
-	flag.StringVar(&cfg.Filter.CompPred, "compiler-predicate", "", compPredUsage)
-	flag.StringVar(&cfg.Filter.MachPred, "machine-predicate", "", machPredUsage)
+	flag.StringVar(&cfg.Filter.CompPred, "c", "", compPredUsage)
+
+	flag.StringVar(&cfg.Filter.MachPred, "m", "", machPredUsage)
+
+	flag.IntVar(&cfg.CorpusSize, "n", 0, corpusSizeUsage)
 }
 
 func main() {
@@ -28,6 +35,6 @@ func main() {
 	cfg.Corpus = flag.Args()
 
 	if err := cfg.Plan(); err != nil {
-		fmt.Fprintln(os.Stderr, "error:", err)
+		_, _ = fmt.Fprintln(os.Stderr, "error:", err)
 	}
 }

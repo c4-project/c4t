@@ -5,11 +5,6 @@ import (
 	"os/exec"
 )
 
-const (
-	// BinActCompiler is the name of the ACT compiler services binary.
-	BinActCompiler = "act-compiler"
-)
-
 // ActRunner stores information about how to run the core ACT binaries.
 type ActRunner struct {
 	// DuneExec toggles whether ACT should be run through dune.

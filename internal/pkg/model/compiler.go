@@ -39,7 +39,7 @@ func ParseCompiler(bs []byte) (*Compiler, error) {
 		name     string
 		inserter func(*Compiler, string)
 	}{
-		{"machine Id", func(c *Compiler, s string) { c.MachineId = IdFromString(s) }},
+		{"machine Id", func(c *Compiler, s string) { m := IdFromString(s); c.MachineId = &m }},
 		{"compiler Id", func(c *Compiler, s string) { c.Id = IdFromString(s) }},
 		{"style", func(c *Compiler, s string) { c.Style = IdFromString(s) }},
 		// arch

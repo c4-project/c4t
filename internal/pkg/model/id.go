@@ -15,6 +15,9 @@ var (
 
 	// ErrTagHasSep occurs when a tag passed to NewId contains the separator rune.
 	ErrTagHasSep = errors.New("tag contains separator")
+
+	// EmptyId is the empty ACT ID.
+	EmptyId = Id{}
 )
 
 // Id represents an ACT ID.
@@ -30,12 +33,18 @@ func (i Id) String() string {
 // NewId tries to construct an ACT ID from tags.
 // It fails if any of the tags contain a separator.
 // It also fails if no tags are passed.
-func IdFromTag(tags ...string) (Id, error) {
+func NewId(tags ...string) (Id, error) {
 	// We could use the signature (tag string, tags ...string) to enforce the 'at least one segment' rule,
 	// but this'd make it harder to splat in a []string.
 	if err := validateTags(tags); err != nil {
 		return Id{nil}, fmt.Errorf("tag validation failed for %v: %w", tags, err)
 	}
+
+	// Normalise the empty tag.
+	if len(tags) == 1 && tags[0] == "" {
+		return EmptyId, nil
+	}
+
 	return Id{tags}, nil
 }
 

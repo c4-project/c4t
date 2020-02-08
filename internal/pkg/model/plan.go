@@ -16,6 +16,9 @@ type Plan struct {
 
 	// Machines contains the per-machine plans for this overall test plan.
 	Machines []MachinePlan `json:"machines"`
+
+	// Corpus contains the filenames of each test corpus entry chosen for this plan.
+	Corpus []string `json:"corpus"`
 }
 
 // Init initialises the creation-sensitive parts of plan p.
