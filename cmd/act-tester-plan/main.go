@@ -7,11 +7,11 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 
-	"github.com/MattWindsor91/act-tester/internal/app/act-tester-plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 )
 
 // The configuration parsed from the command-line arguments.
-var cfg = act_tester_plan.Planner{
+var cfg = planner.Planner{
 	Source: &interop.ActRunner{},
 }
 

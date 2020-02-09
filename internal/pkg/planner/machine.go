@@ -1,4 +1,4 @@
-package act_tester_plan
+package planner
 
 import (
 	"errors"

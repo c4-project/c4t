@@ -1,5 +1,5 @@
-// Package act_tester_plan contains the app-specific logic for the test planner.
-package act_tester_plan
+// Package planner contains the logic for the test planner.
+package planner
 
 import (
 	"encoding/json"

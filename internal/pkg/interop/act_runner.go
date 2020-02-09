@@ -30,7 +30,7 @@ func (s StandardArgs) ToArgv() []string {
 }
 
 // Run runs an ACT command in a blocking manner.
-func (a *ActRunner) Run(cmd string, stdin io.Reader, stdout, stderr io.Writer, sargs StandardArgs, argv ...string) error {
+func (a ActRunner) Run(cmd string, stdin io.Reader, stdout, stderr io.Writer, sargs StandardArgs, argv ...string) error {
 	fullArgv := append(sargs.ToArgv(), argv...)
 
 	c := a.Command(cmd, fullArgv...)
@@ -41,7 +41,7 @@ func (a *ActRunner) Run(cmd string, stdin io.Reader, stdout, stderr io.Writer, s
 	return c.Run()
 }
 
-func (a *ActRunner) Command(cmd string, argv ...string) *exec.Cmd {
+func (a ActRunner) Command(cmd string, argv ...string) *exec.Cmd {
 	if a.DuneExec {
 		duneArgv := append([]string{"exec", cmd, "--"}, argv...)
 		return exec.Command("dune", duneArgv...)

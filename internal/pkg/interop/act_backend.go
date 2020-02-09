@@ -22,7 +22,7 @@ const BinActBackend = "act-backend"
 // ErrNoBackend occurs when no backend is reported by ACT.
 var ErrNoBackend = errors.New("no backend reported")
 
-func (a *ActRunner) FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error) {
+func (a ActRunner) FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error) {
 	id, err := a.runActBackend(style, machines)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (a *ActRunner) FindBackend(style model.Id, machines ...model.Id) (*model.Ba
 	}, nil
 }
 
-func (a *ActRunner) runActBackend(style model.Id, machines []model.Id) (model.Id, error) {
+func (a ActRunner) runActBackend(style model.Id, machines []model.Id) (model.Id, error) {
 	argv := findBackendArgv(style, machines)
 	sargs := StandardArgs{Verbose: false}
 

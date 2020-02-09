@@ -16,7 +16,7 @@ type CompilerLister interface {
 // BinActCompiler is the name of the ACT compiler services binary.
 const BinActCompiler = "act-compiler"
 
-func (a *ActRunner) ListCompilers(f model.CompilerFilter) ([]*model.Compiler, error) {
+func (a ActRunner) ListCompilers(f model.CompilerFilter) ([]*model.Compiler, error) {
 	argv := append([]string{"list"}, f.ToArgv()...)
 	sargs := StandardArgs{Verbose: false}
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// ExampleParseCompilerList is a testable example for ParseCompilerlist.
 func ExampleParseCompilerList() {
 	list := []string{
 		"localhost clang.normal gcc x86.64 enabled",
