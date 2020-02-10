@@ -8,6 +8,17 @@ in the [ACT](https://github.com/MattWindsor91/act) project.  The idea is that th
 - takes control of more parts of the test process, such as fuzzing and optimiser levels;
 - handles test failures more gracefully.
 
+## Components
+
+We envision that `act-tester` will have the following components:
+
+- [ ] `act-tester-plan`, which creates an initial test plan over some Litmus tests and compilers;
+- [ ] `act-tester-fuzz`, which runs `act-fuzz` over a test plan to create a more useful plan;
+- [ ] `act-tester-litmus`, which runs `litmus` over a test plan to generate compilable harnesses;
+- [ ] `act-tester-cp`, which copies a test plan to one of its remote machines;
+- [ ] `act-tester-run`, which runs compilers over Litmus harnesses to produce results;
+- [ ] `act-tester-direct`, which combines the above into a looping test campaign.
+
 ## Licence
 
 As with the rest of ACT, `act-tester` uses the MIT licence.  (See `LICENSE` for details.)
