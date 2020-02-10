@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/BurntSushi/toml"
 )
 
 const idSep = '.'
@@ -66,18 +64,13 @@ func IdFromString(s string) Id {
 	return Id{strings.Split(s, ".")}
 }
 
-// MarshalText implements TOML marshalling for IDs by stringifying them.
+// MarshalText implements text marshalling for IDs by stringifying them.
 func (i Id) MarshalText() ([]byte, error) {
 	return []byte(i.String()), nil
 }
 
+// UnmarshalText implements text unmarshalling for IDs by unstringifying them.
 func (i *Id) UnmarshalText(b []byte) error {
-	var s *string
-	if err := toml.Unmarshal(b, &s); err != nil {
-		return err
-	}
-	if s != nil {
-		*i = IdFromString(*s)
-	}
+	*i = IdFromString(string(b))
 	return nil
 }

@@ -1,10 +1,12 @@
 package model
 
 import (
-	"encoding/json"
+	"bytes"
+	"fmt"
 	"reflect"
-	"strconv"
 	"testing"
+
+	"github.com/BurntSushi/toml"
 )
 
 var cases = []string{
@@ -14,30 +16,45 @@ var cases = []string{
 	`weird-hyphens.allowed`,
 }
 
-func TestId_MarshalJSON(t *testing.T) {
+func TestId_MarshalText(t *testing.T) {
 	for _, c := range cases {
-		id := IdFromString(c)
-		want := strconv.Quote(c)
-		if j, err := json.Marshal(id); err != nil {
+		id := wrappedId{IdFromString(c)}
+		want := fmt.Sprintf("Id = %q\n", id.Id)
+		if j, err := encodeToString(t, id); err != nil {
 			t.Errorf("error marshalling %q: %v", id, err)
 		} else if string(j) != want {
-			t.Errorf("json of %q=%q, want %q", id, string(j), want)
+			t.Errorf("TOML of %q=%q, want %q", id.Id, string(j), want)
 		}
 	}
 }
 
-func TestId_MarshalJSON_RoundTrip(t *testing.T) {
+func TestId_MarshalText_RoundTrip(t *testing.T) {
 	for _, c := range cases {
 		id := IdFromString(c)
 
-		var got *Id
+		var got wrappedId
 
-		if j, err := json.Marshal(id); err != nil {
+		if str, err := encodeToString(t, wrappedId{id}); err != nil {
 			t.Errorf("error marshalling %q: %v", id, err)
-		} else if err = json.Unmarshal(j, &got); err != nil {
+		} else if _, err = toml.Decode(str, &got); err != nil {
 			t.Errorf("error unmarshalling %q: %v", id, err)
-		} else if !reflect.DeepEqual(id, *got) {
-			t.Errorf("marshal roundtrip %q came back as %q", id, got)
+		} else if !reflect.DeepEqual(id, got.Id) {
+			t.Errorf("marshal roundtrip %q came back as %q", id, got.Id)
 		}
 	}
+}
+
+type wrappedId struct {
+	Id Id
+}
+
+func encodeToString(t *testing.T, in wrappedId) (string, error) {
+	t.Helper()
+
+	var buf bytes.Buffer
+	enc := toml.NewEncoder(&buf)
+	if err := enc.Encode(in); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
