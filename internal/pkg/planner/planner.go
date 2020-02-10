@@ -11,11 +11,18 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
+// BackendFinder is the interface of things that can find backends for machines.
+type BackendFinder interface {
+	// FindBackend asks for a backend with the given style on any one of machines,
+	// or a default machine if none have such a backend.
+	FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error)
+}
+
 // Planner holds all configuration for the test planner.
 type Planner struct {
 	// Source is the planner's information source.
 	Source interface {
-		interop.BackendFinder
+		BackendFinder
 		interop.CompilerLister
 	}
 
@@ -36,7 +43,7 @@ type Planner struct {
 func (p *Planner) Plan() error {
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(p.Corpus) == 0 {
-		return ErrNoCorpus
+		return model.ErrNoCorpus
 	}
 
 	var plan model.Plan

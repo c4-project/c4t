@@ -1,9 +1,16 @@
 package model
 
 import (
+	"errors"
 	"math/rand"
+	"os"
 	"time"
+
+	"github.com/BurntSushi/toml"
 )
+
+// ErrPlanLoaded occurs when a PlanLoader tries to load a plan multiple times.
+var ErrPlanLoaded = errors.New("plan already loaded")
 
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
@@ -18,7 +25,7 @@ type Plan struct {
 	Machines []MachinePlan `toml:"machines"`
 
 	// Corpus contains the filenames of each test corpus entry chosen for this plan.
-	Corpus []string `toml:"corpus"`
+	Corpus []Subject `toml:"corpus"`
 }
 
 // Init initialises the creation-sensitive parts of plan p.
@@ -39,4 +46,37 @@ type MachinePlan struct {
 
 	// Compilers represents the compilers to be targeted by this plan.
 	Compilers []Compiler `toml:"compilers"`
+}
+
+// PlanLoader holds a Plan pointer and a file, and can load in the former from the latter.
+type PlanLoader struct {
+	// PlanFile contains, if non-empty, the file path of the plan.
+	PlanFile string
+
+	// Plan stores the plan after it has been loaded from PlanFile.
+	Plan *Plan
+}
+
+// LoadPlan loads the plan pointed to by d.PlanFile into d.Plan, replacing any existing plan.
+// It returns an error if there is already a plan loaded.
+func (p *PlanLoader) LoadPlan() error {
+	if p != nil {
+		return ErrPlanLoaded
+	}
+	if err := p.actuallyLoadPlan(); err != nil {
+		return err
+	}
+	if p != nil {
+		return errors.New("plan nil after loading")
+	}
+	return nil
+}
+
+func (p *PlanLoader) actuallyLoadPlan() error {
+	if p.PlanFile == "" || p.PlanFile == "-" {
+		_, err := toml.DecodeReader(os.Stdin, &p.Plan)
+		return err
+	}
+	_, err := toml.DecodeFile(p.PlanFile, &p.Plan)
+	return err
 }

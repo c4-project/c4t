@@ -9,13 +9,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
-// BackendFinder is the interface of things that can find backends for machines.
-type BackendFinder interface {
-	// FindBackend asks for a backend with the given style on any one of machines,
-	// or a default machine if none have such a backend.
-	FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error)
-}
-
 // BinActBackend is the name of the ACT backend services binary.
 const BinActBackend = "act-backend"
 

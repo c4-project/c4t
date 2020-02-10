@@ -1,4 +1,4 @@
-package planner
+package model
 
 import (
 	"errors"
@@ -8,50 +8,50 @@ import (
 
 // smallCorpi contains test cases for the overly-small-corpus error handling of SampleCorpus.
 var smallCorpi = []struct {
-	corpus []string
+	corpus Corpus
 	want   int
 }{
 	// Empty corpus
-	{[]string{}, 10},
-	{[]string{}, 0},
+	{Corpus{}, 10},
+	{Corpus{}, 0},
 	// Small corpus
-	{[]string{"foo"}, 2},
-	{[]string{"foo", "bar", "baz"}, 10},
+	{NewCorpus("foo"), 2},
+	{NewCorpus("foo", "bar", "baz"), 10},
 }
 
 // exactCorpi contains test cases for the pass-through behaviour of SampleCorpus.
 var exactCorpi = []struct {
-	corpus []string
+	corpus Corpus
 	want   int
 }{
 	// No sampling requested
-	{[]string{"foo"}, 0},
-	{[]string{"foo", "bar"}, 0},
-	{[]string{"foo", "bar", "baz"}, 0},
-	{[]string{"you're", "going", "to", "have", "a", "bad", "time"}, 0},
+	{NewCorpus("foo"), 0},
+	{NewCorpus("foo", "bar"), 0},
+	{NewCorpus("foo", "bar", "baz"), 0},
+	{NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 0},
 	// Sample size matches input size
-	{[]string{"foo"}, 1},
-	{[]string{"foo", "bar"}, 2},
-	{[]string{"foo", "bar", "baz"}, 3},
-	{[]string{"you're", "going", "to", "have", "a", "bad", "time"}, 7},
+	{NewCorpus("foo"), 1},
+	{NewCorpus("foo", "bar"), 2},
+	{NewCorpus("foo", "bar", "baz"), 3},
+	{NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 7},
 }
 
 // sampleCorpi contains test cases for the 'actually sample' behaviour of SampleCorpus.
 var sampleCorpi = []struct {
-	corpus []string
+	corpus Corpus
 	want   int
 }{
-	{[]string{"foo", "bar"}, 1},
-	{[]string{"foo", "bar", "baz"}, 1},
-	{[]string{"foo", "bar", "baz"}, 2},
-	{[]string{"you're", "going", "to", "have", "a", "bad", "time"}, 3},
-	{[]string{"you're", "going", "to", "have", "a", "bad", "time"}, 5},
+	{NewCorpus("foo", "bar"), 1},
+	{NewCorpus("foo", "bar", "baz"), 1},
+	{NewCorpus("foo", "bar", "baz"), 2},
+	{NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 3},
+	{NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 5},
 }
 
 // TestSampleCorpus_SmallErrors tests that various 'overly small corpus' situations produce an error.
 func TestSampleCorpus_SmallErrors(t *testing.T) {
 	for _, c := range smallCorpi {
-		_, err := SampleCorpus(1, c.corpus, c.want)
+		_, err := c.corpus.Sample(1, c.want)
 		if err == nil {
 			t.Errorf("no error when sampling small corpus (%v, want %d)", c.corpus, c.want)
 		} else if !errors.Is(err, ErrSmallCorpus) {
@@ -63,7 +63,7 @@ func TestSampleCorpus_SmallErrors(t *testing.T) {
 // TestSampleCorpus_PassThrough tests that various cases that shouldn't cause sampling don't.
 func TestSampleCorpus_PassThrough(t *testing.T) {
 	for _, c := range exactCorpi {
-		smp, err := SampleCorpus(1, c.corpus, c.want)
+		smp, err := c.corpus.Sample(1, c.want)
 		if err != nil {
 			t.Errorf("error when sampling exact corpus (%v, want %d): %v", c.corpus, c.want, err)
 		} else if !reflect.DeepEqual(smp, c.corpus) {
@@ -75,7 +75,7 @@ func TestSampleCorpus_PassThrough(t *testing.T) {
 // TestSampleCorpus_ActuallySample tests that sampling behaves correctly.
 func TestSampleCorpus_ActuallySample(t *testing.T) {
 	for i, c := range sampleCorpi {
-		smp, err := SampleCorpus(int64(i), c.corpus, c.want)
+		smp, err := c.corpus.Sample(int64(i), c.want)
 		if err != nil {
 			t.Errorf("error when sampling corpus (%v, want %d): %v", c.corpus, c.want, err)
 		} else {
@@ -87,7 +87,7 @@ func TestSampleCorpus_ActuallySample(t *testing.T) {
 		SampleLoop:
 			for _, s := range smp {
 				for ; j < len(c.corpus); j++ {
-					if c.corpus[j] == s {
+					if c.corpus[j].Litmus == s.Litmus {
 						continue SampleLoop
 					}
 				}
