@@ -36,6 +36,14 @@ func (p *Plan) Init() {
 	p.Seed = rand.Int63()
 }
 
+// Dump dumps plan p to stdout.
+func (p *Plan) Dump() error {
+	// TODO(@MattWindsor91): output to other files
+	enc := toml.NewEncoder(os.Stdout)
+	enc.Indent = "  "
+	return enc.Encode(p)
+}
+
 // MachinePlan represents a test plan for a single machine.
 type MachinePlan struct {
 	// A MachinePlan subsumes a machine entry.

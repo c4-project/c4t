@@ -15,10 +15,10 @@ var cfg = planner.Planner{
 }
 
 const (
-	corpusSizeUsage = "The `number` of corpus files to select for this test plan.\n" +
-		"If non-positive, the planner will use all viable provided corpus files."
-	compPredUsage = "The predicate `sexp` used to filter compilers for this test plan."
-	machPredUsage = "The predicate `sexp` used to filter machines for this test plan."
+	corpusSizeUsage = "`number` of corpus files to select for this test plan;\n" +
+		"if non-positive, the planner will use all viable provided corpus files"
+	compPredUsage = "predicate `sexp` used to filter compilers for this test plan"
+	machPredUsage = "predicate `sexp` used to filter machines for this test plan"
 )
 
 func init() {

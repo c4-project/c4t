@@ -2,12 +2,11 @@
 package planner
 
 import (
-	"github.com/sirupsen/logrus"
 	"math/rand"
-	"os"
 	"time"
 
-	"github.com/BurntSushi/toml"
+	"github.com/sirupsen/logrus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -67,13 +66,5 @@ func (p *Planner) Plan() error {
 		return err
 	}
 
-	return dumpPlan(&plan)
-}
-
-// dumpPlan dumps plan p to stdout.
-func dumpPlan(p *model.Plan) error {
-	// TODO(@MattWindsor91): output to other files
-	enc := toml.NewEncoder(os.Stdout)
-	enc.Indent = "  "
-	return enc.Encode(p)
+	return plan.Dump()
 }

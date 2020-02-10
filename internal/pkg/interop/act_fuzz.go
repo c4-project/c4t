@@ -9,8 +9,9 @@ import (
 const BinActFuzz = "act-fuzz"
 
 // FuzzSingle wraps the ACT one-file fuzzer, supplying the given seed.
-func (a ActRunner) FuzzSingle(seed int, inPath, outPath string) error {
+func (a ActRunner) FuzzSingle(seed int32, inPath, outPath, tracePath string) error {
 	sargs := StandardArgs{Verbose: false}
-	seedStr := strconv.Itoa(seed)
-	return a.Run(BinActCompiler, nil, nil, os.Stderr, sargs, "-seed", seedStr, "-o", outPath, inPath)
+	seedStr := strconv.Itoa(int(seed))
+	return a.Run(BinActFuzz, nil, nil, os.Stderr, sargs, "run", "-seed", seedStr, "-o", outPath,
+		"-trace-output", tracePath, inPath)
 }
