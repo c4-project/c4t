@@ -2,10 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 )
@@ -34,7 +33,6 @@ func main() {
 	flag.Parse()
 	cfg.Corpus = flag.Args()
 
-	if err := cfg.Plan(); err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, "error:", err)
-	}
+	err := cfg.Plan()
+	ux.LogTopError(err)
 }

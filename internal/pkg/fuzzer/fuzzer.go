@@ -1,3 +1,5 @@
+// Package director contains a test-plan fuzzer.
+// It relies on the existence of a single-file fuzzer such as act-fuzz.
 package fuzzer
 
 import (

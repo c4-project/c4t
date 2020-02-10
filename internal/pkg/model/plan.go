@@ -60,7 +60,7 @@ type PlanLoader struct {
 // LoadPlan loads the plan pointed to by d.PlanFile into d.Plan, replacing any existing plan.
 // It returns an error if there is already a plan loaded.
 func (p *PlanLoader) LoadPlan() error {
-	if p != nil {
+	if p.Plan != nil {
 		return ErrPlanLoaded
 	}
 	if err := p.actuallyLoadPlan(); err != nil {

@@ -7,5 +7,5 @@ type Machine struct {
 
 	// Cores is the number of known cores on the machine.
 	// If zero, there is no known core count.
-	Cores int `toml:"cores,omitempty"`
+	Cores int `toml:"cores,omitzero"`
 }

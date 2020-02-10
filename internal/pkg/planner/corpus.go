@@ -4,12 +4,30 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
+// SubjectProber is the interface of types that allow filling in of subject information.
 type SubjectProber interface {
+	// ProbeSubject populates subject with information gleaned from investigating its litmus file.
+	ProbeSubject(subject *model.Subject) error
 }
 
 func (p *Planner) planCorpus(seed int64) (model.Corpus, error) {
-	// TODO(@MattWindsor91): perform corpus pruning
-	prunedCorpus := model.NewCorpus(p.Corpus...)
+	probed, err := p.ProbeCorpus()
+	if err != nil {
+		return model.Corpus{}, err
+	}
 
-	return prunedCorpus.Sample(seed, p.CorpusSize)
+	// TODO(@MattWindsor91): perform corpus pruning
+	return probed.Sample(seed, p.CorpusSize)
+}
+
+func (p *Planner) ProbeCorpus() (model.Corpus, error) {
+	corpus := model.NewCorpus(p.Corpus...)
+
+	for i := range corpus {
+		if err := p.Source.ProbeSubject(&corpus[i]); err != nil {
+			return corpus, err
+		}
+	}
+
+	return corpus, nil
 }

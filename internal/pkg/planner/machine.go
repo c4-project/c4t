@@ -6,7 +6,14 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
+// ErrNoMachineId arises when a compiler arrives at the machine querying logic with no attached machine ID.
 var ErrNoMachineId = errors.New("queried compiler has no machine id")
+
+// CompilerLister is the interface of things that can query compiler information.
+type CompilerLister interface {
+	// ListCompilers asks the compiler inspector to list all available compilers given the filter f.
+	ListCompilers(f model.CompilerFilter) ([]*model.Compiler, error)
+}
 
 func (p *Planner) planMachines() ([]model.MachinePlan, error) {
 	cmap, err := p.queryCompilers()

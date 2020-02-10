@@ -1,5 +1,5 @@
 // Package lifter contains the part of the tester framework that lifts litmus tests to compilable C.
-// It does so by means of a backend.
+// It does so by means of a backend HarnessMaker.
 package lifter
 
 import (

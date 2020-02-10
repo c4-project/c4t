@@ -14,7 +14,7 @@ type Subject struct {
 	Name string `toml:"name"`
 
 	// Litmus is the path to this subject's current Litmus file.
-	Litmus string `toml:"name,omitempty"`
+	Litmus string `toml:"litmus,omitempty"`
 
 	// OrigLitmus is the path to this subject's original Litmus file.
 	// If empty, then Litmus is the original file.

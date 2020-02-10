@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -18,13 +17,18 @@ type BackendFinder interface {
 	FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error)
 }
 
+// Source is the composite interface of types that can provide the requisite information a Planner needs about
+// backends, compilers, and subjects.
+type Source interface {
+	BackendFinder
+	CompilerLister
+	SubjectProber
+}
+
 // Planner holds all configuration for the test planner.
 type Planner struct {
 	// Source is the planner's information source.
-	Source interface {
-		BackendFinder
-		interop.CompilerLister
-	}
+	Source Source
 
 	// Filter is the compiler filter to use to select compilers to test.
 	Filter model.CompilerFilter
