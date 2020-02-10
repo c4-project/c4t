@@ -66,7 +66,7 @@ func (p *PlanLoader) LoadPlan() error {
 	if err := p.actuallyLoadPlan(); err != nil {
 		return err
 	}
-	if p != nil {
+	if p == nil {
 		return errors.New("plan nil after loading")
 	}
 	return nil

@@ -8,8 +8,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )
 
-const usagePlanFile = "Read from this plan `file` instead of stdin."
-
 // direct is the Director being built and run by this command.
 var direct director.Director
 

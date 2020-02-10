@@ -20,10 +20,10 @@ func TestId_MarshalText(t *testing.T) {
 	for _, c := range cases {
 		id := wrappedId{IdFromString(c)}
 		want := fmt.Sprintf("Id = %q\n", id.Id)
-		if j, err := encodeToString(t, id); err != nil {
+		if s, err := encodeToString(t, id); err != nil {
 			t.Errorf("error marshalling %q: %v", id, err)
-		} else if string(j) != want {
-			t.Errorf("TOML of %q=%q, want %q", id.Id, string(j), want)
+		} else if s != want {
+			t.Errorf("TOML of %q=%q, want %q", id.Id, s, want)
 		}
 	}
 }

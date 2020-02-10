@@ -2,6 +2,7 @@
 package planner
 
 import (
+	"github.com/sirupsen/logrus"
 	"math/rand"
 	"os"
 	"time"
@@ -55,11 +56,13 @@ func (p *Planner) Plan() error {
 	rand.Seed(time.Now().UnixNano())
 	plan.Init()
 
+	logrus.Infoln("Planning machines...")
 	var err error
 	if plan.Machines, err = p.planMachines(); err != nil {
 		return err
 	}
 
+	logrus.Infoln("Planning corpus...")
 	if plan.Corpus, err = p.planCorpus(plan.Seed); err != nil {
 		return err
 	}
