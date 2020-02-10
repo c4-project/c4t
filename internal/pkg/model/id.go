@@ -1,10 +1,11 @@
 package model
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/BurntSushi/toml"
 )
 
 const idSep = '.'
@@ -65,14 +66,14 @@ func IdFromString(s string) Id {
 	return Id{strings.Split(s, ".")}
 }
 
-// MarshalJSON implements JSON marshalling for IDs by stringifying them.
-func (i Id) MarshalJSON() ([]byte, error) {
-	return json.Marshal(i.String())
+// MarshalText implements TOML marshalling for IDs by stringifying them.
+func (i Id) MarshalText() ([]byte, error) {
+	return []byte(i.String()), nil
 }
 
-func (i *Id) UnmarshalJSON(b []byte) error {
+func (i *Id) UnmarshalText(b []byte) error {
 	var s *string
-	if err := json.Unmarshal(b, &s); err != nil {
+	if err := toml.Unmarshal(b, &s); err != nil {
 		return err
 	}
 	if s != nil {

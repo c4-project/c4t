@@ -9,16 +9,16 @@ import (
 // A plan covers an entire campaign of testing.
 type Plan struct {
 	// Creation marks the time at which the plan was created.
-	Creation time.Time `json:"created"`
+	Creation time.Time `toml:"created"`
 
 	// Seed is a pseudo-randomly generated integer that should be used to drive randomiser input.
-	Seed int64 `json:"seed"`
+	Seed int64 `toml:"seed"`
 
 	// Machines contains the per-machine plans for this overall test plan.
-	Machines []MachinePlan `json:"machines"`
+	Machines []MachinePlan `toml:"machines"`
 
 	// Corpus contains the filenames of each test corpus entry chosen for this plan.
-	Corpus []string `json:"corpus"`
+	Corpus []string `toml:"corpus"`
 }
 
 // Init initialises the creation-sensitive parts of plan p.
@@ -35,8 +35,8 @@ type MachinePlan struct {
 	Machine
 
 	// Backend represents the backend targeted by this plan.
-	Backend Backend `json:"backend"`
+	Backend Backend `toml:"backend"`
 
 	// Compilers represents the compilers to be targeted by this plan.
-	Compilers []Compiler `json:"compilers"`
+	Compilers []Compiler `toml:"compilers"`
 }

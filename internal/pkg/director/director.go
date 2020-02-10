@@ -3,10 +3,10 @@ package director
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
@@ -25,18 +25,12 @@ type Director struct {
 
 // LoadPlan loads the plan pointed to by d.PlanFile into d.Plan, replacing any existing plan.
 func (d *Director) LoadPlan() error {
-	r, err := openFileOpt(d.PlanFile)
-	if err != nil {
+	if d.PlanFile == "" || d.PlanFile == "-" {
+		_, err := toml.DecodeReader(os.Stdin, &d.Plan)
 		return err
 	}
-
-	dec := json.NewDecoder(r)
-	if err = dec.Decode(&d.Plan); err != nil {
-		_ = r.Close()
-		return err
-	}
-
-	return r.Close()
+	_, err := toml.DecodeFile(d.PlanFile, &d.Plan)
+	return err
 }
 
 // openFileOpt opens the file at path, or stdin if path is empty or the special path '-'.
