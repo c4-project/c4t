@@ -1,6 +1,10 @@
 package model
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"testing"
+)
 
 // ExampleSubject_HarnessPath is a testable example for HarnessPath.
 func ExampleSubject_HarnessPath() {
@@ -31,4 +35,17 @@ func ExampleSubject_HarnessPath() {
 	// baz
 	// foobar
 	// barbaz
+}
+
+// TestSubject_HarnessPath_Missing checks that trying to get a harness path for a missing machine/emits pair triggers
+// the appropriate error.
+func TestSubject_HarnessPath_Missing(t *testing.T) {
+	var s Subject
+	_, err := s.HarnessPath(IdFromString("localhost"), IdFromString("x86.64"))
+	if err == nil {
+		t.Fatal("missing harness path gave no error")
+	}
+	if !errors.Is(err, ErrMissingHarness) {
+		t.Fatalf("missing harness path gave wrong error: %v", err)
+	}
 }

@@ -15,8 +15,9 @@ const BinActBackend = "act-backend"
 // ErrNoBackend occurs when no backend is reported by ACT.
 var ErrNoBackend = errors.New("no backend reported")
 
+// FindBackend finds a backend using ACT.
 func (a ActRunner) FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error) {
-	id, err := a.runActBackend(style, machines)
+	id, err := a.runFindBackend(style, machines)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +31,8 @@ func (a ActRunner) FindBackend(style model.Id, machines ...model.Id) (*model.Bac
 	}, nil
 }
 
-func (a ActRunner) runActBackend(style model.Id, machines []model.Id) (model.Id, error) {
+// runFindBackend does most of the legwork of running an ACT find-backend query.
+func (a ActRunner) runFindBackend(style model.Id, machines []model.Id) (model.Id, error) {
 	argv := findBackendArgv(style, machines)
 	sargs := StandardArgs{Verbose: false}
 
@@ -42,6 +44,7 @@ func (a ActRunner) runActBackend(style model.Id, machines []model.Id) (model.Id,
 	return model.IdFromString(strings.TrimSpace(obuf.String())), nil
 }
 
+// findBackendArgv constructs the argv for a backend find on style and machines.
 func findBackendArgv(style model.Id, machines []model.Id) []string {
 	argv := make([]string, len(machines)+2)
 	argv[0] = "find"
@@ -50,4 +53,10 @@ func findBackendArgv(style model.Id, machines []model.Id) []string {
 		argv[i+2] = m.String()
 	}
 	return argv
+}
+
+// FindBackend makes a harness using ACT.
+func (a ActRunner) MakeHarness(_ model.HarnessSpec) (outFiles []string, err error) {
+	// TODO(@MattWindsor91)
+	return nil, errors.New("unimplemented")
 }

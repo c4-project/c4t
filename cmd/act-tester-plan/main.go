@@ -9,30 +9,23 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 )
 
-// The configuration parsed from the command-line arguments.
-var cfg = planner.Planner{
-	Source: &interop.ActRunner{},
-}
-
 const (
-	corpusSizeUsage = "`number` of corpus files to select for this test plan;\n" +
+	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
 		"if non-positive, the planner will use all viable provided corpus files"
-	compPredUsage = "predicate `sexp` used to filter compilers for this test plan"
-	machPredUsage = "predicate `sexp` used to filter machines for this test plan"
+	usageCompPred = "predicate `sexp` used to filter compilers for this test plan"
+	usageMachPred = "predicate `sexp` used to filter machines for this test plan"
 )
 
-func init() {
-	flag.StringVar(&cfg.Filter.CompPred, "c", "", compPredUsage)
-
-	flag.StringVar(&cfg.Filter.MachPred, "m", "", machPredUsage)
-
-	flag.IntVar(&cfg.CorpusSize, "n", 0, corpusSizeUsage)
-}
-
 func main() {
-	flag.Parse()
-	cfg.Corpus = flag.Args()
+	var act interop.ActRunner
+	plan := planner.Planner{Source: &act}
 
-	err := cfg.Plan()
+	flag.StringVar(&plan.Filter.CompPred, "c", "", usageCompPred)
+	flag.StringVar(&plan.Filter.MachPred, "m", "", usageMachPred)
+	ux.CorpusSizeFlag(&plan.CorpusSize)
+	flag.Parse()
+	plan.Corpus = flag.Args()
+
+	err := plan.Plan()
 	ux.LogTopError(err)
 }
