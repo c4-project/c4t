@@ -16,14 +16,14 @@ type MachinePlan struct {
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.
 // These architectures are in order of their string equivalents.
-func (m MachinePlan) Arches() []Id {
-	amap := make(map[string]Id)
+func (m MachinePlan) Arches() []ID {
+	amap := make(map[string]ID)
 
 	for _, c := range m.Compilers {
 		amap[c.Arch.String()] = c.Arch
 	}
 
-	arches := make([]Id, len(amap))
+	arches := make([]ID, len(amap))
 	i := 0
 	for _, id := range amap {
 		arches[i] = id

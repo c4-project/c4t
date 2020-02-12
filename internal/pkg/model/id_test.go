@@ -9,7 +9,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-var cases = []struct{
+var cases = []struct {
 	name string
 	id   string
 }{
@@ -19,46 +19,46 @@ var cases = []struct{
 	{"hyphenated", `weird-hyphens.allowed`},
 }
 
-// TestId_MarshalText tests whether text marshalling for IDs works by means of TOML encoding.
-func TestId_MarshalText(t *testing.T) {
+// TestID_MarshalText tests whether text marshalling for IDs works by means of TOML encoding.
+func TestID_MarshalText(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			id := wrappedId{IdFromString(c.id)}
-			want := fmt.Sprintf("Id = %q\n", id.Id)
+			id := wrappedID{IDFromString(c.id)}
+			want := fmt.Sprintf("ID = %q\n", id.ID)
 			if s, err := encodeToString(t, id); err != nil {
 				t.Errorf("error marshalling %q: %v", id, err)
 			} else if s != want {
-				t.Errorf("TOML of %q=%q, want %q", id.Id, s, want)
+				t.Errorf("TOML of %q=%q, want %q", id.ID, s, want)
 			}
 		})
 	}
 }
 
-// TestId_MarshalText tests whether text marshalling for IDs works by means of round-trip TOML encoding and decoding.
-func TestId_MarshalText_RoundTrip(t *testing.T) {
+// TestID_MarshalText tests whether text marshalling for IDs works by means of round-trip TOML encoding and decoding.
+func TestID_MarshalText_RoundTrip(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			id := IdFromString(c.id)
+			id := IDFromString(c.id)
 
-			var got wrappedId
+			var got wrappedID
 
-			if str, err := encodeToString(t, wrappedId{id}); err != nil {
+			if str, err := encodeToString(t, wrappedID{id}); err != nil {
 				t.Errorf("error marshalling %q: %v", id, err)
 			} else if _, err = toml.Decode(str, &got); err != nil {
 				t.Errorf("error unmarshalling %q: %v", id, err)
-			} else if !reflect.DeepEqual(id, got.Id) {
-				t.Errorf("marshal roundtrip %q came back as %q", id, got.Id)
+			} else if !reflect.DeepEqual(id, got.ID) {
+				t.Errorf("marshal roundtrip %q came back as %q", id, got.ID)
 			}
 		})
 	}
 }
 
-// wrappedID serves to lift Id into a TOMLable struct type.
-type wrappedId struct {
-	Id Id
+// wrappedID serves to lift ID into a TOMLable struct type.
+type wrappedID struct {
+	ID ID
 }
 
-func encodeToString(t *testing.T, in wrappedId) (string, error) {
+func encodeToString(t *testing.T, in wrappedID) (string, error) {
 	t.Helper()
 
 	var buf bytes.Buffer
@@ -69,7 +69,7 @@ func encodeToString(t *testing.T, in wrappedId) (string, error) {
 	return buf.String(), nil
 }
 
-func TestNewId_Valid(t *testing.T) {
+func TestNewID_Valid(t *testing.T) {
 	tests := []struct {
 		name string
 		tags []string
@@ -78,14 +78,14 @@ func TestNewId_Valid(t *testing.T) {
 		{"empty", []string{""}, ""},
 		{"one-tag", []string{"foo"}, "foo"},
 		{"multi-tag", []string{"foo", "bar", "baz"}, "foo.bar.baz"},
-		{"hyphenated", []string{"weird-hyphens", "allowed"}, "weird-hyphens.allowed"},	
+		{"hyphenated", []string{"weird-hyphens", "allowed"}, "weird-hyphens.allowed"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if id, err := NewId(test.tags...); err != nil {
-				t.Errorf("NewId from tags %v error: %v", test.tags, err)
+			if id, err := NewID(test.tags...); err != nil {
+				t.Errorf("NewID from tags %v error: %v", test.tags, err)
 			} else if id.String() != test.want {
-				t.Errorf("NewId from tags %v=%s, want %s", test.tags, id.String(), test.want)
+				t.Errorf("NewID from tags %v=%s, want %s", test.tags, id.String(), test.want)
 			}
 		})
 	}

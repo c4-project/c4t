@@ -58,7 +58,7 @@ func (l *Lifter) Lift(ctx context.Context) error {
 }
 
 func (l *Lifter) liftMachine(ctx context.Context, m model.MachinePlan, resCh chan<- result) error {
-	dir, err := buildAndMkDir(l.OutDir, m.Id.Tags()...)
+	dir, err := buildAndMkDir(l.OutDir, m.ID.Tags()...)
 	if err != nil {
 		return err
 	}

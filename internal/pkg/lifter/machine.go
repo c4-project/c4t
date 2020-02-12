@@ -27,7 +27,7 @@ type machine struct {
 }
 
 func (m *machine) lift(ctx context.Context) error {
-	logrus.WithField("machine", m.Machine.Id).Debugln("lifting machine")
+	logrus.WithField("machine", m.Machine.ID).Debugln("lifting machine")
 
 	for _, a := range m.Machine.Arches() {
 		if err := m.liftArch(ctx, a); err != nil {
@@ -37,7 +37,7 @@ func (m *machine) lift(ctx context.Context) error {
 	return nil
 }
 
-func (m *machine) liftArch(ctx context.Context, arch model.Id) error {
+func (m *machine) liftArch(ctx context.Context, arch model.ID) error {
 	dir, derr := buildAndMkDir(m.Dir, arch.Tags()...)
 	if derr != nil {
 		return derr
@@ -51,14 +51,14 @@ func (m *machine) liftArch(ctx context.Context, arch model.Id) error {
 	return nil
 }
 
-func (m *machine) liftSubject(ctx context.Context, arch model.Id, dir string, s *model.Subject) error {
+func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s *model.Subject) error {
 	dir, derr := buildAndMkDir(dir, s.Name)
 	if derr != nil {
 		return derr
 	}
 
 	spec := model.HarnessSpec{
-		Backend: m.Machine.Backend.Id,
+		Backend: m.Machine.Backend.ID,
 		Arch:    arch,
 		InFile:  s.Litmus,
 		OutDir:  dir,
@@ -73,7 +73,7 @@ func (m *machine) liftSubject(ctx context.Context, arch model.Id, dir string, s 
 	res := result{
 		Arch:    arch,
 		Harness: model.Harness{Dir: dir, Files: files},
-		Machine: m.Machine.Id,
+		Machine: m.Machine.ID,
 		Subject: s,
 	}
 

@@ -7,10 +7,10 @@ import (
 // HarnessSpec is a specification of how to make a test harness.
 type HarnessSpec struct {
 	// Backend is the fully-qualified identifier of the backend to use to make this harness.
-	Backend Id
+	Backend ID
 
 	// Arch is the ID of the architecture for which a harness should be prepared.
-	Arch Id
+	Arch ID
 
 	// InFile is the path to the input litmus test file.
 	InFile string

@@ -10,22 +10,22 @@ func TestMachinePlan_Arches(t *testing.T) {
 	tests := []struct {
 		name string
 		plan MachinePlan
-		want []Id
+		want []ID
 	}{
-		{"no arches", MachinePlan{}, []Id{}},
+		{"no arches", MachinePlan{}, []ID{}},
 		{"one compiler", MachinePlan{Compilers: []Compiler{
-			Compiler{Service: Service{Id: IdFromString("gcc")}, Arch: ArchX8664},
-		}}, []Id{ArchX8664}},
+			Compiler{Service: Service{ID: IDFromString("gcc")}, Arch: ArchX8664},
+		}}, []ID{ArchX8664}},
 		{"same arch", MachinePlan{Compilers: []Compiler{
-			Compiler{Service: Service{Id: IdFromString("gcc")}, Arch: ArchArm},
-			Compiler{Service: Service{Id: IdFromString("clang")}, Arch: ArchArm},
-		}}, []Id{ArchArm}},
+			Compiler{Service: Service{ID: IDFromString("gcc")}, Arch: ArchArm},
+			Compiler{Service: Service{ID: IDFromString("clang")}, Arch: ArchArm},
+		}}, []ID{ArchArm}},
 		{"two arches", MachinePlan{Compilers: []Compiler{
-			Compiler{Service: Service{Id: IdFromString("gcc-ppc")}, Arch: ArchPPC},
-			Compiler{Service: Service{Id: IdFromString("clang-ppc")}, Arch: ArchPPC},
-			Compiler{Service: Service{Id: IdFromString("gcc")}, Arch: ArchArm},
-			Compiler{Service: Service{Id: IdFromString("clang")}, Arch: ArchArm},
-		}}, []Id{ArchArm, ArchPPC}},
+			Compiler{Service: Service{ID: IDFromString("gcc-ppc")}, Arch: ArchPPC},
+			Compiler{Service: Service{ID: IDFromString("clang-ppc")}, Arch: ArchPPC},
+			Compiler{Service: Service{ID: IDFromString("gcc")}, Arch: ArchArm},
+			Compiler{Service: Service{ID: IDFromString("clang")}, Arch: ArchArm},
+		}}, []ID{ArchArm, ArchPPC}},
 	}
 
 	for _, test := range tests {

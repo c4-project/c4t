@@ -23,7 +23,7 @@ func main() {
 	ux.ActRunnerFlags(&act)
 	ux.CorpusSizeFlag(&plan.CorpusSize)
 	flag.Parse()
-	plan.Corpus = flag.Args()
+	plan.InFiles = flag.Args()
 
 	err := plan.Plan()
 	ux.LogTopError(err)

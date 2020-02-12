@@ -32,7 +32,7 @@ type Subject struct {
 }
 
 // Harness gets the harness for the given machine and arch IDs.
-func (s *Subject) Harness(machine, arch Id) (Harness, error) {
+func (s *Subject) Harness(machine, arch ID) (Harness, error) {
 	h, ok := s.Harnesses[harnessKey(machine, arch)]
 	if !ok {
 		return Harness{}, fmt.Errorf("%w: machine=%q, arch=%q", ErrMissingHarness, machine, arch)
@@ -41,7 +41,7 @@ func (s *Subject) Harness(machine, arch Id) (Harness, error) {
 }
 
 // AddHarness sets the harness information for machine and arch to h in this subject.
-func (s *Subject) AddHarness(machine, arch Id, h Harness) {
+func (s *Subject) AddHarness(machine, arch ID, h Harness) {
 	if s.Harnesses == nil {
 		s.Harnesses = make(map[string]Harness)
 	}
@@ -49,6 +49,6 @@ func (s *Subject) AddHarness(machine, arch Id, h Harness) {
 }
 
 // harnessKey gets the harness-path key for a given machine and arch ID.
-func harnessKey(machine, arch Id) string {
+func harnessKey(machine, arch ID) string {
 	return strings.Join([]string{machine.String(), arch.String()}, ":")
 }

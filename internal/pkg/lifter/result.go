@@ -10,10 +10,10 @@ import (
 // result is the type of results from the parallelised lifting process.
 type result struct {
 	// Machine is the machine for which this lifting is occurring.
-	Machine model.Id
+	Machine model.ID
 
 	// Arch is the architecture for which this lifting is occurring.
-	Arch model.Id
+	Arch model.ID
 
 	// Subject is the subject that has been lifted,
 	// passed as a pointer to let the result collector modify it in-place.

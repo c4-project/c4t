@@ -20,7 +20,7 @@ func ExampleParseCompilerList() {
 		fmt.Println("error:", err)
 	} else {
 		for _, c := range compilers {
-			fmt.Println(c.MachineId, c.Id, c.Style)
+			fmt.Println(c.MachineID, c.ID, c.Style)
 		}
 	}
 

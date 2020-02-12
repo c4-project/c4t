@@ -12,7 +12,7 @@ type Compiler struct {
 	Service
 
 	// Arch is the architecture (or 'emits') ID for the compiler.
-	Arch Id
+	Arch ID
 }
 
 // ParseCompilerList parses a compiler list from the reader rd.
@@ -42,10 +42,10 @@ func ParseCompiler(bs []byte) (*Compiler, error) {
 		name     string
 		inserter func(*Compiler, string)
 	}{
-		{"machine Id", func(c *Compiler, s string) { m := IdFromString(s); c.MachineId = &m }},
-		{"compiler Id", func(c *Compiler, s string) { c.Id = IdFromString(s) }},
-		{"style", func(c *Compiler, s string) { c.Style = IdFromString(s) }},
-		{"arch", func(c *Compiler, s string) { c.Arch = IdFromString(s) }},
+		{"machine ID", func(c *Compiler, s string) { m := IDFromString(s); c.MachineID = &m }},
+		{"compiler ID", func(c *Compiler, s string) { c.ID = IDFromString(s) }},
+		{"style", func(c *Compiler, s string) { c.Style = IDFromString(s) }},
+		{"arch", func(c *Compiler, s string) { c.Arch = IDFromString(s) }},
 		// enabled
 	}
 

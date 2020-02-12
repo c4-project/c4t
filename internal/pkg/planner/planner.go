@@ -14,7 +14,7 @@ import (
 type BackendFinder interface {
 	// FindBackend asks for a backend with the given style on any one of machines,
 	// or a default machine if none have such a backend.
-	FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error)
+	FindBackend(style model.ID, machines ...model.ID) (*model.Backend, error)
 }
 
 // Source is the composite interface of types that can provide the requisite information a Planner needs about
@@ -39,14 +39,14 @@ type Planner struct {
 	// that requested.
 	CorpusSize int
 
-	// Corpus is a list of paths to files that form the incoming test corpus.
-	Corpus []string
+	// InFiles is a list of paths to files that form the incoming test corpus.
+	InFiles []string
 }
 
-// Planner runs the test planner p.
+// Plan runs the test planner p.
 func (p *Planner) Plan() error {
 	// Early out to prevent us from doing any planning if we received no files.
-	if len(p.Corpus) == 0 {
+	if len(p.InFiles) == 0 {
 		return model.ErrNoCorpus
 	}
 

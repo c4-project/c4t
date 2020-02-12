@@ -6,42 +6,40 @@ import (
 	"testing"
 )
 
-// ExampleSubject_HarnessPath is a testable example for HarnessPath.
-func ExampleSubject_HarnessPath() {
-	s := Subject{HarnessPaths: map[string][]string{
-		"localhost:x86.64": {"foo", "bar", "baz"},
-		"spikemuth:arm.7":  {"foobar", "barbaz"},
+// ExampleSubject_Harness is a testable example for Harness.
+func ExampleSubject_Harness() {
+	s := Subject{Harnesses: map[string]Harness{
+		"localhost:x86.64": Harness{Dir: "foo", Files: []string{"bar", "baz"}},
+		"spikemuth:arm.7":  Harness{Dir: "foobar", Files: []string{"barbaz"}},
 	}}
-	lps, le := s.HarnessPath(IdFromString("localhost"), IdFromString("x86.64"))
-	sps, se := s.HarnessPath(IdFromString("spikemuth"), IdFromString("arm.7"))
+	lps, le := s.Harness(IDFromString("localhost"), IDFromString("x86.64"))
+	sps, se := s.Harness(IDFromString("spikemuth"), IDFromString("arm.7"))
 
 	if le != nil {
 		fmt.Println(le)
 	}
-	for _, l := range lps {
+	for _, l := range lps.Files {
 		fmt.Println(l)
 	}
 
 	if se != nil {
 		fmt.Println(se)
 	}
-	for _, s := range sps {
+	for _, s := range sps.Files {
 		fmt.Println(s)
 	}
 
 	// Output:
-	// foo
 	// bar
 	// baz
-	// foobar
 	// barbaz
 }
 
-// TestSubject_HarnessPath_Missing checks that trying to get a harness path for a missing machine/emits pair triggers
+// TestSubject_Harness_Missing checks that trying to get a harness path for a missing machine/emits pair triggers
 // the appropriate error.
-func TestSubject_HarnessPath_Missing(t *testing.T) {
+func TestSubject_Harness_Missing(t *testing.T) {
 	var s Subject
-	_, err := s.HarnessPath(IdFromString("localhost"), IdFromString("x86.64"))
+	_, err := s.Harness(IDFromString("localhost"), IDFromString("x86.64"))
 	if err == nil {
 		t.Fatal("missing harness path gave no error")
 	}

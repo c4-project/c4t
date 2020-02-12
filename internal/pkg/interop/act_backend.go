@@ -16,7 +16,7 @@ const BinActBackend = "act-backend"
 var ErrNoBackend = errors.New("no backend reported")
 
 // FindBackend finds a backend using ACT.
-func (a ActRunner) FindBackend(style model.Id, machines ...model.Id) (*model.Backend, error) {
+func (a ActRunner) FindBackend(style model.ID, machines ...model.ID) (*model.Backend, error) {
 	id, err := a.runFindBackend(style, machines)
 	if err != nil {
 		return nil, err
@@ -27,12 +27,12 @@ func (a ActRunner) FindBackend(style model.Id, machines ...model.Id) (*model.Bac
 	}
 
 	return &model.Backend{
-		Service: model.Service{Id: id, IdQualified: true, Style: style},
+		Service: model.Service{ID: id, IDQualified: true, Style: style},
 	}, nil
 }
 
 // runFindBackend does most of the legwork of running an ACT find-backend query.
-func (a ActRunner) runFindBackend(style model.Id, machines []model.Id) (model.Id, error) {
+func (a ActRunner) runFindBackend(style model.ID, machines []model.ID) (model.ID, error) {
 	argv := findBackendArgv(style, machines)
 	sargs := StandardArgs{Verbose: false}
 
@@ -40,14 +40,14 @@ func (a ActRunner) runFindBackend(style model.Id, machines []model.Id) (model.Id
 	cmd := a.Command(BinActBackend, "find", sargs, argv...)
 	cmd.Stdout = &obuf
 	if err := cmd.Run(); err != nil {
-		return model.EmptyId, err
+		return model.EmptyID, err
 	}
 
-	return model.IdFromString(strings.TrimSpace(obuf.String())), nil
+	return model.IDFromString(strings.TrimSpace(obuf.String())), nil
 }
 
 // findBackendArgv constructs the argv for a backend find on style and machines.
-func findBackendArgv(style model.Id, machines []model.Id) []string {
+func findBackendArgv(style model.ID, machines []model.ID) []string {
 	argv := make([]string, len(machines)+1)
 	argv[0] = style.String()
 	for i, m := range machines {

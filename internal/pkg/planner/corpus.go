@@ -20,8 +20,9 @@ func (p *Planner) planCorpus(seed int64) (model.Corpus, error) {
 	return probed.Sample(seed, p.CorpusSize)
 }
 
+// ProbeCorpus probes each subject in this planner's corpus file list, producing a Corpus proper.
 func (p *Planner) ProbeCorpus() (model.Corpus, error) {
-	corpus := model.NewCorpus(p.Corpus...)
+	corpus := model.NewCorpus(p.InFiles...)
 
 	for i := range corpus {
 		if err := p.Source.ProbeSubject(&corpus[i]); err != nil {
