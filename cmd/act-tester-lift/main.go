@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
@@ -23,6 +24,6 @@ func main() {
 	ux.PlanFileFlag(&pf)
 	flag.Parse()
 
-	err := lift.LiftPlanFile(pf)
+	err := lift.LiftPlanFile(context.Background(), pf)
 	ux.LogTopError(err)
 }

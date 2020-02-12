@@ -4,6 +4,7 @@ package lifter
 
 import (
 	"context"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/sirupsen/logrus"
 )
@@ -33,7 +34,7 @@ func (l *Lifter) LiftPlanFile(ctx context.Context, file string) error {
 	if err := l.Plan.Load(file); err != nil {
 		return err
 	}
-	if err := l.Lift(context); err != nil {
+	if err := l.Lift(ctx); err != nil {
 		return err
 	}
 	return l.Plan.Dump()
@@ -41,18 +42,17 @@ func (l *Lifter) LiftPlanFile(ctx context.Context, file string) error {
 
 // Lift runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
 func (l *Lifter) Lift(ctx context.Context) error {
-
-
-	return l.Plan.ParMachines(ctx, func(ectx context.Context, m model.MachinePlan) {
-		l.liftMachine(ectx, m)
-	})
+	return l.Plan.ParMachines(ctx, l.liftMachine)
 }
 
 func (l *Lifter) count() int {
 	i := 0
 	for _, m := range l.Plan.Machines {
-
+		i += len(m.Arches())
 	}
+	return i
 }
 
-func (l *Lifter)
+func (l *Lifter) liftMachine(ctx context.Context, m model.MachinePlan) error {
+	return nil
+}

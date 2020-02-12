@@ -56,7 +56,27 @@ func findBackendArgv(style model.Id, machines []model.Id) []string {
 }
 
 // MakeHarness makes a harness using ACT.
-func (a ActRunner) MakeHarness(_ model.HarnessSpec) (outFiles []string, err error) {
-	// TODO(@MattWindsor91)
-	return nil, errors.New("unimplemented")
+func (a ActRunner) MakeHarness(s model.HarnessSpec) (outFiles []string, err error) {
+	argv := makeHarnessArgv(s)
+	sargs := StandardArgs{Verbose: false}
+
+	cmd := a.Command(BinActBackend, "make-harness", sargs, argv...)
+	if err := cmd.Run(); err != nil {
+		return nil, err
+	}
+
+	return s.OutFiles()
+}
+
+// makeHarnessArgv creates the appropriate harness making argv for s.
+func makeHarnessArgv(s model.HarnessSpec) []string {
+	return []string{
+		"-backend",
+		s.Backend.String(),
+		"-carch",
+		s.Arch.String(),
+		"-o",
+		s.OutDir,
+		s.InFile,
+	}
 }
