@@ -3,7 +3,6 @@ package interop
 import (
 	"bytes"
 	"errors"
-	"os"
 	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -37,7 +36,9 @@ func (a ActRunner) runFindBackend(style model.Id, machines []model.Id) (model.Id
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer
-	if err := a.Run(BinActBackend, nil, &obuf, os.Stderr, sargs, argv...); err != nil {
+	cmd := a.Command(BinActBackend, "find", sargs, argv...)
+	cmd.Stdout = &obuf
+	if err := cmd.Run(); err != nil {
 		return model.EmptyId, err
 	}
 
@@ -46,16 +47,15 @@ func (a ActRunner) runFindBackend(style model.Id, machines []model.Id) (model.Id
 
 // findBackendArgv constructs the argv for a backend find on style and machines.
 func findBackendArgv(style model.Id, machines []model.Id) []string {
-	argv := make([]string, len(machines)+2)
-	argv[0] = "find"
-	argv[1] = style.String()
+	argv := make([]string, len(machines)+1)
+	argv[0] = style.String()
 	for i, m := range machines {
-		argv[i+2] = m.String()
+		argv[i+1] = m.String()
 	}
 	return argv
 }
 
-// FindBackend makes a harness using ACT.
+// MakeHarness makes a harness using ACT.
 func (a ActRunner) MakeHarness(_ model.HarnessSpec) (outFiles []string, err error) {
 	// TODO(@MattWindsor91)
 	return nil, errors.New("unimplemented")

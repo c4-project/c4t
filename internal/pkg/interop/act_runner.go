@@ -1,7 +1,6 @@
 package interop
 
 import (
-	"io"
 	"os/exec"
 )
 
@@ -15,12 +14,13 @@ type ActRunner struct {
 	ConfFile string
 }
 
-// StandardArgs captures the ACT 'standard args'.
+// StandardArgs captures the ACT 'standard arguments', less those covered by ActRunner itself.
 type StandardArgs struct {
 	// Whether verbosity is enabled.
 	Verbose bool
 }
 
+// ToArgv converts s to an argument vector fragment.
 func (s StandardArgs) ToArgv() []string {
 	var argv []string
 	if s.Verbose {
@@ -29,22 +29,31 @@ func (s StandardArgs) ToArgv() []string {
 	return argv
 }
 
-// Run runs an ACT command in a blocking manner.
-func (a ActRunner) Run(cmd string, stdin io.Reader, stdout, stderr io.Writer, sargs StandardArgs, argv ...string) error {
-	fullArgv := append(sargs.ToArgv(), argv...)
-
-	c := a.Command(cmd, fullArgv...)
-	c.Stdin = stdin
-	c.Stdout = stdout
-	c.Stderr = stderr
-
-	return c.Run()
+// Command constructs a Cmd for running the ACT command cmd with subcommand sub and arguments argv.
+func (a ActRunner) Command(cmd, sub string, sargs StandardArgs, argv ...string) *exec.Cmd {
+	fargv := a.actArgv(sub, sargs, argv)
+	dcmd, dargv := liftDuneExec(a.DuneExec, cmd, fargv)
+	return exec.Command(dcmd, dargv...)
 }
 
-func (a ActRunner) Command(cmd string, argv ...string) *exec.Cmd {
-	if a.DuneExec {
-		duneArgv := append([]string{"exec", cmd, "--"}, argv...)
-		return exec.Command("dune", duneArgv...)
+func (a ActRunner) actArgv(sub string, sargs StandardArgs, argv []string) []string {
+	sargv := sargs.ToArgv()
+
+	// Reserving room for the subcommand, and optionally '-config FOO'.
+	fargv := make([]string, 1, 3+len(sargv)+len(argv))
+	fargv[0] = sub
+	fargv = append(fargv, sargs.ToArgv()...)
+
+	if a.ConfFile != "" {
+		fargv = append(fargv, "-config", a.ConfFile)
 	}
-	return exec.Command(cmd, argv...)
+
+	return append(fargv, argv...)
+}
+
+func liftDuneExec(duneExec bool, cmd string, argv []string) (string, []string) {
+	if duneExec {
+		return "dune", append([]string{"exec", cmd, "--"}, argv...)
+	}
+	return cmd, argv
 }

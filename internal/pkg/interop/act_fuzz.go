@@ -1,7 +1,6 @@
 package interop
 
 import (
-	"os"
 	"strconv"
 )
 
@@ -12,6 +11,6 @@ const BinActFuzz = "act-fuzz"
 func (a ActRunner) FuzzSingle(seed int32, inPath, outPath, tracePath string) error {
 	sargs := StandardArgs{Verbose: false}
 	seedStr := strconv.Itoa(int(seed))
-	return a.Run(BinActFuzz, nil, nil, os.Stderr, sargs, "run", "-seed", seedStr, "-o", outPath,
-		"-trace-output", tracePath, inPath)
+	cmd := a.Command(BinActFuzz, "run", sargs, "-seed", seedStr, "-o", outPath, "-trace-output", tracePath, inPath)
+	return cmd.Run()
 }

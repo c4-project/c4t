@@ -20,6 +20,7 @@ func main() {
 
 	flag.StringVar(&plan.Filter.CompPred, "c", "", usageCompPred)
 	flag.StringVar(&plan.Filter.MachPred, "m", "", usageMachPred)
+	ux.ActRunnerFlags(&act)
 	ux.CorpusSizeFlag(&plan.CorpusSize)
 	flag.Parse()
 	plan.Corpus = flag.Args()

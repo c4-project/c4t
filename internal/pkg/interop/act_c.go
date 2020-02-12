@@ -23,7 +23,10 @@ func (a ActRunner) ProbeSubject(subject *model.Subject) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 
-	if err := a.Run(BinActC, nil, &obuf, nil, sargs, "dump-header", subject.Litmus); err != nil {
+	cmd := a.Command(BinActC, "dump-header", sargs, subject.Litmus)
+	cmd.Stdout = &obuf
+
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("ACT dump-header on %s failed: %w", subject.Litmus, err)
 	}
 	hdr, err := ReadHeader(&obuf)

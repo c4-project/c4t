@@ -2,7 +2,6 @@ package interop
 
 import (
 	"bytes"
-	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
@@ -10,13 +9,16 @@ import (
 // BinActCompiler is the name of the ACT compiler services binary.
 const BinActCompiler = "act-compiler"
 
+// ListCompilers queries ACT for a list of compilers satisfying f.
 func (a ActRunner) ListCompilers(f model.CompilerFilter) ([]*model.Compiler, error) {
-	argv := append([]string{"list"}, f.ToArgv()...)
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer
 
-	if err := a.Run(BinActCompiler, nil, &obuf, os.Stderr, sargs, argv...); err != nil {
+	cmd := a.Command(BinActCompiler, "list", sargs, f.ToArgv()...)
+	cmd.Stdout = &obuf
+
+	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
 
