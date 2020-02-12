@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// ErrMissingHarness occurs on requests for harness paths for a machine/arch that do not have them.
 var ErrMissingHarness = errors.New("no such harness")
 
 // Subject represents a single test subject in a corpus.
@@ -24,18 +25,30 @@ type Subject struct {
 	// If empty, this subject hasn't been fuzzed by act-tester-fuzz.
 	TracePath string `toml:"trace_path,omitempty"`
 
-	// HarnessPaths contains the paths of every file in this subject's test harness.
-	// Each maps from a string of the form 'machine:emits', where machine and emits are ACT IDs.
+	// Harnesses contains information about this subject's test harnesses.
+	// It maps from a string of the form 'machine:arch', where machine and arch are ACT IDs.
 	// If nil, this subject hasn't had a harness generated.
-	HarnessPaths map[string][]string `toml:"harness_paths,omitempty"`
+	Harnesses map[string]Harness `toml:"harnesses,omitempty"`
 }
 
-// HarnessPath gets the harness path for the given machine and emits IDs.
-func (s Subject) HarnessPath(machine, emits Id) ([]string, error) {
-	key := strings.Join([]string{machine.String(), emits.String()}, ":")
-	slice, ok := s.HarnessPaths[key]
+// Harness gets the harness for the given machine and arch IDs.
+func (s *Subject) Harness(machine, arch Id) (Harness, error) {
+	h, ok := s.Harnesses[harnessKey(machine, arch)]
 	if !ok {
-		return nil, fmt.Errorf("%w: machine=%q, emits=%q", ErrMissingHarness, machine, emits)
+		return Harness{}, fmt.Errorf("%w: machine=%q, arch=%q", ErrMissingHarness, machine, arch)
 	}
-	return slice, nil
+	return h, nil
+}
+
+// AddHarness sets the harness information for machine and arch to h in this subject.
+func (s *Subject) AddHarness(machine, arch Id, h Harness) {
+	if s.Harnesses == nil {
+		s.Harnesses = make(map[string]Harness)
+	}
+	s.Harnesses[harnessKey(machine, arch)] = h
+}
+
+// harnessKey gets the harness-path key for a given machine and arch ID.
+func harnessKey(machine, arch Id) string {
+	return strings.Join([]string{machine.String(), arch.String()}, ":")
 }

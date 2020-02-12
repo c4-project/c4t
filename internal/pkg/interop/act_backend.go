@@ -3,6 +3,7 @@ package interop
 import (
 	"bytes"
 	"errors"
+	"os"
 	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -61,6 +62,7 @@ func (a ActRunner) MakeHarness(s model.HarnessSpec) (outFiles []string, err erro
 	sargs := StandardArgs{Verbose: false}
 
 	cmd := a.Command(BinActBackend, "make-harness", sargs, argv...)
+	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ package lifter
 
 import (
 	"context"
+	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/sirupsen/logrus"
@@ -42,17 +43,41 @@ func (l *Lifter) LiftPlanFile(ctx context.Context, file string) error {
 
 // Lift runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
 func (l *Lifter) Lift(ctx context.Context) error {
-	return l.Plan.ParMachines(ctx, l.liftMachine)
+	logrus.Infoln("making output directory", l.OutDir)
+	if err := os.Mkdir(l.OutDir, 0744); err != nil {
+		return err
+	}
+
+	logrus.Infoln("now lifting")
+	resCh := make(chan result)
+	return l.Plan.ParMachines(ctx, func(ctx context.Context, m model.MachinePlan) error {
+		return l.liftMachine(ctx, m, resCh)
+	}, func(ctx context.Context) error {
+		return handleResults(ctx, l.count(), resCh)
+	})
 }
 
+func (l *Lifter) liftMachine(ctx context.Context, m model.MachinePlan, resCh chan<- result) error {
+	dir, err := buildAndMkDir(l.OutDir, m.Id.Tags()...)
+	if err != nil {
+		return err
+	}
+
+	ml := machine{
+		Corpus:  l.Plan.Corpus,
+		Dir:     dir,
+		Machine: m,
+		Maker:   l.Maker,
+		ResCh:   resCh,
+	}
+	return ml.lift(ctx)
+}
+
+// count counts the number of liftings that need doing.
 func (l *Lifter) count() int {
 	i := 0
 	for _, m := range l.Plan.Machines {
 		i += len(m.Arches())
 	}
-	return i
-}
-
-func (l *Lifter) liftMachine(ctx context.Context, m model.MachinePlan) error {
-	return nil
+	return i * len(l.Plan.Corpus)
 }

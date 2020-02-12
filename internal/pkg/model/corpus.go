@@ -27,7 +27,7 @@ func NewCorpus(infiles ...string) Corpus {
 	return corpus
 }
 
-// SampleCorpus tries to select a sample of size want from corpus-slice corpus.
+// Sample tries to select a sample of size want from corpus-slice corpus.
 // If want is non-positive, no sampling occurs.
 // If sampling occurs, seed becomes the seed for the random number generator used.
 func (c Corpus) Sample(seed int64, want int) (Corpus, error) {

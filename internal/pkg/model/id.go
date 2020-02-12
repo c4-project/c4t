@@ -9,7 +9,7 @@ import (
 const idSep = '.'
 
 var (
-	// ErrTagHasSep occurs when one calls NewId with no tags.
+	// ErrNoTags occurs when one calls NewId with no tags.
 	ErrNoTags = errors.New("no tags")
 
 	// ErrTagHasSep occurs when a tag passed to NewId contains the separator rune.
@@ -22,6 +22,11 @@ var (
 // Id represents an ACT ID.
 type Id struct {
 	tags []string
+}
+
+// Tags extracts the tags comprising an ID as a slice.
+func (i Id) Tags() []string {
+	return i.tags
 }
 
 // String converts an ACT ID to a string.

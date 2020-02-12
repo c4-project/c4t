@@ -15,3 +15,11 @@ type Service struct {
 	// Style is the declared style of the service.
 	Style Id `toml:"style"`
 }
+
+// FQID constructs the fully qualified ID of this service.
+func (s Service) FQID() Id {
+	if s.IdQualified {
+		return s.Id
+	}
+	return Id{append(s.MachineId.tags, s.Id.tags...)}
+}

@@ -37,3 +37,12 @@ func (s HarnessSpec) OutFiles() ([]string, error) {
 	}
 	return ps[:i], nil
 }
+
+// Harness represents information about a lifted test harness.
+type Harness struct {
+	// Dir is the root directory of the harness.
+	Dir string `toml:"dir"`
+
+	// Files is a list of files in the harness.
+	Files []string `toml:"files"`
+}

@@ -2,10 +2,11 @@ package model
 
 import (
 	"context"
-	"golang.org/x/sync/errgroup"
 	"math/rand"
 	"os"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/BurntSushi/toml"
 )
@@ -47,12 +48,17 @@ func (p *Plan) Dump() error {
 	return enc.Encode(p)
 }
 
-// ParMachines runs f for every machine in the plan, threading through a context that will terminate each machine if
-// an error occurs on some other machine.
-func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, MachinePlan) error) error {
+// ParMachines runs f for every machine in the plan.
+// It threads through a context that will terminate each machine if an error occurs on some other machine.
+// It also takes zero or more 'auxiliary' funcs to launch within the same context.
+func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, MachinePlan) error, aux ...func(context.Context) error) error {
 	eg, ectx := errgroup.WithContext(ctx)
 	for _, m := range p.Machines {
-		eg.Go(func() error { return f(ectx, m) })
+		mc := m
+		eg.Go(func() error { return f(ectx, mc) })
+	}
+	for _, a := range aux {
+		eg.Go(func() error { return a(ectx) })
 	}
 	return eg.Wait()
 }
