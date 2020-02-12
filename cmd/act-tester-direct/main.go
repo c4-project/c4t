@@ -10,9 +10,12 @@ import (
 
 func main() {
 	// direct is the Director being built and run by this command.
-	var direct director.Director
+	var (
+		direct director.Director
+		pf     string
+	)
 
-	ux.PlanLoaderFlags(&direct.PlanLoader)
+	ux.PlanFileFlag(&pf)
 	flag.Parse()
 
 	err := direct.Direct(context.Background())

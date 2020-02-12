@@ -8,11 +8,13 @@ import (
 )
 
 var headerDecodeCases = []struct {
+	name string
 	json string
 	want Header
 }{
 	// TODO(@MattWindsor91): add more test cases
-	{`{
+	{"sbrlx",
+		`{
 		"name": "SBRlx",
 		"locations": null,
 		"init": { "x": 0, "y": 0 },
@@ -32,13 +34,15 @@ var headerDecodeCases = []struct {
 // TestHeader_JsonDecode tests that the JSON tags on Header are set up to be able to parse valid headers.
 func TestHeader_JsonDecode(t *testing.T) {
 	for _, c := range headerDecodeCases {
-		got := Header{}
+		t.Run(c.name, func(t *testing.T) {
+			got := Header{}
 
-		dec := json.NewDecoder(strings.NewReader(c.json))
-		if err := dec.Decode(&got); err != nil {
-			t.Errorf("decode failed with error (%s): %q", err, c.json)
-		} else if !reflect.DeepEqual(got, c.want) {
-			t.Errorf("decode got=%v; want=%v; input: %q", got, c.want, c.json)
-		}
+			dec := json.NewDecoder(strings.NewReader(c.json))
+			if err := dec.Decode(&got); err != nil {
+				t.Errorf("decode failed with error (%s): %q", err, c.json)
+			} else if !reflect.DeepEqual(got, c.want) {
+				t.Errorf("decode got=%v; want=%v; input: %q", got, c.want, c.json)
+			}
+		})
 	}
 }

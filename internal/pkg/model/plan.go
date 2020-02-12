@@ -1,7 +1,8 @@
 package model
 
 import (
-	"errors"
+	"context"
+	"golang.org/x/sync/errgroup"
 	"math/rand"
 	"os"
 	"time"
@@ -9,8 +10,10 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// ErrPlanLoaded occurs when a PlanLoader tries to load a plan multiple times.
-var ErrPlanLoaded = errors.New("plan already loaded")
+const (
+	// StdinFile is the special file path that the plan loader treats as a request to load from stdin instead.
+	StdinFile = "-"
+)
 
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
@@ -44,47 +47,23 @@ func (p *Plan) Dump() error {
 	return enc.Encode(p)
 }
 
-// MachinePlan represents a test plan for a single machine.
-type MachinePlan struct {
-	// A MachinePlan subsumes a machine entry.
-	Machine
-
-	// Backend represents the backend targeted by this plan.
-	Backend Backend `toml:"backend"`
-
-	// Compilers represents the compilers to be targeted by this plan.
-	Compilers []Compiler `toml:"compilers"`
-}
-
-// PlanLoader holds a Plan pointer and a file, and can load in the former from the latter.
-type PlanLoader struct {
-	// PlanFile contains, if non-empty, the file path of the plan.
-	PlanFile string
-
-	// Plan stores the plan after it has been loaded from PlanFile.
-	Plan *Plan
-}
-
-// LoadPlan loads the plan pointed to by d.PlanFile into d.Plan, replacing any existing plan.
-// It returns an error if there is already a plan loaded.
-func (p *PlanLoader) LoadPlan() error {
-	if p.Plan != nil {
-		return ErrPlanLoaded
+// ParMachines runs f for every machine in the plan, threading through a context that will terminate each machine if
+// an error occurs on some other machine.
+func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, MachinePlan) error) error {
+	eg, ectx := errgroup.WithContext(ctx)
+	for _, m := range p.Machines {
+		eg.Go(func() error { return f(ectx, m) })
 	}
-	if err := p.actuallyLoadPlan(); err != nil {
+	return eg.Wait()
+}
+
+// Load loads a plan pointed to by f into p, replacing any existing plan.
+// If f is empty or StdinFile, Load loads from standard input instead.
+func (p *Plan) Load(f string) error {
+	if f == "" || f == StdinFile {
+		_, err := toml.DecodeReader(os.Stdin, &p)
 		return err
 	}
-	if p == nil {
-		return errors.New("plan nil after loading")
-	}
-	return nil
-}
-
-func (p *PlanLoader) actuallyLoadPlan() error {
-	if p.PlanFile == "" || p.PlanFile == "-" {
-		_, err := toml.DecodeReader(os.Stdin, &p.Plan)
-		return err
-	}
-	_, err := toml.DecodeFile(p.PlanFile, &p.Plan)
+	_, err := toml.DecodeFile(f, &p)
 	return err
 }

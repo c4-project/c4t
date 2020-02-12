@@ -3,7 +3,9 @@
 package lifter
 
 import (
+	"context"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/sirupsen/logrus"
 )
 
 // HarnessMaker is an interface capturing the ability to make test harnesses.
@@ -15,7 +17,8 @@ type HarnessMaker interface {
 
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {
-	model.PlanLoader
+	// Plan is the plan on which this lifter is operating.
+	Plan model.Plan
 
 	// Maker is a harness maker.
 	Maker HarnessMaker
@@ -24,7 +27,32 @@ type Lifter struct {
 	OutDir string
 }
 
-func (l *Lifter) Lift() error {
-	// TODO(@MattWindsor91)
-	return nil
+// LiftPlanFile loads a plan from file, runs the lifter on it, then outputs the plan to stdout.
+func (l *Lifter) LiftPlanFile(ctx context.Context, file string) error {
+	logrus.Infoln("loading plan from", file)
+	if err := l.Plan.Load(file); err != nil {
+		return err
+	}
+	if err := l.Lift(context); err != nil {
+		return err
+	}
+	return l.Plan.Dump()
 }
+
+// Lift runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
+func (l *Lifter) Lift(ctx context.Context) error {
+
+
+	return l.Plan.ParMachines(ctx, func(ectx context.Context, m model.MachinePlan) {
+		l.liftMachine(ectx, m)
+	})
+}
+
+func (l *Lifter) count() int {
+	i := 0
+	for _, m := range l.Plan.Machines {
+
+	}
+}
+
+func (l *Lifter)

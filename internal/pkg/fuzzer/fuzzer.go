@@ -23,7 +23,8 @@ type SingleFuzzer interface {
 
 // Fuzzer holds the configuration required to fuzz a plan file.
 type Fuzzer struct {
-	model.PlanLoader
+	// Plan is the plan on which this fuzzer is operating.
+	Plan model.Plan
 
 	// Driver holds the single-file fuzzer that the fuzzer is going to use.
 	Driver SingleFuzzer
@@ -37,6 +38,18 @@ type Fuzzer struct {
 
 	// SubjectCycles is the number of times to fuzz each file.
 	SubjectCycles int
+}
+
+// FuzzPlanFile loads a plan from file, then runs the fuzzer on it.
+func (f *Fuzzer) FuzzPlanFile(file string) error {
+	logrus.Infoln("loading plan from", file)
+	if err := f.Plan.Load(file); err != nil {
+		return err
+	}
+	if err := f.Fuzz(); err != nil {
+		return err
+	}
+	return f.Plan.Dump()
 }
 
 // Fuzz runs the fuzzer, sampling the results if needed.
@@ -53,16 +66,11 @@ func (f *Fuzzer) Fuzz() error {
 		return ferr
 	}
 
-	return f.updateAndDumpPlan(fcs, rng)
+	return f.sampleAndUpdatePlan(fcs, rng)
 }
 
 // prepare does various pre-fuzzing checks and preparation steps.
 func (f *Fuzzer) prepare() (*Pathset, error) {
-	logrus.Infoln("loading plan")
-	if err := f.LoadPlan(); err != nil {
-		return nil, err
-	}
-
 	logrus.Infoln("checking viability")
 	if err := f.checkViability(); err != nil {
 		return nil, err
@@ -76,8 +84,8 @@ func (f *Fuzzer) prepare() (*Pathset, error) {
 	return ps, nil
 }
 
-// updateAndDumpPlan samples fcs, places the result in the fuzzer's plan, and dumps it to stdout.
-func (f *Fuzzer) updateAndDumpPlan(fcs model.Corpus, rng *rand.Rand) error {
+// sampleAndUpdatePlan samples fcs and places the result in the fuzzer's plan.
+func (f *Fuzzer) sampleAndUpdatePlan(fcs model.Corpus, rng *rand.Rand) error {
 	logrus.Infoln("sampling corpus")
 	scs, err := fcs.Sample(rng.Int63(), f.CorpusSize)
 	if err != nil {
@@ -87,8 +95,7 @@ func (f *Fuzzer) updateAndDumpPlan(fcs model.Corpus, rng *rand.Rand) error {
 	logrus.Infoln("updating plan")
 	f.Plan.Corpus = scs
 	f.Plan.Seed = rng.Int63()
-
-	return f.Plan.Dump()
+	return nil
 }
 
 func (f *Fuzzer) checkViability() error {

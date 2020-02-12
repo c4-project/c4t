@@ -10,8 +10,6 @@ import (
 )
 
 const (
-	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
-		"if non-positive, the planner will use all viable provided corpus files"
 	usageCompPred = "predicate `sexp` used to filter compilers for this test plan"
 	usageMachPred = "predicate `sexp` used to filter machines for this test plan"
 )

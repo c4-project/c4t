@@ -10,6 +10,9 @@ import (
 // Compiler collects the test-relevant information about a compiler.
 type Compiler struct {
 	Service
+
+	// Arch is the architecture (or 'emits') ID for the compiler.
+	Arch Id
 }
 
 // ParseCompilerList parses a compiler list from the reader rd.
@@ -42,7 +45,7 @@ func ParseCompiler(bs []byte) (*Compiler, error) {
 		{"machine Id", func(c *Compiler, s string) { m := IdFromString(s); c.MachineId = &m }},
 		{"compiler Id", func(c *Compiler, s string) { c.Id = IdFromString(s) }},
 		{"style", func(c *Compiler, s string) { c.Style = IdFromString(s) }},
-		// arch
+		{"arch", func(c *Compiler, s string) { c.Arch = IdFromString(s) }},
 		// enabled
 	}
 

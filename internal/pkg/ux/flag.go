@@ -4,8 +4,6 @@ import (
 	"flag"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 const (
@@ -43,7 +41,7 @@ func ActRunnerFlags(a *interop.ActRunner) {
 	flag.BoolVar(&a.DuneExec, flagActDuneExec, false, usageDuneExec)
 }
 
-// PlanLoaderFlags sets up a standard set of arguments feeding into the PlanLoader p.
-func PlanLoaderFlags(p *model.PlanLoader) {
-	flag.StringVar(&p.PlanFile, FlagInputFile, "", usagePlanFile)
+// PlanFileFlag sets up a standard argument for loading a plan file into f.
+func PlanFileFlag(f *string) {
+	flag.StringVar(f, FlagInputFile, "", usagePlanFile)
 }
