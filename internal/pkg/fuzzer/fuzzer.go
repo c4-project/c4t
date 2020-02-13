@@ -3,8 +3,11 @@
 package fuzzer
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/cheggaaa/pb/v3"
@@ -24,7 +27,7 @@ type SingleFuzzer interface {
 // Fuzzer holds the configuration required to fuzz a plan file.
 type Fuzzer struct {
 	// Plan is the plan on which this fuzzer is operating.
-	Plan model.Plan
+	Plan plan.Plan
 
 	// Driver holds the single-file fuzzer that the fuzzer is going to use.
 	Driver SingleFuzzer
@@ -40,30 +43,24 @@ type Fuzzer struct {
 	SubjectCycles int
 }
 
-// FuzzPlanFile loads a plan from file, then runs the fuzzer on it.
-func (f *Fuzzer) FuzzPlanFile(file string) error {
-	logrus.Infoln("loading plan from", file)
-	if err := f.Plan.Load(file); err != nil {
-		return err
+// Run runs the fuzzer, sampling the results if needed.
+// Run is not thread-safe.
+func (f *Fuzzer) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	if p == nil {
+		return nil, plan.ErrNil
 	}
-	if err := f.Fuzz(); err != nil {
-		return err
-	}
-	return f.Plan.Dump()
-}
+	f.Plan = *p
 
-// Fuzz runs the fuzzer, sampling the results if needed.
-func (f *Fuzzer) Fuzz() error {
 	ps, err := f.prepare()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	logrus.Infoln("now fuzzing")
 	rng := rand.New(rand.NewSource(f.Plan.Seed))
 	fcs, ferr := f.fuzzWithPathset(rng, ps)
 	if ferr != nil {
-		return ferr
+		return nil, ferr
 	}
 
 	return f.sampleAndUpdatePlan(fcs, rng)
@@ -85,17 +82,17 @@ func (f *Fuzzer) prepare() (*Pathset, error) {
 }
 
 // sampleAndUpdatePlan samples fcs and places the result in the fuzzer's plan.
-func (f *Fuzzer) sampleAndUpdatePlan(fcs model.Corpus, rng *rand.Rand) error {
+func (f *Fuzzer) sampleAndUpdatePlan(fcs model.Corpus, rng *rand.Rand) (*plan.Plan, error) {
 	logrus.Infoln("sampling corpus")
 	scs, err := fcs.Sample(rng.Int63(), f.CorpusSize)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	logrus.Infoln("updating plan")
 	f.Plan.Corpus = scs
 	f.Plan.Seed = rng.Int63()
-	return nil
+	return &f.Plan, nil
 }
 
 func (f *Fuzzer) checkViability() error {

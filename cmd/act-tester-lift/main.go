@@ -24,6 +24,6 @@ func main() {
 	ux.PlanFileFlag(&pf)
 	flag.Parse()
 
-	err := lift.LiftPlanFile(context.Background(), pf)
+	err := ux.RunOnPlanFile(context.Background(), &lift, pf)
 	ux.LogTopError(err)
 }

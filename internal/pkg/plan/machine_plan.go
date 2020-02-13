@@ -1,29 +1,33 @@
-package model
+package plan
 
-import "sort"
+import (
+	"sort"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+)
 
 // MachinePlan represents a test plan for a single machine.
 type MachinePlan struct {
 	// A MachinePlan subsumes a machine entry.
-	Machine
+	model.Machine
 
 	// Backend represents the backend targeted by this plan.
-	Backend Backend `toml:"backend"`
+	Backend model.Backend `toml:"backend"`
 
 	// Compilers represents the compilers to be targeted by this plan.
-	Compilers []Compiler `toml:"compilers"`
+	Compilers []model.Compiler `toml:"compilers"`
 }
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.
 // These architectures are in order of their string equivalents.
-func (m MachinePlan) Arches() []ID {
-	amap := make(map[string]ID)
+func (m MachinePlan) Arches() []model.ID {
+	amap := make(map[string]model.ID)
 
 	for _, c := range m.Compilers {
 		amap[c.Arch.String()] = c.Arch
 	}
 
-	arches := make([]ID, len(amap))
+	arches := make([]model.ID, len(amap))
 	i := 0
 	for _, id := range amap {
 		arches[i] = id

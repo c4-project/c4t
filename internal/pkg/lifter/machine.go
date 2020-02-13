@@ -3,6 +3,8 @@ package lifter
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -17,7 +19,7 @@ type machine struct {
 	Dir string
 
 	// Machine is the plan for this machine.
-	Machine model.MachinePlan
+	Machine plan.MachinePlan
 
 	// Maker is the parent harness maker.
 	Maker HarnessMaker

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
@@ -29,6 +30,6 @@ func main() {
 	flag.IntVar(&fuzz.SubjectCycles, "k", fuzzer.DefaultSubjectCycles, usageSubjectCycles)
 	flag.Parse()
 
-	err := fuzz.FuzzPlanFile(pf)
+	err := ux.RunOnPlanFile(context.Background(), &fuzz, pf)
 	ux.LogTopError(err)
 }

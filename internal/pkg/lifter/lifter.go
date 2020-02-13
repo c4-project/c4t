@@ -6,6 +6,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +22,7 @@ type HarnessMaker interface {
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {
 	// Plan is the plan on which this lifter is operating.
-	Plan model.Plan
+	Plan plan.Plan
 
 	// Maker is a harness maker.
 	Maker HarnessMaker
@@ -29,35 +31,33 @@ type Lifter struct {
 	OutDir string
 }
 
-// LiftPlanFile loads a plan from file, runs the lifter on it, then outputs the plan to stdout.
-func (l *Lifter) LiftPlanFile(ctx context.Context, file string) error {
-	logrus.Infoln("loading plan from", file)
-	if err := l.Plan.Load(file); err != nil {
-		return err
+// Run runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
+func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	if p == nil {
+		return nil, plan.ErrNil
 	}
-	if err := l.Lift(ctx); err != nil {
-		return err
-	}
-	return l.Plan.Dump()
-}
+	l.Plan = *p
 
-// Lift runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
-func (l *Lifter) Lift(ctx context.Context) error {
 	logrus.Infoln("making output directory", l.OutDir)
 	if err := os.Mkdir(l.OutDir, 0744); err != nil {
-		return err
+		return nil, err
 	}
 
+	err := l.lift(ctx)
+	return &l.Plan, err
+}
+
+func (l *Lifter) lift(ctx context.Context) error {
 	logrus.Infoln("now lifting")
 	resCh := make(chan result)
-	return l.Plan.ParMachines(ctx, func(ctx context.Context, m model.MachinePlan) error {
+	return l.Plan.ParMachines(ctx, func(ctx context.Context, m plan.MachinePlan) error {
 		return l.liftMachine(ctx, m, resCh)
 	}, func(ctx context.Context) error {
 		return handleResults(ctx, l.count(), resCh)
 	})
 }
 
-func (l *Lifter) liftMachine(ctx context.Context, m model.MachinePlan, resCh chan<- result) error {
+func (l *Lifter) liftMachine(ctx context.Context, m plan.MachinePlan, resCh chan<- result) error {
 	dir, err := buildAndMkDir(l.OutDir, m.ID.Tags()...)
 	if err != nil {
 		return err

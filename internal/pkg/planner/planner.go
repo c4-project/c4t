@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -50,21 +52,21 @@ func (p *Planner) Plan() error {
 		return model.ErrNoCorpus
 	}
 
-	var plan model.Plan
+	var pn plan.Plan
 
 	rand.Seed(time.Now().UnixNano())
-	plan.Init()
+	pn.Init()
 
 	logrus.Infoln("Planning machines...")
 	var err error
-	if plan.Machines, err = p.planMachines(); err != nil {
+	if pn.Machines, err = p.planMachines(); err != nil {
 		return err
 	}
 
 	logrus.Infoln("Planning corpus...")
-	if plan.Corpus, err = p.planCorpus(plan.Seed); err != nil {
+	if pn.Corpus, err = p.planCorpus(pn.Seed); err != nil {
 		return err
 	}
 
-	return plan.Dump()
+	return pn.Dump()
 }

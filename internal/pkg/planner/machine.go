@@ -3,6 +3,8 @@ package planner
 import (
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -15,7 +17,7 @@ type CompilerLister interface {
 	ListCompilers(f model.CompilerFilter) ([]*model.Compiler, error)
 }
 
-func (p *Planner) planMachines() ([]model.MachinePlan, error) {
+func (p *Planner) planMachines() ([]plan.MachinePlan, error) {
 	cmap, err := p.queryCompilers()
 	if err != nil {
 		return nil, err
@@ -55,10 +57,10 @@ func scrubMachineID(c *model.Compiler) (key string, err error) {
 
 // planMachinesFromMap assembles a list of machine plans by taking a compiler map cmap and performing all other machine
 // information scraping necessary.
-func (p *Planner) planMachinesFromMap(cmap map[string][]model.Compiler) ([]model.MachinePlan, error) {
+func (p *Planner) planMachinesFromMap(cmap map[string][]model.Compiler) ([]plan.MachinePlan, error) {
 	var err error
 
-	plans := make([]model.MachinePlan, len(cmap))
+	plans := make([]plan.MachinePlan, len(cmap))
 	i := 0
 	for mstr, cs := range cmap {
 		mid := model.IDFromString(mstr)
@@ -73,15 +75,15 @@ func (p *Planner) planMachinesFromMap(cmap map[string][]model.Compiler) ([]model
 
 // planMachine builds a machine plan given machine ID mid and compiler set compilers.
 // It performs various further config lookups on the machine, which can cause errors.
-func (p *Planner) planMachine(mid model.ID, compilers []model.Compiler) (model.MachinePlan, error) {
+func (p *Planner) planMachine(mid model.ID, compilers []model.Compiler) (plan.MachinePlan, error) {
 	style := model.IDFromString("litmus")
 	backend, err := p.Source.FindBackend(style, mid)
 	if err != nil {
-		return model.MachinePlan{}, err
+		return plan.MachinePlan{}, err
 	}
 
 	// TODO(@MattWindsor91): probe cores
-	return model.MachinePlan{
+	return plan.MachinePlan{
 		Machine:   model.Machine{ID: mid},
 		Backend:   *backend,
 		Compilers: compilers,

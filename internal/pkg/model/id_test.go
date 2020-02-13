@@ -9,6 +9,19 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// ExampleID_Tags is a runnable example for Tags.
+func ExampleID_Tags() {
+	id := IDFromString("foo.bar.baz")
+	for _, tag := range id.Tags() {
+		fmt.Println(tag)
+	}
+
+	// Output:
+	// foo
+	// bar
+	// baz
+}
+
 var cases = []struct {
 	name string
 	id   string

@@ -1,20 +1,21 @@
-package model
+package plan
 
 import (
 	"context"
+	"errors"
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
 	"golang.org/x/sync/errgroup"
 
 	"github.com/BurntSushi/toml"
 )
 
-const (
-	// StdinFile is the special file path that the plan loader treats as a request to load from stdin instead.
-	StdinFile = "-"
-)
+// ErrNil is an error that can be returned if a tester stage gets a nil plan.
+var ErrNil = errors.New("plan nil")
 
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
@@ -29,7 +30,7 @@ type Plan struct {
 	Machines []MachinePlan `toml:"machines"`
 
 	// Corpus contains the filenames of each test corpus entry chosen for this plan.
-	Corpus []Subject `toml:"corpus"`
+	Corpus []model.Subject `toml:"corpus"`
 }
 
 // Init initialises the creation-sensitive parts of plan p.
@@ -61,15 +62,4 @@ func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, MachineP
 		eg.Go(func() error { return a(ectx) })
 	}
 	return eg.Wait()
-}
-
-// Load loads a plan pointed to by f into p, replacing any existing plan.
-// If f is empty or StdinFile, Load loads from standard input instead.
-func (p *Plan) Load(f string) error {
-	if f == "" || f == StdinFile {
-		_, err := toml.DecodeReader(os.Stdin, &p)
-		return err
-	}
-	_, err := toml.DecodeFile(f, &p)
-	return err
 }
