@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"runtime"
 
 	"golang.org/x/sync/errgroup"
 
@@ -17,8 +16,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
-const DefaultSubjectCycles = 10
+const (
+	// DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
+	DefaultSubjectCycles = 10
+
+	// NoChunkLimit is the chunk count that should be passed to turn off chunk limiting.
+	NoChunkLimit = 0
+)
 
 // SingleFuzzer represents types that can commune with a C litmus test fuzzer.
 type SingleFuzzer interface {
@@ -44,6 +48,9 @@ type Fuzzer struct {
 
 	// SubjectCycles is the number of times to fuzz each file.
 	SubjectCycles int
+
+	// FuzzWorkers is the number of separate goroutines to launch for fuzzing.
+	FuzzWorkers int
 }
 
 // Run runs the fuzzer, sampling the results if needed.
@@ -131,8 +138,8 @@ func (f *Fuzzer) fuzzWithPathset(ctx context.Context, rng *rand.Rand, ps *Pathse
 	eg, ectx := errgroup.WithContext(ctx)
 	resCh := make(chan model.Subject)
 
-	chunks := f.Plan.Corpus.Chunks(runtime.NumCPU())
-	logrus.Infof("Fuzzing with %d chunks\n", len(chunks))
+	chunks := f.corpusChunks()
+	logrus.Infof("Fuzzing %d inputs with %d chunks\n", len(f.Plan.Corpus), len(chunks))
 
 	for _, c := range chunks {
 		cp := c
@@ -155,6 +162,14 @@ func (f *Fuzzer) fuzzWithPathset(ctx context.Context, rng *rand.Rand, ps *Pathse
 	})
 	err := eg.Wait()
 	return fcs, err
+}
+
+func (f *Fuzzer) corpusChunks() []model.Corpus {
+	nchunks := len(f.Plan.Corpus)
+	if 0 < f.FuzzWorkers && f.FuzzWorkers < nchunks {
+		nchunks = f.FuzzWorkers
+	}
+	return f.Plan.Corpus.Chunks(nchunks)
 }
 
 func handleResults(ctx context.Context, fuzzed model.Corpus, resCh <-chan model.Subject) error {
