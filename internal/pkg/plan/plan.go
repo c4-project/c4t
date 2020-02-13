@@ -29,8 +29,8 @@ type Plan struct {
 	// Machines contains the per-machine plans for this overall test plan.
 	Machines []MachinePlan `toml:"machines"`
 
-	// Corpus contains the filenames of each test corpus entry chosen for this plan.
-	Corpus []model.Subject `toml:"corpus"`
+	// Corpus contains each test corpus entry chosen for this plan.
+	Corpus model.Corpus `toml:"corpus"`
 }
 
 // Init initialises the creation-sensitive parts of plan p.

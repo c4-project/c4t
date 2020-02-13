@@ -61,3 +61,37 @@ func (c Corpus) actuallySample(r *rand.Rand, want int) Corpus {
 
 	return sample
 }
+
+// Chunks divides this corpus into n roughly-equal subcorpi.
+// If n is less than or equal to 1, it returns the original corpus only.
+// If n is greater than the length of the corpus, the remaining chunks will be nil.
+// If n doesn't subdivide the corpus exactly, chunks towards the end will be smaller than chunks at the start.
+func (c Corpus) Chunks(n int) []Corpus {
+	if n <= 1 {
+		return []Corpus{c}
+	}
+
+	chunks := make([]Corpus, n, n)
+
+	rem := len(c)
+	// Corner case to make sure empty corpi always have the empty corpus at the start;
+	// if we didn't do this, the early-out at the top would be noticeably different.
+	if rem == 0 {
+		chunks[0] = c
+		return chunks
+	}
+	pos := 0
+	for i := n; 0 < i && 0 < rem; i-- {
+		chsize := rem / i
+		if chsize*i < rem {
+			chsize++
+		}
+
+		chunks[n-i] = c[pos : pos+chsize]
+
+		rem -= chsize
+		pos += chsize
+	}
+
+	return chunks
+}
