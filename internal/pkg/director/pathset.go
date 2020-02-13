@@ -1,11 +1,11 @@
 package director
 
-// Pathset contains the pre-computed paths used by the director.
-type Pathset struct {
+// pathset contains the pre-computed paths used by the director.
+type pathset struct {
 	// DirRoot is the root directory of this director's path set.
 	DirRoot string
 
-	CurRun RunPathset
+	CurRun runPathset
 
 	// DirLitmus is the directory to which litmus tests will be written.
 	DirLitmus string
@@ -14,8 +14,8 @@ type Pathset struct {
 	DirTrace string
 }
 
-// RunPathset contains the pre-computed paths used by a run of the director.
-type RunPathset struct {
+// runPathset contains the pre-computed paths used by a run of the director.
+type runPathset struct {
 	// DirRoot is the root directory of this run.
 	DirRoot string
 

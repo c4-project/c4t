@@ -3,6 +3,7 @@ package director
 
 import (
 	"context"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -29,7 +30,7 @@ func (d *Director) DirectPlanFile(ctx context.Context, file string) error {
 func (d *Director) Direct(ctx context.Context) error {
 	var err error
 
-	var ps *Pathset
+	var ps *pathset
 	if ps, err = d.prepare(); err != nil {
 		return err
 	}
@@ -42,25 +43,25 @@ func (d *Director) Direct(ctx context.Context) error {
 	return d.directMachines(ctx, ps, fc)
 }
 
-func (d *Director) prepare() (*Pathset, error) {
+func (d *Director) prepare() (*pathset, error) {
 	// TODO(@MattWindsor91)
 
 	return nil, nil
 }
 
-func (d *Director) fuzzCorpus(_ *Pathset) (corpusFiles []string, err error) {
+func (d *Director) fuzzCorpus(_ *pathset) (corpusFiles []string, err error) {
 	// TODO(@MattWindsor91)
 
 	return nil, nil
 }
 
-func (d *Director) directMachines(ctx context.Context, ps *Pathset, fc []string) error {
+func (d *Director) directMachines(ctx context.Context, ps *pathset, fc []string) error {
 	return d.Plan.ParMachines(ctx, func(ectx context.Context, m model.MachinePlan) error {
 		return d.directMachine(ectx, ps, fc, m)
 	})
 }
 
-func (d *Director) directMachine(_ context.Context, _ *Pathset, _ []string, _ model.MachinePlan) error {
+func (d *Director) directMachine(_ context.Context, _ *pathset, _ []string, _ model.MachinePlan) error {
 	// TODO(@MattWindsor91)
 	return nil
 }

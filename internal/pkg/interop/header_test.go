@@ -19,14 +19,14 @@ var headerDecodeCases = []struct {
 		"init": { "x": 0, "y": 0 },
 		"postcondition": "exists (0:a == 0 /\\ 1:a == 0)"
 	 }`, Header{
-		Name:      "SBRlx",
-		Locations: nil,
-		Init: map[string]int{
-			"x": 0,
-			"y": 0,
+			Name:      "SBRlx",
+			Locations: nil,
+			Init: map[string]int{
+				"x": 0,
+				"y": 0,
+			},
+			Postcondition: `exists (0:a == 0 /\ 1:a == 0)`,
 		},
-		Postcondition: `exists (0:a == 0 /\ 1:a == 0)`,
-	},
 	},
 }
 
