@@ -1,7 +1,6 @@
 package interop
 
 import (
-	"encoding/json"
 	"reflect"
 	"strings"
 	"testing"
@@ -31,16 +30,14 @@ var headerDecodeCases = []struct {
 	},
 }
 
-// TestHeader_JsonDecode tests that the JSON tags on Header are set up to be able to parse valid headers.
-func TestHeader_JsonDecode(t *testing.T) {
+// TestReadHeader tests that we can read headers properly from JSON.
+func TestReadHeader(t *testing.T) {
 	for _, c := range headerDecodeCases {
 		t.Run(c.name, func(t *testing.T) {
-			got := Header{}
-
-			dec := json.NewDecoder(strings.NewReader(c.json))
-			if err := dec.Decode(&got); err != nil {
+			rd := strings.NewReader(c.json)
+			if got, err := ReadHeader(rd); err != nil {
 				t.Errorf("decode failed with error (%s): %q", err, c.json)
-			} else if !reflect.DeepEqual(got, c.want) {
+			} else if !reflect.DeepEqual(*got, c.want) {
 				t.Errorf("decode got=%v; want=%v; input: %q", got, c.want, c.json)
 			}
 		})
