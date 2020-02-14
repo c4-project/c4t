@@ -50,25 +50,26 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 func (l *Lifter) lift(ctx context.Context) error {
 	logrus.Infoln("now lifting")
 	resCh := make(chan result)
-	return l.Plan.ParMachines(ctx, func(ctx context.Context, m plan.MachinePlan) error {
-		return l.liftMachine(ctx, m, resCh)
+	return l.Plan.ParMachines(ctx, func(ctx context.Context, mid model.ID, m plan.MachinePlan) error {
+		return l.liftMachine(ctx, mid, m, resCh)
 	}, func(ctx context.Context) error {
 		return handleResults(ctx, l.count(), resCh)
 	})
 }
 
-func (l *Lifter) liftMachine(ctx context.Context, m plan.MachinePlan, resCh chan<- result) error {
-	dir, err := buildAndMkDir(l.OutDir, m.ID.Tags()...)
+func (l *Lifter) liftMachine(ctx context.Context, mid model.ID, m plan.MachinePlan, resCh chan<- result) error {
+	dir, err := buildAndMkDir(l.OutDir, mid.Tags()...)
 	if err != nil {
 		return err
 	}
 
 	ml := machine{
-		Corpus:  l.Plan.Corpus,
-		Dir:     dir,
-		Machine: m,
-		Maker:   l.Maker,
-		ResCh:   resCh,
+		Corpus:    l.Plan.Corpus,
+		Dir:       dir,
+		MachineID: mid,
+		Machine:   m,
+		Maker:     l.Maker,
+		ResCh:     resCh,
 	}
 	return ml.lift(ctx)
 }

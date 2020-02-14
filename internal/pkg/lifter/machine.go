@@ -18,6 +18,9 @@ type machine struct {
 	// Dir is the directory to which lifted harnesses should be created.
 	Dir string
 
+	// MachineID is the ID for this machine.
+	MachineID model.ID
+
 	// Machine is the plan for this machine.
 	Machine plan.MachinePlan
 
@@ -29,8 +32,7 @@ type machine struct {
 }
 
 func (m *machine) lift(ctx context.Context) error {
-	logrus.WithField("machine", m.Machine.ID).Debugln("lifting machine")
-
+	logrus.WithField("machine", m.MachineID).Debugln("lifting machine")
 	for _, a := range m.Machine.Arches() {
 		if err := m.liftArch(ctx, a); err != nil {
 			return err
@@ -75,7 +77,7 @@ func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s 
 	res := result{
 		Arch:    arch,
 		Harness: model.Harness{Dir: dir, Files: files},
-		Machine: m.Machine.ID,
+		Machine: m.MachineID,
 		Subject: s,
 	}
 

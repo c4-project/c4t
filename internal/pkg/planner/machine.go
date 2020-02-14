@@ -17,7 +17,7 @@ type CompilerLister interface {
 	ListCompilers(f model.CompilerFilter) ([]*model.Compiler, error)
 }
 
-func (p *Planner) planMachines() ([]plan.MachinePlan, error) {
+func (p *Planner) planMachines() (map[string]plan.MachinePlan, error) {
 	cmap, err := p.queryCompilers()
 	if err != nil {
 		return nil, err
@@ -57,17 +57,15 @@ func scrubMachineID(c *model.Compiler) (key string, err error) {
 
 // planMachinesFromMap assembles a list of machine plans by taking a compiler map cmap and performing all other machine
 // information scraping necessary.
-func (p *Planner) planMachinesFromMap(cmap map[string][]model.Compiler) ([]plan.MachinePlan, error) {
+func (p *Planner) planMachinesFromMap(cmap map[string][]model.Compiler) (map[string]plan.MachinePlan, error) {
 	var err error
 
-	plans := make([]plan.MachinePlan, len(cmap))
-	i := 0
+	plans := make(map[string]plan.MachinePlan, len(cmap))
 	for mstr, cs := range cmap {
 		mid := model.IDFromString(mstr)
-		if plans[i], err = p.planMachine(mid, cs); err != nil {
+		if plans[mstr], err = p.planMachine(mid, cs); err != nil {
 			return nil, err
 		}
-		i++
 	}
 
 	return plans, nil
@@ -84,7 +82,7 @@ func (p *Planner) planMachine(mid model.ID, compilers []model.Compiler) (plan.Ma
 
 	// TODO(@MattWindsor91): probe cores
 	return plan.MachinePlan{
-		Machine:   model.Machine{ID: mid},
+		Machine:   model.Machine{},
 		Backend:   *backend,
 		Compilers: compilers,
 	}, nil

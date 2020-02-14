@@ -4,6 +4,8 @@ package director
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 )
 
@@ -45,12 +47,12 @@ func (d *Director) fuzzCorpus(_ *pathset) (corpusFiles []string, err error) {
 }
 
 func (d *Director) directMachines(ctx context.Context, ps *pathset, fc []string) error {
-	return d.Plan.ParMachines(ctx, func(ectx context.Context, m plan.MachinePlan) error {
-		return d.directMachine(ectx, ps, fc, m)
+	return d.Plan.ParMachines(ctx, func(ectx context.Context, mid model.ID, m plan.MachinePlan) error {
+		return d.directMachine(ectx, ps, fc, mid, m)
 	})
 }
 
-func (d *Director) directMachine(_ context.Context, _ *pathset, _ []string, _ plan.MachinePlan) error {
+func (d *Director) directMachine(_ context.Context, _ *pathset, _ []string, _ model.ID, _ plan.MachinePlan) error {
 	// TODO(@MattWindsor91)
 	return nil
 }

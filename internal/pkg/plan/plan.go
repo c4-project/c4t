@@ -27,7 +27,8 @@ type Plan struct {
 	Seed int64 `toml:"seed"`
 
 	// Machines contains the per-machine plans for this overall test plan.
-	Machines []MachinePlan `toml:"machines"`
+	// Each machine is mapped under a stringified form of its ID.
+	Machines map[string]MachinePlan `toml:"machines"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
 	Corpus model.Corpus `toml:"corpus"`
@@ -52,11 +53,12 @@ func (p *Plan) Dump() error {
 // ParMachines runs f for every machine in the plan.
 // It threads through a context that will terminate each machine if an error occurs on some other machine.
 // It also takes zero or more 'auxiliary' funcs to launch within the same context.
-func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, MachinePlan) error, aux ...func(context.Context) error) error {
+func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, model.ID, MachinePlan) error, aux ...func(context.Context) error) error {
 	eg, ectx := errgroup.WithContext(ctx)
-	for _, m := range p.Machines {
+	for i, m := range p.Machines {
+		mid := model.IDFromString(i)
 		mc := m
-		eg.Go(func() error { return f(ectx, mc) })
+		eg.Go(func() error { return f(ectx, mid, mc) })
 	}
 	for _, a := range aux {
 		eg.Go(func() error { return a(ectx) })
