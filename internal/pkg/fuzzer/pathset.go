@@ -2,10 +2,7 @@ package fuzzer
 
 import (
 	"fmt"
-	"os"
 	"path"
-
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -18,9 +15,6 @@ const (
 
 // Pathset contains the pre-computed paths used by a run of the fuzzer.
 type Pathset struct {
-	// DirRoot is the root directory of this fuzzer's path set.
-	DirRoot string
-
 	// DirLitmus is the directory to which litmus tests will be written.
 	DirLitmus string
 
@@ -31,21 +25,14 @@ type Pathset struct {
 // NewPathset constructs a new pathset from the directory root.
 func NewPathset(root string) *Pathset {
 	return &Pathset{
-		DirRoot:   root,
 		DirLitmus: path.Join(root, segLitmus),
 		DirTrace:  path.Join(root, segTrace),
 	}
 }
 
-// Mkdirs tries to make each directory in pathset.
-func (p Pathset) Mkdirs() error {
-	for _, dir := range []string{p.DirRoot, p.DirLitmus, p.DirTrace} {
-		logrus.Debugf("mkdir %s\n", dir)
-		if err := os.Mkdir(dir, 0744); err != nil {
-			return err
-		}
-	}
-	return nil
+// Dirs gets a list of all directories in the pathset.
+func (p Pathset) Dirs() []string {
+	return []string{p.DirTrace, p.DirLitmus}
 }
 
 // OnSubject gets the litmus and trace file paths for the subject with the given name and fuzzing cycle.

@@ -3,8 +3,10 @@ package plan
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -14,8 +16,13 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// ErrNil is an error that can be returned if a tester stage gets a nil plan.
-var ErrNil = errors.New("plan nil")
+var (
+	// ErrNil is an error that can be returned if a tester stage gets a nil plan.
+	ErrNil = errors.New("plan nil")
+
+	// ErrNoMachine is an error that can be returned if an attempt to get a machine by its ID fails.
+	ErrNoMachine = errors.New("can't get machine")
+)
 
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
@@ -64,4 +71,28 @@ func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, model.ID
 		eg.Go(func() error { return a(ectx) })
 	}
 	return eg.Wait()
+}
+
+// Machine gets the plan of the machine with ID id, if it exists.
+// If id is empty and the plan contains only one machine, Machine gets that instead.
+func (p *Plan) Machine(id model.ID) (MachinePlan, error) {
+	if id.IsEmpty() {
+		return p.singleMachine()
+	}
+
+	ids := id.String()
+	mp, ok := p.Machines[ids]
+	if !ok {
+		return MachinePlan{}, fmt.Errorf("%w: no plan for machine %s", ErrNoMachine, ids)
+	}
+	return mp, nil
+}
+
+func (p *Plan) singleMachine() (MachinePlan, error) {
+	rv := reflect.ValueOf(p.Machines)
+	keys := rv.MapKeys()
+	if len(keys) != 1 {
+		return MachinePlan{}, fmt.Errorf("%w: machine plan doesn't contain exactly one machine", ErrNoMachine)
+	}
+	return p.Machines[keys[0].String()], nil
 }

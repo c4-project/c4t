@@ -71,7 +71,7 @@ func (c Corpus) Chunks(n int) []Corpus {
 		return []Corpus{c}
 	}
 
-	chunks := make([]Corpus, n, n)
+	chunks := make([]Corpus, n)
 
 	rem := len(c)
 	// Corner case to make sure empty corpi always have the empty corpus at the start;

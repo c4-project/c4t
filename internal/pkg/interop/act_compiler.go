@@ -24,3 +24,17 @@ func (a ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]
 
 	return model.ParseCompilerList(&obuf)
 }
+
+func (a ActRunner) RunCompiler(compiler model.ID, infiles []string, outfile string) error {
+	sargs := StandardArgs{Verbose: false}
+
+	argv := runCompilerArgv(compiler, infiles, outfile)
+	cmd := a.Command(BinActCompiler, "run", sargs, argv...)
+
+	return cmd.Run()
+}
+
+func runCompilerArgv(compiler model.ID, infiles []string, outfile string) []string {
+	base := []string{"-compiler", compiler.String(), "-mode", "binary", "-o", outfile}
+	return append(base, infiles...)
+}

@@ -20,18 +20,20 @@ const (
 func main() {
 	var (
 		act interop.ActRunner
+		dir string
 		pf  string
 	)
 	fuzz := fuzzer.Fuzzer{Driver: &act}
 
 	ux.ActRunnerFlags(&act)
 	ux.CorpusSizeFlag(&fuzz.CorpusSize)
-	ux.OutDirFlag(&fuzz.OutDir, defaultOutDir)
+	ux.OutDirFlag(&dir, defaultOutDir)
 	ux.PlanFileFlag(&pf)
 	flag.IntVar(&fuzz.FuzzWorkers, "j", fuzzer.NoChunkLimit, usageFuzzWorkers)
 	flag.IntVar(&fuzz.SubjectCycles, "k", fuzzer.DefaultSubjectCycles, usageSubjectCycles)
 	flag.Parse()
 
+	fuzz.Paths = fuzzer.NewPathset(dir)
 	err := ux.RunOnPlanFile(context.Background(), &fuzz, pf)
 	ux.LogTopError(err)
 }

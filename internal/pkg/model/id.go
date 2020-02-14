@@ -14,24 +14,11 @@ var (
 
 	// ErrTagHasSep occurs when a tag passed to NewID contains the separator rune.
 	ErrTagHasSep = errors.New("tag contains separator")
-
-	// EmptyID is the empty ACT ID.
-	EmptyID = ID{}
 )
 
 // ID represents an ACT ID.
 type ID struct {
 	tags []string
-}
-
-// Tags extracts the tags comprising an ID as a slice.
-func (i ID) Tags() []string {
-	return i.tags
-}
-
-// String converts an ACT ID to a string.
-func (i ID) String() string {
-	return strings.Join(i.tags, string(idSep))
 }
 
 // NewID tries to construct an ACT ID from tags.
@@ -46,7 +33,7 @@ func NewID(tags ...string) (ID, error) {
 
 	// Normalise the empty tag.
 	if len(tags) == 1 && tags[0] == "" {
-		return EmptyID, nil
+		return ID{}, nil
 	}
 
 	return ID{tags}, nil
@@ -67,6 +54,26 @@ func validateTags(tags []string) error {
 // IDFromString converts a string to an ACT ID.
 func IDFromString(s string) ID {
 	return ID{strings.Split(s, ".")}
+}
+
+// IsEmpty gets whether this ID is empty.
+func (i ID) IsEmpty() bool {
+	return len(i.tags) == 0
+}
+
+// Tags extracts the tags comprising an ID as a slice.
+func (i ID) Tags() []string {
+	return i.tags
+}
+
+// String converts an ACT ID to a string.
+func (i ID) String() string {
+	return strings.Join(i.tags, string(idSep))
+}
+
+// Join appends r to this ID, creating a new ID.
+func (i ID) Join(r ID) ID {
+	return ID{append(i.tags, r.tags...)}
 }
 
 // MarshalText implements text marshalling for IDs by stringifying them.

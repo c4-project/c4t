@@ -40,7 +40,7 @@ func (a ActRunner) runFindBackend(style model.ID, machines []model.ID) (model.ID
 	cmd := a.Command(BinActBackend, "find", sargs, argv...)
 	cmd.Stdout = &obuf
 	if err := cmd.Run(); err != nil {
-		return model.EmptyID, err
+		return model.ID{}, err
 	}
 
 	return model.IDFromString(strings.TrimSpace(obuf.String())), nil

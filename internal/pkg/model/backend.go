@@ -25,5 +25,5 @@ func (b Backend) FQID() ID {
 	if b.IDQualified {
 		return b.ID
 	}
-	return ID{append(b.MachineID.tags, b.ID.tags...)}
+	return b.MachineID.Join(b.ID)
 }

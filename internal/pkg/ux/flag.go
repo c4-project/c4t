@@ -10,6 +10,9 @@ const (
 	// FlagInputFile is a standard flag for arguments that suggest an alternative to stdin for commands that read files.
 	FlagInputFile = "i"
 
+	// FlagMachine is a standard flag for machine selection arguments.
+	FlagMachine = "m"
+
 	// FlagNum is a standard flag for 'number of' arguments.
 	FlagNum = "n"
 
