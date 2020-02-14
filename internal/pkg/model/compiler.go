@@ -12,7 +12,7 @@ type Compiler struct {
 	Service
 
 	// Arch is the architecture (or 'emits') ID for the compiler.
-	Arch ID
+	Arch ID `toml:"arch"`
 }
 
 // ParseCompilerList parses a compiler list from the reader rd.
