@@ -15,7 +15,8 @@ type MachinePlan struct {
 	Backend model.Backend `toml:"backend"`
 
 	// Compilers represents the compilers to be targeted by this plan.
-	Compilers []model.Compiler `toml:"compilers"`
+	// Each compiler's key is a stringified form of its machine ID.
+	Compilers map[string]model.Compiler `toml:"compilers"`
 }
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.

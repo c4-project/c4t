@@ -15,18 +15,18 @@ func TestMachinePlan_Arches(t *testing.T) {
 		want []model.ID
 	}{
 		{"no arches", MachinePlan{}, []model.ID{}},
-		{"one compiler", MachinePlan{Compilers: []model.Compiler{
-			model.Compiler{Service: model.Service{ID: model.IDFromString("gcc")}, Arch: model.ArchX8664},
+		{"one compiler", MachinePlan{Compilers: map[string]model.Compiler{
+			"gcc": {Arch: model.ArchX8664},
 		}}, []model.ID{model.ArchX8664}},
-		{"same arch", MachinePlan{Compilers: []model.Compiler{
-			model.Compiler{Service: model.Service{ID: model.IDFromString("gcc")}, Arch: model.ArchArm},
-			model.Compiler{Service: model.Service{ID: model.IDFromString("clang")}, Arch: model.ArchArm},
+		{"same arch", MachinePlan{Compilers: map[string]model.Compiler{
+			"gcc":   {Arch: model.ArchArm},
+			"clang": {Arch: model.ArchArm},
 		}}, []model.ID{model.ArchArm}},
-		{"two arches", MachinePlan{Compilers: []model.Compiler{
-			model.Compiler{Service: model.Service{ID: model.IDFromString("gcc-ppc")}, Arch: model.ArchPPC},
-			model.Compiler{Service: model.Service{ID: model.IDFromString("clang-ppc")}, Arch: model.ArchPPC},
-			model.Compiler{Service: model.Service{ID: model.IDFromString("gcc")}, Arch: model.ArchArm},
-			model.Compiler{Service: model.Service{ID: model.IDFromString("clang")}, Arch: model.ArchArm},
+		{"two arches", MachinePlan{Compilers: map[string]model.Compiler{
+			"gcc-ppc":   {Arch: model.ArchPPC},
+			"clang-ppc": {Arch: model.ArchPPC},
+			"gcc":       {Arch: model.ArchArm},
+			"clang":     {Arch: model.ArchArm},
 		}}, []model.ID{model.ArchArm, model.ArchPPC}},
 	}
 

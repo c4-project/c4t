@@ -19,8 +19,10 @@ func ExampleParseCompilerList() {
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		for _, c := range compilers {
-			fmt.Println(c.MachineID, c.ID, c.Style)
+		for mid, mcs := range compilers {
+			for cid, c := range mcs {
+				fmt.Println(mid, cid, c.Style)
+			}
 		}
 	}
 

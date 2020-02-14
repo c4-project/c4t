@@ -27,7 +27,7 @@ func (a ActRunner) FindBackend(style model.ID, machines ...model.ID) (*model.Bac
 	}
 
 	return &model.Backend{
-		Service: model.Service{ID: id, IDQualified: true, Style: style},
+		ID: id, IDQualified: true, Style: style,
 	}, nil
 }
 

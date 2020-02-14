@@ -10,7 +10,7 @@ import (
 const BinActCompiler = "act-compiler"
 
 // ListCompilers queries ACT for a list of compilers satisfying f.
-func (a ActRunner) ListCompilers(f model.CompilerFilter) ([]*model.Compiler, error) {
+func (a ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]model.Compiler, error) {
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer
