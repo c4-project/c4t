@@ -6,8 +6,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
-	"github.com/MattWindsor91/act-tester/internal/pkg/runner"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )
 
@@ -23,7 +23,7 @@ func main() {
 		pfile string
 		pmach string
 	)
-	rn := runner.Runner{Compiler: &act}
+	rn := compiler.Compiler{Runner: &act}
 
 	ux.ActRunnerFlags(&act)
 	ux.OutDirFlag(&dir, defaultOutDir)
@@ -35,13 +35,13 @@ func main() {
 	ux.LogTopError(err)
 }
 
-func run(dir, pfile, pmach string, rn *runner.Runner) error {
+func run(dir, pfile, pmach string, rn *compiler.Compiler) error {
 	p, perr := ux.LoadPlan(pfile)
 	if perr != nil {
 		return perr
 	}
 
-	rn.Paths = runner.NewPathset(dir)
+	rn.Paths = compiler.NewPathset(dir)
 
 	// TODO(@MattWindsor91): output results
 	_, rerr := rn.RunOnPlan(context.Background(), p, model.IDFromString(pmach))

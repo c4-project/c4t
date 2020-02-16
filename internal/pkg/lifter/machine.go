@@ -18,7 +18,7 @@ type machine struct {
 	// Dir is the directory to which lifted harnesses should be created.
 	Dir string
 
-	// MachineID is the ID for this machine.
+	// MachineID is the CompilerID for this machine.
 	MachineID model.ID
 
 	// Machine is the plan for this machine.

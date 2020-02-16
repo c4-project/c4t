@@ -48,7 +48,7 @@ func (s *Subject) AddHarness(machine, arch ID, h Harness) {
 	s.Harnesses[harnessKey(machine, arch)] = h
 }
 
-// harnessKey gets the harness-path key for a given machine and arch ID.
+// harnessKey gets the harness-path key for a given machine and arch CompilerID.
 func harnessKey(machine, arch ID) string {
 	return strings.Join([]string{machine.String(), arch.String()}, ":")
 }

@@ -12,8 +12,16 @@ type Compiler struct {
 	// Style is the declared style of the backend.
 	Style ID `toml:"style"`
 
-	// Arch is the architecture (or 'emits') ID for the compiler.
+	// Arch is the architecture (or 'emits') CompilerID for the compiler.
 	Arch ID `toml:"arch"`
+}
+
+// NamedCompiler wraps a Compiler with its ID.
+type NamedCompiler struct {
+	// ID is the ID of the compiler.
+	ID ID `toml:"id"`
+
+	Compiler
 }
 
 // ParseCompilerList parses a compiler list from the reader rd.
@@ -22,12 +30,12 @@ func ParseCompilerList(rd io.Reader) (map[string]map[string]Compiler, error) {
 
 	s := bufio.NewScanner(rd)
 	for s.Scan() {
-		mid, cid, c, err := ParseCompiler(s.Bytes())
+		mid, c, err := ParseCompiler(s.Bytes())
 		if err != nil {
 			return nil, err
 		}
 
-		if cerr := addCompiler(compilers, mid, cid, c); cerr != nil {
+		if cerr := addCompiler(compilers, mid, c); cerr != nil {
 			return nil, cerr
 		}
 	}
@@ -35,26 +43,26 @@ func ParseCompilerList(rd io.Reader) (map[string]map[string]Compiler, error) {
 	return compilers, s.Err()
 }
 
-// addCompiler tries to add the compiler at machine ID mid and compiler ID mid to compilers.
+// addCompiler tries to add the compiler at machine CompilerID mid and compiler CompilerID mid to compilers.
 // It fails if there is a duplicate compiler.
-func addCompiler(compilers map[string]map[string]Compiler, mid, cid ID, c Compiler) error {
+func addCompiler(compilers map[string]map[string]Compiler, mid ID, c NamedCompiler) error {
 	ms := mid.String()
 	if _, ok := compilers[ms]; !ok {
 		compilers[ms] = make(map[string]Compiler)
 	}
 
-	cs := cid.String()
+	cs := c.ID.String()
 	if _, ok := compilers[ms][cs]; ok {
 		return fmt.Errorf("duplicate compiler: machine=%s, compiler=%s", ms, cs)
 	}
 
-	compilers[ms][cs] = c
+	compilers[ms][cs] = c.Compiler
 	return nil
 }
 
 // ParseCompiler parses a single line from byte slice bs.
-// It produces a machine ID mid, a compiler ID cid, a compiler pointer, and/or an error.
-func ParseCompiler(bs []byte) (mid, cid ID, c Compiler, err error) {
+// It produces a machine CompilerID mid, a named compiler c, and/or an error.
+func ParseCompiler(bs []byte) (mid ID, c NamedCompiler, err error) {
 	s := bufio.NewScanner(bytes.NewReader(bs))
 	s.Split(bufio.ScanWords)
 
@@ -62,8 +70,8 @@ func ParseCompiler(bs []byte) (mid, cid ID, c Compiler, err error) {
 		name     string
 		inserter func(string)
 	}{
-		{"machine ID", func(s string) { mid = IDFromString(s) }},
-		{"compiler ID", func(s string) { cid = IDFromString(s) }},
+		{"machine CompilerID", func(s string) { mid = IDFromString(s) }},
+		{"compiler CompilerID", func(s string) { c.ID = IDFromString(s) }},
 		{"style", func(s string) { c.Style = IDFromString(s) }},
 		{"arch", func(s string) { c.Arch = IDFromString(s) }},
 		// enabled
@@ -71,7 +79,7 @@ func ParseCompiler(bs []byte) (mid, cid ID, c Compiler, err error) {
 
 	for _, f := range fields {
 		if !s.Scan() {
-			return mid, cid, c, CompilerFieldMissingError{
+			return mid, c, CompilerFieldMissingError{
 				line:  nil,
 				field: f.name,
 			}
@@ -79,7 +87,7 @@ func ParseCompiler(bs []byte) (mid, cid ID, c Compiler, err error) {
 		f.inserter(s.Text())
 	}
 
-	return mid, cid, c, nil
+	return mid, c, nil
 }
 
 // CompilerFieldMissingError is an error caused when a compiler list line is missing an expected field.

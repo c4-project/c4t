@@ -1,4 +1,4 @@
-package runner
+package compiler
 
 import (
 	"path"
@@ -32,9 +32,8 @@ func TestPathset_Dirs(t *testing.T) {
 // TestPathset_OnCompiler tests that OnCompiler produces sensible paths.
 func TestPathset_OnCompiler(t *testing.T) {
 	ps := Pathset{
-		DirBins:     "bins",
-		DirLogs:     "logs",
-		DirFailures: "fails",
+		DirBins: "bins",
+		DirLogs: "logs",
 	}
 	cid := model.IDFromString("foo.bar.baz")
 	b, l := ps.OnCompiler(cid, "yeet")

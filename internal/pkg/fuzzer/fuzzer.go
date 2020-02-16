@@ -14,13 +14,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	// DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
-	DefaultSubjectCycles = 10
-
-	// NoChunkLimit is the chunk count that should be passed to turn off chunk limiting.
-	NoChunkLimit = 0
-)
+// DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
+const DefaultSubjectCycles = 10
 
 // SingleFuzzer represents types that can commune with a C litmus test fuzzer.
 type SingleFuzzer interface {
@@ -98,14 +93,12 @@ func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (model.Corpus, error)
 	eg, ectx := errgroup.WithContext(ctx)
 	resCh := make(chan model.Subject)
 
-	chunks := f.corpusChunks()
-	logrus.Infof("Fuzzing %d inputs with %d chunks\n", len(f.Plan.Corpus), len(chunks))
+	logrus.Infof("Fuzzing %d inputs\n", len(f.Plan.Corpus))
 
-	for _, c := range chunks {
-		cp := c
+	for _, s := range f.Plan.Corpus {
 		subrng := rand.New(rand.NewSource(rng.Int63()))
+		j := f.makeJob(s, subrng, resCh)
 		eg.Go(func() error {
-			j := f.makeJob(cp, subrng, resCh)
 			return j.Fuzz(ectx)
 		})
 	}
@@ -117,21 +110,13 @@ func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (model.Corpus, error)
 	return fcs, err
 }
 
-func (f *Fuzzer) makeJob(cp model.Corpus, subrng *rand.Rand, resCh chan model.Subject) *job {
+func (f *Fuzzer) makeJob(s model.Subject, subrng *rand.Rand, resCh chan model.Subject) *job {
 	return &job{
-		Corpus:        cp,
 		Driver:        f.Driver,
+		Subject:       s,
 		SubjectCycles: f.SubjectCycles,
 		Pathset:       f.Paths,
 		Rng:           subrng,
 		ResCh:         resCh,
 	}
-}
-
-func (f *Fuzzer) corpusChunks() []model.Corpus {
-	nchunks := len(f.Plan.Corpus)
-	if 0 < f.FuzzWorkers && f.FuzzWorkers < nchunks {
-		nchunks = f.FuzzWorkers
-	}
-	return f.Plan.Corpus.Chunks(nchunks)
 }

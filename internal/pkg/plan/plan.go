@@ -20,7 +20,7 @@ var (
 	// ErrNil is an error that can be returned if a tester stage gets a nil plan.
 	ErrNil = errors.New("plan nil")
 
-	// ErrNoMachine is an error that can be returned if an attempt to get a machine by its ID fails.
+	// ErrNoMachine is an error that can be returned if an attempt to get a machine by its CompilerID fails.
 	ErrNoMachine = errors.New("can't get machine")
 )
 
@@ -34,7 +34,7 @@ type Plan struct {
 	Seed int64 `toml:"seed"`
 
 	// Machines contains the per-machine plans for this overall test plan.
-	// Each machine is mapped under a stringified form of its ID.
+	// Each machine is mapped under a stringified form of its CompilerID.
 	Machines map[string]MachinePlan `toml:"machines"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
@@ -73,7 +73,7 @@ func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, model.ID
 	return eg.Wait()
 }
 
-// Machine gets the plan of the machine with ID id, if it exists.
+// Machine gets the plan of the machine with CompilerID id, if it exists.
 // If id is empty and the plan contains only one machine, Machine gets that instead.
 func (p *Plan) Machine(id model.ID) (MachinePlan, error) {
 	if id.IsEmpty() {

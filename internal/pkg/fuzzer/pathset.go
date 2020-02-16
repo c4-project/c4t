@@ -35,8 +35,8 @@ func (p Pathset) Dirs() []string {
 	return []string{p.DirTrace, p.DirLitmus}
 }
 
-// OnSubject gets the litmus and trace file paths for the subject with the given name and fuzzing cycle.
-func (p Pathset) OnSubject(name string, cycle int) (litmus, trace string) {
+// SubjectPaths gets the litmus and trace file paths for the subject with the given name and fuzzing cycle.
+func (p Pathset) SubjectPaths(name string, cycle int) (litmus, trace string) {
 	base := CycledName(name, cycle)
 	return path.Join(p.DirLitmus, base+".litmus"), path.Join(p.DirTrace, base+".trace")
 }

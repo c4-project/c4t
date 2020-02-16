@@ -2,6 +2,7 @@ package interop
 
 import (
 	"bytes"
+	"io"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
@@ -25,11 +26,12 @@ func (a ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]
 	return model.ParseCompilerList(&obuf)
 }
 
-func (a ActRunner) RunCompiler(compiler model.ID, infiles []string, outfile string) error {
+func (a ActRunner) RunCompiler(compiler model.ID, infiles []string, outfile string, errw io.Writer) error {
 	sargs := StandardArgs{Verbose: false}
 
 	argv := runCompilerArgv(compiler, infiles, outfile)
 	cmd := a.Command(BinActCompiler, "run", sargs, argv...)
+	cmd.Stderr = errw
 
 	return cmd.Run()
 }

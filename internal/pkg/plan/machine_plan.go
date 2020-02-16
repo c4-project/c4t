@@ -15,7 +15,7 @@ type MachinePlan struct {
 	Backend model.Backend `toml:"backend"`
 
 	// Compilers represents the compilers to be targeted by this plan.
-	// Each compiler's key is a stringified form of its machine ID.
+	// Each compiler's key is a stringified form of its machine CompilerID.
 	Compilers map[string]model.Compiler `toml:"compilers"`
 }
 

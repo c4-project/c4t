@@ -8,7 +8,7 @@ type Result struct {
 	Start time.Time
 
 	// Compilers is the set of results that were reported in this test run.
-	// Each key is a stringified form of a compiler ID.
+	// Each key is a stringified form of a compiler CompilerID.
 	Compilers map[string]CompilerResult
 }
 

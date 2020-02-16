@@ -1,4 +1,4 @@
-package runner
+package compiler
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
@@ -6,7 +6,7 @@ import (
 )
 
 // prepare does various pre-fuzzing checks and preparation steps.
-func (r *Runner) prepare(p *plan.MachinePlan) error {
+func (r *Compiler) prepare(p *plan.MachinePlan) error {
 	if p == nil {
 		return plan.ErrNil
 	}
@@ -20,7 +20,7 @@ func (r *Runner) prepare(p *plan.MachinePlan) error {
 }
 
 // checkViability does some pre-flight checks.
-func (r *Runner) checkViability() error {
+func (r *Compiler) checkViability() error {
 	if r.Paths == nil {
 		return iohelp.ErrPathsetNil
 	}

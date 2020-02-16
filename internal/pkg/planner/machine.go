@@ -36,7 +36,7 @@ func (p *Planner) planMachinesFromMap(cmap map[string]map[string]model.Compiler)
 	return plans, nil
 }
 
-// planMachine builds a machine plan given machine ID mid and compiler set compilers.
+// planMachine builds a machine plan given machine CompilerID mid and compiler set compilers.
 // It performs various further config lookups on the machine, which can cause errors.
 func (p *Planner) planMachine(mid model.ID, compilers map[string]model.Compiler) (plan.MachinePlan, error) {
 	style := model.IDFromString("litmus")

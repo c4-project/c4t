@@ -9,6 +9,22 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// ExampleID_Join is a runnable example for Join.
+func ExampleID_Join() {
+	id1 := IDFromString("foo.bar")
+	id2 := IDFromString("baz.barbaz")
+	fmt.Println(id1.Join(id2).String())
+
+	// empty IDs do nothing when joined
+	fmt.Println(ID{}.Join(id1).String())
+	fmt.Println(id2.Join(ID{}).String())
+
+	// Output:
+	// foo.bar.baz.barbaz
+	// foo.bar
+	// baz.barbaz
+}
+
 // ExampleID_Tags is a runnable example for Tags.
 func ExampleID_Tags() {
 	id := IDFromString("foo.bar.baz")
@@ -66,7 +82,7 @@ func TestID_MarshalText_RoundTrip(t *testing.T) {
 	}
 }
 
-// wrappedID serves to lift ID into a TOMLable struct type.
+// wrappedID serves to lift CompilerID into a TOMLable struct type.
 type wrappedID struct {
 	ID ID
 }

@@ -16,12 +16,12 @@ var (
 	ErrTagHasSep = errors.New("tag contains separator")
 )
 
-// ID represents an ACT ID.
+// CompilerID represents an ACT CompilerID.
 type ID struct {
 	tags []string
 }
 
-// NewID tries to construct an ACT ID from tags.
+// NewID tries to construct an ACT CompilerID from tags.
 // It fails if any of the tags contain a separator.
 // It also fails if no tags are passed.
 func NewID(tags ...string) (ID, error) {
@@ -51,28 +51,34 @@ func validateTags(tags []string) error {
 	return nil
 }
 
-// IDFromString converts a string to an ACT ID.
+// IDFromString converts a string to an ACT CompilerID.
 func IDFromString(s string) ID {
 	return ID{strings.Split(s, ".")}
 }
 
-// IsEmpty gets whether this ID is empty.
+// IsEmpty gets whether this CompilerID is empty.
 func (i ID) IsEmpty() bool {
 	return len(i.tags) == 0
 }
 
-// Tags extracts the tags comprising an ID as a slice.
+// Tags extracts the tags comprising an CompilerID as a slice.
 func (i ID) Tags() []string {
 	return i.tags
 }
 
-// String converts an ACT ID to a string.
+// String converts an ACT CompilerID to a string.
 func (i ID) String() string {
 	return strings.Join(i.tags, string(idSep))
 }
 
-// Join appends r to this ID, creating a new ID.
+// Join appends r to this CompilerID, creating a new CompilerID.
 func (i ID) Join(r ID) ID {
+	if i.IsEmpty() {
+		return r
+	}
+	if r.IsEmpty() {
+		return i
+	}
 	return ID{append(i.tags, r.tags...)}
 }
 

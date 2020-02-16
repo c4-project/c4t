@@ -10,7 +10,7 @@ type HarnessSpec struct {
 	// Backend is the fully-qualified identifier of the backend to use to make this harness.
 	Backend ID
 
-	// Arch is the ID of the architecture for which a harness should be prepared.
+	// Arch is the CompilerID of the architecture for which a harness should be prepared.
 	Arch ID
 
 	// InFile is the path to the input litmus test file.
