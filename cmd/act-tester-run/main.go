@@ -23,7 +23,6 @@ func main() {
 		pfile string
 		pmach string
 	)
-	rn := compiler.Compiler{Runner: &act}
 
 	ux.ActRunnerFlags(&act)
 	ux.OutDirFlag(&dir, defaultOutDir)
@@ -31,23 +30,11 @@ func main() {
 	flag.StringVar(&pmach, ux.FlagMachine, "", usageFlagMachine)
 	flag.Parse()
 
-	err := run(dir, pfile, pmach, &rn)
+	cfg := compiler.Config{
+		Driver:    &act,
+		MachineID: model.IDFromString(pmach),
+		Paths:     compiler.NewPathset(dir),
+	}
+	err := ux.RunOnPlanFile(context.Background(), &cfg, pfile)
 	ux.LogTopError(err)
-}
-
-func run(dir, pfile, pmach string, rn *compiler.Compiler) error {
-	p, perr := ux.LoadPlan(pfile)
-	if perr != nil {
-		return perr
-	}
-
-	rn.Paths = compiler.NewPathset(dir)
-
-	// TODO(@MattWindsor91): output results
-	_, rerr := rn.RunOnPlan(context.Background(), p, model.IDFromString(pmach))
-	if rerr != nil {
-		return rerr
-	}
-
-	return nil
 }

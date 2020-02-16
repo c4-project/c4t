@@ -9,6 +9,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
 	"golang.org/x/sync/errgroup"
@@ -24,7 +26,7 @@ var (
 	ErrNoMachine = errors.New("can't get machine")
 )
 
-// Plan represents a test plan.
+// plan represents a test plan.
 // A plan covers an entire campaign of testing.
 type Plan struct {
 	// Creation marks the time at which the plan was created.
@@ -38,15 +40,17 @@ type Plan struct {
 	Machines map[string]MachinePlan `toml:"machines"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
-	Corpus model.Corpus `toml:"corpus"`
+	Corpus subject.Corpus `toml:"corpus"`
 }
 
-// Init initialises the creation-sensitive parts of plan p.
+// New creates a new plan using the given machines and corpus.
 // It randomises the seed using the top-level random number generator;
 // and also updates the creation time.
-func (p *Plan) Init() {
+func New(ms map[string]MachinePlan, c subject.Corpus) *Plan {
+	p := Plan{Machines: ms, Corpus: c}
 	p.Creation = time.Now()
 	p.Seed = rand.Int63()
+	return &p
 }
 
 // Dump dumps plan p to stdout.
@@ -55,6 +59,21 @@ func (p *Plan) Dump() error {
 	enc := toml.NewEncoder(os.Stdout)
 	enc.Indent = "  "
 	return enc.Encode(p)
+}
+
+// ParCorpus runs f for every subject in the plan's corpus.
+// It threads through a context that will terminate each machine if an error occurs on some other machine.
+// It also takes zero or more 'auxiliary' funcs to launch within the same context.
+func (p *Plan) ParCorpus(ctx context.Context, f func(context.Context, subject.Subject) error, aux ...func(context.Context) error) error {
+	eg, ectx := errgroup.WithContext(ctx)
+	for _, s := range p.Corpus {
+		sc := s
+		eg.Go(func() error { return f(ectx, sc) })
+	}
+	for _, a := range aux {
+		eg.Go(func() error { return a(ectx) })
+	}
+	return eg.Wait()
 }
 
 // ParMachines runs f for every machine in the plan.
@@ -75,24 +94,28 @@ func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, model.ID
 
 // Machine gets the plan of the machine with CompilerID id, if it exists.
 // If id is empty and the plan contains only one machine, Machine gets that instead.
-func (p *Plan) Machine(id model.ID) (MachinePlan, error) {
+// Machine also returns the actual ID of the machine.
+func (p *Plan) Machine(id model.ID) (model.ID, MachinePlan, error) {
 	if id.IsEmpty() {
-		return p.singleMachine()
+		var err error
+		if id, err = p.singleMachineId(); err != nil {
+			return id, MachinePlan{}, err
+		}
 	}
 
 	ids := id.String()
 	mp, ok := p.Machines[ids]
 	if !ok {
-		return MachinePlan{}, fmt.Errorf("%w: no plan for machine %s", ErrNoMachine, ids)
+		return id, MachinePlan{}, fmt.Errorf("%w: no plan for machine %s", ErrNoMachine, ids)
 	}
-	return mp, nil
+	return id, mp, nil
 }
 
-func (p *Plan) singleMachine() (MachinePlan, error) {
+func (p *Plan) singleMachineId() (model.ID, error) {
 	rv := reflect.ValueOf(p.Machines)
 	keys := rv.MapKeys()
 	if len(keys) != 1 {
-		return MachinePlan{}, fmt.Errorf("%w: machine plan doesn't contain exactly one machine", ErrNoMachine)
+		return model.ID{}, fmt.Errorf("%w: machine plan doesn't contain exactly one machine", ErrNoMachine)
 	}
-	return p.Machines[keys[0].String()], nil
+	return model.IDFromString(keys[0].String()), nil
 }

@@ -41,3 +41,17 @@ func (m MachinePlan) Arches() []model.ID {
 	})
 	return arches
 }
+
+// CompilerIDs gets a sorted slice of all compiler IDs mentioned in this machine plan.
+func (m MachinePlan) CompilerIDs() []model.ID {
+	cids := make([]model.ID, len(m.Compilers))
+	i := 0
+	for cid := range m.Compilers {
+		cids[i] = model.IDFromString(cid)
+		i++
+	}
+	sort.Slice(cids, func(i, j int) bool {
+		return cids[i].Less(cids[j])
+	})
+	return cids
+}

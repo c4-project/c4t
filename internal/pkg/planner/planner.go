@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
 	"github.com/sirupsen/logrus"
@@ -45,17 +47,15 @@ type Planner struct {
 	InFiles []string
 }
 
-// Plan runs the test planner p.
+// plan runs the test planner p.
 func (p *Planner) Plan() error {
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(p.InFiles) == 0 {
-		return model.ErrNoCorpus
+		return subject.ErrNoCorpus
 	}
 
-	var pn plan.Plan
-
 	rand.Seed(time.Now().UnixNano())
-	pn.Init()
+	pn := plan.New(nil, nil)
 
 	logrus.Infoln("Planning machines...")
 	var err error

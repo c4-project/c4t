@@ -9,8 +9,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
-// Test_Pathset_Dirs makes sure each of the expected paths appears in the pathset.
-func TestPathset_Dirs(t *testing.T) {
+// Test_Pathset_Dirs_NoCompilers makes sure each of the expected paths appears in the pathset
+// when no compilers are involved.
+func TestPathset_Dirs_NoCompilers(t *testing.T) {
 	ps := NewPathset("foo")
 	dirs := ps.Dirs()
 	sort.Strings(dirs)
@@ -29,22 +30,25 @@ func TestPathset_Dirs(t *testing.T) {
 	}
 }
 
-// TestPathset_OnCompiler tests that OnCompiler produces sensible paths.
+// TestPathset_OnCompiler tests that SubjectPaths produces sensible paths.
 func TestPathset_OnCompiler(t *testing.T) {
 	ps := Pathset{
 		DirBins: "bins",
 		DirLogs: "logs",
 	}
 	cid := model.IDFromString("foo.bar.baz")
-	b, l := ps.OnCompiler(cid, "yeet")
+	sps := ps.SubjectPaths(SubjectCompile{
+		Name:       "yeet",
+		CompilerID: cid,
+	})
 
 	wantb := path.Join("bins", "foo", "bar", "baz", "yeet")
-	if b != wantb {
-		t.Errorf("bin for %s= %s, want %s", cid.String(), b, wantb)
+	if sps.Bin != wantb {
+		t.Errorf("bin for %s= %s, want %s", cid.String(), sps.Bin, wantb)
 	}
 
 	wantl := path.Join("logs", "foo", "bar", "baz", "yeet")
-	if l != wantl {
-		t.Errorf("logs for %s= %s, want %s", cid.String(), l, wantl)
+	if sps.Log != wantl {
+		t.Errorf("logs for %s= %s, want %s", cid.String(), sps.Log, wantl)
 	}
 }

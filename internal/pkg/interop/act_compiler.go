@@ -26,10 +26,10 @@ func (a ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]
 	return model.ParseCompilerList(&obuf)
 }
 
-func (a ActRunner) RunCompiler(compiler model.ID, infiles []string, outfile string, errw io.Writer) error {
+func (a ActRunner) RunCompiler(c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error {
 	sargs := StandardArgs{Verbose: false}
 
-	argv := runCompilerArgv(compiler, infiles, outfile)
+	argv := runCompilerArgv(c.ID, infiles, outfile)
 	cmd := a.Command(BinActCompiler, "run", sargs, argv...)
 	cmd.Stderr = errw
 

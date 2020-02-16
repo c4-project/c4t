@@ -3,27 +3,26 @@ package lifter
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/cheggaaa/pb/v3"
 )
 
 // result is the type of results from the parallelised lifting process.
 type result struct {
-	// Machine is the machine for which this lifting is occurring.
-	Machine model.ID
-
-	// Arch is the architecture for which this lifting is occurring.
-	Arch model.ID
+	// MArch is the machine-qualified architecture for which this lifting is occurring.
+	MArch model.MachQualID
 
 	// Subject is the subject that has been lifted,
 	// passed as a pointer to let the result collector modify it in-place.
-	Subject *model.Subject
+	Subject *subject.Subject
 
 	// Harness is the produced harness pathset.
-	Harness model.Harness
+	Harness subject.Harness
 }
 
-// handleResults is a goroutine body that waits for nresult results to come in through resCh.
+// handleResults waits for nresult results to come in through resCh.
 // For each result, it propagates the harness pathset to its subject.
 func handleResults(ctx context.Context, nresult int, resCh <-chan result) error {
 	bar := pb.StartNew(nresult)
@@ -32,7 +31,9 @@ func handleResults(ctx context.Context, nresult int, resCh <-chan result) error 
 	for i := 0; i < nresult; i++ {
 		select {
 		case r := <-resCh:
-			handleResult(r)
+			if err := handleResult(r); err != nil {
+				return err
+			}
 			bar.Increment()
 		case <-ctx.Done():
 			return ctx.Err()
@@ -43,7 +44,7 @@ func handleResults(ctx context.Context, nresult int, resCh <-chan result) error 
 }
 
 // handleResult applies a result's liftings to its own subject.
-// We make sure to do this sequentiall in a single result-handling goroutine, to avoid races.
-func handleResult(r result) {
-	r.Subject.AddHarness(r.Machine, r.Arch, r.Harness)
+// We make sure to do this sequentially in a single result-handling goroutine, to avoid races.
+func handleResult(r result) error {
+	return r.Subject.AddHarness(r.MArch, r.Harness)
 }

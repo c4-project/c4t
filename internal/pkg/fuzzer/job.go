@@ -4,13 +4,13 @@ import (
 	"context"
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
 // job contains state for a single fuzzer batch-job.
 type job struct {
 	// Subject contains the subject for which this job is responsible.
-	Subject model.Subject
+	Subject subject.Subject
 
 	// Driver is the low-level fuzzer.
 	Driver SingleFuzzer
@@ -25,7 +25,7 @@ type job struct {
 	Rng *rand.Rand
 
 	// ResCh is the channel onto which each fuzzed subject should be sent.
-	ResCh chan<- model.Subject
+	ResCh chan<- subject.Subject
 }
 
 // Fuzz performs a single fuzzing job.
@@ -38,19 +38,13 @@ func (j *job) Fuzz(ctx context.Context) error {
 	return nil
 }
 
-// Interface for things that can be used to locate a subject path.
-// Mainly exists to permit us to mock out Pathset.
-type SubjectPather interface {
-	// SubjectPaths gets the output and trace paths for a subject.
-	SubjectPaths(name string, cycle int) (outp string, tracep string)
-}
-
 func (j *job) fuzzCycle(ctx context.Context, cycle int) error {
-	outp, tracep := j.Pathset.SubjectPaths(j.Subject.Name, cycle)
-	if err := j.Driver.FuzzSingle(j.Rng.Int31(), j.Subject.Litmus, outp, tracep); err != nil {
+	sc := SubjectCycle{Name: j.Subject.Name, Cycle: cycle}
+	spaths := j.Pathset.SubjectPaths(sc)
+	if err := j.Driver.FuzzSingle(j.Rng.Int31(), j.Subject.Litmus, spaths.FileLitmus, spaths.FileTrace); err != nil {
 		return err
 	}
-	s2 := j.makeSubject(cycle, outp, tracep)
+	s2 := j.makeSubject(sc, spaths)
 	if err := j.sendSubject(ctx, s2); err != nil {
 		return err
 	}
@@ -58,17 +52,17 @@ func (j *job) fuzzCycle(ctx context.Context, cycle int) error {
 }
 
 // makeSubject makes the new, fuzzed subject to send back to the batch fuzzer.
-func (j *job) makeSubject(cycle int, outp, tracep string) model.Subject {
-	return model.Subject{
-		Name:       CycledName(j.Subject.Name, cycle),
+func (j *job) makeSubject(sc SubjectCycle, ps SubjectPathset) subject.Subject {
+	return subject.Subject{
+		Name:       sc.String(),
 		OrigLitmus: j.Subject.Litmus,
-		Litmus:     outp,
-		TracePath:  tracep,
+		Litmus:     ps.FileLitmus,
+		TracePath:  ps.FileTrace,
 	}
 }
 
 // sendSubject tries to send s down this job's result channel.
-func (j *job) sendSubject(ctx context.Context, s model.Subject) error {
+func (j *job) sendSubject(ctx context.Context, s subject.Subject) error {
 	select {
 	case j.ResCh <- s:
 	case <-ctx.Done():

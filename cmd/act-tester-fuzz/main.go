@@ -22,16 +22,16 @@ func main() {
 		dir string
 		pf  string
 	)
-	fuzz := fuzzer.Fuzzer{Driver: &act}
+	cfg := fuzzer.Config{Driver: &act}
 
 	ux.ActRunnerFlags(&act)
-	ux.CorpusSizeFlag(&fuzz.CorpusSize)
+	ux.CorpusSizeFlag(&cfg.CorpusSize)
 	ux.OutDirFlag(&dir, defaultOutDir)
 	ux.PlanFileFlag(&pf)
-	flag.IntVar(&fuzz.SubjectCycles, "k", fuzzer.DefaultSubjectCycles, usageSubjectCycles)
+	flag.IntVar(&cfg.SubjectCycles, "k", fuzzer.DefaultSubjectCycles, usageSubjectCycles)
 	flag.Parse()
 
-	fuzz.Paths = fuzzer.NewPathset(dir)
-	err := ux.RunOnPlanFile(context.Background(), &fuzz, pf)
+	cfg.Paths = fuzzer.NewPathset(dir)
+	err := ux.RunOnPlanFile(context.Background(), &cfg, pf)
 	ux.LogTopError(err)
 }

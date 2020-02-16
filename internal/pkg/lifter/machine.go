@@ -3,6 +3,8 @@ package lifter
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
 	"github.com/sirupsen/logrus"
@@ -13,7 +15,7 @@ import (
 // machine contains state used in a single-machine lifting job.
 type machine struct {
 	// Corpus is the corpus we are lifting.
-	Corpus model.Corpus
+	Corpus subject.Corpus
 
 	// Dir is the directory to which lifted harnesses should be created.
 	Dir string
@@ -55,7 +57,7 @@ func (m *machine) liftArch(ctx context.Context, arch model.ID) error {
 	return nil
 }
 
-func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s *model.Subject) error {
+func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s *subject.Subject) error {
 	dir, derr := buildAndMkDir(dir, s.Name)
 	if derr != nil {
 		return derr
@@ -75,9 +77,8 @@ func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s 
 	}
 
 	res := result{
-		Arch:    arch,
-		Harness: model.Harness{Dir: dir, Files: files},
-		Machine: m.MachineID,
+		MArch:   model.MachQualID{MachineID: m.MachineID, ID: arch},
+		Harness: subject.Harness{Dir: dir, Files: files},
 		Subject: s,
 	}
 

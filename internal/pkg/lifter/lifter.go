@@ -21,7 +21,7 @@ type HarnessMaker interface {
 
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {
-	// Plan is the plan on which this lifter is operating.
+	// plan is the plan on which this lifter is operating.
 	Plan plan.Plan
 
 	// Maker is a harness maker.

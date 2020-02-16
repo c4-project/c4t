@@ -7,6 +7,10 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
+func ExampleMachinePlan_CompilerIDs() {
+
+}
+
 // TestMachinePlan_Arches tests the Arches method on MachinePlan.
 func TestMachinePlan_Arches(t *testing.T) {
 	tests := []struct {

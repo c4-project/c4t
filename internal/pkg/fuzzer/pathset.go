@@ -1,8 +1,9 @@
 package fuzzer
 
 import (
-	"fmt"
 	"path"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 )
 
 const (
@@ -30,18 +31,16 @@ func NewPathset(root string) *Pathset {
 	}
 }
 
-// Dirs gets a list of all directories in the pathset.
-func (p Pathset) Dirs() []string {
-	return []string{p.DirTrace, p.DirLitmus}
+// Prepare prepares this pathset by making its directories.
+func (p *Pathset) Prepare() error {
+	return iohelp.Mkdirs(p.DirTrace, p.DirLitmus)
 }
 
-// SubjectPaths gets the litmus and trace file paths for the subject with the given name and fuzzing cycle.
-func (p Pathset) SubjectPaths(name string, cycle int) (litmus, trace string) {
-	base := CycledName(name, cycle)
-	return path.Join(p.DirLitmus, base+".litmus"), path.Join(p.DirTrace, base+".trace")
-}
-
-// CycledName gets the new name of subject name given the current cycle.
-func CycledName(name string, cycle int) string {
-	return fmt.Sprintf("%s_%d", name, cycle)
+// SubjectPaths gets the litmus and trace file paths for the subject/cycle pair c.
+func (p *Pathset) SubjectPaths(c SubjectCycle) SubjectPathset {
+	base := c.String()
+	return SubjectPathset{
+		FileLitmus: path.Join(p.DirLitmus, base+".litmus"),
+		FileTrace:  path.Join(p.DirTrace, base+".trace"),
+	}
 }

@@ -1,24 +1,49 @@
 package compiler
 
-import "github.com/MattWindsor91/act-tester/internal/pkg/model"
+import (
+	"context"
 
-// Result logs information about an attempt to compile a subject with a compiler under test.
-type Result struct {
-	// BackendID is the CompilerID of the backend that generated the harness compiled by this compiler.
-	BackendID model.ID
+	"github.com/cheggaaa/pb/v3"
 
-	// CompilerID is the CompilerID of the compiler used to compile this binary.
-	CompilerID model.ID
+	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+)
 
-	// SubName is the name of the test subject.
-	SubName string
+// result logs information about an attempt to compile a subject with a compiler under test.
+type result struct {
+	// CompilerID is the machine-qualified ID of the compiler that produced this result.
+	CompilerID model.MachQualID
 
-	// Success gets whether the compilation succeeded (possibly with errors).
-	Success bool
+	// Subject is the subject that has been lifted,
+	// passed as a pointer to let the result collector modify it in-place.
+	Subject *subject.Subject
 
-	// PathBin, on success, provides the path to the compiled binary.
-	PathBin string
+	subject.CompileResult
+}
 
-	// PathLog provides the path to the compiler's stderr log.
-	PathLog string
+// handleResults waits for nresult results to come in through resCh.
+// For each result, it propagates the compilation results to its subject.
+func handleResults(ctx context.Context, nresult int, resCh <-chan result) error {
+	bar := pb.StartNew(nresult)
+	defer bar.Finish()
+
+	for i := 0; i < nresult; i++ {
+		select {
+		case r := <-resCh:
+			if err := handleResult(r); err != nil {
+				return err
+			}
+			bar.Increment()
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+
+	return nil
+}
+
+// handleResult applies a result's compiler result to its own subject.
+// We make sure to do this sequentially in a single result-handling goroutine, to avoid races.
+func handleResult(r result) error {
+	return r.Subject.AddCompileResult(r.CompilerID, r.CompileResult)
 }

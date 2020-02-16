@@ -4,10 +4,43 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"sort"
 	"testing"
 
 	"github.com/BurntSushi/toml"
 )
+
+// ExampleID_Less is a runnable example for Less
+func ExampleID_Less() {
+	ids := []ID{
+		IDFromString("arm.7"),
+		IDFromString("ppc.64.le"),
+		IDFromString("x86.32"),
+		IDFromString("x86"),
+		IDFromString("arm"),
+		IDFromString("ppc"),
+		IDFromString("x86.64"),
+		IDFromString("ppc.64"),
+		IDFromString("arm.6"),
+	}
+	sort.Slice(ids, func(i, j int) bool {
+		return ids[i].Less(ids[j])
+	})
+	for _, id := range ids {
+		fmt.Println(id)
+	}
+
+	// Output:
+	// arm
+	// arm.6
+	// arm.7
+	// ppc
+	// ppc.64
+	// ppc.64.le
+	// x86
+	// x86.32
+	// x86.64
+}
 
 // ExampleID_Join is a runnable example for Join.
 func ExampleID_Join() {

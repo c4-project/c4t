@@ -1,4 +1,4 @@
-package model
+package subject
 
 import (
 	"errors"
@@ -47,8 +47,8 @@ var sampleCorpi = []struct {
 	{"sample5", NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 5},
 }
 
-// TestSampleCorpus_SmallErrors tests that various 'overly small corpus' situations produce an error.
-func TestSampleCorpus_SmallErrors(t *testing.T) {
+// TestCorpus_Sample_SmallErrors tests that various 'overly small corpus' situations produce an error.
+func TestCorpus_Sample_SmallErrors(t *testing.T) {
 	for _, c := range smallCorpi {
 		t.Run(c.name, func(t *testing.T) {
 			_, err := c.corpus.Sample(1, c.want)
@@ -61,8 +61,8 @@ func TestSampleCorpus_SmallErrors(t *testing.T) {
 	}
 }
 
-// TestSampleCorpus_PassThrough tests that various cases that shouldn't cause sampling don't.
-func TestSampleCorpus_PassThrough(t *testing.T) {
+// TestCorpus_Sample_PassThrough tests that various cases that shouldn't cause sampling don't.
+func TestCorpus_Sample_PassThrough(t *testing.T) {
 	for _, c := range exactCorpi {
 		t.Run(c.name, func(t *testing.T) {
 			smp, err := c.corpus.Sample(1, c.want)
@@ -75,8 +75,8 @@ func TestSampleCorpus_PassThrough(t *testing.T) {
 	}
 }
 
-// TestSampleCorpus_ActuallySample tests that sampling behaves correctly.
-func TestSampleCorpus_ActuallySample(t *testing.T) {
+// TestCorpus_Sample_ActuallySample tests that sampling behaves correctly.
+func TestCorpus_Sample_ActuallySample(t *testing.T) {
 	for i, c := range sampleCorpi {
 		t.Run(c.name, func(t *testing.T) {
 			smp, err := c.corpus.Sample(int64(i), c.want)
@@ -95,7 +95,7 @@ func TestSampleCorpus_ActuallySample(t *testing.T) {
 							continue SampleLoop
 						}
 					}
-					t.Fatalf("sample of %v (%v) contains bad or ill-positioned item %q", c.corpus, smp, s)
+					t.Fatalf("sample of %v (%v) contains bad or ill-positioned item: %v", c.corpus, smp, s)
 				}
 			}
 		})
