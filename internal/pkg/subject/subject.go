@@ -30,6 +30,9 @@ type Subject struct {
 	// Name is the name of this subject.
 	Name string `toml:"name"`
 
+	// Threads is the number of threads contained in this subject.
+	Threads int `toml:"threads,omitzero"`
+
 	// Litmus is the path to this subject's current Litmus file.
 	Litmus string `toml:"litmus,omitempty"`
 

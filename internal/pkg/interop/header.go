@@ -20,10 +20,8 @@ type Header struct {
 	Postcondition string `json:"postcondition"`
 }
 
-// ReadHeader tries to read a Header from JSON in rd.
-func ReadHeader(rd io.Reader) (*Header, error) {
-	hdr := Header{}
-	dec := json.NewDecoder(rd)
-	err := dec.Decode(&hdr)
-	return &hdr, err
+// ReadHeader tries to read a Header from JSON in r.
+func (h *Header) Read(r io.Reader) error {
+	dec := json.NewDecoder(r)
+	return dec.Decode(&h)
 }

@@ -35,9 +35,10 @@ func TestReadHeader(t *testing.T) {
 	for _, c := range headerDecodeCases {
 		t.Run(c.name, func(t *testing.T) {
 			rd := strings.NewReader(c.json)
-			if got, err := ReadHeader(rd); err != nil {
+			var got Header
+			if err := got.Read(rd); err != nil {
 				t.Errorf("decode failed with error (%s): %q", err, c.json)
-			} else if !reflect.DeepEqual(*got, c.want) {
+			} else if !reflect.DeepEqual(got, c.want) {
 				t.Errorf("decode got=%v; want=%v; input: %q", got, c.want, c.json)
 			}
 		})
