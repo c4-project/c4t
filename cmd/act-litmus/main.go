@@ -46,7 +46,7 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 	}
 
 	fs.StringVar(&cfg.CArch, "carch", "", usageCArch)
-	fs.StringVar(&cfg.OutDir, "o", "", usageOutDir)
+	fs.StringVar(&cfg.Pathset.DirOut, "o", "", usageOutDir)
 	// TODO(@MattWindsor91): ActRunner flags
 
 	if err := fs.Parse(args[1:]); err != nil {
@@ -57,6 +57,6 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 	if len(anons) != 1 {
 		return nil, fmt.Errorf("expected precisely one anonymous argument; got %v", anons)
 	}
-	cfg.InFile = anons[0]
+	cfg.Pathset.FileIn = anons[0]
 	return &cfg, nil
 }

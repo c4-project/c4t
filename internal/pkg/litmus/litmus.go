@@ -20,12 +20,6 @@ var (
 
 	// ErrNoCArch occurs when the output directory is empty.
 	ErrNoCArch = errors.New("need carch")
-
-	// ErrNoInFile occurs when the input file is empty.
-	ErrNoInFile = errors.New("need input file")
-
-	// ErrNoOutDir occurs when the output directory is empty.
-	ErrNoOutDir = errors.New("need output directory")
 )
 
 // Litmus is the configuration required to run the litmus shim.
@@ -38,11 +32,8 @@ type Litmus struct {
 	// It corresponds to Litmus's 'carch' argument.
 	CArch string
 
-	// InFile is the path to the input test file.
-	InFile string
-
-	// OutDir is the path to the output directory.
-	OutDir string
+	// Pathset is the set of specified paths for this litmus invocation.
+	Pathset Pathset
 
 	// Fixset is the set of enabled fixes.
 	// It is part of the config to allow the forcing of fixes that the shim would otherwise deem unnecessary.
@@ -53,63 +44,58 @@ type Litmus struct {
 }
 
 // Run runs the litmus wrapper according to the configuration c.
-func (c *Litmus) Run() error {
-	if err := c.check(); err != nil {
+func (l *Litmus) Run() error {
+	if err := l.check(); err != nil {
 		return err
 	}
 
-	if err := c.probeFixes(); err != nil {
+	if err := l.probeFixes(); err != nil {
 		return err
 	}
 
-	if err := c.runLitmus(); err != nil {
+	if err := l.runLitmus(); err != nil {
 		return err
 	}
 
-	return nil
+	return l.patch()
 }
 
 // check checks that the configuration makes sense.
-func (c *Litmus) check() error {
-	if c == nil {
+func (l *Litmus) check() error {
+	if l == nil {
 		return ErrConfigNil
 	}
-	if c.Stat == nil {
+	if l.Stat == nil {
 		return ErrStatNil
 	}
-	if c.CArch == "" {
+	if l.CArch == "" {
 		return ErrNoCArch
 	}
-	if c.InFile == "" {
-		return ErrNoInFile
-	}
-	if c.OutDir == "" {
-		return ErrNoOutDir
-	}
-	return nil
+	return l.Pathset.Check()
 }
 
 // probeFixes checks to see if there are any fixes needed for the input.
-func (c *Litmus) probeFixes() error {
+func (l *Litmus) probeFixes() error {
 	var s interop.Statset
-	if err := c.Stat.DumpStats(&s, c.InFile); err != nil {
+	if err := l.Stat.DumpStats(&s, l.Pathset.FileIn); err != nil {
 		return err
 	}
-	c.Fixset.PopulateFromStats(&s)
-	return c.Fixset.Dump(c.Err)
+	l.Fixset.PopulateFromStats(&s)
+	return l.Fixset.Dump(l.Err)
 }
 
 // runLitmus actually runs Litmus.
-func (c *Litmus) runLitmus() error {
-	cmd := exec.Command("litmus7", c.litmusArgs()...)
+func (l *Litmus) runLitmus() error {
+	cmd := exec.Command("litmus7", l.litmusArgs()...)
 
-	cmd.Stderr = c.Err
+	cmd.Stderr = l.Err
 	return cmd.Run()
 }
 
 // litmusArgs works out the argument vector for Litmus.
-func (c *Litmus) litmusArgs() []string {
-	args := c.Fixset.Args()
-	args = append(args, "-carch", c.CArch, "-c11", "true", "-o", c.OutDir, c.InFile)
+func (l *Litmus) litmusArgs() []string {
+	args := l.Fixset.Args()
+	args = append(args, "-carch", l.CArch, "-c11", "true")
+	args = append(args, l.Pathset.Args()...)
 	return args
 }
