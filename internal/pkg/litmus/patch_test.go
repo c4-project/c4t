@@ -8,12 +8,16 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/litmus"
 )
 
-const mainFileExample = `#include <stdio.h>
+const mainFileExample = `// File example
+
+/* Includes */
+#include <stdio.h>
 
 int
 main(int argc, char **argv)
 {
-  printf("hello, world\n");
+  x = (_Atomic int)y;
+  fprintf(fhist, "x=%i", (_Atomic int)y);
 }
 `
 
@@ -28,7 +32,34 @@ func TestFixset_PatchMainFile(t *testing.T) {
 		},
 		"stdbool": {
 			fixset: litmus.Fixset{InjectStdbool: true},
-			want:   strings.Join([]string{litmus.IncludeStdbool, mainFileExample}, "\n"),
+			want: `// File example
+
+/* Includes */
+#include <stdbool.h>
+#include <stdio.h>
+
+int
+main(int argc, char **argv)
+{
+  x = (_Atomic int)y;
+  fprintf(fhist, "x=%i", (_Atomic int)y);
+}
+`,
+		},
+		"casts": {
+			fixset: litmus.Fixset{RemoveAtomicCasts: true},
+			want: `// File example
+
+/* Includes */
+#include <stdio.h>
+
+int
+main(int argc, char **argv)
+{
+  x = (_Atomic int)y;
+  fprintf(fhist, "x=%i", y);
+}
+`,
 		},
 	}
 

@@ -1,15 +1,23 @@
 package litmus
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
-// IncludeStdbool is the include directive that the litmus patcher will insert if needed.
-// It is exported for testing purposes.
-const IncludeStdbool = "#include <stdbool.h>"
+const (
+	// IncludeStdbool is the include directive that the litmus patcher will insert if needed.
+	// It is exported for testing purposes.
+	IncludeStdbool = "#include <stdbool.h>"
+
+	atomicCast = "(_Atomic int)"
+
+	dumpPrefix = "fprintf(fhist,"
+)
 
 // patch patches the Litmus files in p, which originated from a Litmus invocation in inFile.
 func (l *Litmus) patch() error {
@@ -49,17 +57,49 @@ func (l *Litmus) patch() error {
 
 // PatchMainFile patches the main C file represented by rw according to this fixset.
 func (f *Fixset) PatchMainFile(r io.Reader, w io.Writer) error {
-	if err := f.patchStdbool(w); err != nil {
-		return fmt.Errorf("can't insert include into buffer: %w", err)
+	sc := bufio.NewScanner(r)
+
+	for sc.Scan() {
+		if err := f.patchLine(w, sc.Text()); err != nil {
+			return err
+		}
+	}
+	return sc.Err()
+}
+
+func (f *Fixset) patchLine(w io.Writer, line string) error {
+	line = f.patchWithinLine(line)
+
+	if _, err := fmt.Fprintln(w, line); err != nil {
+		return fmt.Errorf("can't write to patched file: %w", err)
 	}
 
-	if _, err := io.Copy(w, r); err != nil {
-		return fmt.Errorf("can't copy C file: %w", err)
+	if strings.Contains(line, "/* Includes */") {
+		if err := f.patchStdbool(w); err != nil {
+			return fmt.Errorf("can't insert include into buffer: %w", err)
+		}
 	}
-
 	return nil
 }
 
+// patchWithinLine does line-level patches on line.
+func (f *Fixset) patchWithinLine(line string) string {
+	switch {
+	case f.RemoveAtomicCasts && isDump(line):
+		return strings.ReplaceAll(line, atomicCast, "")
+	default:
+		return line
+	}
+}
+
+// isDump is a heuristic for checking whether line is the problematic dumping fprintf in the Litmus harness that
+// includes atomic casts.
+func isDump(line string) bool {
+	ls := strings.TrimSpace(line)
+	return strings.HasPrefix(ls, dumpPrefix)
+}
+
+// patchStdbool inserts an include for stdbool into w.
 func (f *Fixset) patchStdbool(w io.Writer) error {
 	if !f.InjectStdbool {
 		return nil
