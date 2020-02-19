@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	usageCArch  = "C architecture to pass through to litmus"
-	usageOutDir = "output directory for harness"
+	usageCArch   = "C architecture to pass through to litmus"
+	usageOutDir  = "output directory for harness"
+	usageVerbose = "be more verbose"
 )
 
 func main() {
@@ -45,6 +46,9 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 		Err:  errw,
 	}
 
+	_ = fs.String("c11", "", "for Litmus compatibility; ignored")
+
+	fs.BoolVar(&cfg.Verbose, "v", false, usageVerbose)
 	fs.StringVar(&cfg.CArch, "carch", "", usageCArch)
 	fs.StringVar(&cfg.Pathset.DirOut, "o", "", usageOutDir)
 	// TODO(@MattWindsor91): ActRunner flags

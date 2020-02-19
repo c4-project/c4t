@@ -5,6 +5,18 @@ import (
 	"os"
 )
 
+// ExampleFixset_Args is a runnable example for Args.
+func ExampleFixset_Args() {
+	f := Fixset{InjectStdbool: true, UseAsCall: true}
+	for _, s := range f.Args() {
+		fmt.Println(s)
+	}
+
+	// Output:
+	// -ascall
+	// true
+}
+
 // ExampleFixset_Dump is a runnable example for Dump.
 func ExampleFixset_Dump() {
 	f := Fixset{InjectStdbool: true, UseAsCall: true}
@@ -15,14 +27,14 @@ func ExampleFixset_Dump() {
 	// using -ascall
 }
 
-// ExampleFixset_Args is a runnable example for Args.
-func ExampleFixset_Args() {
-	f := Fixset{InjectStdbool: true, UseAsCall: true}
-	for _, s := range f.Args() {
-		fmt.Println(s)
-	}
+// ExampleFixset_NeedsPatch is a runnable example for NeedsPatch.
+func ExampleFixset_NeedsPatch() {
+	fmt.Println((&Fixset{}).NeedsPatch())
+	fmt.Println((&Fixset{UseAsCall: true}).NeedsPatch())
+	fmt.Println((&Fixset{InjectStdbool: true}).NeedsPatch())
 
 	// Output:
-	// -ascall
+	// false
+	// false
 	// true
 }

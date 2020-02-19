@@ -63,3 +63,8 @@ func (f *Fixset) Dump(w io.Writer) error {
 	}
 	return nil
 }
+
+// NeedsPatch checks whether patching the litmus harness is necessary.
+func (f *Fixset) NeedsPatch() bool {
+	return f.RemoveAtomicCasts || f.InjectStdbool
+}

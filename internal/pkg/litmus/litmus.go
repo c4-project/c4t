@@ -32,6 +32,9 @@ type Litmus struct {
 	// It corresponds to Litmus's 'carch' argument.
 	CArch string
 
+	// Verbose toggles various 'verbose' dumping actions.
+	Verbose bool
+
 	// Pathset is the set of specified paths for this litmus invocation.
 	Pathset Pathset
 
@@ -81,7 +84,11 @@ func (l *Litmus) probeFixes() error {
 		return err
 	}
 	l.Fixset.PopulateFromStats(&s)
-	return l.Fixset.Dump(l.Err)
+
+	if l.Verbose {
+		return l.Fixset.Dump(l.Err)
+	}
+	return nil
 }
 
 // runLitmus actually runs Litmus.

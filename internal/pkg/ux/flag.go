@@ -28,23 +28,23 @@ const (
 	usagePlanFile = "read from this plan `file` instead of stdin"
 )
 
-// CorpusSizeFlag sets up a 'target corpus size' flag.
-func CorpusSizeFlag(out *int) {
-	flag.IntVar(out, FlagNum, 0, usageCorpusSize)
+// CorpusSizeFlag sets up a 'target corpus size' flag on fs.
+func CorpusSizeFlag(fs *flag.FlagSet, out *int) {
+	fs.IntVar(out, FlagNum, 0, usageCorpusSize)
 }
 
-// OutDirFlag sets up an 'output directory' flag.
-func OutDirFlag(out *string, defaultdir string) {
-	flag.StringVar(out, flagOutDir, defaultdir, usageOutDir)
+// OutDirFlag sets up an 'output directory' flag on fs.
+func OutDirFlag(fs *flag.FlagSet, out *string, defaultdir string) {
+	fs.StringVar(out, flagOutDir, defaultdir, usageOutDir)
 }
 
-// ActRunnerFlags sets up a standard set of arguments feeding into the ActRunner a.
-func ActRunnerFlags(a *interop.ActRunner) {
-	flag.StringVar(&a.ConfFile, flagActConfFile, "", usageConfFile)
-	flag.BoolVar(&a.DuneExec, flagActDuneExec, false, usageDuneExec)
+// ActRunnerFlags sets up a standard set of arguments on fs feeding into the ActRunner a.
+func ActRunnerFlags(fs *flag.FlagSet, a *interop.ActRunner) {
+	fs.StringVar(&a.ConfFile, flagActConfFile, "", usageConfFile)
+	fs.BoolVar(&a.DuneExec, flagActDuneExec, false, usageDuneExec)
 }
 
-// PlanFileFlag sets up a standard argument for loading a plan file into f.
-func PlanFileFlag(f *string) {
-	flag.StringVar(f, FlagInputFile, "", usagePlanFile)
+// PlanFileFlag sets up a standard argument on fs for loading a plan file into f.
+func PlanFileFlag(fs *flag.FlagSet, f *string) {
+	fs.StringVar(f, FlagInputFile, "", usagePlanFile)
 }

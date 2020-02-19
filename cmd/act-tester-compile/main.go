@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
@@ -17,6 +18,12 @@ const (
 )
 
 func main() {
+	if err := run(os.Args); err != nil {
+		ux.LogTopError(err)
+	}
+}
+
+func run(args []string) error {
 	var (
 		act   interop.ActRunner
 		dir   string
@@ -24,17 +31,19 @@ func main() {
 		pmach string
 	)
 
-	ux.ActRunnerFlags(&act)
-	ux.OutDirFlag(&dir, defaultOutDir)
-	ux.PlanFileFlag(&pfile)
-	flag.StringVar(&pmach, ux.FlagMachine, "", usageFlagMachine)
-	flag.Parse()
+	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
+	ux.ActRunnerFlags(fs, &act)
+	ux.OutDirFlag(fs, &dir, defaultOutDir)
+	ux.PlanFileFlag(fs, &pfile)
+	fs.StringVar(&pmach, ux.FlagMachine, "", usageFlagMachine)
+	if err := fs.Parse(args[1:]); err != nil {
+		return err
+	}
 
 	cfg := compiler.Config{
 		Driver:    &act,
 		MachineID: model.IDFromString(pmach),
 		Paths:     compiler.NewPathset(dir),
 	}
-	err := ux.RunOnPlanFile(context.Background(), &cfg, pfile)
-	ux.LogTopError(err)
+	return ux.RunOnPlanFile(context.Background(), &cfg, pfile)
 }

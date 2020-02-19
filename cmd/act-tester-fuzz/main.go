@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
@@ -17,6 +18,11 @@ const (
 )
 
 func main() {
+	err := run(os.Args)
+	ux.LogTopError(err)
+}
+
+func run(args []string) error {
 	var (
 		act interop.ActRunner
 		dir string
@@ -24,14 +30,16 @@ func main() {
 	)
 	cfg := fuzzer.Config{Driver: &act}
 
-	ux.ActRunnerFlags(&act)
-	ux.CorpusSizeFlag(&cfg.CorpusSize)
-	ux.OutDirFlag(&dir, defaultOutDir)
-	ux.PlanFileFlag(&pf)
-	flag.IntVar(&cfg.SubjectCycles, "k", fuzzer.DefaultSubjectCycles, usageSubjectCycles)
-	flag.Parse()
+	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
+	ux.ActRunnerFlags(fs, &act)
+	ux.CorpusSizeFlag(fs, &cfg.CorpusSize)
+	ux.OutDirFlag(fs, &dir, defaultOutDir)
+	ux.PlanFileFlag(fs, &pf)
+	fs.IntVar(&cfg.SubjectCycles, "k", fuzzer.DefaultSubjectCycles, usageSubjectCycles)
+	if err := fs.Parse(args[1:]); err != nil {
+		return err
+	}
 
 	cfg.Paths = fuzzer.NewPathset(dir)
-	err := ux.RunOnPlanFile(context.Background(), &cfg, pf)
-	ux.LogTopError(err)
+	return ux.RunOnPlanFile(context.Background(), &cfg, pf)
 }

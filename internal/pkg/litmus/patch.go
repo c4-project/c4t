@@ -23,7 +23,7 @@ const (
 func (l *Litmus) patch() error {
 	// Right now, there's only one thing to patch, so this is fairly easy.
 
-	if !l.Fixset.InjectStdbool {
+	if !l.Fixset.NeedsPatch() {
 		return nil
 	}
 
