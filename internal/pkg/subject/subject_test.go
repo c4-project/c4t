@@ -13,8 +13,8 @@ import (
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
 	s := Subject{Compiles: map[string]CompileResult{
-		"localhost:gcc":   {Success: true, Files: CompileFileset{"a.out", "gcc.log"}},
-		"spikemuth:clang": {Success: false, Files: CompileFileset{"a.out", "clang.log"}},
+		"localhost:gcc":   {Success: true, Files: CompileFileset{Bin: "a.out", Log: "gcc.log"}},
+		"spikemuth:clang": {Success: false, Files: CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
 	lps, _ := s.CompileResult(model.MachQualID{MachineID: model.IDFromString("localhost"), ID: model.IDFromString("gcc")})
 	sps, _ := s.CompileResult(model.MachQualID{MachineID: model.IDFromString("spikemuth"), ID: model.IDFromString("clang")})

@@ -15,4 +15,8 @@ type CompileFileset struct {
 	Bin string `toml:"bin,omitempty"`
 	// Log is the path to this subject's compiler stderr log file.
 	Log string `toml:"log,omitempty"`
+	// RawObs is the path to this subject's raw observation file.
+	RawObs string `toml:"log,omitempty"`
+	// Obs is the path to this subject's processed observation file.
+	Obs string `toml:"log,omitempty"`
 }
