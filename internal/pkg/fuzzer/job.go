@@ -28,7 +28,7 @@ type job struct {
 	ResCh chan<- subject.Subject
 }
 
-// Fuzz performs a single fuzzing job.
+// FuzzFileset performs a single fuzzing job.
 func (j *job) Fuzz(ctx context.Context) error {
 	for i := 0; i < j.SubjectCycles; i++ {
 		if err := j.fuzzCycle(ctx, i); err != nil {
@@ -41,30 +41,20 @@ func (j *job) Fuzz(ctx context.Context) error {
 func (j *job) fuzzCycle(ctx context.Context, cycle int) error {
 	sc := SubjectCycle{Name: j.Subject.Name, Cycle: cycle}
 	spaths := j.Pathset.SubjectPaths(sc)
-	if err := j.Driver.FuzzSingle(j.Rng.Int31(), j.Subject.Litmus, spaths.FileLitmus, spaths.FileTrace); err != nil {
+	if err := j.Driver.FuzzSingle(j.Rng.Int31(), j.Subject.Litmus, spaths.Litmus, spaths.Trace); err != nil {
 		return err
 	}
-	s2 := j.makeSubject(sc, spaths)
-	if err := j.sendSubject(ctx, s2); err != nil {
+	j.Subject.Fuzz = &spaths
+	if err := j.sendSubject(ctx); err != nil {
 		return err
 	}
 	return nil
 }
 
-// makeSubject makes the new, fuzzed subject to send back to the batch fuzzer.
-func (j *job) makeSubject(sc SubjectCycle, ps SubjectPathset) subject.Subject {
-	return subject.Subject{
-		Name:       sc.String(),
-		OrigLitmus: j.Subject.Litmus,
-		Litmus:     ps.FileLitmus,
-		TracePath:  ps.FileTrace,
-	}
-}
-
-// sendSubject tries to send s down this job's result channel.
-func (j *job) sendSubject(ctx context.Context, s subject.Subject) error {
+// sendSubject tries to send this job's subject down its result channel.
+func (j *job) sendSubject(ctx context.Context) error {
 	select {
-	case j.ResCh <- s:
+	case j.ResCh <- j.Subject:
 	case <-ctx.Done():
 		return ctx.Err()
 	}

@@ -67,7 +67,7 @@ func (f *Fuzzer) checkCount() error {
 	return nil
 }
 
-// Fuzz runs the fuzzer with context ctx.
+// FuzzFileset runs the fuzzer with context ctx.
 func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 	logrus.Infoln("preparing directories")
 	if err := f.conf.Paths.Prepare(); err != nil {

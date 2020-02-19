@@ -1,14 +1,30 @@
 package plan
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
+// ExampleMachinePlan_CompilerIDs is a runnable example for CompilerIDs.
 func ExampleMachinePlan_CompilerIDs() {
+	plan := MachinePlan{Compilers: map[string]model.Compiler{
+		"gcc.ppc":   {Arch: model.ArchPPC},
+		"clang.ppc": {Arch: model.ArchPPC},
+		"gcc":       {Arch: model.ArchArm},
+		"clang":     {Arch: model.ArchArm},
+	}}
+	for _, c := range plan.CompilerIDs() {
+		fmt.Println(c.String())
+	}
 
+	// Output:
+	// clang
+	// clang.ppc
+	// gcc
+	// gcc.ppc
 }
 
 // TestMachinePlan_Arches tests the Arches method on MachinePlan.

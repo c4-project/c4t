@@ -63,10 +63,15 @@ func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s 
 		return derr
 	}
 
+	path, perr := s.BestLitmus()
+	if perr != nil {
+		return perr
+	}
+
 	spec := model.HarnessSpec{
 		Backend: m.Machine.Backend.ID,
 		Arch:    arch,
-		InFile:  s.Litmus,
+		InFile:  path,
 		OutDir:  dir,
 	}
 

@@ -36,8 +36,7 @@ func (m MachinePlan) Arches() []model.ID {
 	}
 
 	sort.Slice(arches, func(i, j int) bool {
-		// TODO(@MattWindsor91): probably not a good heuristic
-		return arches[i].String() < arches[j].String()
+		return arches[i].Less(arches[j])
 	})
 	return arches
 }

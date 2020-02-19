@@ -3,6 +3,8 @@ package fuzzer
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 )
 
@@ -19,7 +21,7 @@ type SubjectPather interface {
 	Prepare() error
 
 	// SubjectPaths gets the litmus and trace file paths for the subject/cycle pair sc.
-	SubjectPaths(sc SubjectCycle) SubjectPathset
+	SubjectPaths(sc SubjectCycle) subject.FuzzFileset
 }
 
 // Config represents the configuration that goes into a batch fuzzer run.

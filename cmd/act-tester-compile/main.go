@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	defaultOutDir    = "run_results"
-	usageFlagMachine = "specifies a machine in a multi-machine plan to run"
+	defaultOutDir    = "compile_results"
+	usageFlagMachine = "specifies a machine in a multi-machine plan to compile against"
 )
 
 func main() {

@@ -23,6 +23,9 @@ var (
 
 	// ErrMissingHarness occurs on requests for harness paths for a machine/arch that do not have them.
 	ErrMissingHarness = errors.New("no such harness")
+
+	// ErrNoBestLitmus occurs when asking for a BestLitmus() on a test with no valid Litmus file paths.
+	ErrNoBestLitmus = errors.New("no valid litmus file for this subject")
 )
 
 // Subject represents a single test subject in a corpus.
@@ -33,16 +36,11 @@ type Subject struct {
 	// Threads is the number of threads contained in this subject.
 	Threads int `toml:"threads,omitzero"`
 
-	// Litmus is the path to this subject's current Litmus file.
+	// FuzzFileset is the fuzzing pathset for this subject, if it has been fuzzed.
+	Fuzz *FuzzFileset `toml:"fuzz,omitempty"`
+
+	// Litmus is the path to this subject's original Litmus file.
 	Litmus string `toml:"litmus,omitempty"`
-
-	// OrigLitmus is the path to this subject's original Litmus file.
-	// If empty, then Litmus is the original file.
-	OrigLitmus string `toml:"orig_litmus,omitempty"`
-
-	// TracePath is the path to this subject's fuzzer trace file.
-	// If empty, this subject hasn't been fuzzed by act-tester-fuzz.
-	TracePath string `toml:"trace_path,omitempty"`
 
 	// Compiles contains information about this subject's compilation attempts.
 	// It maps from a string of the form 'machine:compiler', where machine and compiler are ACT IDs.
@@ -53,6 +51,22 @@ type Subject struct {
 	// It maps from a string of the form 'machine:arch', where machine and arch are ACT IDs.
 	// If nil, this subject hasn't had a harness generated.
 	Harnesses map[string]Harness `toml:"harnesses,omitempty"`
+}
+
+// BestLitmus tries to get the 'best' litmus test path for further development.
+//
+// When there is a fuzzing record for this subject, the fuzz output is the best path.
+// Otherwise, if there is a non-empty Litmus file for this subject, that file is the best path.
+// Else, BestLitmus returns an error.
+func (s *Subject) BestLitmus() (string, error) {
+	switch {
+	case s.Fuzz != nil && s.Fuzz.Litmus != "":
+		return s.Fuzz.Litmus, nil
+	case s.Litmus != "":
+		return s.Litmus, nil
+	default:
+		return "", fmt.Errorf("%s: %w", s.Name, ErrNoBestLitmus)
+	}
 }
 
 // Note that the Compiles and Harnesses maps work in basically the same way; their being separate and duplicated is just a

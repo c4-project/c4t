@@ -3,6 +3,8 @@ package fuzzer
 import (
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 )
 
@@ -37,10 +39,10 @@ func (p *Pathset) Prepare() error {
 }
 
 // SubjectPaths gets the litmus and trace file paths for the subject/cycle pair c.
-func (p *Pathset) SubjectPaths(c SubjectCycle) SubjectPathset {
+func (p *Pathset) SubjectPaths(c SubjectCycle) subject.FuzzFileset {
 	base := c.String()
-	return SubjectPathset{
-		FileLitmus: path.Join(p.DirLitmus, base+".litmus"),
-		FileTrace:  path.Join(p.DirTrace, base+".trace"),
+	return subject.FuzzFileset{
+		Litmus: path.Join(p.DirLitmus, base+".litmus"),
+		Trace:  path.Join(p.DirTrace, base+".trace"),
 	}
 }

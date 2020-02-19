@@ -4,6 +4,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
@@ -20,11 +22,11 @@ func (m *MockPathset) Prepare() error {
 	return nil
 }
 
-func (m *MockPathset) SubjectPaths(sc fuzzer.SubjectCycle) fuzzer.SubjectPathset {
+func (m *MockPathset) SubjectPaths(sc fuzzer.SubjectCycle) subject.FuzzFileset {
 	m.SubjectCycles = append(m.SubjectCycles, sc)
-	return fuzzer.SubjectPathset{
-		FileLitmus: path.Join("litmus", sc.String()),
-		FileTrace:  path.Join("trace", sc.String()),
+	return subject.FuzzFileset{
+		Litmus: path.Join("litmus", sc.String()),
+		Trace:  path.Join("trace", sc.String()),
 	}
 }
 

@@ -14,11 +14,3 @@ type SubjectCycle struct {
 func (f SubjectCycle) String() string {
 	return fmt.Sprintf("%s_%d", f.Name, f.Cycle)
 }
-
-// SubjectPathset is the set of file paths associated with a fuzzer output.
-type SubjectPathset struct {
-	// FileLitmus is the path to this subject's fuzzed Litmus file.
-	FileLitmus string
-	// FileTrace is the path to this subject's fuzzer trace file.
-	FileTrace string
-}
