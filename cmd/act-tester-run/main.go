@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"io"
+	"log"
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/runner"
@@ -18,12 +21,12 @@ const (
 )
 
 func main() {
-	if err := run(os.Args); err != nil {
+	if err := run(os.Args, os.Stderr); err != nil {
 		ux.LogTopError(err)
 	}
 }
 
-func run(args []string) error {
+func run(args []string, errw io.Writer) error {
 	var (
 		act   interop.ActRunner
 		dir   string
@@ -41,6 +44,7 @@ func run(args []string) error {
 	}
 
 	cfg := runner.Config{
+		Logger:    log.New(errw, "", 0),
 		Parser:    &act,
 		MachineID: model.IDFromString(pmach),
 		Paths:     runner.NewPathset(dir),
@@ -57,5 +61,5 @@ func makeAndRunRunner(c *runner.Config, pfile string) error {
 	if rerr != nil {
 		return rerr
 	}
-	return run.Run()
+	return run.Run(context.Background())
 }

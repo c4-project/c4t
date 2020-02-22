@@ -20,8 +20,13 @@ import (
 // DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
 const DefaultSubjectCycles = 10
 
-// ErrDriverNil occurs when the fuzzer tries to use the nil pointer as its single-fuzz driver.
-var ErrDriverNil = errors.New("driver nil")
+var (
+	// ErrConfigNil occurs when a fuzzer gets constructed using a nil config.
+	ErrConfigNil = errors.New("config nil")
+
+	// ErrDriverNil occurs when the fuzzer tries to use the nil pointer as its single-fuzz driver.
+	ErrDriverNil = errors.New("driver nil")
+)
 
 // Fuzzer holds the configuration required to fuzz a plan file.
 type Fuzzer struct {
@@ -34,8 +39,8 @@ type Fuzzer struct {
 
 // New constructs a fuzzer with the config c and plan p.
 func New(c *Config, p *plan.Plan) (*Fuzzer, error) {
-	if p == nil {
-		return nil, plan.ErrNil
+	if c == nil {
+		return nil, ErrConfigNil
 	}
 	if c.Driver == nil {
 		return nil, ErrDriverNil
@@ -45,6 +50,9 @@ func New(c *Config, p *plan.Plan) (*Fuzzer, error) {
 	}
 	if c.SubjectCycles <= 0 {
 		return nil, fmt.Errorf("%w: non-positive subject cycle amount", subject.ErrSmallCorpus)
+	}
+	if p == nil {
+		return nil, plan.ErrNil
 	}
 
 	f := Fuzzer{plan: *p, conf: *c}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 )
 
 // ObsFlag is the type of observation flags.
@@ -43,11 +44,12 @@ func (o ObsFlag) Strings() []string {
 			strs = append(strs, str)
 		}
 	}
+	sort.Strings(strs)
 	return strs
 }
 
 // ObsFlagOfStrings reconstitutes an observation flag given a representation as a list strs of strings.
-func ObsFlagOfStrings(strs []string) (ObsFlag, error) {
+func ObsFlagOfStrings(strs ...string) (ObsFlag, error) {
 	var o ObsFlag
 	for _, s := range strs {
 		f, ok := ObsFlagNames[s]
@@ -72,7 +74,7 @@ func (o *ObsFlag) UnmarshalJSON(bs []byte) error {
 	}
 
 	var err error
-	*o, err = ObsFlagOfStrings(strs)
+	*o, err = ObsFlagOfStrings(strs...)
 	return err
 }
 
@@ -92,4 +94,14 @@ type Obs struct {
 
 	// States lists all observed states.
 	States []ObsState `json:"states"`
+}
+
+// Sat gets whether the observation satisfies its validation.
+func (o *Obs) Sat() bool {
+	return o.Flags.Has(ObsSat)
+}
+
+// Unsat gets whether the observation does not satisfy its validation.
+func (o *Obs) Unsat() bool {
+	return o.Flags.Has(ObsUnsat)
 }

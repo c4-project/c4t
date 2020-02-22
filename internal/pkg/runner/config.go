@@ -3,6 +3,7 @@ package runner
 import (
 	"context"
 	"io"
+	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
@@ -16,6 +17,10 @@ type ObsParser interface {
 
 // Config represents the configuration needed to run a Runner.
 type Config struct {
+	// Logger is the logger that should be used for this Runner.
+	// If nil, logging will be suppressed.
+	Logger *log.Logger
+
 	// Parser handles the parsing of observations.
 	Parser ObsParser
 
