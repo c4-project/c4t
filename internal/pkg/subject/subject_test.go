@@ -1,9 +1,12 @@
-package subject
+package subject_test
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
@@ -12,11 +15,11 @@ import (
 
 // ExampleSubject_BestLitmus is a testable example for BestLitmus.
 func ExampleSubject_BestLitmus() {
-	s1 := Subject{Litmus: "foo.litmus"}
+	s1 := subject.Subject{Litmus: "foo.litmus"}
 	b1, _ := s1.BestLitmus()
 
 	// This subject has a fuzzed litmus file, which takes priority.
-	s2 := Subject{Litmus: "foo.litmus", Fuzz: &FuzzFileset{Litmus: "bar.litmus"}}
+	s2 := subject.Subject{Litmus: "foo.litmus", Fuzz: &subject.FuzzFileset{Litmus: "bar.litmus"}}
 	b2, _ := s2.BestLitmus()
 
 	fmt.Println("s1:", b1)
@@ -29,9 +32,9 @@ func ExampleSubject_BestLitmus() {
 
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
-	s := Subject{Compiles: map[string]CompileResult{
-		"localhost:gcc":   {Success: true, Files: CompileFileset{Bin: "a.out", Log: "gcc.log"}},
-		"spikemuth:clang": {Success: false, Files: CompileFileset{Bin: "a.out", Log: "clang.log"}},
+	s := subject.Subject{Compiles: map[string]subject.CompileResult{
+		"localhost:gcc":   {Success: true, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
+		"spikemuth:clang": {Success: false, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
 	lps, _ := s.CompileResult(model.MachQualID{MachineID: model.IDFromString("localhost"), ID: model.IDFromString("gcc")})
 	sps, _ := s.CompileResult(model.MachQualID{MachineID: model.IDFromString("spikemuth"), ID: model.IDFromString("clang")})
@@ -46,7 +49,7 @@ func ExampleSubject_CompileResult() {
 
 // ExampleSubject_Harness is a testable example for Harness.
 func ExampleSubject_Harness() {
-	s := Subject{Harnesses: map[string]Harness{
+	s := subject.Subject{Harnesses: map[string]subject.Harness{
 		"localhost:x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"spikemuth:arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
@@ -69,20 +72,20 @@ func ExampleSubject_Harness() {
 // TestSubject_CompileResult_Missing checks that trying to get a harness path for a missing machine/emits pair triggers
 // the appropriate error.
 func TestSubject_CompileResult_Missing(t *testing.T) {
-	var s Subject
+	var s subject.Subject
 	_, err := s.CompileResult(model.MachQualID{
 		MachineID: model.IDFromString("localhost"),
 		ID:        model.IDFromString("gcc"),
 	})
-	testhelp.ExpectErrorIs(t, err, ErrMissingCompile, "missing compile result path")
+	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompile, "missing compile result path")
 }
 
 // TestSubject_AddCompileResult checks that AddCompileResult is working properly.
 func TestSubject_AddCompileResult(t *testing.T) {
-	var s Subject
-	c := CompileResult{
+	var s subject.Subject
+	c := subject.CompileResult{
 		Success: true,
-		Files: CompileFileset{
+		Files: subject.CompileFileset{
 			Bin: "a.out",
 			Log: "gcc.log",
 		},
@@ -108,23 +111,23 @@ func TestSubject_AddCompileResult(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		err := s.AddCompileResult(mcomp, CompileResult{})
-		testhelp.ExpectErrorIs(t, err, ErrDuplicateCompile, "adding compile twice")
+		err := s.AddCompileResult(mcomp, subject.CompileResult{})
+		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateCompile, "adding compile twice")
 	})
 }
 
 // TestSubject_Harness_Missing checks that trying to get a harness path for a missing machine/emits pair triggers
 // the appropriate error.
 func TestSubject_Harness_Missing(t *testing.T) {
-	var s Subject
+	var s subject.Subject
 	_, err := s.Harness(model.MachQualID{MachineID: model.IDFromString("localhost"), ID: model.IDFromString("x86.64")})
-	testhelp.ExpectErrorIs(t, err, ErrMissingHarness, "missing harness path")
+	testhelp.ExpectErrorIs(t, err, subject.ErrMissingHarness, "missing harness path")
 }
 
 // TestSubject_AddHarness checks that AddHarness is working properly.
 func TestSubject_AddHarness(t *testing.T) {
-	var s Subject
-	h := Harness{
+	var s subject.Subject
+	h := subject.Harness{
 		Dir:   "foo",
 		Files: []string{"bar", "baz"},
 	}
@@ -149,7 +152,39 @@ func TestSubject_AddHarness(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		err := s.AddHarness(march, Harness{})
-		testhelp.ExpectErrorIs(t, err, ErrDuplicateHarness, "adding harness twice")
+		err := s.AddHarness(march, subject.Harness{})
+		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateHarness, "adding harness twice")
 	})
+}
+
+// TestSubject_BestLitmus tests a few cases of BestLitmus.
+// It should be more comprehensive than the examples.
+func TestSubject_BestLitmus(t *testing.T) {
+	// Note that the presence of 'err' overrides 'want'.
+	cases := map[string]struct {
+		s    subject.Subject
+		err  error
+		want string
+	}{
+		"zero":             {s: subject.Subject{}, err: subject.ErrNoBestLitmus, want: ""},
+		"zero-fuzz":        {s: subject.Subject{Fuzz: &subject.FuzzFileset{}}, err: subject.ErrNoBestLitmus, want: ""},
+		"litmus-only":      {s: subject.Subject{Litmus: "foo"}, err: nil, want: "foo"},
+		"litmus-only-fuzz": {s: subject.Subject{Litmus: "foo", Fuzz: &subject.FuzzFileset{}}, err: nil, want: "foo"},
+		"fuzz":             {s: subject.Subject{Litmus: "foo", Fuzz: &subject.FuzzFileset{Litmus: "bar"}}, err: nil, want: "bar"},
+	}
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			got, err := c.s.BestLitmus()
+			switch {
+			case err != nil && c.err == nil:
+				t.Errorf("unexpected BestLitmus(%v) error: %v", c.s, err)
+			case err != nil && !errors.Is(err, c.err):
+				t.Errorf("wrong BestLitmus(%v) error: got %v; want %v", c.s, err, c.err)
+			case err == nil && c.err != nil:
+				t.Errorf("no BestLitmus(%v) error; want %v", c.s, err)
+			case err == nil && got != c.want:
+				t.Errorf("BestLitmus(%v)=%q; want %q", c.s, got, c.want)
+			}
+		})
+	}
 }

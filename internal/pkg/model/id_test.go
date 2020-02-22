@@ -71,21 +71,18 @@ func ExampleID_Tags() {
 	// baz
 }
 
-var cases = []struct {
-	name string
-	id   string
-}{
-	{"empty", ``},
-	{"one-tag", `foo`},
-	{"multi-tag", `foo.bar.baz`},
-	{"hyphenated", `weird-hyphens.allowed`},
+var cases = map[string]string{
+	"empty":      ``,
+	"one-tag":    `foo`,
+	"multi-tag":  `foo.bar.baz`,
+	"hyphenated": `weird-hyphens.allowed`,
 }
 
 // TestID_MarshalText tests whether text marshalling for IDs works by means of TOML encoding.
 func TestID_MarshalText(t *testing.T) {
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			id := wrappedID{IDFromString(c.id)}
+	for name, ids := range cases {
+		t.Run(name, func(t *testing.T) {
+			id := wrappedID{IDFromString(ids)}
 			want := fmt.Sprintf("ID = %q\n", id.ID)
 			if s, err := encodeToString(t, id); err != nil {
 				t.Errorf("error marshalling %q: %v", id, err)
@@ -98,9 +95,9 @@ func TestID_MarshalText(t *testing.T) {
 
 // TestID_MarshalText tests whether text marshalling for IDs works by means of round-trip TOML encoding and decoding.
 func TestID_MarshalText_RoundTrip(t *testing.T) {
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			id := IDFromString(c.id)
+	for name, ids := range cases {
+		t.Run(name, func(t *testing.T) {
+			id := IDFromString(ids)
 
 			var got wrappedID
 

@@ -6,13 +6,12 @@ import (
 	"testing"
 )
 
-var headerDecodeCases = []struct {
-	name string
+var headerDecodeCases = map[string]struct {
 	json string
 	want Header
 }{
 	// TODO(@MattWindsor91): add more test cases
-	{"sbrlx",
+	"sbrlx": {
 		`{
 		"name": "SBRlx",
 		"locations": null,
@@ -32,8 +31,8 @@ var headerDecodeCases = []struct {
 
 // TestReadHeader tests that we can read headers properly from JSON.
 func TestReadHeader(t *testing.T) {
-	for _, c := range headerDecodeCases {
-		t.Run(c.name, func(t *testing.T) {
+	for name, c := range headerDecodeCases {
+		t.Run(name, func(t *testing.T) {
 			rd := strings.NewReader(c.json)
 			var got Header
 			if err := got.Read(rd); err != nil {
