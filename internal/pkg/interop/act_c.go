@@ -16,7 +16,7 @@ const BinActC = "act-c"
 var ErrSubjectNil = errors.New("subject pointer is nil")
 
 // ProbeSubject populates s with information gleaned from investigating its litmus file.
-func (a ActRunner) ProbeSubject(s *subject.Subject) error {
+func (a *ActRunner) ProbeSubject(s *subject.Subject) error {
 	if s == nil {
 		return ErrSubjectNil
 	}
@@ -37,7 +37,7 @@ func (a ActRunner) ProbeSubject(s *subject.Subject) error {
 }
 
 // DumpHeader runs act-c dump-header on the subject at path, writing the results to h.
-func (a ActRunner) DumpHeader(h *Header, path string) error {
+func (a *ActRunner) DumpHeader(h *Header, path string) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 
@@ -52,7 +52,7 @@ func (a ActRunner) DumpHeader(h *Header, path string) error {
 }
 
 // DumpStats runs act-c dump-stats on the subject at path, writing the stats to s.
-func (a ActRunner) DumpStats(s *Statset, path string) error {
+func (a *ActRunner) DumpStats(s *Statset, path string) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 

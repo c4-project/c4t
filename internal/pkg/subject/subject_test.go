@@ -10,6 +10,23 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
+// ExampleSubject_BestLitmus is a testable example for BestLitmus.
+func ExampleSubject_BestLitmus() {
+	s1 := Subject{Litmus: "foo.litmus"}
+	b1, _ := s1.BestLitmus()
+
+	// This subject has a fuzzed litmus file, which takes priority.
+	s2 := Subject{Litmus: "foo.litmus", Fuzz: &FuzzFileset{Litmus: "bar.litmus"}}
+	b2, _ := s2.BestLitmus()
+
+	fmt.Println("s1:", b1)
+	fmt.Println("s2:", b2)
+
+	// Output:
+	// s1: foo.litmus
+	// s2: bar.litmus
+}
+
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
 	s := Subject{Compiles: map[string]CompileResult{

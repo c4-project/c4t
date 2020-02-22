@@ -42,7 +42,7 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 
 	var act interop.ActRunner
 	cfg := litmus.Litmus{
-		Stat: act,
+		Stat: &act,
 		Err:  errw,
 	}
 

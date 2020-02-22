@@ -12,6 +12,13 @@ type Result struct {
 	Compilers map[string]CompilerResult
 }
 
-// CompilerResult contains results from
+// CompilerResult contains results from a single compiler.
 type CompilerResult struct {
+}
+
+type SubjectResult struct {
+	// RawObs is the path to this subject's raw observation file.
+	RawObs string `toml:"log,omitempty"`
+	// Obs is the path to this subject's processed observation file.
+	Obs string `toml:"log,omitempty"`
 }

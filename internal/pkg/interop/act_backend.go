@@ -2,9 +2,14 @@ package interop
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
 	"errors"
+	"io"
 	"os"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
@@ -16,7 +21,7 @@ const BinActBackend = "act-backend"
 var ErrNoBackend = errors.New("no backend reported")
 
 // FindBackend finds a backend using ACT.
-func (a ActRunner) FindBackend(style model.ID, machines ...model.ID) (*model.Backend, error) {
+func (a *ActRunner) FindBackend(style model.ID, machines ...model.ID) (*model.Backend, error) {
 	id, err := a.runFindBackend(style, machines)
 	if err != nil {
 		return nil, err
@@ -32,7 +37,7 @@ func (a ActRunner) FindBackend(style model.ID, machines ...model.ID) (*model.Bac
 }
 
 // runFindBackend does most of the legwork of running an ACT find-backend query.
-func (a ActRunner) runFindBackend(style model.ID, machines []model.ID) (model.ID, error) {
+func (a *ActRunner) runFindBackend(style model.ID, machines []model.ID) (model.ID, error) {
 	argv := findBackendArgv(style, machines)
 	sargs := StandardArgs{Verbose: false}
 
@@ -57,7 +62,7 @@ func findBackendArgv(style model.ID, machines []model.ID) []string {
 }
 
 // MakeHarness makes a harness using ACT.
-func (a ActRunner) MakeHarness(s model.HarnessSpec) (outFiles []string, err error) {
+func (a *ActRunner) MakeHarness(s model.HarnessSpec) (outFiles []string, err error) {
 	argv := makeHarnessArgv(s)
 	sargs := StandardArgs{Verbose: false}
 
@@ -81,4 +86,29 @@ func makeHarnessArgv(s model.HarnessSpec) []string {
 		s.OutDir,
 		s.InFile,
 	}
+}
+
+// ParseObs uses act-backend to parse the observation coming in from r into o according to b.
+func (a *ActRunner) ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error {
+	pr, pw := io.Pipe()
+	d := json.NewDecoder(pr)
+
+	eg, ectx := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		return a.runParse(ectx, b, r, pw)
+	})
+	eg.Go(func() error {
+		return d.Decode(o)
+	})
+	return eg.Wait()
+}
+
+func (a *ActRunner) runParse(ctx context.Context, b model.Backend, r io.Reader, w io.Writer) error {
+	cmd := a.CommandContext(ctx, BinActBackend, "parse", StandardArgs{}, "-backend", b.ID.String())
+	cmd.Stdin = r
+	cmd.Stdout = w
+	// TODO(@MattWindsor91): do something useful with this
+	cmd.Stderr = os.Stderr
+
+	return cmd.Run()
 }

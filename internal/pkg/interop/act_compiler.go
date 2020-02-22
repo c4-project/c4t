@@ -11,7 +11,7 @@ import (
 const BinActCompiler = "act-compiler"
 
 // ListCompilers queries ACT for a list of compilers satisfying f.
-func (a ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]model.Compiler, error) {
+func (a *ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]model.Compiler, error) {
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer
@@ -26,7 +26,7 @@ func (a ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]
 	return model.ParseCompilerList(&obuf)
 }
 
-func (a ActRunner) RunCompiler(c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error {
+func (a *ActRunner) RunCompiler(c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error {
 	sargs := StandardArgs{Verbose: false}
 
 	argv := runCompilerArgv(c.ID, infiles, outfile)
