@@ -6,11 +6,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"golang.org/x/sync/errgroup"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
@@ -18,6 +17,9 @@ import (
 )
 
 var (
+	// ErrConfigNil occurs when we try to build a compiler with a nil config.
+	ErrConfigNil = errors.New("config nil")
+
 	// ErrDriverNil occurs when the compiler tries to use the nil pointer as its single-compile driver.
 	ErrDriverNil = errors.New("driver nil")
 
@@ -27,6 +29,9 @@ var (
 
 // Compiler contains the configuration required to compile the harnesses for a single test run.
 type Compiler struct {
+	// l is the logger for this batch compiler.
+	l *log.Logger
+
 	// plan is the plan on which this batch compiler is operating.
 	plan plan.Plan
 
@@ -47,11 +52,8 @@ func New(c *Config, p *plan.Plan) (*Compiler, error) {
 	if p == nil {
 		return nil, plan.ErrNil
 	}
-	if c.Driver == nil {
-		return nil, ErrDriverNil
-	}
-	if c.Paths == nil {
-		return nil, iohelp.ErrPathsetNil
+	if err := checkConfig(c); err != nil {
+		return nil, err
 	}
 
 	mid, mp, err := p.Machine(c.MachineID)
@@ -62,13 +64,26 @@ func New(c *Config, p *plan.Plan) (*Compiler, error) {
 		return nil, fmt.Errorf("%w: machine %s", ErrNoCompilers, c.MachineID.String())
 	}
 
-	return &Compiler{mid: mid, plan: *p, conf: *c, mach: mp}, nil
+	return &Compiler{mid: mid, plan: *p, conf: *c, l: iohelp.EnsureLog(c.Logger), mach: mp}, nil
+}
+
+func checkConfig(c *Config) error {
+	if c == nil {
+		return ErrConfigNil
+	}
+	if c.Driver == nil {
+		return ErrDriverNil
+	}
+	if c.Paths == nil {
+		return iohelp.ErrPathsetNil
+	}
+	return nil
 }
 
 // Run runs the batch compiler with context ctx.
 // On success, it returns an amended plan, now associating each subject with its compiler results.
 func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
-	logrus.Infoln("preparing directories")
+	c.l.Println("preparing directories")
 	if err := c.conf.Paths.Prepare(c.mach.CompilerIDs()); err != nil {
 		return nil, err
 	}

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"io"
+	"log"
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -18,12 +20,12 @@ const (
 )
 
 func main() {
-	if err := run(os.Args); err != nil {
+	if err := run(os.Args, os.Stderr); err != nil {
 		ux.LogTopError(err)
 	}
 }
 
-func run(args []string) error {
+func run(args []string, errw io.Writer) error {
 	var (
 		act   interop.ActRunner
 		dir   string
@@ -42,6 +44,7 @@ func run(args []string) error {
 
 	cfg := compiler.Config{
 		Driver:    &act,
+		Logger:    log.New(errw, "", 0),
 		MachineID: model.IDFromString(pmach),
 		Paths:     compiler.NewPathset(dir),
 	}

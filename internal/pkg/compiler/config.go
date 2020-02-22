@@ -3,6 +3,7 @@ package compiler
 import (
 	"context"
 	"io"
+	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
@@ -33,6 +34,8 @@ type SubjectPather interface {
 type Config struct {
 	// Driver is what the compiler should use to run single compiler jobs.
 	Driver SingleRunner
+
+	Logger *log.Logger
 
 	// MachineID is the machine ID to use when loading from a multi-machine plan.
 	// This can be empty if the plan only contains one machine.
