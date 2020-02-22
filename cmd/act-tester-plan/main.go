@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -34,5 +35,5 @@ func run(args []string) error {
 	}
 	plan.InFiles = fs.Args()
 
-	return plan.Plan()
+	return plan.Plan(context.Background())
 }

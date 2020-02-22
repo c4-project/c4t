@@ -2,6 +2,7 @@
 package planner
 
 import (
+	"context"
 	"math/rand"
 	"time"
 
@@ -18,7 +19,7 @@ import (
 type BackendFinder interface {
 	// FindBackend asks for a backend with the given style on any one of machines,
 	// or a default machine if none have such a backend.
-	FindBackend(style model.ID, machines ...model.ID) (*model.Backend, error)
+	FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error)
 }
 
 // Source is the composite interface of types that can provide the requisite information a Planner needs about
@@ -48,7 +49,7 @@ type Planner struct {
 }
 
 // plan runs the test planner p.
-func (p *Planner) Plan() error {
+func (p *Planner) Plan(ctx context.Context) error {
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(p.InFiles) == 0 {
 		return subject.ErrNoCorpus
@@ -59,12 +60,12 @@ func (p *Planner) Plan() error {
 
 	logrus.Infoln("Planning machines...")
 	var err error
-	if pn.Machines, err = p.planMachines(); err != nil {
+	if pn.Machines, err = p.planMachines(ctx); err != nil {
 		return err
 	}
 
 	logrus.Infoln("Planning corpus...")
-	if pn.Corpus, err = p.planCorpus(pn.Seed); err != nil {
+	if pn.Corpus, err = p.planCorpus(ctx, pn.Seed); err != nil {
 		return err
 	}
 

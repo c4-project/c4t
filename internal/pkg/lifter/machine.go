@@ -76,7 +76,7 @@ func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s 
 	}
 
 	logrus.WithField("spec", spec).Debugln("making harness")
-	files, err := m.Maker.MakeHarness(spec)
+	files, err := m.Maker.MakeHarness(ctx, spec)
 	if err != nil {
 		return err
 	}

@@ -16,7 +16,7 @@ type SingleRunner interface {
 	// RunCompiler runs the compiler pointed to by c on the input files infiles.
 	// On success, it outputs a binary to outfile.
 	// If applicable, errw will be connected to the compiler's standard error.
-	RunCompiler(c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error
+	RunCompiler(ctx context.Context, c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error
 }
 
 // SubjectPather is the interface of types that can produce path sets for compilations.

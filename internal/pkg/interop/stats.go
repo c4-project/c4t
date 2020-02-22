@@ -2,6 +2,7 @@ package interop
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -15,7 +16,7 @@ var ErrStatsetParse = errors.New("statistic parse error")
 // StatDumper is the interface of things that can dump statistics for a litmus test.
 type StatDumper interface {
 	// DumpStats populates s with statistics gleaned from the Litmus file at path.
-	DumpStats(s *Statset, path string) error
+	DumpStats(ctx context.Context, s *Statset, path string) error
 }
 
 // Statset contains a set of statistics acquired from `act-c dump-stats`.

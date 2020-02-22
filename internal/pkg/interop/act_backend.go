@@ -21,8 +21,8 @@ const BinActBackend = "act-backend"
 var ErrNoBackend = errors.New("no backend reported")
 
 // FindBackend finds a backend using ACT.
-func (a *ActRunner) FindBackend(style model.ID, machines ...model.ID) (*model.Backend, error) {
-	id, err := a.runFindBackend(style, machines)
+func (a *ActRunner) FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error) {
+	id, err := a.runFindBackend(ctx, style, machines)
 	if err != nil {
 		return nil, err
 	}
@@ -37,12 +37,12 @@ func (a *ActRunner) FindBackend(style model.ID, machines ...model.ID) (*model.Ba
 }
 
 // runFindBackend does most of the legwork of running an ACT find-backend query.
-func (a *ActRunner) runFindBackend(style model.ID, machines []model.ID) (model.ID, error) {
+func (a *ActRunner) runFindBackend(ctx context.Context, style model.ID, machines []model.ID) (model.ID, error) {
 	argv := findBackendArgv(style, machines)
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer
-	cmd := a.Command(BinActBackend, "find", sargs, argv...)
+	cmd := a.CommandContext(ctx, BinActBackend, "find", sargs, argv...)
 	cmd.Stdout = &obuf
 	if err := cmd.Run(); err != nil {
 		return model.ID{}, err
@@ -62,11 +62,11 @@ func findBackendArgv(style model.ID, machines []model.ID) []string {
 }
 
 // MakeHarness makes a harness using ACT.
-func (a *ActRunner) MakeHarness(s model.HarnessSpec) (outFiles []string, err error) {
+func (a *ActRunner) MakeHarness(ctx context.Context, s model.HarnessSpec) (outFiles []string, err error) {
 	argv := makeHarnessArgv(s)
 	sargs := StandardArgs{Verbose: false}
 
-	cmd := a.Command(BinActBackend, "make-harness", sargs, argv...)
+	cmd := a.CommandContext(ctx, BinActBackend, "make-harness", sargs, argv...)
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return nil, err

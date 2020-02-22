@@ -2,6 +2,7 @@ package interop
 
 import (
 	"bytes"
+	"context"
 	"io"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -11,12 +12,12 @@ import (
 const BinActCompiler = "act-compiler"
 
 // ListCompilers queries ACT for a list of compilers satisfying f.
-func (a *ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string]model.Compiler, error) {
+func (a *ActRunner) ListCompilers(ctx context.Context, f model.CompilerFilter) (map[string]map[string]model.Compiler, error) {
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer
 
-	cmd := a.Command(BinActCompiler, "list", sargs, f.ToArgv()...)
+	cmd := a.CommandContext(ctx, BinActCompiler, "list", sargs, f.ToArgv()...)
 	cmd.Stdout = &obuf
 
 	if err := cmd.Run(); err != nil {
@@ -26,11 +27,11 @@ func (a *ActRunner) ListCompilers(f model.CompilerFilter) (map[string]map[string
 	return model.ParseCompilerList(&obuf)
 }
 
-func (a *ActRunner) RunCompiler(c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error {
+func (a *ActRunner) RunCompiler(ctx context.Context, c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error {
 	sargs := StandardArgs{Verbose: false}
 
 	argv := runCompilerArgv(c.ID, infiles, outfile)
-	cmd := a.Command(BinActCompiler, "run", sargs, argv...)
+	cmd := a.CommandContext(ctx, BinActCompiler, "run", sargs, argv...)
 	cmd.Stderr = errw
 
 	return cmd.Run()

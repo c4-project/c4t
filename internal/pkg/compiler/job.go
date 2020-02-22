@@ -62,7 +62,7 @@ func (j *compileJob) compileSubject(ctx context.Context, s *subject.Subject) err
 	}
 
 	// Some compiler errors are recoverable, so we don't immediately bail on them.
-	cerr := j.Runner.RunCompiler(j.Compiler, h.Paths(), sp.Bin, logf)
+	cerr := j.Runner.RunCompiler(ctx, j.Compiler, h.Paths(), sp.Bin, logf)
 
 	res, rerr := j.makeCompileResult(sp, s, cerr)
 	if rerr != nil {

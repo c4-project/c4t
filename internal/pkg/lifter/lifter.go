@@ -16,7 +16,7 @@ import (
 type HarnessMaker interface {
 	// MakeHarness asks the harness maker to make the test harness described by spec.
 	// It returns a list outfiles of files created (C files, header files, etc.), and/or an error err.
-	MakeHarness(spec model.HarnessSpec) (outFiles []string, err error)
+	MakeHarness(ctx context.Context, spec model.HarnessSpec) (outFiles []string, err error)
 }
 
 // Lifter holds the main configuration for the lifter part of the tester framework.

@@ -38,13 +38,6 @@ func (a *ActRunner) CommandContext(ctx context.Context, cmd, sub string, sargs S
 	return exec.CommandContext(ctx, dcmd, dargv...)
 }
 
-// Command constructs a Cmd for running the ACT command cmd with subcommand sub and arguments argv.
-func (a *ActRunner) Command(cmd, sub string, sargs StandardArgs, argv ...string) *exec.Cmd {
-	fargv := a.actArgv(sub, sargs, argv)
-	dcmd, dargv := liftDuneExec(a.DuneExec, cmd, fargv)
-	return exec.Command(dcmd, dargv...)
-}
-
 func (a *ActRunner) actArgv(sub string, sargs StandardArgs, argv []string) []string {
 	sargv := sargs.ToArgv()
 

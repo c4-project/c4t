@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -32,7 +33,7 @@ func run(args []string, errw io.Writer) error {
 		return err
 	}
 
-	return cfg.Run()
+	return cfg.Run(context.Background())
 }
 
 // parseArgs parses args into a litmus config, using errw as stderr.

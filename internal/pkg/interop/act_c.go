@@ -2,6 +2,7 @@ package interop
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -16,19 +17,19 @@ const BinActC = "act-c"
 var ErrSubjectNil = errors.New("subject pointer is nil")
 
 // ProbeSubject populates s with information gleaned from investigating its litmus file.
-func (a *ActRunner) ProbeSubject(s *subject.Subject) error {
+func (a *ActRunner) ProbeSubject(ctx context.Context, s *subject.Subject) error {
 	if s == nil {
 		return ErrSubjectNil
 	}
 
 	var h Header
-	if err := a.DumpHeader(&h, s.Litmus); err != nil {
+	if err := a.DumpHeader(ctx, &h, s.Litmus); err != nil {
 		return fmt.Errorf("header read on %s failed: %w", s.Litmus, err)
 	}
 	s.Name = h.Name
 
 	var st Statset
-	if err := a.DumpStats(&st, s.Litmus); err != nil {
+	if err := a.DumpStats(ctx, &st, s.Litmus); err != nil {
 		return fmt.Errorf("stats read on %s failed: %w", s.Litmus, err)
 	}
 	s.Threads = st.Threads
@@ -37,11 +38,11 @@ func (a *ActRunner) ProbeSubject(s *subject.Subject) error {
 }
 
 // DumpHeader runs act-c dump-header on the subject at path, writing the results to h.
-func (a *ActRunner) DumpHeader(h *Header, path string) error {
+func (a *ActRunner) DumpHeader(ctx context.Context, h *Header, path string) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 
-	cmd := a.Command(BinActC, "dump-header", sargs, path)
+	cmd := a.CommandContext(ctx, BinActC, "dump-header", sargs, path)
 	cmd.Stdout = &obuf
 
 	if err := cmd.Run(); err != nil {
@@ -52,11 +53,11 @@ func (a *ActRunner) DumpHeader(h *Header, path string) error {
 }
 
 // DumpStats runs act-c dump-stats on the subject at path, writing the stats to s.
-func (a *ActRunner) DumpStats(s *Statset, path string) error {
+func (a *ActRunner) DumpStats(ctx context.Context, s *Statset, path string) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 
-	cmd := a.Command(BinActC, "dump-stats", sargs, path)
+	cmd := a.CommandContext(ctx, BinActC, "dump-stats", sargs, path)
 	cmd.Stdout = &obuf
 	// TODO(@MattWindsor91): allow redirecting this
 	cmd.Stderr = os.Stderr

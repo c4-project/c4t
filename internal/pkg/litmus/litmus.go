@@ -4,6 +4,7 @@
 package litmus
 
 import (
+	"context"
 	"errors"
 	"io"
 	"os/exec"
@@ -47,12 +48,12 @@ type Litmus struct {
 }
 
 // Run runs the litmus wrapper according to the configuration c.
-func (l *Litmus) Run() error {
+func (l *Litmus) Run(ctx context.Context) error {
 	if err := l.check(); err != nil {
 		return err
 	}
 
-	if err := l.probeFixes(); err != nil {
+	if err := l.probeFixes(ctx); err != nil {
 		return err
 	}
 
@@ -78,9 +79,9 @@ func (l *Litmus) check() error {
 }
 
 // probeFixes checks to see if there are any fixes needed for the input.
-func (l *Litmus) probeFixes() error {
+func (l *Litmus) probeFixes(ctx context.Context) error {
 	var s interop.Statset
-	if err := l.Stat.DumpStats(&s, l.Pathset.FileIn); err != nil {
+	if err := l.Stat.DumpStats(ctx, &s, l.Pathset.FileIn); err != nil {
 		return err
 	}
 	l.Fixset.PopulateFromStats(&s)

@@ -41,7 +41,7 @@ func (j *job) Fuzz(ctx context.Context) error {
 func (j *job) fuzzCycle(ctx context.Context, cycle int) error {
 	sc := SubjectCycle{Name: j.Subject.Name, Cycle: cycle}
 	spaths := j.Pathset.SubjectPaths(sc)
-	if err := j.Driver.FuzzSingle(j.Rng.Int31(), j.Subject.Litmus, spaths.Litmus, spaths.Trace); err != nil {
+	if err := j.Driver.FuzzSingle(ctx, j.Rng.Int31(), j.Subject.Litmus, spaths.Litmus, spaths.Trace); err != nil {
 		return err
 	}
 	j.Subject.Fuzz = &spaths
