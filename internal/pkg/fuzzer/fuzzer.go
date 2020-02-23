@@ -39,17 +39,8 @@ type Fuzzer struct {
 
 // New constructs a fuzzer with the config c and plan p.
 func New(c *Config, p *plan.Plan) (*Fuzzer, error) {
-	if c == nil {
-		return nil, ErrConfigNil
-	}
-	if c.Driver == nil {
-		return nil, ErrDriverNil
-	}
-	if c.Paths == nil {
-		return nil, iohelp.ErrPathsetNil
-	}
-	if c.SubjectCycles <= 0 {
-		return nil, fmt.Errorf("%w: non-positive subject cycle amount", subject.ErrSmallCorpus)
+	if err := checkConfig(c); err != nil {
+		return nil, err
 	}
 	if p == nil {
 		return nil, plan.ErrNil
@@ -59,6 +50,22 @@ func New(c *Config, p *plan.Plan) (*Fuzzer, error) {
 
 	err := f.checkCount()
 	return &f, err
+}
+
+func checkConfig(c *Config) error {
+	if c == nil {
+		return ErrConfigNil
+	}
+	if c.Driver == nil {
+		return ErrDriverNil
+	}
+	if c.Paths == nil {
+		return iohelp.ErrPathsetNil
+	}
+	if c.SubjectCycles <= 0 {
+		return fmt.Errorf("%w: non-positive subject cycle amount", subject.ErrSmallCorpus)
+	}
+	return nil
 }
 
 func (f *Fuzzer) checkCount() error {

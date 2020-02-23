@@ -38,9 +38,6 @@ type Config struct {
 
 	// SubjectCycles is the number of times to fuzz each file.
 	SubjectCycles int
-
-	// FuzzWorkers is the number of separate goroutines to launch for fuzzing.
-	FuzzWorkers int
 }
 
 // Run runs a fuzzer configured by this config.

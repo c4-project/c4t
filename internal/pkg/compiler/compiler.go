@@ -83,8 +83,7 @@ func checkConfig(c *Config) error {
 // Run runs the batch compiler with context ctx.
 // On success, it returns an amended plan, now associating each subject with its compiler results.
 func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
-	c.l.Println("preparing directories")
-	if err := c.conf.Paths.Prepare(c.mach.CompilerIDs()); err != nil {
+	if err := c.prepareDirs(); err != nil {
 		return nil, err
 	}
 
@@ -103,6 +102,11 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 	eg.Go(func() error { return handleResults(ectx, c.count(), resCh) })
 
 	return &c.plan, eg.Wait()
+}
+
+func (c *Compiler) prepareDirs() error {
+	c.l.Println("preparing directories")
+	return c.conf.Paths.Prepare(c.mach.CompilerIDs())
 }
 
 func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- result) *compileJob {

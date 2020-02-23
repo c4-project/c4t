@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"io"
 	"log"
@@ -21,12 +22,12 @@ const (
 )
 
 func main() {
-	if err := run(os.Args, os.Stderr); err != nil {
+	if err := run(os.Args, os.Stdout, os.Stderr); err != nil {
 		ux.LogTopError(err)
 	}
 }
 
-func run(args []string, errw io.Writer) error {
+func run(args []string, outw, errw io.Writer) error {
 	var (
 		act   interop.ActRunner
 		dir   string
@@ -49,10 +50,10 @@ func run(args []string, errw io.Writer) error {
 		MachineID: model.IDFromString(pmach),
 		Paths:     runner.NewPathset(dir),
 	}
-	return makeAndRunRunner(&cfg, pfile)
+	return makeAndRunRunner(&cfg, pfile, outw)
 }
 
-func makeAndRunRunner(c *runner.Config, pfile string) error {
+func makeAndRunRunner(c *runner.Config, pfile string, outw io.Writer) error {
 	p, perr := ux.LoadPlan(pfile)
 	if perr != nil {
 		return perr
@@ -61,5 +62,10 @@ func makeAndRunRunner(c *runner.Config, pfile string) error {
 	if rerr != nil {
 		return rerr
 	}
-	return run.Run(context.Background())
+	out, oerr := run.Run(context.Background())
+	if oerr != nil {
+		return oerr
+	}
+	je := json.NewEncoder(outw)
+	return je.Encode(out)
 }

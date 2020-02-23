@@ -9,8 +9,6 @@ import (
 	"os"
 	"strings"
 
-	"golang.org/x/sync/errgroup"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -90,25 +88,22 @@ func makeHarnessArgv(s model.HarnessSpec) []string {
 
 // ParseObs uses act-backend to parse the observation coming in from r into o according to b.
 func (a *ActRunner) ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error {
-	pr, pw := io.Pipe()
-	d := json.NewDecoder(pr)
-
-	eg, ectx := errgroup.WithContext(ctx)
-	eg.Go(func() error {
-		return a.runParse(ectx, b, r, pw)
-	})
-	eg.Go(func() error {
-		return d.Decode(o)
-	})
-	return eg.Wait()
-}
-
-func (a *ActRunner) runParse(ctx context.Context, b model.Backend, r io.Reader, w io.Writer) error {
 	cmd := a.CommandContext(ctx, BinActBackend, "parse", StandardArgs{}, "-backend", b.ID.String())
 	cmd.Stdin = r
-	cmd.Stdout = w
 	// TODO(@MattWindsor91): do something useful with this
 	cmd.Stderr = os.Stderr
 
-	return cmd.Run()
+	obsr, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	if err := cmd.Start(); err != nil {
+		return nil
+	}
+
+	if err := json.NewDecoder(obsr).Decode(o); err != nil {
+		_ = cmd.Wait()
+		return err
+	}
+	return cmd.Wait()
 }
