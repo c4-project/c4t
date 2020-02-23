@@ -64,16 +64,8 @@ func (p *Plan) Dump() error {
 // ParCorpus runs f for every subject in the plan's corpus.
 // It threads through a context that will terminate each machine if an error occurs on some other machine.
 // It also takes zero or more 'auxiliary' funcs to launch within the same context.
-func (p *Plan) ParCorpus(ctx context.Context, f func(context.Context, subject.Subject) error, aux ...func(context.Context) error) error {
-	eg, ectx := errgroup.WithContext(ctx)
-	for _, s := range p.Corpus {
-		sc := s
-		eg.Go(func() error { return f(ectx, sc) })
-	}
-	for _, a := range aux {
-		eg.Go(func() error { return a(ectx) })
-	}
-	return eg.Wait()
+func (p *Plan) ParCorpus(ctx context.Context, f func(context.Context, subject.Named) error, aux ...func(context.Context) error) error {
+	return p.Corpus.Par(ctx, f, aux...)
 }
 
 // ParMachines runs f for every machine in the plan.

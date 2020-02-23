@@ -87,19 +87,15 @@ func (r *Runner) Run(ctx context.Context) (*Result, error) {
 		Subjects: make(map[string]SubjectResult, len(r.plan.Corpus)),
 	}
 
-	var err error
-	for i := range r.plan.Corpus {
-		// TODO(@MattWindsor91): make sure subject names are unique
-		s := &r.plan.Corpus[i]
-		res.Subjects[s.Name], err = r.runSubject(ctx, s)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &res, nil
+	err := r.plan.Corpus.Map(func(named *subject.Named) error {
+		var err error
+		res.Subjects[named.Name], err = r.runSubject(ctx, named)
+		return err
+	})
+	return &res, err
 }
 
-func (r *Runner) runSubject(ctx context.Context, s *subject.Subject) (SubjectResult, error) {
+func (r *Runner) runSubject(ctx context.Context, s *subject.Named) (SubjectResult, error) {
 	r.l.Println("running subject:", s.Name)
 
 	var err error
@@ -115,7 +111,7 @@ func (r *Runner) runSubject(ctx context.Context, s *subject.Subject) (SubjectRes
 	return res, nil
 }
 
-func (r *Runner) runCompile(ctx context.Context, s *subject.Subject, cid model.ID, c *subject.CompileResult) (CompilerResult, error) {
+func (r *Runner) runCompile(ctx context.Context, s *subject.Named, cid model.ID, c *subject.CompileResult) (CompilerResult, error) {
 	if !c.Success {
 		return CompilerResult{Status: StatusCompileFail}, nil
 	}

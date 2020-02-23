@@ -14,24 +14,23 @@ type result struct {
 	// MArch is the machine-qualified architecture for which this lifting is occurring.
 	MArch model.MachQualID
 
-	// Subject is the subject that has been lifted,
-	// passed as a pointer to let the result collector modify it in-place.
-	Subject *subject.Subject
+	// Subject is the name of the subject that has been lifted.
+	Subject string
 
 	// Harness is the produced harness pathset.
 	Harness subject.Harness
 }
 
 // handleResults waits for nresult results to come in through resCh.
-// For each result, it propagates the harness pathset to its subject.
-func handleResults(ctx context.Context, nresult int, resCh <-chan result) error {
+// For each result, it propagates the harness pathset to its subject in c.
+func handleResults(ctx context.Context, c subject.Corpus, nresult int, resCh <-chan result) error {
 	bar := pb.StartNew(nresult)
 	defer bar.Finish()
 
 	for i := 0; i < nresult; i++ {
 		select {
 		case r := <-resCh:
-			if err := handleResult(r); err != nil {
+			if err := handleResult(r, c); err != nil {
 				return err
 			}
 			bar.Increment()
@@ -45,6 +44,11 @@ func handleResults(ctx context.Context, nresult int, resCh <-chan result) error 
 
 // handleResult applies a result's liftings to its own subject.
 // We make sure to do this sequentially in a single result-handling goroutine, to avoid races.
-func handleResult(r result) error {
-	return r.Subject.AddHarness(r.MArch, r.Harness)
+func handleResult(r result, c subject.Corpus) error {
+	s := c[r.Subject]
+	if err := s.AddHarness(r.MArch, r.Harness); err != nil {
+		return err
+	}
+	c[r.Subject] = s
+	return nil
 }

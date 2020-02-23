@@ -8,13 +8,16 @@ import (
 	"github.com/cheggaaa/pb/v3"
 )
 
-func handleResults(ctx context.Context, fuzzed subject.Corpus, resCh <-chan subject.Subject) error {
-	bar := pb.StartNew(len(fuzzed))
+func handleResults(ctx context.Context, fuzzed subject.Corpus, nfuzzes int, resCh <-chan subject.Named) error {
+	bar := pb.StartNew(nfuzzes)
 	defer bar.Finish()
 
-	for i := range fuzzed {
+	for i := 0; i < nfuzzes; i++ {
 		select {
-		case fuzzed[i] = <-resCh:
+		case r := <-resCh:
+			if err := fuzzed.Add(r); err != nil {
+				return err
+			}
 			bar.Increment()
 		case <-ctx.Done():
 			return ctx.Err()

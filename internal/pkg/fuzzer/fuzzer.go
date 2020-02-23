@@ -126,27 +126,27 @@ func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (subject.Corpus, erro
 
 	fcs := make(subject.Corpus, nfuzzes)
 
-	resCh := make(chan subject.Subject)
+	resCh := make(chan subject.Named)
 
 	logrus.Infof("Fuzzing %d inputs\n", len(f.plan.Corpus))
 
 	seeds := make(map[string]int64)
-	for _, s := range f.plan.Corpus {
-		seeds[s.Name] = rng.Int63()
+	for n := range f.plan.Corpus {
+		seeds[n] = rng.Int63()
 	}
 
 	err := f.plan.ParCorpus(ctx,
-		func(ctx context.Context, s subject.Subject) error {
+		func(ctx context.Context, s subject.Named) error {
 			j := f.makeJob(s, seeds[s.Name], resCh)
 			return j.Fuzz(ctx)
 		},
 		func(ctx context.Context) error {
-			return handleResults(ctx, fcs, resCh)
+			return handleResults(ctx, fcs, nfuzzes, resCh)
 		})
 	return fcs, err
 }
 
-func (f *Fuzzer) makeJob(s subject.Subject, seed int64, resCh chan subject.Subject) *job {
+func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan subject.Named) *job {
 	return &job{
 		Driver:        f.conf.Driver,
 		Subject:       s,

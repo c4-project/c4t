@@ -8,8 +8,8 @@ import (
 
 // SubjectProber is the interface of types that allow filling in of subject information.
 type SubjectProber interface {
-	// ProbeSubject populates subject with information gleaned from investigating its litmus file.
-	ProbeSubject(ctx context.Context, subject *subject.Subject) error
+	// ProbeSubject probes the Litmus test at file litmus, producing a named subject record.
+	ProbeSubject(ctx context.Context, litmus string) (subject.Named, error)
 }
 
 func (p *Planner) planCorpus(ctx context.Context, seed int64) (subject.Corpus, error) {
@@ -24,11 +24,15 @@ func (p *Planner) planCorpus(ctx context.Context, seed int64) (subject.Corpus, e
 
 // ProbeCorpus probes each subject in this planner's corpus file list, producing a Corpus proper.
 func (p *Planner) ProbeCorpus(ctx context.Context) (subject.Corpus, error) {
-	corpus := subject.NewCorpus(p.InFiles...)
+	corpus := make(subject.Corpus, len(p.InFiles))
 
-	for i := range corpus {
-		if err := p.Source.ProbeSubject(ctx, &corpus[i]); err != nil {
-			return corpus, err
+	for _, f := range p.InFiles {
+		s, err := p.Source.ProbeSubject(ctx, f)
+		if err != nil {
+			return nil, err
+		}
+		if err := corpus.Add(s); err != nil {
+			return nil, err
 		}
 	}
 

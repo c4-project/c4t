@@ -53,7 +53,7 @@ func (l *Lifter) lift(ctx context.Context) error {
 	return l.Plan.ParMachines(ctx, func(ctx context.Context, mid model.ID, m plan.MachinePlan) error {
 		return l.liftMachine(ctx, mid, m, resCh)
 	}, func(ctx context.Context) error {
-		return handleResults(ctx, l.count(), resCh)
+		return handleResults(ctx, l.Plan.Corpus, l.count(), resCh)
 	})
 }
 

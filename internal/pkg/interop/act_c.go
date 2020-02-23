@@ -3,7 +3,6 @@ package interop
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"os"
 
@@ -13,28 +12,26 @@ import (
 // BinActC is the name of the ACT C services binary.
 const BinActC = "act-c"
 
-// ErrSubjectNil is an error returned if one calls ProbeSubject(nil).
-var ErrSubjectNil = errors.New("subject pointer is nil")
-
-// ProbeSubject populates s with information gleaned from investigating its litmus file.
-func (a *ActRunner) ProbeSubject(ctx context.Context, s *subject.Subject) error {
-	if s == nil {
-		return ErrSubjectNil
-	}
-
+// ProbeSubject probes the litmus test at path litmus, returning a named subject record.
+func (a *ActRunner) ProbeSubject(ctx context.Context, litmus string) (subject.Named, error) {
 	var h Header
-	if err := a.DumpHeader(ctx, &h, s.Litmus); err != nil {
-		return fmt.Errorf("header read on %s failed: %w", s.Litmus, err)
+	if err := a.DumpHeader(ctx, &h, litmus); err != nil {
+		return subject.Named{}, fmt.Errorf("header read on %s failed: %w", litmus, err)
 	}
-	s.Name = h.Name
 
 	var st Statset
-	if err := a.DumpStats(ctx, &st, s.Litmus); err != nil {
-		return fmt.Errorf("stats read on %s failed: %w", s.Litmus, err)
+	if err := a.DumpStats(ctx, &st, litmus); err != nil {
+		return subject.Named{}, fmt.Errorf("stats read on %s failed: %w", litmus, err)
 	}
-	s.Threads = st.Threads
 
-	return nil
+	s := subject.Named{
+		Name: h.Name,
+		Subject: subject.Subject{
+			Litmus:  litmus,
+			Threads: st.Threads,
+		},
+	}
+	return s, nil
 }
 
 // DumpHeader runs act-c dump-header on the subject at path, writing the results to h.

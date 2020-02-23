@@ -10,7 +10,7 @@ import (
 // job contains state for a single fuzzer batch-job.
 type job struct {
 	// Subject contains the subject for which this job is responsible.
-	Subject subject.Subject
+	Subject subject.Named
 
 	// Driver is the low-level fuzzer.
 	Driver SingleFuzzer
@@ -25,7 +25,7 @@ type job struct {
 	Rng *rand.Rand
 
 	// ResCh is the channel onto which each fuzzed subject should be sent.
-	ResCh chan<- subject.Subject
+	ResCh chan<- subject.Named
 }
 
 // FuzzFileset performs a single fuzzing job.

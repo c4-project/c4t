@@ -1,47 +1,65 @@
-package subject
+package subject_test
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
+
+// ExampleCorpus_Add is a runnable example for Add.
+func ExampleCorpus_Add() {
+	c := make(subject.Corpus)
+	_ = c.Add(subject.Named{Name: "foo", Subject: subject.Subject{Litmus: "bar/baz.litmus"}})
+	fmt.Println(c["foo"].Litmus)
+
+	// We can't add duplicates to a corpus.
+	err := c.Add(subject.Named{Name: "foo", Subject: subject.Subject{Litmus: "bar/baz2.litmus"}})
+	fmt.Println(err)
+
+	// Output:
+	// bar/baz.litmus
+	// duplicate corpus entry: foo
+}
 
 // smallCorpi contains test cases for the overly-small-corpus error handling of SampleCorpus.
 var smallCorpi = map[string]struct {
-	corpus Corpus
+	corpus subject.Corpus
 	want   int
 }{
-	"empty+cap": {Corpus{}, 10},
-	"empty":     {Corpus{}, 0},
-	"small1":    {NewCorpus("foo"), 2},
-	"small2":    {NewCorpus("foo", "bar", "baz"), 10},
+	"empty+cap": {subject.Corpus{}, 10},
+	"empty":     {subject.Corpus{}, 0},
+	"small1":    {subject.NewCorpus("foo"), 2},
+	"small2":    {subject.NewCorpus("foo", "bar", "baz"), 10},
 }
 
 // exactCorpi contains test cases for the pass-through behaviour of SampleCorpus.
 var exactCorpi = map[string]struct {
-	corpus Corpus
+	corpus subject.Corpus
 	want   int
 }{
-	"nocap1": {NewCorpus("foo"), 0},
-	"nocap2": {NewCorpus("foo", "bar"), 0},
-	"nocap3": {NewCorpus("foo", "bar", "baz"), 0},
-	"nocap4": {NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 0},
-	"cap1":   {NewCorpus("foo"), 1},
-	"cap2":   {NewCorpus("foo", "bar"), 2},
-	"cap3":   {NewCorpus("foo", "bar", "baz"), 3},
-	"cap4":   {NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 7},
+	"nocap1": {subject.NewCorpus("foo"), 0},
+	"nocap2": {subject.NewCorpus("foo", "bar"), 0},
+	"nocap3": {subject.NewCorpus("foo", "bar", "baz"), 0},
+	"nocap4": {subject.NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 0},
+	"cap1":   {subject.NewCorpus("foo"), 1},
+	"cap2":   {subject.NewCorpus("foo", "bar"), 2},
+	"cap3":   {subject.NewCorpus("foo", "bar", "baz"), 3},
+	"cap4":   {subject.NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 7},
 }
 
 // sampleCorpi contains test cases for the 'actually sample' behaviour of SampleCorpus.
 var sampleCorpi = map[string]struct {
-	corpus Corpus
+	corpus subject.Corpus
 	want   int
 }{
-	"sample1": {NewCorpus("foo", "bar"), 1},
-	"sample2": {NewCorpus("foo", "bar", "baz"), 1},
-	"sample3": {NewCorpus("foo", "bar", "baz"), 2},
-	"sample4": {NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 3},
-	"sample5": {NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 5},
+	"sample1": {subject.NewCorpus("foo", "bar"), 1},
+	"sample2": {subject.NewCorpus("foo", "bar", "baz"), 1},
+	"sample3": {subject.NewCorpus("foo", "bar", "baz"), 2},
+	"sample4": {subject.NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 3},
+	"sample5": {subject.NewCorpus("you're", "going", "to", "have", "a", "bad", "time"), 5},
 }
 
 // TestCorpus_Sample_SmallErrors tests that various 'overly small corpus' situations produce an error.
@@ -51,7 +69,7 @@ func TestCorpus_Sample_SmallErrors(t *testing.T) {
 			_, err := c.corpus.Sample(1, c.want)
 			if err == nil {
 				t.Errorf("no error when sampling small corpus (%v, want %d)", c.corpus, c.want)
-			} else if !errors.Is(err, ErrSmallCorpus) {
+			} else if !errors.Is(err, subject.ErrSmallCorpus) {
 				t.Errorf("wrong error when sampling small corpus (%v, want %d): %v", c.corpus, c.want, err)
 			}
 		})
@@ -81,22 +99,47 @@ func TestCorpus_Sample_ActuallySample(t *testing.T) {
 			if err != nil {
 				t.Errorf("error when sampling corpus (%v, want %d): %v", c.corpus, c.want, err)
 			} else {
-				// The sample should contain the items in ascending order of index in the original corpus.
-				// To test this, we do a slightly convoluted lock-step search, where we slowly sweep over the corpus trying
-				// to find each sample in turn.
-
-				j := 0
-			SampleLoop:
-				for _, s := range smp {
-					for ; j < len(c.corpus); j++ {
-						if c.corpus[j].Litmus == s.Litmus {
-							continue SampleLoop
-						}
-					}
-					t.Fatalf("sample of %v (%v) contains bad or ill-positioned item: %v", c.corpus, smp, s)
-				}
+				checkCorpusIsSample(t, c.corpus, smp)
 			}
 		})
 		i++
+	}
+}
+
+func checkCorpusIsSample(t *testing.T, corpus, smp subject.Corpus) {
+	// Each item in the sample should be in the corpus.
+	for k, got := range smp {
+		want, ok := corpus[k]
+		if !ok {
+			t.Helper()
+			t.Fatalf("sample of %v (%v) contains unexpected key: %q", corpus, smp, k)
+
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Helper()
+			t.Fatalf("sample of %v (%v) maps %q to %v; want %v", corpus, smp, k, got, want)
+		}
+	}
+}
+
+// TestCorpus_Map tests the Map function on a basic exercise.
+func TestCorpus_Map(t *testing.T) {
+	c := subject.NewCorpus("foo", "bar", "baz", "barbaz")
+	err := c.Map(func(s *subject.Named) error {
+		s.Litmus = s.Name + ".litmus"
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("unexpected error in Map: %v", err)
+	}
+
+	// Each subject should've been updated according to the function.
+	for n, s := range c {
+		got := s.Litmus
+		want := n + ".litmus"
+
+		if got != want {
+			t.Errorf("Map set Litmus incorrectly: got=%s; want=%s", got, want)
+		}
 	}
 }

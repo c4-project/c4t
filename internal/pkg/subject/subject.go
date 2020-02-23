@@ -30,9 +30,6 @@ var (
 
 // Subject represents a single test subject in a corpus.
 type Subject struct {
-	// Name is the name of this subject.
-	Name string `toml:"name"`
-
 	// Threads is the number of threads contained in this subject.
 	Threads int `toml:"threads,omitzero"`
 
@@ -65,7 +62,7 @@ func (s *Subject) BestLitmus() (string, error) {
 	case s.Litmus != "":
 		return s.Litmus, nil
 	default:
-		return "", fmt.Errorf("%s: %w", s.Name, ErrNoBestLitmus)
+		return "", ErrNoBestLitmus
 	}
 }
 

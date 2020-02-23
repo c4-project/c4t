@@ -40,21 +40,22 @@ func (j *compileJob) Compile(ctx context.Context) error {
 		return fmt.Errorf("in job: %w", iohelp.ErrPathsetNil)
 	}
 
-	for i := range j.Corpus {
-		if err := j.compileSubject(ctx, &j.Corpus[i]); err != nil {
+	for n, s := range j.Corpus {
+		if err := j.compileSubject(ctx, n, &s); err != nil {
 			return err
 		}
+		j.Corpus[n] = s
 	}
 	return nil
 }
 
-func (j *compileJob) compileSubject(ctx context.Context, s *subject.Subject) error {
+func (j *compileJob) compileSubject(ctx context.Context, name string, s *subject.Subject) error {
 	h, herr := s.Harness(j.qualifiedArch())
 	if herr != nil {
 		return herr
 	}
 
-	sp := j.Pathset.SubjectPaths(SubjectCompile{CompilerID: j.Compiler.ID, Name: s.Name})
+	sp := j.Pathset.SubjectPaths(SubjectCompile{CompilerID: j.Compiler.ID, Name: name})
 
 	logf, err := os.Create(sp.Log)
 	if err != nil {

@@ -49,15 +49,12 @@ func (m *machine) liftArch(ctx context.Context, arch model.ID) error {
 		return derr
 	}
 
-	for i := range m.Corpus {
-		if err := m.liftSubject(ctx, arch, dir, &(m.Corpus[i])); err != nil {
-			return err
-		}
-	}
-	return nil
+	return m.Corpus.Map(func(s *subject.Named) error {
+		return m.liftSubject(ctx, arch, dir, s)
+	})
 }
 
-func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s *subject.Subject) error {
+func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s *subject.Named) error {
 	dir, derr := buildAndMkDir(dir, s.Name)
 	if derr != nil {
 		return derr
@@ -84,7 +81,7 @@ func (m *machine) liftSubject(ctx context.Context, arch model.ID, dir string, s 
 	res := result{
 		MArch:   model.MachQualID{MachineID: m.MachineID, ID: arch},
 		Harness: subject.Harness{Dir: dir, Files: files},
-		Subject: s,
+		Subject: s.Name,
 	}
 
 	return m.sendResult(ctx, res)
