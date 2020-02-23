@@ -14,6 +14,9 @@ var (
 	// ErrCorpusDup occurs when we try to Add a subject into a corpus under a name that is already taken.
 	ErrCorpusDup = errors.New("duplicate corpus entry")
 
+	// ErrMapRename occurs when we try to change the name of an entry inside a Map.
+	ErrMapRename = errors.New("tried to rename a corpus entry")
+
 	// ErrSmallCorpus occurs when the viable test corpus is smaller than that requested by the user.
 	ErrSmallCorpus = errors.New("test corpus too small")
 
@@ -72,7 +75,7 @@ func (c Corpus) Map(f func(*Named) error) error {
 		}
 
 		if n != sn.Name {
-			return fmt.Errorf("name change from %q to %q forbidden", n, sn.Name)
+			return fmt.Errorf("%w: from %q to %q", ErrMapRename, n, sn.Name)
 		}
 		c[n] = sn.Subject
 	}

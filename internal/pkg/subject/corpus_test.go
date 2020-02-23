@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
@@ -142,4 +144,25 @@ func TestCorpus_Map(t *testing.T) {
 			t.Errorf("Map set Litmus incorrectly: got=%s; want=%s", got, want)
 		}
 	}
+}
+
+// TestCorpus_Map_Rename makes sure Map fails if there is an attempt to rename a subject.
+func TestCorpus_Map_Rename(t *testing.T) {
+	c := subject.NewCorpus("foo", "bar", "baz", "barbaz")
+	err := c.Map(func(s *subject.Named) error {
+		s.Name = s.Name + "2"
+		return nil
+	})
+	testhelp.ExpectErrorIs(t, err, subject.ErrMapRename, "renaming in a Map")
+}
+
+// TestCorpus_Map_Error makes sure Map fails if there is an error inside an invocation.
+func TestCorpus_Map_Error(t *testing.T) {
+	e := errors.New("test error")
+
+	c := subject.NewCorpus("foo", "bar", "baz", "barbaz")
+	err := c.Map(func(s *subject.Named) error {
+		return e
+	})
+	testhelp.ExpectErrorIs(t, err, e, "Map of function returning error")
 }
