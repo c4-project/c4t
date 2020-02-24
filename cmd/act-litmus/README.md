@@ -12,5 +12,7 @@ It depends on both `litmus7` and `act-c` being in `PATH`.
 
 `act-litmus -carch ARCH -o DIR FILE`
 
-Both `-carch` and `-o` are mandatory.  `act-litmus` always runs in C11 harness outputting mode,
-and doesn't support any other operating mode.
+Both `-carch` and `-o` are mandatory.
+
+`act-litmus` always runs in C11 harness outputting mode,
+and doesn't support any other operating mode; `-c11` is ignored.
