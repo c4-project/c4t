@@ -1,3 +1,8 @@
+// Copyright (c) 2020 Matt Windsor and contributors
+//
+// This file is part of act-tester.
+// Licenced under the MIT licence; see `LICENSE`.
+
 package model
 
 // Machine represents the information about a machine that is relevant to the tester.

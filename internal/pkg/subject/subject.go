@@ -1,3 +1,8 @@
+// Copyright (c) 2020 Matt Windsor and contributors
+//
+// This file is part of act-tester.
+// Licenced under the MIT licence; see `LICENSE`.
+
 // Package subject contains types and functions for dealing with test subject records.
 // Such subjects generally live in a plan; the separate package exists to accommodate the large amount of subject
 // specific types and functions in relation to the other parts of a test plan.

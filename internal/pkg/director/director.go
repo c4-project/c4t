@@ -1,3 +1,8 @@
+// Copyright (c) 2020 Matt Windsor and contributors
+//
+// This file is part of act-tester.
+// Licenced under the MIT licence; see `LICENSE`.
+
 // Package director contains the top-level ACT test director, which manages a full testing campaign.
 package director
 

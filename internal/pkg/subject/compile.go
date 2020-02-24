@@ -1,3 +1,8 @@
+// Copyright (c) 2020 Matt Windsor and contributors
+//
+// This file is part of act-tester.
+// Licenced under the MIT licence; see `LICENSE`.
+
 package subject
 
 // CompileResult is a record about an attempt to compile a subject.

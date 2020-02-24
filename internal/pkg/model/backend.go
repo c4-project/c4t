@@ -1,3 +1,8 @@
+// Copyright (c) 2020 Matt Windsor and contributors
+//
+// This file is part of act-tester.
+// Licenced under the MIT licence; see `LICENSE`.
+
 package model
 
 // TODO(@MattWindsor91): backends are unusually complex, mostly because I originally expected that backends would need

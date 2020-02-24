@@ -1,3 +1,8 @@
+// Copyright (c) 2020 Matt Windsor and contributors
+//
+// This file is part of act-tester.
+// Licenced under the MIT licence; see `LICENSE`.
+
 // Package lifter contains the part of the tester framework that lifts litmus tests to compilable C.
 // It does so by means of a backend HarnessMaker.
 package lifter
