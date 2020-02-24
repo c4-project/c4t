@@ -1,7 +1,6 @@
 package fuzzer_test
 
 import (
-	"context"
 	"path"
 	"testing"
 
@@ -34,17 +33,11 @@ func (m *MockPathset) SubjectPaths(sc fuzzer.SubjectCycle) subject.FuzzFileset {
 // makeConfig makes a 'valid' fuzzer config.
 func makeConfig() fuzzer.Config {
 	return fuzzer.Config{
-		Driver:        MockDriver{},
+		Driver:        fuzzer.NopFuzzer{},
 		Paths:         &MockPathset{},
 		CorpusSize:    0,
 		SubjectCycles: 10,
 	}
-}
-
-type MockDriver struct{}
-
-func (m MockDriver) FuzzSingle(_ context.Context, _ int32, _, _, _ string) error {
-	return nil
 }
 
 // TestNewFuzzer_DriverNil makes sure fuzzer creation on a nil driver fails.

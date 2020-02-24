@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
@@ -63,7 +65,7 @@ func checkConfig(c *Config) error {
 		return iohelp.ErrPathsetNil
 	}
 	if c.SubjectCycles <= 0 {
-		return fmt.Errorf("%w: non-positive subject cycle amount", subject.ErrSmallCorpus)
+		return fmt.Errorf("%w: non-positive subject cycle amount", corpus.ErrSmallCorpus)
 	}
 	return nil
 }
@@ -71,12 +73,12 @@ func checkConfig(c *Config) error {
 func (f *Fuzzer) checkCount() error {
 	nsubjects, nruns := f.count()
 	if nsubjects <= 0 {
-		return subject.ErrNoCorpus
+		return corpus.ErrNoCorpus
 	}
 
 	// Note that this inequality 'does the right thing' when f.CorpusSize = 0, ie no corpus size requirement.
 	if nruns < f.conf.CorpusSize {
-		return fmt.Errorf("%w: projected corpus size %d, want %d", subject.ErrSmallCorpus, nruns, f.conf.CorpusSize)
+		return fmt.Errorf("%w: projected corpus size %d, want %d", corpus.ErrSmallCorpus, nruns, f.conf.CorpusSize)
 	}
 
 	return nil
@@ -100,7 +102,7 @@ func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 }
 
 // sampleAndUpdatePlan samples fcs and places the result in the fuzzer's plan.
-func (f *Fuzzer) sampleAndUpdatePlan(fcs subject.Corpus, rng *rand.Rand) (*plan.Plan, error) {
+func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand) (*plan.Plan, error) {
 	logrus.Infoln("sampling corpus")
 	scs, err := fcs.Sample(rng.Int63(), f.conf.CorpusSize)
 	if err != nil {
@@ -121,12 +123,8 @@ func (f *Fuzzer) count() (nsubjects, nruns int) {
 }
 
 // fuzz actually does the business of fuzzing.
-func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (subject.Corpus, error) {
+func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error) {
 	_, nfuzzes := f.count()
-
-	fcs := make(subject.Corpus, nfuzzes)
-
-	resCh := make(chan subject.Named)
 
 	logrus.Infof("Fuzzing %d inputs\n", len(f.plan.Corpus))
 
@@ -135,19 +133,27 @@ func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (subject.Corpus, erro
 		seeds[n] = rng.Int63()
 	}
 
+	b, resCh, berr := corpus.NewBuilder(make(corpus.Corpus, nfuzzes), nfuzzes)
+	if berr != nil {
+		return nil, berr
+	}
+
+	var fcs corpus.Corpus
+
 	err := f.plan.ParCorpus(ctx,
 		func(ctx context.Context, s subject.Named) error {
 			j := f.makeJob(s, seeds[s.Name], resCh)
 			return j.Fuzz(ctx)
 		},
-		func(ctx context.Context) error {
-			return handleResults(ctx, fcs, nfuzzes, resCh)
+		func(ctx context.Context) (err error) {
+			fcs, err = b.Run(ctx)
+			return err
 		})
 	return fcs, err
 }
 
-func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan subject.Named) *job {
-	return &job{
+func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- corpus.BuilderReq) *Job {
+	return &Job{
 		Driver:        f.conf.Driver,
 		Subject:       s,
 		SubjectCycles: f.conf.SubjectCycles,

@@ -2,14 +2,19 @@ package fuzzer
 
 import (
 	"context"
+	"errors"
 	"math/rand"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
-// job contains state for a single fuzzer batch-job.
-type job struct {
-	// Subject contains the subject for which this job is responsible.
+// Job contains state for a single fuzzer batch-Job.
+type Job struct {
+	// Subject contains the subject for which this Job is responsible.
 	Subject subject.Named
 
 	// Driver is the low-level fuzzer.
@@ -25,11 +30,15 @@ type job struct {
 	Rng *rand.Rand
 
 	// ResCh is the channel onto which each fuzzed subject should be sent.
-	ResCh chan<- subject.Named
+	ResCh chan<- corpus.BuilderReq
 }
 
-// FuzzFileset performs a single fuzzing job.
-func (j *job) Fuzz(ctx context.Context) error {
+// Fuzz performs a single fuzzing Job.
+func (j *Job) Fuzz(ctx context.Context) error {
+	if err := j.check(); err != nil {
+		return err
+	}
+
 	for i := 0; i < j.SubjectCycles; i++ {
 		if err := j.fuzzCycle(ctx, i); err != nil {
 			return err
@@ -38,25 +47,50 @@ func (j *job) Fuzz(ctx context.Context) error {
 	return nil
 }
 
-func (j *job) fuzzCycle(ctx context.Context, cycle int) error {
+// check checks the health of the job before running it.
+func (j *Job) check() error {
+	if j.Pathset == nil {
+		return iohelp.ErrPathsetNil
+	}
+	if j.Rng == nil {
+		return errors.New("RNG nil")
+	}
+	return nil
+}
+
+func (j *Job) fuzzCycle(ctx context.Context, cycle int) error {
 	sc := SubjectCycle{Name: j.Subject.Name, Cycle: cycle}
 	spaths := j.Pathset.SubjectPaths(sc)
 	if err := j.Driver.FuzzSingle(ctx, j.Rng.Int31(), j.Subject.Litmus, spaths.Litmus, spaths.Trace); err != nil {
 		return err
 	}
-	j.Subject.Fuzz = &spaths
-	if err := j.sendSubject(ctx); err != nil {
-		return err
-	}
-	return nil
+
+	nsub := j.fuzzedSubject(sc, spaths)
+	return j.sendSubject(ctx, nsub)
 }
 
-// sendSubject tries to send this job's subject down its result channel.
-func (j *job) sendSubject(ctx context.Context) error {
+// fuzzedSubject makes a copy of this Job's subject with the cycled name sc and fuzz fileset spaths.
+func (j *Job) fuzzedSubject(sc SubjectCycle, spaths subject.FuzzFileset) subject.Named {
+	nsub := j.Subject
+	nsub.Name = sc.String()
+	nsub.Fuzz = &spaths
+	return nsub
+}
+
+// sendSubject tries to send subject s down this Job's results channel.
+func (j *Job) sendSubject(ctx context.Context, s subject.Named) error {
 	select {
-	case j.ResCh <- j.Subject:
+	case j.ResCh <- j.builderReq(s):
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 	return nil
+}
+
+// builderReq makes a builder request for adding s to the fuzzed corpus.
+func (j *Job) builderReq(s subject.Named) corpus.BuilderReq {
+	return corpus.BuilderReq{
+		Name: s.Name,
+		Req:  corpus.AddReq(s.Subject),
+	}
 }

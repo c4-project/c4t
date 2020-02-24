@@ -3,6 +3,8 @@ package planner
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
@@ -12,10 +14,10 @@ type SubjectProber interface {
 	ProbeSubject(ctx context.Context, litmus string) (subject.Named, error)
 }
 
-func (p *Planner) planCorpus(ctx context.Context, seed int64) (subject.Corpus, error) {
+func (p *Planner) planCorpus(ctx context.Context, seed int64) (corpus.Corpus, error) {
 	probed, err := p.ProbeCorpus(ctx)
 	if err != nil {
-		return subject.Corpus{}, err
+		return corpus.Corpus{}, err
 	}
 
 	// TODO(@MattWindsor91): perform corpus pruning
@@ -23,18 +25,18 @@ func (p *Planner) planCorpus(ctx context.Context, seed int64) (subject.Corpus, e
 }
 
 // ProbeCorpus probes each subject in this planner's corpus file list, producing a Corpus proper.
-func (p *Planner) ProbeCorpus(ctx context.Context) (subject.Corpus, error) {
-	corpus := make(subject.Corpus, len(p.InFiles))
+func (p *Planner) ProbeCorpus(ctx context.Context) (corpus.Corpus, error) {
+	c := make(corpus.Corpus, len(p.InFiles))
 
 	for _, f := range p.InFiles {
 		s, err := p.Source.ProbeSubject(ctx, f)
 		if err != nil {
 			return nil, err
 		}
-		if err := corpus.Add(s); err != nil {
+		if err := c.Add(s); err != nil {
 			return nil, err
 		}
 	}
 
-	return corpus, nil
+	return c, nil
 }

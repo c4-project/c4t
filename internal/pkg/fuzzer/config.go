@@ -8,13 +8,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 )
 
-// SingleFuzzer represents types that can commune with a C litmus test fuzzer.
-type SingleFuzzer interface {
-	// FuzzSingle fuzzes the test at path inPath using the given seed,
-	// outputting the new test to path outPath and the trace to tracePath.
-	FuzzSingle(ctx context.Context, seed int32, inPath, outPath, tracePath string) error
-}
-
 // SubjectPather is the interface of things that serve file-paths for subject outputs during a fuzz batch.
 type SubjectPather interface {
 	// Prepare sets up the directories ready to serve through SubjectPaths.

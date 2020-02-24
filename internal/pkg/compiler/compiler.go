@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"golang.org/x/sync/errgroup"
 
@@ -89,19 +91,34 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 
 	eg, ectx := errgroup.WithContext(ctx)
 
-	resCh := make(chan result)
+	// Note that this builder is modifying the plan's corpus in-place; this means we have to provide the job goroutines
+	// with a copy rc.
+	b, reqCh, berr := corpus.NewBuilder(c.plan.Corpus, c.count())
+	if berr != nil {
+		return nil, berr
+	}
 
 	for ids, cc := range c.mach.Compilers {
 		nc := nameCompiler(ids, cc)
-		cr := c.makeJob(nc, resCh)
+		cr := c.makeJob(nc, reqCh)
 		eg.Go(func() error {
 			return cr.Compile(ectx)
 		})
 	}
 
-	eg.Go(func() error { return handleResults(ectx, c.count(), resCh) })
+	var newc corpus.Corpus
+	eg.Go(func() error {
+		var err error
+		newc, err = b.Run(ectx)
+		return err
+	})
 
-	return &c.plan, eg.Wait()
+	// Need to wait until there are no goroutines accessing the corpus before we copy it over.
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+	c.plan.Corpus = newc
+	return &c.plan, nil
 }
 
 func (c *Compiler) prepareDirs() error {
@@ -109,7 +126,10 @@ func (c *Compiler) prepareDirs() error {
 	return c.conf.Paths.Prepare(c.mach.CompilerIDs())
 }
 
-func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- result) *compileJob {
+// makeJob makes a job for the named compiler nc, outputting results to resCh.
+// It also takes in a read-only copy, rc, of the corpus; this is because the result handling thread will be modifying
+// the corpus proper.
+func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- corpus.BuilderReq) *compileJob {
 	return &compileJob{
 		MachineID: c.mid,
 		Compiler:  nc,

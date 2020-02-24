@@ -3,6 +3,8 @@ package lifter
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
@@ -15,7 +17,7 @@ import (
 // machine contains state used in a single-machine lifting job.
 type machine struct {
 	// Corpus is the corpus we are lifting.
-	Corpus subject.Corpus
+	Corpus corpus.Corpus
 
 	// Dir is the directory to which lifted harnesses should be created.
 	Dir string
@@ -49,8 +51,8 @@ func (m *machine) liftArch(ctx context.Context, arch model.ID) error {
 		return derr
 	}
 
-	return m.Corpus.Map(func(s *subject.Named) error {
-		return m.liftSubject(ctx, arch, dir, s)
+	return m.Corpus.Each(func(s subject.Named) error {
+		return m.liftSubject(ctx, arch, dir, &s)
 	})
 }
 

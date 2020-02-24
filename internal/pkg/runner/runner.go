@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
@@ -75,7 +77,7 @@ func New(c *Config, p *plan.Plan) (*Runner, error) {
 
 func (r *Runner) check() error {
 	if len(r.plan.Corpus) == 0 {
-		return subject.ErrNoCorpus
+		return corpus.ErrNoCorpus
 	}
 	return nil
 }
@@ -129,12 +131,11 @@ func (r *Runner) runCompile(ctx context.Context, s *subject.Named, cid model.ID,
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
 func (r *Runner) runAndParseBin(ctx context.Context, bin string) (*model.Obs, error) {
-
 	tctx, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
 	cmd := exec.CommandContext(tctx, bin)
-	obsr, err := cmd.StderrPipe()
+	obsr, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
 	}

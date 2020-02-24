@@ -7,11 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
 var testPlan = plan.Plan{
@@ -54,7 +55,7 @@ var testMachines = map[string]plan.MachinePlan{
 	},
 }
 
-var testCorpus = subject.NewCorpus("a.litmus", "b.litmus", "c.litmus")
+var testCorpus = corpus.New("a.litmus", "b.litmus", "c.litmus")
 
 // TestPlan_ParMachines tests ParMachines by spinning up a basic computation on the test machine set.
 func TestPlan_ParMachines(t *testing.T) {

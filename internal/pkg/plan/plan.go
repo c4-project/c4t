@@ -9,6 +9,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -40,13 +42,13 @@ type Plan struct {
 	Machines map[string]MachinePlan `toml:"machines"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
-	Corpus subject.Corpus `toml:"corpus"`
+	Corpus corpus.Corpus `toml:"corpus"`
 }
 
 // New creates a new plan using the given machines and corpus.
 // It randomises the seed using the top-level random number generator;
 // and also updates the creation time.
-func New(ms map[string]MachinePlan, c subject.Corpus) *Plan {
+func New(ms map[string]MachinePlan, c corpus.Corpus) *Plan {
 	p := Plan{Machines: ms, Corpus: c}
 	p.Creation = time.Now()
 	p.Seed = rand.Int63()

@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
@@ -52,7 +52,7 @@ type Planner struct {
 func (p *Planner) Plan(ctx context.Context) error {
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(p.InFiles) == 0 {
-		return subject.ErrNoCorpus
+		return corpus.ErrNoCorpus
 	}
 
 	rand.Seed(time.Now().UnixNano())
