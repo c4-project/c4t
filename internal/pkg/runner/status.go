@@ -25,6 +25,8 @@ const (
 	StatusTimeout
 	// StatusCompileFail indicates that a run failed because of the compilation failing.
 	StatusCompileFail
+	// NumStatus is the number of status flags.
+	NumStatus
 )
 
 var (
@@ -32,7 +34,7 @@ var (
 	ErrBadStatus = errors.New("bad status")
 
 	// StatusStrings enumerates string equivalents for each Status.
-	StatusStrings = []string{
+	StatusStrings = [NumStatus]string{
 		"unknown",
 		"ok",
 		"flagged",
@@ -63,7 +65,7 @@ func StatusOfString(s string) (Status, error) {
 
 // String gets the string representation of a Status.
 func (s Status) String() string {
-	if 0 < s || int(s) <= len(StatusStrings) {
+	if len(StatusStrings) <= int(s) || s < 0 {
 		return "(BAD STATUS)"
 	}
 	return StatusStrings[s]
