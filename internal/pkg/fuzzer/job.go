@@ -71,7 +71,7 @@ func (j *Job) fuzzCycle(ctx context.Context, cycle int) error {
 	}
 
 	nsub := j.fuzzedSubject(sc, spaths)
-	return j.sendSubject(ctx, nsub)
+	return corpus.SendAdd(ctx, j.ResCh, &nsub)
 }
 
 // fuzzedSubject makes a copy of this Job's subject with the cycled name sc and fuzz fileset spaths.
@@ -80,22 +80,4 @@ func (j *Job) fuzzedSubject(sc SubjectCycle, spaths subject.FuzzFileset) subject
 	nsub.Name = sc.String()
 	nsub.Fuzz = &spaths
 	return nsub
-}
-
-// sendSubject tries to send subject s down this Job's results channel.
-func (j *Job) sendSubject(ctx context.Context, s subject.Named) error {
-	select {
-	case j.ResCh <- j.builderReq(s):
-	case <-ctx.Done():
-		return ctx.Err()
-	}
-	return nil
-}
-
-// builderReq makes a builder request for adding s to the fuzzed corpus.
-func (j *Job) builderReq(s subject.Named) corpus.BuilderReq {
-	return corpus.BuilderReq{
-		Name: s.Name,
-		Req:  corpus.AddReq(s.Subject),
-	}
 }

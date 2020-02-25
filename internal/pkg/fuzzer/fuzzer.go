@@ -138,7 +138,12 @@ func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error
 		seeds[n] = rng.Int63()
 	}
 
-	b, resCh, berr := corpus.NewBuilder(make(corpus.Corpus, nfuzzes), nfuzzes)
+	bc := corpus.BuilderConfig{
+		NReqs: nfuzzes,
+		// TODO(@MattWindsor91): decouple this
+		Obs: &corpus.PbObserver{},
+	}
+	b, resCh, berr := corpus.NewBuilder(bc)
 	if berr != nil {
 		return nil, berr
 	}

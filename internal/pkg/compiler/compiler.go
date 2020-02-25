@@ -96,9 +96,13 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 
 	eg, ectx := errgroup.WithContext(ctx)
 
-	// Note that this builder is modifying the plan's corpus in-place; this means we have to provide the job goroutines
-	// with a copy rc.
-	b, reqCh, berr := corpus.NewBuilder(c.plan.Corpus, c.count())
+	bc := corpus.BuilderConfig{
+		Init:  c.plan.Corpus,
+		NReqs: c.count(),
+		// TODO(@MattWindsor91): decouple this
+		Obs: &corpus.PbObserver{},
+	}
+	b, reqCh, berr := corpus.NewBuilder(bc)
 	if berr != nil {
 		return nil, berr
 	}

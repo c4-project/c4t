@@ -6,6 +6,8 @@
 package corpus
 
 import (
+	"context"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
@@ -21,6 +23,20 @@ type BuilderReq struct {
 
 // AddReq is a request to add the given subject to the corpus.
 type AddReq subject.Subject
+
+// SendAdd tries to send an add request for s down ch, failing if ctx has terminated.
+func SendAdd(ctx context.Context, ch chan<- BuilderReq, s *subject.Named) error {
+	rq := BuilderReq{
+		Name: s.Name,
+		Req:  AddReq(s.Subject),
+	}
+	select {
+	case ch <- rq:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
 
 // AddCompileReq is a request to add the given compiler result to the named subject.
 type AddCompileReq struct {

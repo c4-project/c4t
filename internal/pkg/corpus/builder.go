@@ -14,7 +14,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
-	"github.com/cheggaaa/pb/v3"
 )
 
 var (
@@ -36,24 +35,36 @@ type Builder struct {
 	// n is the number of expected requests for the corpus.
 	n int
 
+	// obs is the observer for the builder.
+	obs BuilderObserver
+
 	// reqCh is the receiving channel for requests.
 	reqCh <-chan BuilderReq
 }
 
-// NewBuilder constructs a Builder for n incoming requests, copying any bindings in the initial corpus init if non-nil.
-// It fails if nreqs is negative.
-func NewBuilder(init Corpus, nreqs int) (*Builder, chan<- BuilderReq, error) {
-	if nreqs <= 0 {
-		return nil, nil, fmt.Errorf("%w: %d", ErrBadBuilderTarget, nreqs)
+// NewBuilder constructs a Builder according to cfg.
+// It fails if the number of target requests is negative.
+func NewBuilder(cfg BuilderConfig) (*Builder, chan<- BuilderReq, error) {
+	if cfg.NReqs <= 0 {
+		return nil, nil, fmt.Errorf("%w: %d", ErrBadBuilderTarget, cfg.NReqs)
 	}
 
 	reqCh := make(chan BuilderReq)
 	b := Builder{
-		corpus: initCorpus(init, nreqs),
-		n:      nreqs,
+		corpus: initCorpus(cfg.Init, cfg.NReqs),
+		n:      cfg.NReqs,
+		obs:    obsOrDefault(cfg.Obs),
 		reqCh:  reqCh,
 	}
 	return &b, reqCh, nil
+}
+
+// obsOrDefault fills in a default observer if o is nil.
+func obsOrDefault(o BuilderObserver) BuilderObserver {
+	if o == nil {
+		return SilentObserver{}
+	}
+	return o
 }
 
 func initCorpus(init Corpus, nreqs int) Corpus {
@@ -67,15 +78,13 @@ func initCorpus(init Corpus, nreqs int) Corpus {
 // Run runs the builder in context ctx.
 // Run is not thread-safe.
 func (b *Builder) Run(ctx context.Context) (Corpus, error) {
-	// TODO(@MattWindsor91): decouple this
-	bar := pb.StartNew(b.n)
-	defer bar.Finish()
+	b.obs.OnStart(b.n)
+	defer b.obs.OnFinish()
 
 	for i := 0; i < b.n; i++ {
 		if err := b.runSingle(ctx); err != nil {
 			return nil, err
 		}
-		bar.Increment()
 	}
 
 	return b.corpus, nil
@@ -93,12 +102,20 @@ func (b *Builder) runSingle(ctx context.Context) error {
 func (b *Builder) runRequest(r BuilderReq) error {
 	switch rq := r.Req.(type) {
 	case AddReq:
-		return b.corpus.Add(subject.Named{Name: r.Name, Subject: subject.Subject(rq)})
+		return b.add(r.Name, subject.Subject(rq))
 	case AddCompileReq:
 		return b.addCompile(r.Name, rq.CompilerID, rq.Result)
 	default:
 		return fmt.Errorf("%w: %s", ErrBadBuilderRequest, reflect.TypeOf(r.Req).Name())
 	}
+}
+
+func (b *Builder) add(name string, s subject.Subject) error {
+	if err := b.corpus.Add(subject.Named{Name: name, Subject: s}); err != nil {
+		return err
+	}
+	b.obs.OnAdd(name)
+	return nil
 }
 
 func (b *Builder) addCompile(name string, cid model.MachQualID, res subject.CompileResult) error {
@@ -110,5 +127,6 @@ func (b *Builder) addCompile(name string, cid model.MachQualID, res subject.Comp
 		return err
 	}
 	b.corpus[name] = s
+	b.obs.OnCompile(name, cid)
 	return nil
 }
