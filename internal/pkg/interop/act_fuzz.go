@@ -8,15 +8,18 @@ package interop
 import (
 	"context"
 	"strconv"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
 // BinActFuzz is the name of the ACT fuzzer binary.
 const BinActFuzz = "act-fuzz"
 
 // FuzzSingle wraps the ACT one-file fuzzer, supplying the given seed.
-func (a *ActRunner) FuzzSingle(ctx context.Context, seed int32, inPath, outPath, tracePath string) error {
+func (a *ActRunner) FuzzSingle(ctx context.Context, seed int32, inPath string, outPaths subject.FuzzFileset) error {
 	sargs := StandardArgs{Verbose: false}
 	seedStr := strconv.Itoa(int(seed))
-	cmd := a.CommandContext(ctx, BinActFuzz, "run", sargs, "-seed", seedStr, "-o", outPath, "-trace-output", tracePath, inPath)
+	args := []string{"-seed", seedStr, "-o", outPaths.Litmus, "-trace-output", outPaths.Trace, inPath}
+	cmd := a.CommandContext(ctx, BinActFuzz, "run", sargs, args...)
 	return cmd.Run()
 }

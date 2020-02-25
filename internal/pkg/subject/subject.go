@@ -38,8 +38,8 @@ type Subject struct {
 	// Threads is the number of threads contained in this subject.
 	Threads int `toml:"threads,omitzero"`
 
-	// FuzzFileset is the fuzzing pathset for this subject, if it has been fuzzed.
-	Fuzz *FuzzFileset `toml:"fuzz,omitempty"`
+	// Fuzz is the fuzzing pathset for this subject, if it has been fuzzed.
+	Fuzz *Fuzz `toml:"fuzz,omitempty"`
 
 	// Litmus is the path to this subject's original Litmus file.
 	Litmus string `toml:"litmus,omitempty"`
@@ -62,8 +62,8 @@ type Subject struct {
 // Else, BestLitmus returns an error.
 func (s *Subject) BestLitmus() (string, error) {
 	switch {
-	case s.Fuzz != nil && s.Fuzz.Litmus != "":
-		return s.Fuzz.Litmus, nil
+	case s.Fuzz != nil && s.Fuzz.Files.Litmus != "":
+		return s.Fuzz.Files.Litmus, nil
 	case s.Litmus != "":
 		return s.Litmus, nil
 	default:

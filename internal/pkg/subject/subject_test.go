@@ -24,7 +24,7 @@ func ExampleSubject_BestLitmus() {
 	b1, _ := s1.BestLitmus()
 
 	// This subject has a fuzzed litmus file, which takes priority.
-	s2 := subject.Subject{Litmus: "foo.litmus", Fuzz: &subject.FuzzFileset{Litmus: "bar.litmus"}}
+	s2 := subject.Subject{Litmus: "foo.litmus", Fuzz: &subject.Fuzz{Files: subject.FuzzFileset{Litmus: "bar.litmus"}}}
 	b2, _ := s2.BestLitmus()
 
 	fmt.Println("s1:", b1)
@@ -172,10 +172,10 @@ func TestSubject_BestLitmus(t *testing.T) {
 		want string
 	}{
 		"zero":             {s: subject.Subject{}, err: subject.ErrNoBestLitmus, want: ""},
-		"zero-fuzz":        {s: subject.Subject{Fuzz: &subject.FuzzFileset{}}, err: subject.ErrNoBestLitmus, want: ""},
+		"zero-fuzz":        {s: subject.Subject{Fuzz: &subject.Fuzz{}}, err: subject.ErrNoBestLitmus, want: ""},
 		"litmus-only":      {s: subject.Subject{Litmus: "foo"}, err: nil, want: "foo"},
-		"litmus-only-fuzz": {s: subject.Subject{Litmus: "foo", Fuzz: &subject.FuzzFileset{}}, err: nil, want: "foo"},
-		"fuzz":             {s: subject.Subject{Litmus: "foo", Fuzz: &subject.FuzzFileset{Litmus: "bar"}}, err: nil, want: "bar"},
+		"litmus-only-fuzz": {s: subject.Subject{Litmus: "foo", Fuzz: &subject.Fuzz{}}, err: nil, want: "foo"},
+		"fuzz":             {s: subject.Subject{Litmus: "foo", Fuzz: &subject.Fuzz{Files: subject.FuzzFileset{Litmus: "bar"}}}, err: nil, want: "bar"},
 	}
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {

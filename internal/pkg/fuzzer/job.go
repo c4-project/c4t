@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"math/rand"
+	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
@@ -66,18 +67,24 @@ func (j *Job) check() error {
 func (j *Job) fuzzCycle(ctx context.Context, cycle int) error {
 	sc := SubjectCycle{Name: j.Subject.Name, Cycle: cycle}
 	spaths := j.Pathset.SubjectPaths(sc)
-	if err := j.Driver.FuzzSingle(ctx, j.Rng.Int31(), j.Subject.Litmus, spaths.Litmus, spaths.Trace); err != nil {
+
+	stime := time.Now()
+	if err := j.Driver.FuzzSingle(ctx, j.Rng.Int31(), j.Subject.Litmus, spaths); err != nil {
 		return err
 	}
+	fz := subject.Fuzz{
+		Duration: time.Since(stime),
+		Files:    spaths,
+	}
 
-	nsub := j.fuzzedSubject(sc, spaths)
+	nsub := j.fuzzedSubject(sc, &fz)
 	return corpus.SendAdd(ctx, j.ResCh, &nsub)
 }
 
 // fuzzedSubject makes a copy of this Job's subject with the cycled name sc and fuzz fileset spaths.
-func (j *Job) fuzzedSubject(sc SubjectCycle, spaths subject.FuzzFileset) subject.Named {
+func (j *Job) fuzzedSubject(sc SubjectCycle, fz *subject.Fuzz) subject.Named {
 	nsub := j.Subject
 	nsub.Name = sc.String()
-	nsub.Fuzz = &spaths
+	nsub.Fuzz = fz
 	return nsub
 }
