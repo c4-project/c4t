@@ -38,11 +38,11 @@ func ExampleSubject_BestLitmus() {
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
 	s := subject.Subject{Compiles: map[string]subject.CompileResult{
-		"localhost:gcc":   {Success: true, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
-		"spikemuth:clang": {Success: false, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
+		"gcc":   {Success: true, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
+		"clang": {Success: false, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
-	lps, _ := s.CompileResult(model.MachQualID{MachineID: model.IDFromString("localhost"), ID: model.IDFromString("gcc")})
-	sps, _ := s.CompileResult(model.MachQualID{MachineID: model.IDFromString("spikemuth"), ID: model.IDFromString("clang")})
+	lps, _ := s.CompileResult(model.IDFromString("gcc"))
+	sps, _ := s.CompileResult(model.IDFromString("clang"))
 
 	fmt.Println("localhost:", lps.Success, lps.Files.Bin, lps.Files.Log)
 	fmt.Println("spikemuth:", sps.Success, sps.Files.Bin, sps.Files.Log)
@@ -55,11 +55,11 @@ func ExampleSubject_CompileResult() {
 // ExampleSubject_Harness is a testable example for Harness.
 func ExampleSubject_Harness() {
 	s := subject.Subject{Harnesses: map[string]subject.Harness{
-		"localhost:x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
-		"spikemuth:arm":    {Dir: "foobar", Files: []string{"barbaz"}},
+		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
+		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
-	lps, _ := s.Harness(model.MachQualID{MachineID: model.IDFromString("localhost"), ID: model.ArchX8664})
-	sps, _ := s.Harness(model.MachQualID{MachineID: model.IDFromString("spikemuth"), ID: model.ArchArm})
+	lps, _ := s.Harness(model.ArchX8664)
+	sps, _ := s.Harness(model.ArchArm)
 
 	for _, l := range lps.Files {
 		fmt.Println(l)
@@ -78,10 +78,7 @@ func ExampleSubject_Harness() {
 // the appropriate error.
 func TestSubject_CompileResult_Missing(t *testing.T) {
 	var s subject.Subject
-	_, err := s.CompileResult(model.MachQualID{
-		MachineID: model.IDFromString("localhost"),
-		ID:        model.IDFromString("gcc"),
-	})
+	_, err := s.CompileResult(model.IDFromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompile, "missing compile result path")
 }
 
@@ -96,10 +93,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 		},
 	}
 
-	mcomp := model.MachQualID{
-		MachineID: model.IDFromString("localhost"),
-		ID:        model.IDFromString("gcc"),
-	}
+	mcomp := model.IDFromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
 		if err := s.AddCompileResult(mcomp, c); err != nil {
@@ -125,7 +119,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 // the appropriate error.
 func TestSubject_Harness_Missing(t *testing.T) {
 	var s subject.Subject
-	_, err := s.Harness(model.MachQualID{MachineID: model.IDFromString("localhost"), ID: model.IDFromString("x86.64")})
+	_, err := s.Harness(model.IDFromString("x86.64"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingHarness, "missing harness path")
 }
 
@@ -137,10 +131,7 @@ func TestSubject_AddHarness(t *testing.T) {
 		Files: []string{"bar", "baz"},
 	}
 
-	march := model.MachQualID{
-		MachineID: model.IDFromString("localhost"),
-		ID:        model.ArchX8664,
-	}
+	march := model.ArchX8664
 
 	t.Run("initial-add", func(t *testing.T) {
 		if err := s.AddHarness(march, h); err != nil {

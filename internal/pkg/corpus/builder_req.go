@@ -21,28 +21,38 @@ type BuilderReq struct {
 	Req interface{}
 }
 
-// AddReq is a request to add the given subject to the corpus.
-type AddReq subject.Subject
-
-// SendAdd tries to send an add request for s down ch, failing if ctx has terminated.
-func SendAdd(ctx context.Context, ch chan<- BuilderReq, s *subject.Named) error {
-	rq := BuilderReq{
-		Name: s.Name,
-		Req:  AddReq(s.Subject),
-	}
+// SendTo tries to send this request down ch while checking to see if ctx has been cancelled.
+func (b BuilderReq) SendTo(ctx context.Context, ch chan<- BuilderReq) error {
 	select {
-	case ch <- rq:
+	case ch <- b:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 }
 
+// AddReq is a request to add the given subject to the corpus.
+type AddReq subject.Subject
+
+// SendAdd tries to send an add request for s down ch, failing if ctx has terminated.
+func SendAdd(ctx context.Context, ch chan<- BuilderReq, s *subject.Named) error {
+	return BuilderReq{Name: s.Name, Req: AddReq(s.Subject)}.SendTo(ctx, ch)
+}
+
 // AddCompileReq is a request to add the given compiler result to the named subject.
 type AddCompileReq struct {
-	// CompilerID is the machine-qualified ID of the compiler that produced this result.
-	CompilerID model.MachQualID
+	// CompilerID is the ID of the compiler that produced this result.
+	CompilerID model.ID
 
 	// Result is the compile result.
 	Result subject.CompileResult
+}
+
+// AddHarnessReq is a request to add the given harness to the named subject, under the named architecture.
+type AddHarnessReq struct {
+	// Arch is the ID of the architecture for which this lifting is occurring.
+	Arch model.ID
+
+	// Harness is the produced harness pathset.
+	Harness subject.Harness
 }

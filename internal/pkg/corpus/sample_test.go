@@ -7,6 +7,7 @@ package corpus_test
 
 import (
 	"errors"
+	"math/rand"
 	"reflect"
 	"testing"
 
@@ -55,7 +56,7 @@ var sampleCorpi = map[string]struct {
 func TestCorpus_Sample_SmallErrors(t *testing.T) {
 	for name, c := range smallCorpi {
 		t.Run(name, func(t *testing.T) {
-			_, err := c.corpus.Sample(1, c.want)
+			_, err := c.corpus.Sample(rand.New(rand.NewSource(1)), c.want)
 			if err == nil {
 				t.Errorf("no error when sampling small corpus (%v, want %d)", c.corpus, c.want)
 			} else if !errors.Is(err, corpus.ErrSmallCorpus) {
@@ -69,7 +70,7 @@ func TestCorpus_Sample_SmallErrors(t *testing.T) {
 func TestCorpus_Sample_PassThrough(t *testing.T) {
 	for name, c := range exactCorpi {
 		t.Run(name, func(t *testing.T) {
-			smp, err := c.corpus.Sample(1, c.want)
+			smp, err := c.corpus.Sample(rand.New(rand.NewSource(1)), c.want)
 			if err != nil {
 				t.Errorf("error when sampling exact corpus (%v, want %d): %v", c.corpus, c.want, err)
 			} else if !reflect.DeepEqual(smp, c.corpus) {
@@ -81,10 +82,10 @@ func TestCorpus_Sample_PassThrough(t *testing.T) {
 
 // TestCorpus_Sample_ActuallySample tests that sampling behaves correctly.
 func TestCorpus_Sample_ActuallySample(t *testing.T) {
-	i := 0
+	var i int64
 	for name, c := range sampleCorpi {
 		t.Run(name, func(t *testing.T) {
-			smp, err := c.corpus.Sample(int64(i), c.want)
+			smp, err := c.corpus.Sample(rand.New(rand.NewSource(i)), c.want)
 			if err != nil {
 				t.Errorf("error when sampling corpus (%v, want %d): %v", c.corpus, c.want, err)
 			} else {

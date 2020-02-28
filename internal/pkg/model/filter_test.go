@@ -15,10 +15,10 @@ var argvCases = []struct {
 	want []string
 }{
 	{CompilerFilter{}, nil},
-	{CompilerFilter{CompPred: "(id (has_tag yeet))"}, []string{"-compiler-predicate", "(id (has_tag yeet))"}},
-	{CompilerFilter{MachPred: "(id (has_tag yote))"}, []string{"-machine-predicate", "(id (has_tag yote))"}},
+	{CompilerFilter{CompPred: "(id (has_tag yeet))"}, []string{"-filter-compilers", "(id (has_tag yeet))"}},
+	{CompilerFilter{MachPred: "(id (has_tag yote))"}, []string{"-filter-machines", "(id (has_tag yote))"}},
 	{CompilerFilter{CompPred: "(id (has_tag yeet))", MachPred: "(id (has_tag yote))"},
-		[]string{"-compiler-predicate", "(id (has_tag yeet))", "-machine-predicate", "(id (has_tag yote))"}},
+		[]string{"-filter-compilers", "(id (has_tag yeet))", "-filter-machines", "(id (has_tag yote))"}},
 }
 
 func TestCompilerFilter_ToArgv(t *testing.T) {

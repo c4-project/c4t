@@ -7,6 +7,7 @@ package planner
 
 import (
 	"context"
+	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
@@ -19,14 +20,14 @@ type SubjectProber interface {
 	ProbeSubject(ctx context.Context, litmus string) (subject.Named, error)
 }
 
-func (p *Planner) planCorpus(ctx context.Context, seed int64) (corpus.Corpus, error) {
+func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error) {
 	probed, err := p.ProbeCorpus(ctx)
 	if err != nil {
 		return corpus.Corpus{}, err
 	}
 
 	// TODO(@MattWindsor91): perform corpus pruning
-	return probed.Sample(seed, p.CorpusSize)
+	return probed.Sample(rng, p.CorpusSize)
 }
 
 // ProbeCorpus probes each subject in this planner's corpus file list, producing a Corpus proper.

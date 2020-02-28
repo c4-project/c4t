@@ -6,9 +6,12 @@
 package corpus_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sort"
+	"strconv"
+	"sync"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -81,4 +84,38 @@ func TestCorpus_Map_Error(t *testing.T) {
 		return e
 	})
 	testhelp.ExpectErrorIs(t, err, e, "Map of function returning error")
+}
+
+func makeHugeCorpus() corpus.Corpus {
+	names := make([]string, 640)
+	for i := range names {
+		names[i] = strconv.Itoa(i)
+	}
+	return corpus.New(names...)
+}
+
+// TestCorpus_Par tests the 'happy path' of Par across various sizes of corpus.
+func TestCorpus_Par(t *testing.T) {
+	cases := map[string]corpus.Corpus{
+		"empty": {},
+		"small": corpus.New("foo", "bar", "baz"),
+		"large": makeHugeCorpus(),
+	}
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			var sm sync.Map
+			if err := c.Par(context.Background(), func(_ context.Context, s subject.Named) error {
+				sm.Store(s.Name, true)
+				return nil
+			}); err != nil {
+				t.Errorf("par failed: %v", err)
+			}
+
+			for n := range c {
+				if _, ok := sm.Load(n); !ok {
+					t.Errorf("par didn't store %s", n)
+				}
+			}
+		})
+	}
 }

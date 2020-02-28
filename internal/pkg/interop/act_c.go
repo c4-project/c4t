@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
@@ -61,8 +60,6 @@ func (a *ActRunner) DumpStats(ctx context.Context, s *Statset, path string) erro
 
 	cmd := a.CommandContext(ctx, BinActC, "dump-stats", sargs, path)
 	cmd.Stdout = &obuf
-	// TODO(@MattWindsor91): allow redirecting this
-	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
 		return err

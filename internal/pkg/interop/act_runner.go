@@ -7,6 +7,7 @@ package interop
 
 import (
 	"context"
+	"io"
 	"os/exec"
 )
 
@@ -18,6 +19,9 @@ type ActRunner struct {
 	// ConfFile is the path to the act.conf to use.
 	// If missing, we use ACT's default.
 	ConfFile string
+
+	// Stderr is the destination for any error output from ACT commands.
+	Stderr io.Writer
 }
 
 // StandardArgs captures the ACT 'standard arguments', less those covered by ActRunner itself.
@@ -40,7 +44,9 @@ func (s StandardArgs) ToArgv() []string {
 func (a *ActRunner) CommandContext(ctx context.Context, cmd, sub string, sargs StandardArgs, argv ...string) *exec.Cmd {
 	fargv := a.actArgv(sub, sargs, argv)
 	dcmd, dargv := liftDuneExec(a.DuneExec, cmd, fargv)
-	return exec.CommandContext(ctx, dcmd, dargv...)
+	c := exec.CommandContext(ctx, dcmd, dargv...)
+	c.Stderr = a.Stderr
+	return c
 }
 
 func (a *ActRunner) actArgv(sub string, sargs StandardArgs, argv []string) []string {

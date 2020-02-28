@@ -8,8 +8,6 @@ package planner
 
 import (
 	"context"
-	"math/rand"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
@@ -41,7 +39,10 @@ type Planner struct {
 	Source Source
 
 	// Filter is the compiler filter to use to select compilers to test.
-	Filter model.CompilerFilter
+	Filter string
+
+	// MachineID is the identifier of the target machine for the plan.
+	MachineID model.ID
 
 	// CorpusSize is the requested size of the test corpus.
 	// If zero, no corpus sampling is done, but the planner will still error if the final corpus size is 0.
@@ -54,25 +55,41 @@ type Planner struct {
 }
 
 // plan runs the test planner p.
-func (p *Planner) Plan(ctx context.Context) error {
+func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(p.InFiles) == 0 {
-		return corpus.ErrNoCorpus
+		return nil, corpus.ErrNoCorpus
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	pn := plan.New(nil, nil)
+	hd := plan.NewHeader()
+	// TODO(@MattWindsor91): allow manual seed override
+	rng := hd.Rand()
 
-	logrus.Infoln("Planning machines...")
+	pn := plan.Plan{
+		Header:    *hd,
+		Machine:   model.Machine{},
+		Backend:   nil,
+		Compilers: nil,
+		Corpus:    nil,
+	}
+
 	var err error
-	if pn.Machines, err = p.planMachines(ctx); err != nil {
-		return err
+
+	// TODO(@MattWindsor91): probe machine
+	logrus.Infoln("Planning backend...")
+	if pn.Backend, err = p.planBackend(ctx); err != nil {
+		return nil, err
+	}
+
+	logrus.Infoln("Planning compilers...")
+	if pn.Compilers, err = p.planCompilers(ctx); err != nil {
+		return nil, err
 	}
 
 	logrus.Infoln("Planning corpus...")
-	if pn.Corpus, err = p.planCorpus(ctx, pn.Seed); err != nil {
-		return err
+	if pn.Corpus, err = p.planCorpus(ctx, rng); err != nil {
+		return nil, err
 	}
 
-	return pn.Dump()
+	return &pn, nil
 }

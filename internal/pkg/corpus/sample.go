@@ -14,7 +14,7 @@ import (
 // Sample tries to select a sample of size want from corpus-slice corpus.
 // If want is non-positive, no sampling occurs.
 // If sampling occurs, seed becomes the seed for the random number generator used.
-func (c Corpus) Sample(seed int64, want int) (Corpus, error) {
+func (c Corpus) Sample(rng *rand.Rand, want int) (Corpus, error) {
 	// TODO(@MattWindsor91): test
 	got := len(c)
 
@@ -29,7 +29,6 @@ func (c Corpus) Sample(seed int64, want int) (Corpus, error) {
 		return nil, fmt.Errorf("%w: corpus size=%d, want %d", ErrSmallCorpus, got, want)
 	}
 
-	rng := rand.New(rand.NewSource(seed))
 	return c.actuallySample(rng, want), nil
 }
 

@@ -8,6 +8,7 @@ package main
 import (
 	"context"
 	"flag"
+	"io"
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
@@ -19,15 +20,13 @@ import (
 const defaultOutDir = "lift_results"
 
 func main() {
-	err := run(os.Args)
+	err := run(os.Args, os.Stderr)
 	ux.LogTopError(err)
 }
 
-func run(args []string) error {
-	var (
-		act interop.ActRunner
-		pf  string
-	)
+func run(args []string, errw io.Writer) error {
+	var pf string
+	act := interop.ActRunner{Stderr: errw}
 	lift := lifter.Lifter{Maker: &act}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)

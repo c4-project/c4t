@@ -18,10 +18,10 @@ type CompilerFilter struct {
 func (c CompilerFilter) ToArgv() []string {
 	var argv []string
 	if c.CompPred != "" {
-		argv = append(argv, "-compiler-predicate", c.CompPred)
+		argv = append(argv, "-filter-compilers", c.CompPred)
 	}
 	if c.MachPred != "" {
-		argv = append(argv, "-machine-predicate", c.MachPred)
+		argv = append(argv, "-filter-machines", c.MachPred)
 	}
 	return argv
 }

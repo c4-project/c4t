@@ -97,7 +97,7 @@ func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 	}
 
 	logrus.Infoln("now fuzzing")
-	rng := rand.New(rand.NewSource(f.plan.Seed))
+	rng := f.plan.Header.Rand()
 	fcs, ferr := f.fuzz(ctx, rng)
 	if ferr != nil {
 		return nil, ferr
@@ -109,14 +109,14 @@ func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 // sampleAndUpdatePlan samples fcs and places the result in the fuzzer's plan.
 func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand) (*plan.Plan, error) {
 	logrus.Infoln("sampling corpus")
-	scs, err := fcs.Sample(rng.Int63(), f.conf.CorpusSize)
+	scs, err := fcs.Sample(rng, f.conf.CorpusSize)
 	if err != nil {
 		return nil, err
 	}
 
 	logrus.Infoln("updating plan")
 	f.plan.Corpus = scs
-	f.plan.Seed = rng.Int63()
+	f.plan.Header = *plan.NewHeader()
 	return &f.plan, nil
 }
 

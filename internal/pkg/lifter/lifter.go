@@ -9,12 +9,27 @@ package lifter
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"math/rand"
 	"os"
+
+	"golang.org/x/sync/errgroup"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/sirupsen/logrus"
+)
+
+var (
+	// ErrMakerNil occurs when a lifter runs without a HarnessMaker set.
+	ErrMakerNil = errors.New("harness maker nil")
+
+	// ErrNoBackend occurs when backend information is missing.
+	ErrNoBackend = errors.New("no backend provided")
 )
 
 // HarnessMaker is an interface capturing the ability to make test harnesses.
@@ -26,7 +41,7 @@ type HarnessMaker interface {
 
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {
-	// plan is the plan on which this lifter is operating.
+	// Plan is the plan on which this lifter is operating.
 	Plan plan.Plan
 
 	// Maker is a harness maker.
@@ -42,6 +57,13 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, plan.ErrNil
 	}
 	l.Plan = *p
+	if l.Maker == nil {
+		return nil, ErrMakerNil
+	}
+	// TODO(@MattWindsor91): this is a bit wonky
+	if l.Plan.Backend.ID.IsEmpty() {
+		return nil, ErrNoBackend
+	}
 
 	logrus.Infoln("making output directory", l.OutDir)
 	if err := os.Mkdir(l.OutDir, 0744); err != nil {
@@ -54,36 +76,59 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 
 func (l *Lifter) lift(ctx context.Context) error {
 	logrus.Infoln("now lifting")
-	resCh := make(chan result)
-	return l.Plan.ParMachines(ctx, func(ctx context.Context, mid model.ID, m plan.MachinePlan) error {
-		return l.liftMachine(ctx, mid, m, resCh)
-	}, func(ctx context.Context) error {
-		return handleResults(ctx, l.Plan.Corpus, l.count(), resCh)
+
+	b, resCh, err := corpus.NewBuilder(corpus.BuilderConfig{
+		Init:  l.Plan.Corpus,
+		NReqs: l.count(),
+		Obs:   &corpus.PbObserver{},
 	})
+	if err != nil {
+		return fmt.Errorf("when making builder: %w", err)
+	}
+	mrng := l.Plan.Header.Rand()
+
+	var lerr error
+	l.Plan.Corpus, lerr = l.liftInner(ctx, mrng, resCh, b)
+	return lerr
 }
 
-func (l *Lifter) liftMachine(ctx context.Context, mid model.ID, m plan.MachinePlan, resCh chan<- result) error {
-	dir, err := buildAndMkDir(l.OutDir, mid.Tags()...)
-	if err != nil {
+func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, resCh chan<- corpus.BuilderReq, b *corpus.Builder) (corpus.Corpus, error) {
+	eg, ectx := errgroup.WithContext(ctx)
+	var lc corpus.Corpus
+	// It's very likely this will be a single element array.
+	for _, a := range l.Plan.Arches() {
+		dir, derr := buildAndMkDir(l.OutDir, a.Tags()...)
+		if derr != nil {
+			return nil, derr
+		}
+		j := l.makeJob(a, dir, mrng, resCh)
+		eg.Go(func() error {
+			return j.Lift(ectx)
+		})
+	}
+	eg.Go(func() error {
+		var err error
+		lc, err = b.Run(ectx)
 		return err
-	}
+	})
+	err := eg.Wait()
+	return lc, err
+}
 
-	ml := machine{
-		Corpus:    l.Plan.Corpus,
-		Dir:       dir,
-		MachineID: mid,
-		Machine:   m,
-		Maker:     l.Maker,
-		ResCh:     resCh,
+func (l *Lifter) makeJob(a model.ID, dir string, mrng *rand.Rand, resCh chan<- corpus.BuilderReq) Job {
+	j := Job{
+		Arch:    a,
+		Backend: l.Plan.Backend.FQID(),
+		OutDir:  dir,
+		Maker:   l.Maker,
+		Corpus:  l.Plan.Corpus,
+		Rng:     rand.New(rand.NewSource(mrng.Int63())),
+		ResCh:   resCh,
 	}
-	return ml.lift(ctx)
+	return j
 }
 
 // count counts the number of liftings that need doing.
 func (l *Lifter) count() int {
-	i := 0
-	for _, m := range l.Plan.Machines {
-		i += len(m.Arches())
-	}
-	return i * len(l.Plan.Corpus)
+	return len(l.Plan.Arches()) * len(l.Plan.Corpus)
 }

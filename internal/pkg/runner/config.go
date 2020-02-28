@@ -31,7 +31,4 @@ type Config struct {
 
 	// Paths contains the pathset used for this runner's outputs.
 	Paths *Pathset
-
-	// MachineID is the ID of the machine whose compilations we are running.
-	MachineID model.ID
 }

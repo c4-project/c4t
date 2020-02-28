@@ -8,6 +8,7 @@ package main
 import (
 	"context"
 	"flag"
+	"io"
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
@@ -23,16 +24,16 @@ const (
 )
 
 func main() {
-	err := run(os.Args)
+	err := run(os.Args, os.Stderr)
 	ux.LogTopError(err)
 }
 
-func run(args []string) error {
+func run(args []string, errw io.Writer) error {
 	var (
-		act interop.ActRunner
 		dir string
 		pf  string
 	)
+	act := interop.ActRunner{Stderr: errw}
 	cfg := fuzzer.Config{Driver: &act}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)

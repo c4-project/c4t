@@ -69,7 +69,12 @@ func validateTags(tags []string) error {
 
 // IDFromString converts a string to an ACT ID.
 func IDFromString(s string) ID {
-	return ID{strings.Split(s, string(SepTag))}
+	id, err := NewID(strings.Split(s, string(SepTag))...)
+	if err != nil {
+		// TODO(@MattWindsor91): make a properly validating version of this
+		return ID{[]string{"[error]"}}
+	}
+	return id
 }
 
 // IsEmpty gets whether this ID is empty.

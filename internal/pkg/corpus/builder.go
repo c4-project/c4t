@@ -105,6 +105,8 @@ func (b *Builder) runRequest(r BuilderReq) error {
 		return b.add(r.Name, subject.Subject(rq))
 	case AddCompileReq:
 		return b.addCompile(r.Name, rq.CompilerID, rq.Result)
+	case AddHarnessReq:
+		return b.addHarness(r.Name, rq.Arch, rq.Harness)
 	default:
 		return fmt.Errorf("%w: %s", ErrBadBuilderRequest, reflect.TypeOf(r.Req).Name())
 	}
@@ -118,15 +120,36 @@ func (b *Builder) add(name string, s subject.Subject) error {
 	return nil
 }
 
-func (b *Builder) addCompile(name string, cid model.MachQualID, res subject.CompileResult) error {
+func (b *Builder) addCompile(name string, cid model.ID, res subject.CompileResult) error {
+	if err := b.rmwSubject(name, func(s *subject.Subject) error {
+		return s.AddCompileResult(cid, res)
+	}); err != nil {
+		return err
+	}
+	b.obs.OnCompile(name, cid)
+	return nil
+}
+
+func (b *Builder) addHarness(name string, arch model.ID, h subject.Harness) error {
+	if err := b.rmwSubject(name, func(s *subject.Subject) error {
+		return s.AddHarness(arch, h)
+	}); err != nil {
+		return err
+	}
+	b.obs.OnHarness(name, arch)
+	return nil
+}
+
+// rmwSubject hoists a mutating function over subjects so that it operates on the corpus subject name.
+// This hoisting function is necessary because we can't directly mutate the subject in-place.
+func (b *Builder) rmwSubject(name string, f func(*subject.Subject) error) error {
 	s, ok := b.corpus[name]
 	if !ok {
 		return fmt.Errorf("%w: %s", ErrBadBuilderName, name)
 	}
-	if err := s.AddCompileResult(cid, res); err != nil {
+	if err := f(&s); err != nil {
 		return err
 	}
 	b.corpus[name] = s
-	b.obs.OnCompile(name, cid)
 	return nil
 }

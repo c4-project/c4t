@@ -37,7 +37,11 @@ func (s SilentObserver) OnAdd(string) {
 }
 
 // OnCompile does nothing.
-func (s SilentObserver) OnCompile(string, model.MachQualID) {
+func (s SilentObserver) OnCompile(string, model.ID) {
+}
+
+// OnHarness does nothing.
+func (s SilentObserver) OnHarness(string, model.ID) {
 }
 
 // OnFinish does nothing.
@@ -53,7 +57,10 @@ type BuilderObserver interface {
 	OnAdd(sname string)
 
 	// OnCompile executes when the subject sname is compiled with compiler cid.
-	OnCompile(sname string, cid model.MachQualID)
+	OnCompile(sname string, cid model.ID)
+
+	// OnHarness executes when the subject sname is lifted to a harness for architecture arch.
+	OnHarness(sname string, arch model.ID)
 
 	// OnFinish executes when the builder stops processing.
 	OnFinish()
@@ -72,7 +79,11 @@ func (p *PbObserver) OnAdd(string) {
 	p.bar.Increment()
 }
 
-func (p *PbObserver) OnCompile(string, model.MachQualID) {
+func (p *PbObserver) OnCompile(string, model.ID) {
+	p.bar.Increment()
+}
+
+func (p *PbObserver) OnHarness(string, model.ID) {
 	p.bar.Increment()
 }
 

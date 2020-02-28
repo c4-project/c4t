@@ -42,10 +42,6 @@ type Config struct {
 
 	Logger *log.Logger
 
-	// MachineID is the machine ID to use when loading from a multi-machine plan.
-	// This can be empty if the plan only contains one machine.
-	MachineID model.ID
-
 	// Paths is the pathset for this compiler run.
 	Paths SubjectPather
 }

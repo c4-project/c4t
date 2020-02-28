@@ -8,11 +8,8 @@ package plan
 import (
 	"context"
 	"errors"
-	"fmt"
-	"math/rand"
 	"os"
-	"reflect"
-	"time"
+	"sort"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
@@ -20,44 +17,29 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
-	"golang.org/x/sync/errgroup"
-
 	"github.com/BurntSushi/toml"
 )
 
-var (
-	// ErrNil is an error that can be returned if a tester stage gets a nil plan.
-	ErrNil = errors.New("plan nil")
-
-	// ErrNoMachine is an error that can be returned if an attempt to get a machine by its CompilerID fails.
-	ErrNoMachine = errors.New("can't get machine")
-)
+// ErrNil is an error that can be returned if a tester stage gets a nil plan.
+var ErrNil = errors.New("plan nil")
 
 // plan represents a test plan.
 // A plan covers an entire campaign of testing.
 type Plan struct {
-	// Creation marks the time at which the plan was created.
-	Creation time.Time `toml:"created"`
+	Header Header `toml:"header"`
 
-	// Seed is a pseudo-randomly generated integer that should be used to drive randomiser input.
-	Seed int64 `toml:"seed"`
+	// Machine represents the machine targeted by this plan.
+	Machine model.Machine `toml:"machine"`
 
-	// Machines contains the per-machine plans for this overall test plan.
-	// Each machine is mapped under a stringified form of its CompilerID.
-	Machines map[string]MachinePlan `toml:"machines"`
+	// Backend represents the backend targeted by this plan.
+	Backend *model.Backend `toml:"backend, omitempty"`
+
+	// Compilers represents the compilers to be targeted by this plan.
+	// Each compiler's key is a stringified form of its machine CompilerID.
+	Compilers map[string]model.Compiler `toml:"compilers"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
 	Corpus corpus.Corpus `toml:"corpus"`
-}
-
-// New creates a new plan using the given machines and corpus.
-// It randomises the seed using the top-level random number generator;
-// and also updates the creation time.
-func New(ms map[string]MachinePlan, c corpus.Corpus) *Plan {
-	p := Plan{Machines: ms, Corpus: c}
-	p.Creation = time.Now()
-	p.Seed = rand.Int63()
-	return &p
 }
 
 // Dump dumps plan p to stdout.
@@ -75,46 +57,38 @@ func (p *Plan) ParCorpus(ctx context.Context, f func(context.Context, subject.Na
 	return p.Corpus.Par(ctx, f, aux...)
 }
 
-// ParMachines runs f for every machine in the plan.
-// It threads through a context that will terminate each machine if an error occurs on some other machine.
-// It also takes zero or more 'auxiliary' funcs to launch within the same context.
-func (p *Plan) ParMachines(ctx context.Context, f func(context.Context, model.ID, MachinePlan) error, aux ...func(context.Context) error) error {
-	eg, ectx := errgroup.WithContext(ctx)
-	for i, m := range p.Machines {
-		mid := model.IDFromString(i)
-		mc := m
-		eg.Go(func() error { return f(ectx, mid, mc) })
+// Arches gets a list of all architectures targeted by compilers in the machine plan m.
+// These architectures are in order of their string equivalents.
+func (p *Plan) Arches() []model.ID {
+	amap := make(map[string]model.ID)
+
+	for _, c := range p.Compilers {
+		amap[c.Arch.String()] = c.Arch
 	}
-	for _, a := range aux {
-		eg.Go(func() error { return a(ectx) })
+
+	arches := make([]model.ID, len(amap))
+	i := 0
+	for _, id := range amap {
+		arches[i] = id
+		i++
 	}
-	return eg.Wait()
+
+	sort.Slice(arches, func(i, j int) bool {
+		return arches[i].Less(arches[j])
+	})
+	return arches
 }
 
-// Machine gets the plan of the machine with CompilerID id, if it exists.
-// If id is empty and the plan contains only one machine, Machine gets that instead.
-// Machine also returns the actual ID of the machine.
-func (p *Plan) Machine(id model.ID) (model.ID, MachinePlan, error) {
-	if id.IsEmpty() {
-		var err error
-		if id, err = p.singleMachineId(); err != nil {
-			return id, MachinePlan{}, err
-		}
+// CompilerIDs gets a sorted slice of all compiler IDs mentioned in this machine plan.
+func (p *Plan) CompilerIDs() []model.ID {
+	cids := make([]model.ID, len(p.Compilers))
+	i := 0
+	for cid := range p.Compilers {
+		cids[i] = model.IDFromString(cid)
+		i++
 	}
-
-	ids := id.String()
-	mp, ok := p.Machines[ids]
-	if !ok {
-		return id, MachinePlan{}, fmt.Errorf("%w: no plan for machine %s", ErrNoMachine, ids)
-	}
-	return id, mp, nil
-}
-
-func (p *Plan) singleMachineId() (model.ID, error) {
-	rv := reflect.ValueOf(p.Machines)
-	keys := rv.MapKeys()
-	if len(keys) != 1 {
-		return model.ID{}, fmt.Errorf("%w: machine plan doesn't contain exactly one machine", ErrNoMachine)
-	}
-	return model.IDFromString(keys[0].String()), nil
+	sort.Slice(cids, func(i, j int) bool {
+		return cids[i].Less(cids[j])
+	})
+	return cids
 }

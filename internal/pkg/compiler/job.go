@@ -53,7 +53,7 @@ func (j *compileJob) Compile(ctx context.Context) error {
 }
 
 func (j *compileJob) compileSubject(ctx context.Context, s *subject.Named) error {
-	h, herr := s.Harness(j.qualifiedArch())
+	h, herr := s.Harness(j.Compiler.Arch)
 	if herr != nil {
 		return herr
 	}
@@ -88,13 +88,6 @@ func (j *compileJob) runCompiler(ctx context.Context, sp subject.CompileFileset,
 	return res, lerr
 }
 
-func (j *compileJob) qualifiedArch() model.MachQualID {
-	return model.MachQualID{
-		MachineID: j.MachineID,
-		ID:        j.Compiler.Arch,
-	}
-}
-
 // makeCompileResult makes a compile result given a possible compile error cerr and fileset sp.
 // It fails if the compile error is considered substantially fatal.
 func (j *compileJob) makeCompileResult(sp subject.CompileFileset, cerr error) (subject.CompileResult, error) {
@@ -120,30 +113,12 @@ func (j *compileJob) makeCompileResult(sp subject.CompileFileset, cerr error) (s
 
 // sendResult tries to send a compile job result to the result channel.
 // If the context ctx has been cancelled, it will fail and instead terminate the job.
-func (j *compileJob) sendResult(ctx context.Context, name string, result subject.CompileResult) error {
-	select {
-	case j.ResCh <- j.builderReq(name, result):
-	case <-ctx.Done():
-		return ctx.Err()
-	}
-	return nil
-}
-
-// builderReq makes a builder request for adding r to the subject named name.
-func (j *compileJob) builderReq(name string, r subject.CompileResult) corpus.BuilderReq {
+func (j *compileJob) sendResult(ctx context.Context, name string, r subject.CompileResult) error {
 	return corpus.BuilderReq{
 		Name: name,
 		Req: corpus.AddCompileReq{
-			CompilerID: j.qualifiedCompiler(),
+			CompilerID: j.Compiler.ID,
 			Result:     r,
 		},
-	}
-}
-
-// qualifiedCompiler gets the machine-qualified ID of this job's compiler.
-func (j *compileJob) qualifiedCompiler() model.MachQualID {
-	return model.MachQualID{
-		MachineID: j.MachineID,
-		ID:        j.Compiler.ID,
-	}
+	}.SendTo(ctx, j.ResCh)
 }

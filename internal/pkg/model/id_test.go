@@ -47,6 +47,18 @@ func ExampleID_Less() {
 	// x86.64
 }
 
+// ExampleID_IsEmpty is a runnable example for IsEmpty.
+func ExampleID_IsEmpty() {
+	fmt.Println(ID{}.IsEmpty())
+	fmt.Println(IDFromString("").IsEmpty())
+	fmt.Println(IDFromString("foo.bar.baz").IsEmpty())
+
+	// Output:
+	// true
+	// true
+	// false
+}
+
 // ExampleID_Join is a runnable example for Join.
 func ExampleID_Join() {
 	id1 := IDFromString("foo.bar")

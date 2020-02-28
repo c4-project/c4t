@@ -27,7 +27,7 @@ type Backend struct {
 
 // FQID constructs the fully qualified CompilerID of this service.
 func (b Backend) FQID() ID {
-	if b.IDQualified {
+	if b.IDQualified || b.MachineID == nil {
 		return b.ID
 	}
 	return b.MachineID.Join(b.ID)

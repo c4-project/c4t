@@ -12,16 +12,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )
 
 const (
-	defaultOutDir    = "compile_results"
-	usageFlagMachine = "specifies a machine in a multi-machine plan to compile against"
+	defaultOutDir = "compile_results"
 )
 
 func main() {
@@ -32,26 +29,24 @@ func main() {
 
 func run(args []string, errw io.Writer) error {
 	var (
-		act   interop.ActRunner
 		dir   string
 		pfile string
-		pmach string
 	)
+
+	act := interop.ActRunner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	ux.ActRunnerFlags(fs, &act)
 	ux.OutDirFlag(fs, &dir, defaultOutDir)
 	ux.PlanFileFlag(fs, &pfile)
-	fs.StringVar(&pmach, ux.FlagMachine, "", usageFlagMachine)
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 
 	cfg := compiler.Config{
-		Driver:    &act,
-		Logger:    log.New(errw, "", 0),
-		MachineID: model.IDFromString(pmach),
-		Paths:     compiler.NewPathset(dir),
+		Driver: &act,
+		Logger: log.New(errw, "", 0),
+		Paths:  compiler.NewPathset(dir),
 	}
 	return ux.RunOnPlanFile(context.Background(), &cfg, pfile)
 }

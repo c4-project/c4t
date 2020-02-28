@@ -74,22 +74,23 @@ func (s *Subject) BestLitmus() (string, error) {
 // Note that the Compiles and Harnesses maps work in basically the same way; their being separate and duplicated is just a
 // consequence of Go not (yet) having generics.
 
-// CompileResult gets the compilation result for the machine-qualified compiler ID mcomp.
-func (s *Subject) CompileResult(mcomp model.MachQualID) (CompileResult, error) {
-	c, ok := s.Compiles[mcomp.String()]
+// CompileResult gets the compilation result for the compiler ID cid.
+func (s *Subject) CompileResult(cid model.ID) (CompileResult, error) {
+	key := cid.String()
+	c, ok := s.Compiles[key]
 	if !ok {
-		return CompileResult{}, fmt.Errorf("%w: machine=%q, compiler=%q", ErrMissingCompile, mcomp.MachineID, mcomp.ID)
+		return CompileResult{}, fmt.Errorf("%w: compiler=%q", ErrMissingCompile, key)
 	}
 	return c, nil
 }
 
-// AddCompileResult sets the compilation information for mcomp to c in this subject.
+// AddCompileResult sets the compilation information for compiler ID cid to c in this subject.
 // It fails if there already _is_ a compilation.
-func (s *Subject) AddCompileResult(mcomp model.MachQualID, c CompileResult) error {
+func (s *Subject) AddCompileResult(cid model.ID, c CompileResult) error {
 	s.ensureCompileMap()
-	key := mcomp.String()
+	key := cid.String()
 	if _, ok := s.Compiles[key]; ok {
-		return fmt.Errorf("%w: machine=%q, compiler=%q", ErrDuplicateCompile, mcomp.MachineID, mcomp.ID)
+		return fmt.Errorf("%w: compiler=%q", ErrDuplicateCompile, key)
 	}
 	s.Compiles[key] = c
 	return nil
@@ -102,22 +103,23 @@ func (s *Subject) ensureCompileMap() {
 	}
 }
 
-// Harness gets the harness for the machine-qualified arch ID.
-func (s *Subject) Harness(march model.MachQualID) (Harness, error) {
-	h, ok := s.Harnesses[march.String()]
+// Harness gets the harness for the architecture with id arch.
+func (s *Subject) Harness(arch model.ID) (Harness, error) {
+	key := arch.String()
+	h, ok := s.Harnesses[key]
 	if !ok {
-		return Harness{}, fmt.Errorf("%w: machine=%q, arch=%q", ErrMissingHarness, march.MachineID, march.ID)
+		return Harness{}, fmt.Errorf("%w: arch=%q", ErrMissingHarness, key)
 	}
 	return h, nil
 }
 
 // AddHarness sets the harness information for machine and arch to h in this subject.
 // It fails if there already _is_ a harness.
-func (s *Subject) AddHarness(march model.MachQualID, h Harness) error {
+func (s *Subject) AddHarness(arch model.ID, h Harness) error {
 	s.ensureHarnessMap()
-	key := march.String()
+	key := arch.String()
 	if _, ok := s.Harnesses[key]; ok {
-		return fmt.Errorf("%w: machine=%q, arch=%q", ErrDuplicateHarness, march.MachineID, march.ID)
+		return fmt.Errorf("%w: arch=%q", ErrDuplicateHarness, key)
 	}
 	s.Harnesses[key] = h
 	return nil

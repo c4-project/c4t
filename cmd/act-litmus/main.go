@@ -46,11 +46,8 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	fs.SetOutput(errw)
 
-	var act interop.ActRunner
-	cfg := litmus.Litmus{
-		Stat: &act,
-		Err:  errw,
-	}
+	act := interop.ActRunner{Stderr: errw}
+	cfg := litmus.Litmus{Stat: &act, Err: errw}
 
 	_ = fs.String("c11", "", "for Litmus compatibility; ignored")
 

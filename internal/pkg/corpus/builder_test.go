@@ -17,10 +17,11 @@ import (
 )
 
 type testObserver struct {
-	done     bool
-	nreqs    int
-	adds     map[string]struct{}
-	compiles map[string][]model.MachQualID
+	done      bool
+	nreqs     int
+	adds      map[string]struct{}
+	compiles  map[string][]model.ID
+	harnesses map[string][]model.ID
 }
 
 func (t *testObserver) OnStart(nreqs int) {
@@ -34,11 +35,19 @@ func (t *testObserver) OnAdd(sname string) {
 	t.adds[sname] = struct{}{}
 }
 
-func (t *testObserver) OnCompile(sname string, cid model.MachQualID) {
-	if t.compiles == nil {
-		t.compiles = map[string][]model.MachQualID{}
+func (t *testObserver) OnCompile(sname string, cid model.ID) {
+	addID(&t.compiles, sname, cid)
+}
+
+func (t *testObserver) OnHarness(sname string, arch model.ID) {
+	addID(&t.harnesses, sname, arch)
+}
+
+func addID(dest *map[string][]model.ID, key string, val model.ID) {
+	if *dest == nil {
+		*dest = map[string][]model.ID{}
 	}
-	t.compiles[sname] = append(t.compiles[sname], cid)
+	(*dest)[key] = append((*dest)[key], val)
 }
 
 func (t *testObserver) OnFinish() {

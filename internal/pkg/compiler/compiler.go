@@ -10,7 +10,6 @@ package compiler
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -29,9 +28,6 @@ var (
 
 	// ErrDriverNil occurs when the compiler tries to use the nil pointer as its single-compile driver.
 	ErrDriverNil = errors.New("driver nil")
-
-	// ErrNoCompilers occurs when the machine plan being used for compilation has no compilers.
-	ErrNoCompilers = errors.New("no compilers on this machine")
 )
 
 // Compiler contains the configuration required to compile the harnesses for a single test run.
@@ -44,9 +40,6 @@ type Compiler struct {
 
 	// mid is the ID of the machine on which this batch compiler is operating.
 	mid model.ID
-
-	// mach is a copy of the specific machine (in plan) on which this batch compiler is operating.
-	mach plan.MachinePlan
 
 	// conf is the configuration used to build this compiler.
 	conf Config
@@ -63,15 +56,7 @@ func New(c *Config, p *plan.Plan) (*Compiler, error) {
 		return nil, err
 	}
 
-	mid, mp, err := p.Machine(c.MachineID)
-	if err != nil {
-		return nil, err
-	}
-	if len(mp.Compilers) <= 0 {
-		return nil, fmt.Errorf("%w: machine %s", ErrNoCompilers, c.MachineID.String())
-	}
-
-	return &Compiler{mid: mid, plan: *p, conf: *c, l: iohelp.EnsureLog(c.Logger), mach: mp}, nil
+	return &Compiler{plan: *p, conf: *c, l: iohelp.EnsureLog(c.Logger)}, nil
 }
 
 func checkConfig(c *Config) error {
@@ -107,7 +92,7 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 		return nil, berr
 	}
 
-	for ids, cc := range c.mach.Compilers {
+	for ids, cc := range c.plan.Compilers {
 		nc := nameCompiler(ids, cc)
 		cr := c.makeJob(nc, reqCh)
 		eg.Go(func() error {
@@ -132,7 +117,7 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 
 func (c *Compiler) prepareDirs() error {
 	c.l.Println("preparing directories")
-	return c.conf.Paths.Prepare(c.mach.CompilerIDs())
+	return c.conf.Paths.Prepare(c.plan.CompilerIDs())
 }
 
 // makeJob makes a job for the named compiler nc, outputting results to resCh.
@@ -159,5 +144,5 @@ func nameCompiler(ids string, cc model.Compiler) *model.NamedCompiler {
 
 // count gets the number of individual compilations the compiler will perform.
 func (c *Compiler) count() int {
-	return len(c.mach.Compilers) * len(c.plan.Corpus)
+	return len(c.plan.Compilers) * len(c.plan.Corpus)
 }

@@ -40,12 +40,6 @@ type Runner struct {
 	// plan is the plan on which this runner is operating.
 	plan plan.Plan
 
-	// mid is the ID of the machine on which this runner is operating.
-	mid model.ID
-
-	// mach is a copy of the specific machine (in plan) on which this runner is operating.
-	mach plan.MachinePlan
-
 	// conf is the configuration used to build this runner.
 	conf Config
 }
@@ -60,15 +54,9 @@ func New(c *Config, p *plan.Plan) (*Runner, error) {
 	if p == nil {
 		return nil, plan.ErrNil
 	}
-	mid, mach, err := p.Machine(c.MachineID)
-	if err != nil {
-		return nil, err
-	}
 
 	r := Runner{
 		conf: *c,
-		mid:  mid,
-		mach: mach,
 		plan: *p,
 		l:    iohelp.EnsureLog(c.Logger),
 	}
@@ -149,7 +137,7 @@ func (r *Runner) runAndParseBin(ctx context.Context, bin string) (*model.Obs, er
 	}
 
 	var obs model.Obs
-	if err := r.conf.Parser.ParseObs(ctx, r.mach.Backend, obsr, &obs); err != nil {
+	if err := r.conf.Parser.ParseObs(ctx, *r.plan.Backend, obsr, &obs); err != nil {
 		_ = cmd.Wait()
 		return nil, err
 	}
