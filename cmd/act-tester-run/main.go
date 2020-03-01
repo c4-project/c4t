@@ -41,10 +41,12 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
+	l := log.New(errw, "", 0)
 	cfg := runner.Config{
-		Logger: log.New(errw, "", 0),
-		Parser: &act,
-		Paths:  runner.NewPathset(dir),
+		Logger:   l,
+		Parser:   &act,
+		Paths:    runner.NewPathset(dir),
+		Observer: ux.NewPbObserver(l),
 	}
 	return makeAndRunRunner(&cfg, pfile, outw)
 }

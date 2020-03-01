@@ -9,9 +9,8 @@ import (
 	"context"
 	"flag"
 	"io"
+	"log"
 	"os"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
@@ -32,9 +31,10 @@ func main() {
 
 func run(args []string, errw io.Writer) error {
 	act := interop.ActRunner{Stderr: errw}
+	l := log.New(errw, "", 0)
 	cfg := fuzzer.Config{
 		Driver:   &act,
-		Observer: &corpus.PbObserver{},
+		Observer: ux.NewPbObserver(l),
 	}
 
 	var dir, pf string

@@ -38,7 +38,7 @@ func (t *testObserver) OnAdd(sname string) {
 	t.adds[sname] = struct{}{}
 }
 
-func (t *testObserver) OnCompile(sname string, cid model.ID) {
+func (t *testObserver) OnCompile(sname string, cid model.ID, _ bool) {
 	addID(&t.compiles, sname, cid)
 }
 
@@ -46,7 +46,7 @@ func (t *testObserver) OnHarness(sname string, arch model.ID) {
 	addID(&t.harnesses, sname, arch)
 }
 
-func (t *testObserver) OnRun(sname string, cid model.ID) {
+func (t *testObserver) OnRun(sname string, cid model.ID, _ subject.Status) {
 	addID(&t.runs, sname, cid)
 }
 

@@ -132,7 +132,7 @@ func (b *Builder) addCompile(name string, cid model.ID, res subject.CompileResul
 	}); err != nil {
 		return err
 	}
-	b.obs.OnCompile(name, cid)
+	b.obs.OnCompile(name, cid, res.Success)
 	return nil
 }
 
@@ -152,7 +152,7 @@ func (b *Builder) addRun(name string, cid model.ID, r subject.Run) error {
 	}); err != nil {
 		return err
 	}
-	b.obs.OnRun(name, cid)
+	b.obs.OnRun(name, cid, r.Status)
 	return nil
 }
 

@@ -13,8 +13,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
@@ -47,17 +45,19 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
+	cl := log.New(errw, "compiler: ", 0)
 	ccfg := compiler.Config{
 		Driver:   &act,
-		Logger:   log.New(errw, "compiler: ", 0),
+		Logger:   cl,
 		Paths:    compiler.NewPathset(dir),
-		Observer: &corpus.PbObserver{},
+		Observer: ux.NewPbObserver(cl),
 	}
+	rl := log.New(errw, "runner: ", 0)
 	rcfg := runner.Config{
 		Logger:   log.New(errw, "runner: ", 0),
 		Parser:   &act,
 		Paths:    runner.NewPathset(dir),
-		Observer: &corpus.PbObserver{},
+		Observer: ux.NewPbObserver(rl),
 	}
 	return runOnConfigs(context.Background(), &ccfg, &rcfg, pfile, outw)
 }

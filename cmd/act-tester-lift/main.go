@@ -9,9 +9,8 @@ import (
 	"context"
 	"flag"
 	"io"
+	"log"
 	"os"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
@@ -29,9 +28,10 @@ func main() {
 func run(args []string, errw io.Writer) error {
 	var pf string
 	act := interop.ActRunner{Stderr: errw}
+	l := log.New(errw, "", 0)
 	lift := lifter.Lifter{
 		Maker:    &act,
-		Observer: &corpus.PbObserver{},
+		Observer: ux.NewPbObserver(l),
 	}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
