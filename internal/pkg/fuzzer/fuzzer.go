@@ -98,7 +98,7 @@ func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 
 	logrus.Infoln("now fuzzing")
 	rng := f.plan.Header.Rand()
-	fcs, ferr := f.fuzz(ctx, rng)
+	fcs, ferr := f.fuzzInner(ctx, rng)
 	if ferr != nil {
 		return nil, ferr
 	}
@@ -128,7 +128,7 @@ func (f *Fuzzer) count() (nsubjects, nruns int) {
 }
 
 // fuzz actually does the business of fuzzing.
-func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error) {
+func (f *Fuzzer) fuzzInner(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error) {
 	_, nfuzzes := f.count()
 
 	logrus.Infof("Fuzzing %d inputs\n", len(f.plan.Corpus))
@@ -136,12 +136,9 @@ func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error
 	seeds := f.corpusSeeds(rng)
 
 	bc := corpus.BuilderConfig{NReqs: nfuzzes, Obs: f.conf.Observer}
-	b, berr := corpus.NewBuilder(bc)
-	if berr != nil {
-		return nil, berr
-	}
-
-	return f.fuzzInner(ctx, f.plan.Corpus, seeds, b)
+	return corpus.ParBuild(ctx, f.plan.Corpus, bc, func(ctx context.Context, s subject.Named, ch chan<- corpus.BuilderReq) error {
+		return f.makeJob(s, seeds[s.Name], ch).Fuzz(ctx)
+	})
 }
 
 // corpusSeeds generates a seed for each subject in the fuzzer's corpus using rng.
@@ -151,20 +148,6 @@ func (f *Fuzzer) corpusSeeds(rng *rand.Rand) map[string]int64 {
 		seeds[n] = rng.Int63()
 	}
 	return seeds
-}
-
-// fuzzInner fuzzes init to fuzzed, using the builder b and its response channel resCh, and seeds.
-func (f *Fuzzer) fuzzInner(ctx context.Context, init corpus.Corpus, seeds map[string]int64, b *corpus.Builder) (fuzzed corpus.Corpus, err error) {
-	var fcs corpus.Corpus
-	err = init.Par(ctx,
-		func(ctx context.Context, s subject.Named) error {
-			return f.makeJob(s, seeds[s.Name], b.SendCh).Fuzz(ctx)
-		},
-		func(ctx context.Context) (err error) {
-			fcs, err = b.Run(ctx)
-			return err
-		})
-	return fcs, err
 }
 
 func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- corpus.BuilderReq) *Job {
