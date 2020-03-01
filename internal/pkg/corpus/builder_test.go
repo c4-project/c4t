@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -22,6 +24,7 @@ type testObserver struct {
 	adds      map[string]struct{}
 	compiles  map[string][]model.ID
 	harnesses map[string][]model.ID
+	runs      map[string][]model.ID
 }
 
 func (t *testObserver) OnStart(nreqs int) {
@@ -41,6 +44,10 @@ func (t *testObserver) OnCompile(sname string, cid model.ID) {
 
 func (t *testObserver) OnHarness(sname string, arch model.ID) {
 	addID(&t.harnesses, sname, arch)
+}
+
+func (t *testObserver) OnRun(sname string, cid model.ID) {
+	addID(&t.runs, sname, cid)
 }
 
 func addID(dest *map[string][]model.ID, key string, val model.ID) {
@@ -79,7 +86,7 @@ func TestBuilder_Run_Adds(t *testing.T) {
 		Obs:   &obs,
 	}
 
-	b, ch, err := corpus.NewBuilder(c)
+	b, err := corpus.NewBuilder(c)
 	if err != nil {
 		t.Fatal("unexpected NewBuilder error:", err)
 	}
@@ -94,7 +101,7 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	})
 	eg.Go(func() error {
 		for i := range adds {
-			if err := corpus.SendAdd(ectx, ch, &adds[i]); err != nil {
+			if err := corpus.SendAdd(ectx, b.SendCh, &adds[i]); err != nil {
 				return err
 			}
 		}
@@ -130,4 +137,49 @@ func checkAddObs(t *testing.T, obs testObserver, c corpus.BuilderConfig) {
 		t.Helper()
 		t.Error("observer not told the builder was done")
 	}
+}
+
+func TestBuilderReq_SendTo(t *testing.T) {
+	ch := make(chan corpus.BuilderReq)
+
+	t.Run("success", func(t *testing.T) {
+		eg, ectx := errgroup.WithContext(context.Background())
+		if err := exerciseSendTo(t, eg, ectx, ch); err != nil {
+			t.Error("unexpected error:", err)
+		}
+	})
+	t.Run("success", func(t *testing.T) {
+		ctx, c := context.WithCancel(context.Background())
+		eg, ectx := errgroup.WithContext(ctx)
+		c()
+		err := exerciseSendTo(t, eg, ectx, ch)
+		testhelp.ExpectErrorIs(t, err, ectx.Err(), "on cancelled SendTo")
+	})
+}
+
+func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan corpus.BuilderReq) error {
+	want := corpus.BuilderReq{
+		Name: "foo",
+		Req: corpus.AddReq(subject.Subject{
+			Threads: 5,
+			Litmus:  "blah",
+		}),
+	}
+
+	eg.Go(func() error {
+		select {
+		case got := <-ch:
+			if !reflect.DeepEqual(got, want) {
+				t.Helper()
+				t.Errorf("received request malformed: got=%v, want=%v", got, want)
+			}
+			return nil
+		case <-ectx.Done():
+			return ectx.Err()
+		}
+	})
+	eg.Go(func() error {
+		return want.SendTo(ectx, ch)
+	})
+	return eg.Wait()
 }

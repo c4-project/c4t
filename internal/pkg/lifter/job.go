@@ -93,11 +93,15 @@ func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
 		return fmt.Errorf("when making harness for %s (arch %s): %w", s.Name, j.Arch.String(), err)
 	}
 
+	return j.makeBuilderReq(s, dir, files).SendTo(ctx, j.ResCh)
+}
+
+func (j *Job) makeBuilderReq(s *subject.Named, dir string, files []string) corpus.BuilderReq {
 	return corpus.BuilderReq{
 		Name: s.Name,
 		Req: corpus.AddHarnessReq{
 			Arch:    j.Arch,
 			Harness: subject.Harness{Dir: dir, Files: files},
 		},
-	}.SendTo(ctx, j.ResCh)
+	}
 }

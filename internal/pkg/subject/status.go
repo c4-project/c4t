@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package runner
+package subject
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
-// Status is the type of outcome statuses.
+// Status is the type of completed-run statuses.
 type Status int
 
 const (

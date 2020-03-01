@@ -7,7 +7,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"io"
 	"log"
@@ -63,6 +62,5 @@ func makeAndRunRunner(c *runner.Config, pfile string, outw io.Writer) error {
 	if oerr != nil {
 		return oerr
 	}
-	je := json.NewEncoder(outw)
-	return je.Encode(out)
+	return out.Dump(outw)
 }

@@ -7,12 +7,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
@@ -47,14 +48,16 @@ func run(args []string, outw, errw io.Writer) error {
 	}
 
 	ccfg := compiler.Config{
-		Driver: &act,
-		Logger: log.New(errw, "compiler: ", 0),
-		Paths:  compiler.NewPathset(dir),
+		Driver:   &act,
+		Logger:   log.New(errw, "compiler: ", 0),
+		Paths:    compiler.NewPathset(dir),
+		Observer: &corpus.PbObserver{},
 	}
 	rcfg := runner.Config{
-		Logger: log.New(errw, "runner: ", 0),
-		Parser: &act,
-		Paths:  runner.NewPathset(dir),
+		Logger:   log.New(errw, "runner: ", 0),
+		Parser:   &act,
+		Paths:    runner.NewPathset(dir),
+		Observer: &corpus.PbObserver{},
 	}
 	return runOnConfigs(context.Background(), &ccfg, &rcfg, pfile, outw)
 }
@@ -68,15 +71,14 @@ func runOnConfigs(ctx context.Context, cc *compiler.Config, rc *runner.Config, p
 	if cerr != nil {
 		return fmt.Errorf("while running compiler: %w", cerr)
 	}
-	rres, rerr := runRunner(ctx, rc, cp)
+	rp, rerr := runRunner(ctx, rc, cp)
 	if rerr != nil {
 		return fmt.Errorf("while running runner: %w", rerr)
 	}
-	// TODO(@MattWindsor91): filter
-	return json.NewEncoder(outw).Encode(rres)
+	return rp.Dump(outw)
 }
 
-func runRunner(ctx context.Context, c *runner.Config, p *plan.Plan) (*runner.Result, error) {
+func runRunner(ctx context.Context, c *runner.Config, p *plan.Plan) (*plan.Plan, error) {
 	run, rerr := runner.New(c, p)
 	if rerr != nil {
 		return nil, rerr

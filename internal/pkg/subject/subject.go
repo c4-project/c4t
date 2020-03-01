@@ -10,27 +10,9 @@
 package subject
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-)
-
-var (
-	// ErrDuplicateCompile occurs when one tries to insert a compile result that already exists.
-	ErrDuplicateCompile = errors.New("duplicate compile result")
-
-	// ErrDuplicateHarness occurs when one tries to insert a harness that already exists.
-	ErrDuplicateHarness = errors.New("duplicate harness")
-
-	// ErrMissingCompile occurs on requests for compile results for a machine/compiler that do not have them.
-	ErrMissingCompile = errors.New("no such compile result")
-
-	// ErrMissingHarness occurs on requests for harness paths for a machine/arch that do not have them.
-	ErrMissingHarness = errors.New("no such harness")
-
-	// ErrNoBestLitmus occurs when asking for a BestLitmus() on a test with no valid Litmus file paths.
-	ErrNoBestLitmus = errors.New("no valid litmus file for this subject")
 )
 
 // Subject represents a single test subject in a corpus.
@@ -45,14 +27,19 @@ type Subject struct {
 	Litmus string `toml:"litmus,omitempty"`
 
 	// Compiles contains information about this subject's compilation attempts.
-	// It maps from a string of the form 'machine:compiler', where machine and compiler are ACT IDs.
+	// It maps from the string form of each compiler's ID.
 	// If nil, this subject hasn't had any compilations.
 	Compiles map[string]CompileResult `toml:"compiles, omitempty"`
 
 	// Harnesses contains information about this subject's test harnesses.
-	// It maps from a string of the form 'machine:arch', where machine and arch are ACT IDs.
+	// It maps the string form of each harness's target architecture's ID.
 	// If nil, this subject hasn't had a harness generated.
 	Harnesses map[string]Harness `toml:"harnesses,omitempty"`
+
+	// Runs contains information about this subject's runs so far.
+	// It maps from the string form of each compiler's ID.
+	// If nil, this subject hasn't had any runs.
+	Runs map[string]Run `toml:"runs, omitempty"`
 }
 
 // BestLitmus tries to get the 'best' litmus test path for further development.
@@ -71,7 +58,7 @@ func (s *Subject) BestLitmus() (string, error) {
 	}
 }
 
-// Note that the Compiles and Harnesses maps work in basically the same way; their being separate and duplicated is just a
+// Note that all of these maps work in basically the same way; their being separate and duplicated is just a
 // consequence of Go not (yet) having generics.
 
 // CompileResult gets the compilation result for the compiler ID cid.
@@ -113,8 +100,8 @@ func (s *Subject) Harness(arch model.ID) (Harness, error) {
 	return h, nil
 }
 
-// AddHarness sets the harness information for machine and arch to h in this subject.
-// It fails if there already _is_ a harness.
+// AddHarness sets the harness information for arch to h in this subject.
+// It fails if there already _is_ a harness for arch.
 func (s *Subject) AddHarness(arch model.ID, h Harness) error {
 	s.ensureHarnessMap()
 	key := arch.String()
@@ -129,5 +116,34 @@ func (s *Subject) AddHarness(arch model.ID, h Harness) error {
 func (s *Subject) ensureHarnessMap() {
 	if s.Harnesses == nil {
 		s.Harnesses = make(map[string]Harness)
+	}
+}
+
+// RunOf gets the run for the compiler with id cid.
+func (s *Subject) RunOf(cid model.ID) (Run, error) {
+	key := cid.String()
+	h, ok := s.Runs[key]
+	if !ok {
+		return Run{}, fmt.Errorf("%w: compiler=%q", ErrMissingRun, key)
+	}
+	return h, nil
+}
+
+// AddRun sets the run information for cid to r in this subject.
+// It fails if there already _is_ a run for cid.
+func (s *Subject) AddRun(cid model.ID, r Run) error {
+	s.ensureRunMap()
+	key := cid.String()
+	if _, ok := s.Runs[key]; ok {
+		return fmt.Errorf("%w: compiler=%q", ErrDuplicateRun, key)
+	}
+	s.Runs[key] = r
+	return nil
+}
+
+// ensureHarnessMap makes sure this subject has a harness map.
+func (s *Subject) ensureRunMap() {
+	if s.Runs == nil {
+		s.Runs = make(map[string]Run)
 	}
 }

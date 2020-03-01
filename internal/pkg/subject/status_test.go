@@ -3,22 +3,22 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package runner_test
+package subject_test
 
 import (
 	"strconv"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/runner"
+	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 )
 
 // TestStatusOfString_RoundTrip checks that converting a status to and back from its string is the identity.
 func TestStatusOfString_RoundTrip(t *testing.T) {
-	for want := runner.StatusUnknown; want < runner.NumStatus; want++ {
+	for want := subject.StatusUnknown; want < subject.NumStatus; want++ {
 		t.Run(strconv.Itoa(int(want)), func(t *testing.T) {
-			got, err := runner.StatusOfString(want.String())
+			got, err := subject.StatusOfString(want.String())
 			if err != nil {
 				t.Errorf("unexpected error round-tripping status %s(%d): %v", want.String(), want, err)
 			} else if got != want {
@@ -36,8 +36,8 @@ func TestStatusOfString_Bad(t *testing.T) {
 	}
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			_, err := runner.StatusOfString(c)
-			testhelp.ExpectErrorIs(t, err, runner.ErrBadStatus, "in bad StatusOfString")
+			_, err := subject.StatusOfString(c)
+			testhelp.ExpectErrorIs(t, err, subject.ErrBadStatus, "in bad StatusOfString")
 		})
 	}
 }

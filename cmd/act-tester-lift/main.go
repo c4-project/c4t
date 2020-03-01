@@ -11,6 +11,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
@@ -27,7 +29,10 @@ func main() {
 func run(args []string, errw io.Writer) error {
 	var pf string
 	act := interop.ActRunner{Stderr: errw}
-	lift := lifter.Lifter{Maker: &act}
+	lift := lifter.Lifter{
+		Maker:    &act,
+		Observer: &corpus.PbObserver{},
+	}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	ux.ActRunnerFlags(fs, &act)

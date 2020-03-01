@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -25,6 +27,9 @@ type Config struct {
 	// Logger is the logger that should be used for this Runner.
 	// If nil, logging will be suppressed.
 	Logger *log.Logger
+
+	// Observer observes the runner's progress across a corpus.
+	Observer corpus.BuilderObserver
 
 	// Parser handles the parsing of observations.
 	Parser ObsParser

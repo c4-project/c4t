@@ -25,11 +25,11 @@ const (
 )
 
 func main() {
-	err := run(os.Args, os.Stderr)
+	err := run(os.Args, os.Stdout, os.Stderr)
 	ux.LogTopError(err)
 }
 
-func run(args []string, errw io.Writer) error {
+func run(args []string, outw, errw io.Writer) error {
 	act := interop.ActRunner{Stderr: errw}
 	plan := planner.Planner{Source: &act}
 
@@ -38,6 +38,7 @@ func run(args []string, errw io.Writer) error {
 	pmach := fs.String(ux.FlagMachine, "", usageMach)
 	ux.ActRunnerFlags(fs, &act)
 	ux.CorpusSizeFlag(fs, &plan.CorpusSize)
+
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
@@ -48,5 +49,5 @@ func run(args []string, errw io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return p.Dump()
+	return p.Dump(outw)
 }

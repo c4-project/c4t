@@ -133,27 +133,32 @@ func (f *Fuzzer) fuzz(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error
 
 	logrus.Infof("Fuzzing %d inputs\n", len(f.plan.Corpus))
 
-	seeds := make(map[string]int64)
-	for n := range f.plan.Corpus {
-		seeds[n] = rng.Int63()
-	}
+	seeds := f.corpusSeeds(rng)
 
-	bc := corpus.BuilderConfig{
-		NReqs: nfuzzes,
-		// TODO(@MattWindsor91): decouple this
-		Obs: &corpus.PbObserver{},
-	}
-	b, resCh, berr := corpus.NewBuilder(bc)
+	bc := corpus.BuilderConfig{NReqs: nfuzzes, Obs: f.conf.Observer}
+	b, berr := corpus.NewBuilder(bc)
 	if berr != nil {
 		return nil, berr
 	}
 
-	var fcs corpus.Corpus
+	return f.fuzzInner(ctx, f.plan.Corpus, seeds, b)
+}
 
-	err := f.plan.ParCorpus(ctx,
+// corpusSeeds generates a seed for each subject in the fuzzer's corpus using rng.
+func (f *Fuzzer) corpusSeeds(rng *rand.Rand) map[string]int64 {
+	seeds := make(map[string]int64)
+	for n := range f.plan.Corpus {
+		seeds[n] = rng.Int63()
+	}
+	return seeds
+}
+
+// fuzzInner fuzzes init to fuzzed, using the builder b and its response channel resCh, and seeds.
+func (f *Fuzzer) fuzzInner(ctx context.Context, init corpus.Corpus, seeds map[string]int64, b *corpus.Builder) (fuzzed corpus.Corpus, err error) {
+	var fcs corpus.Corpus
+	err = init.Par(ctx,
 		func(ctx context.Context, s subject.Named) error {
-			j := f.makeJob(s, seeds[s.Name], resCh)
-			return j.Fuzz(ctx)
+			return f.makeJob(s, seeds[s.Name], b.SendCh).Fuzz(ctx)
 		},
 		func(ctx context.Context) (err error) {
 			fcs, err = b.Run(ctx)

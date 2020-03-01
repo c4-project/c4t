@@ -56,3 +56,12 @@ type AddHarnessReq struct {
 	// Harness is the produced harness pathset.
 	Harness subject.Harness
 }
+
+// AddRunReq is a request to add the given run result to the named subject.
+type AddRunReq struct {
+	// CompilerID is the ID of the compiler that produced this result.
+	CompilerID model.ID
+
+	// Run is the run result.
+	Result subject.Run
+}

@@ -84,17 +84,16 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 	bc := corpus.BuilderConfig{
 		Init:  c.plan.Corpus,
 		NReqs: c.count(),
-		// TODO(@MattWindsor91): decouple this
-		Obs: &corpus.PbObserver{},
+		Obs:   c.conf.Observer,
 	}
-	b, reqCh, berr := corpus.NewBuilder(bc)
+	b, berr := corpus.NewBuilder(bc)
 	if berr != nil {
 		return nil, berr
 	}
 
 	for ids, cc := range c.plan.Compilers {
 		nc := nameCompiler(ids, cc)
-		cr := c.makeJob(nc, reqCh)
+		cr := c.makeJob(nc, b.SendCh)
 		eg.Go(func() error {
 			return cr.Compile(ectx)
 		})

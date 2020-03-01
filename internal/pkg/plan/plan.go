@@ -6,14 +6,11 @@
 package plan
 
 import (
-	"context"
 	"errors"
-	"os"
+	"io"
 	"sort"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
@@ -42,19 +39,11 @@ type Plan struct {
 	Corpus corpus.Corpus `toml:"corpus"`
 }
 
-// Dump dumps plan p to stdout.
-func (p *Plan) Dump() error {
-	// TODO(@MattWindsor91): output to other files
-	enc := toml.NewEncoder(os.Stdout)
+// Dump dumps plan p to w.
+func (p *Plan) Dump(w io.Writer) error {
+	enc := toml.NewEncoder(w)
 	enc.Indent = "  "
 	return enc.Encode(p)
-}
-
-// ParCorpus runs f for every subject in the plan's corpus.
-// It threads through a context that will terminate each machine if an error occurs on some other machine.
-// It also takes zero or more 'auxiliary' funcs to launch within the same context.
-func (p *Plan) ParCorpus(ctx context.Context, f func(context.Context, subject.Named) error, aux ...func(context.Context) error) error {
-	return p.Corpus.Par(ctx, f, aux...)
 }
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.

@@ -89,16 +89,16 @@ type ObsState map[string]string
 // Obs represents an observation in ACT's JSON-based format.
 type Obs struct {
 	// Flags contains any flags that are active on Obs.
-	Flags ObsFlag `json:"flags"`
+	Flags ObsFlag `json:"flags,omitempty" toml:"flags,omitzero"`
 
 	// CounterExamples lists all states that passed validation.
-	CounterExamples []ObsState `json:"counter_examples"`
+	CounterExamples []ObsState `json:"counter_examples,omitempty" toml:"counter_examples,omitempty"`
 
 	// Witnesses lists all states that passed validation.
-	Witnesses []ObsState `json:"witnesses"`
+	Witnesses []ObsState `json:"witnesses,omitempty" toml:"witnesses,omitempty"`
 
 	// States lists all observed states.
-	States []ObsState `json:"states"`
+	States []ObsState `json:"states" toml:"states,omitempty"`
 }
 
 // Sat gets whether the observation satisfies its validation.

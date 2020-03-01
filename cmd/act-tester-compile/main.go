@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
@@ -44,9 +46,10 @@ func run(args []string, errw io.Writer) error {
 	}
 
 	cfg := compiler.Config{
-		Driver: &act,
-		Logger: log.New(errw, "", 0),
-		Paths:  compiler.NewPathset(dir),
+		Driver:   &act,
+		Logger:   log.New(errw, "", 0),
+		Paths:    compiler.NewPathset(dir),
+		Observer: &corpus.PbObserver{},
 	}
 	return ux.RunOnPlanFile(context.Background(), &cfg, pfile)
 }

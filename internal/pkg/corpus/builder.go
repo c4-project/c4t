@@ -40,13 +40,16 @@ type Builder struct {
 
 	// reqCh is the receiving channel for requests.
 	reqCh <-chan BuilderReq
+
+	// SendCh is the channel to which requests for the builder should be sent.
+	SendCh chan<- BuilderReq
 }
 
 // NewBuilder constructs a Builder according to cfg.
 // It fails if the number of target requests is negative.
-func NewBuilder(cfg BuilderConfig) (*Builder, chan<- BuilderReq, error) {
+func NewBuilder(cfg BuilderConfig) (*Builder, error) {
 	if cfg.NReqs <= 0 {
-		return nil, nil, fmt.Errorf("%w: %d", ErrBadBuilderTarget, cfg.NReqs)
+		return nil, fmt.Errorf("%w: %d", ErrBadBuilderTarget, cfg.NReqs)
 	}
 
 	reqCh := make(chan BuilderReq)
@@ -55,8 +58,9 @@ func NewBuilder(cfg BuilderConfig) (*Builder, chan<- BuilderReq, error) {
 		n:      cfg.NReqs,
 		obs:    obsOrDefault(cfg.Obs),
 		reqCh:  reqCh,
+		SendCh: reqCh,
 	}
-	return &b, reqCh, nil
+	return &b, nil
 }
 
 // obsOrDefault fills in a default observer if o is nil.
@@ -107,6 +111,8 @@ func (b *Builder) runRequest(r BuilderReq) error {
 		return b.addCompile(r.Name, rq.CompilerID, rq.Result)
 	case AddHarnessReq:
 		return b.addHarness(r.Name, rq.Arch, rq.Harness)
+	case AddRunReq:
+		return b.addRun(r.Name, rq.CompilerID, rq.Result)
 	default:
 		return fmt.Errorf("%w: %s", ErrBadBuilderRequest, reflect.TypeOf(r.Req).Name())
 	}
@@ -137,6 +143,16 @@ func (b *Builder) addHarness(name string, arch model.ID, h subject.Harness) erro
 		return err
 	}
 	b.obs.OnHarness(name, arch)
+	return nil
+}
+
+func (b *Builder) addRun(name string, cid model.ID, r subject.Run) error {
+	if err := b.rmwSubject(name, func(s *subject.Subject) error {
+		return s.AddRun(cid, r)
+	}); err != nil {
+		return err
+	}
+	b.obs.OnRun(name, cid)
 	return nil
 }
 

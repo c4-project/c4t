@@ -9,14 +9,9 @@ package runner
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
-	"os/exec"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
@@ -76,72 +71,36 @@ func (r *Runner) check() error {
 }
 
 // Run runs the runner.
-func (r *Runner) Run(ctx context.Context) (*Result, error) {
-	res := Result{
-		Time:     time.Now(),
-		Subjects: make(map[string]SubjectResult, len(r.plan.Corpus)),
+func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
+	bcfg := corpus.BuilderConfig{
+		Init:  r.plan.Corpus,
+		NReqs: r.count(),
+		Obs:   r.conf.Observer,
 	}
-
-	err := r.plan.Corpus.Map(func(named *subject.Named) error {
-		var err error
-		res.Subjects[named.Name], err = r.runSubject(ctx, named)
-		return err
-	})
-	return &res, err
+	b, berr := corpus.NewBuilder(bcfg)
+	if berr != nil {
+		return nil, berr
+	}
+	err := r.plan.Corpus.Par(ctx,
+		func(ctx context.Context, named subject.Named) error {
+			j := Job{
+				Backend: r.plan.Backend,
+				Parser:  r.conf.Parser,
+				ResCh:   b.SendCh,
+				Subject: &named,
+			}
+			return j.Run(ctx)
+		},
+		func(ctx context.Context) error {
+			var err error
+			r.plan.Corpus, err = b.Run(ctx)
+			return err
+		},
+	)
+	return &r.plan, err
 }
 
-func (r *Runner) runSubject(ctx context.Context, s *subject.Named) (SubjectResult, error) {
-	r.l.Println("running subject:", s.Name)
-
-	var err error
-	res := SubjectResult{Compilers: make(map[string]CompilerResult, len(s.Compiles))}
-
-	for cidstr, c := range s.Compiles {
-		cid := model.IDFromString(cidstr)
-
-		if res.Compilers[cidstr], err = r.runCompile(ctx, s, cid, &c); err != nil {
-			return res, err
-		}
-	}
-	return res, nil
-}
-
-func (r *Runner) runCompile(ctx context.Context, s *subject.Named, cid model.ID, c *subject.CompileResult) (CompilerResult, error) {
-	if !c.Success {
-		return CompilerResult{Status: StatusCompileFail}, nil
-	}
-
-	bin := c.Files.Bin
-	if bin == "" {
-		return CompilerResult{Status: StatusUnknown}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, s.Name, cid.String())
-	}
-
-	obs, runErr := r.runAndParseBin(ctx, bin)
-	status, err := StatusOfObs(obs, runErr)
-
-	return CompilerResult{Status: status, Obs: obs}, err
-}
-
-// runAndParseBin runs the binary at bin and parses its result into an observation struct.
-func (r *Runner) runAndParseBin(ctx context.Context, bin string) (*model.Obs, error) {
-	tctx, cancel := context.WithTimeout(ctx, time.Minute)
-	defer cancel()
-
-	cmd := exec.CommandContext(tctx, bin)
-	obsr, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	if err := cmd.Start(); err != nil {
-		return nil, err
-	}
-
-	var obs model.Obs
-	if err := r.conf.Parser.ParseObs(ctx, *r.plan.Backend, obsr, &obs); err != nil {
-		_ = cmd.Wait()
-		return nil, err
-	}
-
-	err = cmd.Wait()
-	return &obs, err
+// count returns the number of individual runs this runner will do.
+func (r *Runner) count() int {
+	return len(r.plan.Corpus) * len(r.plan.Compilers)
 }

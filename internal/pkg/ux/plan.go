@@ -47,5 +47,6 @@ func RunOnPlanFile(ctx context.Context, r PlanRunner, inf string) error {
 	if qerr != nil {
 		return qerr
 	}
-	return q.Dump()
+	// TODO(@MattWindsor91): output to other files
+	return q.Dump(os.Stdout)
 }

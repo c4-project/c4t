@@ -41,15 +41,15 @@ func ExampleSubject_CompileResult() {
 		"gcc":   {Success: true, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
 		"clang": {Success: false, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
-	lps, _ := s.CompileResult(model.IDFromString("gcc"))
-	sps, _ := s.CompileResult(model.IDFromString("clang"))
+	gr, _ := s.CompileResult(model.IDFromString("gcc"))
+	cr, _ := s.CompileResult(model.IDFromString("clang"))
 
-	fmt.Println("localhost:", lps.Success, lps.Files.Bin, lps.Files.Log)
-	fmt.Println("spikemuth:", sps.Success, sps.Files.Bin, sps.Files.Log)
+	fmt.Println("gcc:", gr.Success, gr.Files.Bin, gr.Files.Log)
+	fmt.Println("clang:", cr.Success, cr.Files.Bin, cr.Files.Log)
 
 	// Output:
-	// localhost: true a.out gcc.log
-	// spikemuth: false a.out clang.log
+	// gcc: true a.out gcc.log
+	// clang: false a.out clang.log
 }
 
 // ExampleSubject_Harness is a testable example for Harness.
@@ -58,14 +58,14 @@ func ExampleSubject_Harness() {
 		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
-	lps, _ := s.Harness(model.ArchX8664)
-	sps, _ := s.Harness(model.ArchArm)
+	xs, _ := s.Harness(model.ArchX8664)
+	as, _ := s.Harness(model.ArchArm)
 
-	for _, l := range lps.Files {
-		fmt.Println(l)
+	for _, r := range xs.Files {
+		fmt.Println(r)
 	}
-	for _, s := range sps.Files {
-		fmt.Println(s)
+	for _, r := range as.Files {
+		fmt.Println(r)
 	}
 
 	// Output:
@@ -74,7 +74,24 @@ func ExampleSubject_Harness() {
 	// barbaz
 }
 
-// TestSubject_CompileResult_Missing checks that trying to get a harness path for a missing machine/emits pair triggers
+// ExampleSubject_RunOf is a testable example for RunOf.
+func ExampleSubject_RunOf() {
+	s := subject.Subject{Runs: map[string]subject.Run{
+		"gcc":   {Status: subject.StatusOk},
+		"clang": {Status: subject.StatusTimeout},
+	}}
+	gr, _ := s.RunOf(model.IDFromString("gcc"))
+	cr, _ := s.RunOf(model.IDFromString("clang"))
+
+	fmt.Println("gcc:", gr.Status)
+	fmt.Println("clang:", cr.Status)
+
+	// Output:
+	// gcc: ok
+	// clang: timeout
+}
+
+// TestSubject_CompileResult_Missing checks that trying to get a compile for a missing compiler triggers
 // the appropriate error.
 func TestSubject_CompileResult_Missing(t *testing.T) {
 	var s subject.Subject
@@ -115,7 +132,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 	})
 }
 
-// TestSubject_Harness_Missing checks that trying to get a harness path for a missing machine/emits pair triggers
+// TestSubject_Harness_Missing checks that trying to get a harness path for a missing arch triggers
 // the appropriate error.
 func TestSubject_Harness_Missing(t *testing.T) {
 	var s subject.Subject
@@ -150,6 +167,41 @@ func TestSubject_AddHarness(t *testing.T) {
 	t.Run("add-dupe", func(t *testing.T) {
 		err := s.AddHarness(march, subject.Harness{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateHarness, "adding harness twice")
+	})
+}
+
+// TestSubject_RunOf_Missing checks that trying to get a run for a missing compiler gives
+// the appropriate error.
+func TestSubject_RunOf_Missing(t *testing.T) {
+	var s subject.Subject
+	_, err := s.RunOf(model.IDFromString("gcc"))
+	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRun, "missing run result path")
+}
+
+// TestSubject_AddRun checks that AddRun is working properly.
+func TestSubject_AddRun(t *testing.T) {
+	var s subject.Subject
+	c := subject.Run{Status: subject.StatusTimeout}
+
+	mcomp := model.IDFromString("gcc")
+
+	t.Run("initial-add", func(t *testing.T) {
+		if err := s.AddRun(mcomp, c); err != nil {
+			t.Fatalf("err when adding run to empty subject: %v", err)
+		}
+	})
+	t.Run("add-get", func(t *testing.T) {
+		c2, err := s.RunOf(mcomp)
+		if err != nil {
+			t.Fatalf("err when getting added run: %v", err)
+		}
+		if !reflect.DeepEqual(c2, c) {
+			t.Fatalf("added run (%v) came back wrong (%v)", c2, c)
+		}
+	})
+	t.Run("add-dupe", func(t *testing.T) {
+		err := s.AddRun(mcomp, subject.Run{})
+		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRun, "adding compile twice")
 	})
 }
 

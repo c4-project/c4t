@@ -11,6 +11,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
@@ -29,13 +31,13 @@ func main() {
 }
 
 func run(args []string, errw io.Writer) error {
-	var (
-		dir string
-		pf  string
-	)
 	act := interop.ActRunner{Stderr: errw}
-	cfg := fuzzer.Config{Driver: &act}
+	cfg := fuzzer.Config{
+		Driver:   &act,
+		Observer: &corpus.PbObserver{},
+	}
 
+	var dir, pf string
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	ux.ActRunnerFlags(fs, &act)
 	ux.CorpusSizeFlag(fs, &cfg.CorpusSize)

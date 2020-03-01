@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
@@ -40,6 +42,10 @@ type Config struct {
 	// Driver is what the compiler should use to run single compiler jobs.
 	Driver SingleRunner
 
+	// Observer observes the compiler's progress across a corpus.
+	Observer corpus.BuilderObserver
+
+	// Logger is the logger used for informational output during the compile.
 	Logger *log.Logger
 
 	// Paths is the pathset for this compiler run.
