@@ -8,12 +8,13 @@ package planner
 
 import (
 	"context"
+	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
@@ -41,6 +42,12 @@ type Planner struct {
 	// Filter is the compiler filter to use to select compilers to test.
 	Filter string
 
+	// Logger is the logger used by the planner.
+	Logger *log.Logger
+
+	// Observer watches the plan's corpus being built.
+	Observer corpus.BuilderObserver
+
 	// MachineID is the identifier of the target machine for the plan.
 	MachineID model.ID
 
@@ -61,6 +68,9 @@ func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 		return nil, corpus.ErrNoCorpus
 	}
 
+	// TODO(@MattWindsor91): separate Planner from Config to avoid this
+	p.Logger = iohelp.EnsureLog(p.Logger)
+
 	hd := plan.NewHeader()
 	// TODO(@MattWindsor91): allow manual seed override
 	rng := hd.Rand()
@@ -76,17 +86,17 @@ func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 	var err error
 
 	// TODO(@MattWindsor91): probe machine
-	logrus.Infoln("Planning backend...")
+	p.Logger.Println("Planning backend...")
 	if pn.Backend, err = p.planBackend(ctx); err != nil {
 		return nil, err
 	}
 
-	logrus.Infoln("Planning compilers...")
+	p.Logger.Println("Planning compilers...")
 	if pn.Compilers, err = p.planCompilers(ctx); err != nil {
 		return nil, err
 	}
 
-	logrus.Infoln("Planning corpus...")
+	p.Logger.Println("Planning corpus...")
 	if pn.Corpus, err = p.planCorpus(ctx, rng); err != nil {
 		return nil, err
 	}

@@ -9,6 +9,7 @@ import (
 	"context"
 	"flag"
 	"io"
+	"log"
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -31,7 +32,12 @@ func main() {
 
 func run(args []string, outw, errw io.Writer) error {
 	act := interop.ActRunner{Stderr: errw}
-	plan := planner.Planner{Source: &act}
+	l := log.New(errw, "", 0)
+	plan := planner.Planner{
+		Source:   &act,
+		Logger:   l,
+		Observer: ux.NewPbObserver(l),
+	}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	fs.StringVar(&plan.Filter, "c", "", usageCompPred)
