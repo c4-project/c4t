@@ -11,30 +11,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
-// ExampleObsFlagOfStrings is a testable example for ObsFlagOfStrings.
-func ExampleObsFlagOfStrings() {
-	f, _ := model.ObsFlagOfStrings("unsat", "undef")
-	fmt.Println(f.Has(model.ObsSat))
-	fmt.Println(f.Has(model.ObsUnsat))
-	fmt.Println(f.Has(model.ObsUndef))
-
-	// Output:
-	// false
-	// true
-	// true
-}
-
-// ExampleObsFlag_Strings is a testable example for Strings.
-func ExampleObsFlag_Strings() {
-	for _, s := range (model.ObsSat | model.ObsUndef).Strings() {
-		fmt.Println(s)
-	}
-
-	// Output:
-	// sat
-	// undef
-}
-
 // ExampleObs_Sat is a testable example for Sat.
 func ExampleObs_Sat() {
 	o1 := model.Obs{}
