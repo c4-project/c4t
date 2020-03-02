@@ -38,6 +38,8 @@ func run(args []string, outw, errw io.Writer) error {
 	act := interop.ActRunner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
+	skipc := fs.Bool("c", false, "If given, skip the compiler")
+	skipr := fs.Bool("r", false, "If given, skip the runner")
 	ux.ActRunnerFlags(fs, &act)
 	ux.OutDirFlag(fs, &dir, defaultOutDir)
 	ux.PlanFileFlag(fs, &pfile)
@@ -45,21 +47,37 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
+	ccfg := makeCompilerConfig(*skipc, errw, act, dir)
+	rcfg := makeRunnerConfig(*skipr, errw, act, dir)
+	return runOnConfigs(context.Background(), ccfg, rcfg, pfile, outw)
+}
+
+func makeCompilerConfig(skip bool, errw io.Writer, act interop.ActRunner, dir string) *compiler.Config {
+	if skip {
+		return nil
+	}
+
 	cl := log.New(errw, "compiler: ", 0)
-	ccfg := compiler.Config{
+	return &compiler.Config{
 		Driver:   &act,
 		Logger:   cl,
 		Paths:    compiler.NewPathset(dir),
 		Observer: ux.NewPbObserver(cl),
 	}
+}
+
+func makeRunnerConfig(skip bool, errw io.Writer, act interop.ActRunner, dir string) *runner.Config {
+	if skip {
+		return nil
+	}
+
 	rl := log.New(errw, "runner: ", 0)
-	rcfg := runner.Config{
-		Logger:   log.New(errw, "runner: ", 0),
+	return &runner.Config{
+		Logger:   rl,
 		Parser:   &act,
 		Paths:    runner.NewPathset(dir),
 		Observer: ux.NewPbObserver(rl),
 	}
-	return runOnConfigs(context.Background(), &ccfg, &rcfg, pfile, outw)
 }
 
 func runOnConfigs(ctx context.Context, cc *compiler.Config, rc *runner.Config, pfile string, outw io.Writer) error {
@@ -67,7 +85,7 @@ func runOnConfigs(ctx context.Context, cc *compiler.Config, rc *runner.Config, p
 	if perr != nil {
 		return perr
 	}
-	cp, cerr := cc.Run(ctx, p)
+	cp, cerr := runCompiler(ctx, cc, p)
 	if cerr != nil {
 		return fmt.Errorf("while running compiler: %w", cerr)
 	}
@@ -78,7 +96,22 @@ func runOnConfigs(ctx context.Context, cc *compiler.Config, rc *runner.Config, p
 	return rp.Dump(outw)
 }
 
+// runCompiler runs the batch compiler on plan p using config c, if available.
+// If c is nil, runCompiler returns p unmodified.
+func runCompiler(ctx context.Context, c *compiler.Config, p *plan.Plan) (*plan.Plan, error) {
+	if c == nil {
+		return p, nil
+	}
+	return c.Run(ctx, p)
+}
+
+// runRunner runs the batch runner on plan p using config c, if available.
+// If c is nil, runRunner returns p unmodified.
 func runRunner(ctx context.Context, c *runner.Config, p *plan.Plan) (*plan.Plan, error) {
+	if c == nil {
+		return p, nil
+	}
+
 	run, rerr := runner.New(c, p)
 	if rerr != nil {
 		return nil, rerr

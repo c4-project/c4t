@@ -19,13 +19,16 @@ const StdinFile = "-"
 // Load loads a plan pointed to by f.
 // If f is empty or StdinFile, Load loads from standard input instead.
 func LoadPlan(f string) (*plan.Plan, error) {
-	var p plan.Plan
+	var (
+		p   plan.Plan
+		err error
+	)
 
 	if f == "" || f == StdinFile {
-		_, err := toml.DecodeReader(os.Stdin, &p)
-		return nil, err
+		_, err = toml.DecodeReader(os.Stdin, &p)
+	} else {
+		_, err = toml.DecodeFile(f, &p)
 	}
-	_, err := toml.DecodeFile(f, &p)
 	return &p, err
 }
 
