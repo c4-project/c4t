@@ -7,7 +7,6 @@ package subject
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -76,20 +75,15 @@ func (s Status) String() string {
 	return StatusStrings[s]
 }
 
-// MarshalJSON marshals a Status to JSON via its string representation.
-func (s Status) MarshalJSON() ([]byte, error) {
-	return json.Marshal(s.String())
+// MarshalText marshals a Status to text via its string representation.
+func (s Status) MarshalText() ([]byte, error) {
+	return []byte(s.String()), nil
 }
 
-// UnmarshalJSON unmarshals a Status from JSON via its string representation.
-func (s *Status) UnmarshalJSON(bs []byte) error {
-	var str string
-	if err := json.Unmarshal(bs, &str); err != nil {
-		return err
-	}
-
+// UnmarshalText unmarshals a Status from text via its string representation.
+func (s *Status) UnmarshalText(text []byte) error {
 	var err error
-	*s, err = StatusOfString(str)
+	*s, err = StatusOfString(string(text))
 	return err
 }
 

@@ -6,10 +6,10 @@
 package model
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 )
 
 // ObsFlag is the type of observation flags.
@@ -66,17 +66,14 @@ func ObsFlagOfStrings(strs ...string) (ObsFlag, error) {
 	return o, nil
 }
 
-// MarshalJSON marshals an observation flag list as a string list.
-func (o ObsFlag) MarshalJSON() ([]byte, error) {
-	return json.Marshal(o.Strings())
+// MarshalText marshals an observation flag as a space-delimited string list.
+func (o ObsFlag) MarshalText() ([]byte, error) {
+	return []byte(strings.Join(o.Strings(), " ")), nil
 }
 
-// MarshalJSON unmarshals an observation flag list from bs by interpreting it as a string list.
-func (o *ObsFlag) UnmarshalJSON(bs []byte) error {
-	var strs []string
-	if err := json.Unmarshal(bs, &strs); err != nil {
-		return err
-	}
+// UnmarshalText unmarshals an observation flag list from bs by interpreting it as a string list.
+func (o *ObsFlag) UnmarshalText(bs []byte) error {
+	strs := strings.Fields(string(bs))
 
 	var err error
 	*o, err = ObsFlagOfStrings(strs...)
