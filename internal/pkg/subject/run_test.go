@@ -18,6 +18,7 @@ import (
 
 // TestRun_TomlDecode tests the decoding of a test run from various TOML examples.
 func TestRun_TomlDecode(t *testing.T) {
+	t.Parallel()
 	cases := map[string]struct {
 		toml string
 		want subject.Run
@@ -56,7 +57,9 @@ status = "flagged"
 	}
 
 	for name, c := range cases {
+		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			var got subject.Run
 			if _, err := toml.Decode(c.toml, &got); err != nil {
 				t.Fatal("unexpected decode error:", err)
