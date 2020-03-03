@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -95,20 +96,18 @@ func makeHarnessArgv(s model.HarnessSpec) []string {
 func (a *ActRunner) ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error {
 	cmd := a.CommandContext(ctx, BinActBackend, "parse", StandardArgs{}, "-backend", b.ID.String())
 	cmd.Stdin = r
-	// TODO(@MattWindsor91): do something useful with this
-	cmd.Stderr = os.Stderr
 
 	obsr, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return fmt.Errorf("piping ACT: %w", err)
 	}
 	if err := cmd.Start(); err != nil {
-		return nil
+		return fmt.Errorf("starting ACT: %w", err)
 	}
 
 	if err := json.NewDecoder(obsr).Decode(o); err != nil {
 		_ = cmd.Wait()
-		return err
+		return fmt.Errorf("decoding ACT json: %w", err)
 	}
 	return cmd.Wait()
 }

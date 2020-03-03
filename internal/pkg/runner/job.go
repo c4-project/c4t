@@ -7,6 +7,7 @@ package runner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"time"
@@ -60,39 +61,70 @@ func (j *Job) runCompileInner(ctx context.Context, cid model.ID, c *subject.Comp
 		return subject.Run{Status: subject.StatusUnknown}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.Subject.Name, cid.String())
 	}
 
-	obs, runErr := j.runAndParseBin(ctx, bin)
+	obs, runErr := j.runAndParseBin(ctx, cid, bin)
 	status, err := subject.StatusOfObs(obs, runErr)
 
 	return subject.Run{Status: status, Obs: obs}, err
 }
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
-func (j *Job) runAndParseBin(ctx context.Context, bin string) (*model.Obs, error) {
+func (j *Job) runAndParseBin(ctx context.Context, cid model.ID, bin string) (*model.Obs, error) {
+	// TODO(@MattWindsor91): make the timeout configurable
 	tctx, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
 	cmd := exec.CommandContext(tctx, bin)
 	obsr, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, err
+		return nil, j.liftError(cid, "opening pipe for", err)
 	}
 	if err := cmd.Start(); err != nil {
-		return nil, err
+		return nil, j.liftError(cid, "starting", err)
 	}
 
 	var obs model.Obs
-	if err := j.Parser.ParseObs(ctx, *j.Backend, obsr, &obs); err != nil {
-		_ = cmd.Wait()
-		return nil, err
-	}
+	perr := j.Parser.ParseObs(tctx, *j.Backend, obsr, &obs)
+	werr := cmd.Wait()
 
-	err = cmd.Wait()
-	return &obs, err
+	return &obs, mostRelevantError(werr, perr, tctx.Err())
+}
+
+// mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and
+// possible context errors c.
+//
+// The order of relevance is as follows:
+// - Timeouts (through c)
+// - Run errors (through r)
+// - Parse errors (through p)
+//
+// We assume that no other context errors need to be propagated.
+func mostRelevantError(r, p, c error) error {
+	switch {
+	case c != nil && errors.Is(c, context.DeadlineExceeded):
+		return c
+	case r != nil:
+		return r
+	default:
+		return p
+	}
 }
 
 func (j *Job) makeBuilderReq(cid model.ID, run subject.Run) corpus.BuilderReq {
 	return corpus.BuilderReq{
 		Name: j.Subject.Name,
 		Req:  corpus.AddRunReq{CompilerID: cid, Result: run},
+	}
+}
+
+// liftError wraps err with context about where it occurred.
+func (j *Job) liftError(cid model.ID, stage string, err error) error {
+	if err == nil {
+		return nil
+	}
+	return Error{
+		Stage:    stage,
+		Compiler: cid,
+		Subject:  j.Subject.Name,
+		Inner:    err,
 	}
 }

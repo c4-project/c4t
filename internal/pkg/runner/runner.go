@@ -83,13 +83,7 @@ func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 	}
 	err := r.plan.Corpus.Par(ctx,
 		func(ctx context.Context, named subject.Named) error {
-			j := Job{
-				Backend: r.plan.Backend,
-				Parser:  r.conf.Parser,
-				ResCh:   b.SendCh,
-				Subject: &named,
-			}
-			return j.Run(ctx)
+			return r.makeJob(b, named).Run(ctx)
 		},
 		func(ctx context.Context) error {
 			var err error
@@ -98,6 +92,15 @@ func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 		},
 	)
 	return &r.plan, err
+}
+
+func (r *Runner) makeJob(b *corpus.Builder, named subject.Named) *Job {
+	return &Job{
+		Backend: r.plan.Backend,
+		Parser:  r.conf.Parser,
+		ResCh:   b.SendCh,
+		Subject: &named,
+	}
 }
 
 // count returns the number of individual runs this runner will do.
