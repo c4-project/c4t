@@ -14,13 +14,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
-const (
-	// numParWorkers is the number of worker goroutines that Par will create.
-	// It should be a number high enough to allow for a good amount of parallelism,
-	// but low
-	numParWorkers = 20
-)
-
 // Each applies f to each subject in the corpus.
 // It fails if any invocation of f fails.
 func (c Corpus) Each(f func(subject.Named) error) error {
@@ -54,25 +47,35 @@ func (c Corpus) Map(f func(*subject.Named) error) error {
 // Par runs f for every subject in the plan's corpus, with a degree of parallelism.
 // It threads through a context that will terminate each machine if an error occurs on some other machine.
 // It also takes zero or more 'auxiliary' funcs to launch within the same context.
-func (c Corpus) Par(ctx context.Context, f func(context.Context, subject.Named) error, aux ...func(context.Context) error) error {
+func (c Corpus) Par(ctx context.Context, nworkers int, f func(context.Context, subject.Named) error, aux ...func(context.Context) error) error {
 	eg, ectx := errgroup.WithContext(ctx)
 
 	for _, a := range aux {
 		eg.Go(func() error { return a(ectx) })
 	}
-	c.parInner(eg, ectx, f)
+	c.parInner(eg, ectx, nworkers, f)
 	return eg.Wait()
 }
 
-func (c Corpus) parInner(eg *errgroup.Group, ectx context.Context, f func(context.Context, subject.Named) error) {
+func (c Corpus) parInner(eg *errgroup.Group, ectx context.Context, nworkers int, f func(context.Context, subject.Named) error) {
 	switch {
 	case len(c) == 0:
 		return
-	case len(c) < numParWorkers:
+	case len(c) < nworkers:
 		c.parDirect(eg, ectx, f)
+	case nworkers <= 1:
+		c.parSingle(eg, ectx, f)
 	default:
-		c.parWorkers(eg, ectx, f)
+		c.parWorkers(eg, ectx, nworkers, f)
 	}
+}
+
+func (c Corpus) parSingle(eg *errgroup.Group, ectx context.Context, f func(context.Context, subject.Named) error) {
+	eg.Go(func() error {
+		return c.Each(func(sc subject.Named) error {
+			return f(ectx, sc)
+		})
+	})
 }
 
 func (c Corpus) parDirect(eg *errgroup.Group, ectx context.Context, f func(context.Context, subject.Named) error) {
@@ -82,13 +85,13 @@ func (c Corpus) parDirect(eg *errgroup.Group, ectx context.Context, f func(conte
 	})
 }
 
-func (c Corpus) parWorkers(eg *errgroup.Group, ectx context.Context, f func(context.Context, subject.Named) error) {
+func (c Corpus) parWorkers(eg *errgroup.Group, ectx context.Context, nworkers int, f func(context.Context, subject.Named) error) {
 	wch := make(chan subject.Named)
 
 	eg.Go(func() error {
 		return c.workerSource(wch, ectx)
 	})
-	for i := 0; i < numParWorkers; i++ {
+	for i := 0; i < nworkers; i++ {
 		eg.Go(func() error {
 			return c.workerSink(wch, f, ectx)
 		})

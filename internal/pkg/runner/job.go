@@ -19,11 +19,11 @@ import (
 
 // Job contains all state required to perform a runner operation for a given subject.
 type Job struct {
+	// Config points to the runner config.
+	Conf *Config
+
 	// Backend is the backend used to produce the harnesses being run.
 	Backend *model.Backend
-
-	// Parser is an object that parses observations according to Backend.
-	Parser ObsParser
 
 	// ResCh is the channel to which we're sending the run result.
 	ResCh chan<- corpus.BuilderReq
@@ -70,7 +70,7 @@ func (j *Job) runCompileInner(ctx context.Context, cid model.ID, c *subject.Comp
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
 func (j *Job) runAndParseBin(ctx context.Context, cid model.ID, bin string) (*model.Obs, error) {
 	// TODO(@MattWindsor91): make the timeout configurable
-	tctx, cancel := context.WithTimeout(ctx, time.Minute)
+	tctx, cancel := j.timeout(ctx)
 	defer cancel()
 
 	cmd := exec.CommandContext(tctx, bin)
@@ -83,10 +83,17 @@ func (j *Job) runAndParseBin(ctx context.Context, cid model.ID, bin string) (*mo
 	}
 
 	var obs model.Obs
-	perr := j.Parser.ParseObs(tctx, *j.Backend, obsr, &obs)
+	perr := j.Conf.Parser.ParseObs(tctx, *j.Backend, obsr, &obs)
 	werr := cmd.Wait()
 
 	return &obs, mostRelevantError(werr, perr, tctx.Err())
+}
+
+func (j *Job) timeout(ctx context.Context) (context.Context, context.CancelFunc) {
+	if j.Conf.Timeout <= 0 {
+		return ctx, func() {}
+	}
+	return context.WithTimeout(ctx, time.Duration(j.Conf.Timeout)*time.Minute)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and

@@ -12,7 +12,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/litmus"
 
@@ -46,8 +46,8 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	fs.SetOutput(errw)
 
-	act := interop.ActRunner{Stderr: errw}
-	cfg := litmus.Litmus{Stat: &act, Err: errw}
+	a := act.Runner{Stderr: errw}
+	cfg := litmus.Litmus{Stat: &a, Err: errw}
 
 	_ = fs.String("c11", "", "for Litmus compatibility; ignored")
 

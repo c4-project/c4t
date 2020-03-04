@@ -12,8 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )
 
@@ -30,16 +30,16 @@ func main() {
 }
 
 func run(args []string, errw io.Writer) error {
-	act := interop.ActRunner{Stderr: errw}
+	a := act.Runner{Stderr: errw}
 	l := log.New(errw, "", 0)
 	cfg := fuzzer.Config{
-		Driver:   &act,
+		Driver:   &a,
 		Observer: ux.NewPbObserver(l),
 	}
 
 	var dir, pf string
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	ux.ActRunnerFlags(fs, &act)
+	ux.ActRunnerFlags(fs, &a)
 	ux.CorpusSizeFlag(fs, &cfg.CorpusSize)
 	ux.OutDirFlag(fs, &dir, defaultOutDir)
 	ux.PlanFileFlag(fs, &pf)

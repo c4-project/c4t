@@ -49,7 +49,7 @@ func (j *Job) Lift(ctx context.Context) error {
 		return err
 	}
 
-	return j.Corpus.Par(ctx, func(ctx context.Context, s subject.Named) error {
+	return j.Corpus.Par(ctx, 20, func(ctx context.Context, s subject.Named) error {
 		return j.liftSubject(ctx, &s)
 	})
 }

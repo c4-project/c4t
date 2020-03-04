@@ -12,7 +12,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )
@@ -27,15 +27,15 @@ func main() {
 
 func run(args []string, errw io.Writer) error {
 	var pf string
-	act := interop.ActRunner{Stderr: errw}
+	a := act.Runner{Stderr: errw}
 	l := log.New(errw, "", 0)
 	lift := lifter.Lifter{
-		Maker:    &act,
+		Maker:    &a,
 		Observer: ux.NewPbObserver(l),
 	}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	ux.ActRunnerFlags(fs, &act)
+	ux.ActRunnerFlags(fs, &a)
 	ux.OutDirFlag(fs, &lift.OutDir, defaultOutDir)
 	ux.PlanFileFlag(fs, &pf)
 	if err := fs.Parse(args[1:]); err != nil {

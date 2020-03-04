@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package interop
+package act
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ import (
 const BinActC = "act-c"
 
 // ProbeSubject probes the litmus test at path litmus, returning a named subject record.
-func (a *ActRunner) ProbeSubject(ctx context.Context, litmus string) (subject.Named, error) {
+func (a *Runner) ProbeSubject(ctx context.Context, litmus string) (subject.Named, error) {
 	var h Header
 	if err := a.DumpHeader(ctx, &h, litmus); err != nil {
 		return subject.Named{}, fmt.Errorf("header read on %s failed: %w", litmus, err)
@@ -39,7 +39,7 @@ func (a *ActRunner) ProbeSubject(ctx context.Context, litmus string) (subject.Na
 }
 
 // DumpHeader runs act-c dump-header on the subject at path, writing the results to h.
-func (a *ActRunner) DumpHeader(ctx context.Context, h *Header, path string) error {
+func (a *Runner) DumpHeader(ctx context.Context, h *Header, path string) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 
@@ -54,7 +54,7 @@ func (a *ActRunner) DumpHeader(ctx context.Context, h *Header, path string) erro
 }
 
 // DumpStats runs act-c dump-stats on the subject at path, writing the stats to s.
-func (a *ActRunner) DumpStats(ctx context.Context, s *Statset, path string) error {
+func (a *Runner) DumpStats(ctx context.Context, s *Statset, path string) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 

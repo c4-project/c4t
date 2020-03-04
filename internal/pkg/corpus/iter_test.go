@@ -104,7 +104,7 @@ func TestCorpus_Par(t *testing.T) {
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			var sm sync.Map
-			if err := c.Par(context.Background(), func(_ context.Context, s subject.Named) error {
+			if err := c.Par(context.Background(), 10, func(_ context.Context, s subject.Named) error {
 				sm.Store(s.Name, true)
 				return nil
 			}); err != nil {

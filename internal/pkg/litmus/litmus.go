@@ -14,7 +14,7 @@ import (
 	"io"
 	"os/exec"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 )
 
 var (
@@ -32,7 +32,7 @@ var (
 type Litmus struct {
 	// Stat extracts statistics from litmus files.
 	// These statistics then switch on various fixes.
-	Stat interop.StatDumper
+	Stat act.StatDumper
 
 	// CArch is the architecture that the litmus shim should target.
 	// It corresponds to Litmus's 'carch' argument.
@@ -85,7 +85,7 @@ func (l *Litmus) check() error {
 
 // probeFixes checks to see if there are any fixes needed for the input.
 func (l *Litmus) probeFixes(ctx context.Context) error {
-	var s interop.Statset
+	var s act.Statset
 	if err := l.Stat.DumpStats(ctx, &s, l.Pathset.FileIn); err != nil {
 		return err
 	}

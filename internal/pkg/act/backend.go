@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package interop
+package act
 
 import (
 	"bytes"
@@ -25,7 +25,7 @@ const BinActBackend = "act-backend"
 var ErrNoBackend = errors.New("no backend reported")
 
 // FindBackend finds a backend using ACT.
-func (a *ActRunner) FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error) {
+func (a *Runner) FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error) {
 	id, err := a.runFindBackend(ctx, style, machines)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (a *ActRunner) FindBackend(ctx context.Context, style model.ID, machines ..
 }
 
 // runFindBackend does most of the legwork of running an ACT find-backend query.
-func (a *ActRunner) runFindBackend(ctx context.Context, style model.ID, machines []model.ID) (model.ID, error) {
+func (a *Runner) runFindBackend(ctx context.Context, style model.ID, machines []model.ID) (model.ID, error) {
 	argv := findBackendArgv(style, machines)
 	sargs := StandardArgs{Verbose: false}
 
@@ -66,7 +66,7 @@ func findBackendArgv(style model.ID, machines []model.ID) []string {
 }
 
 // MakeHarness makes a harness using ACT.
-func (a *ActRunner) MakeHarness(ctx context.Context, s model.HarnessSpec) (outFiles []string, err error) {
+func (a *Runner) MakeHarness(ctx context.Context, s model.HarnessSpec) (outFiles []string, err error) {
 	argv := makeHarnessArgv(s)
 	sargs := StandardArgs{Verbose: false}
 
@@ -93,7 +93,7 @@ func makeHarnessArgv(s model.HarnessSpec) []string {
 }
 
 // ParseObs uses act-backend to parse the observation coming in from r into o according to b.
-func (a *ActRunner) ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error {
+func (a *Runner) ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error {
 	cmd := a.CommandContext(ctx, BinActBackend, "parse", StandardArgs{}, "-backend", b.ID.String())
 	cmd.Stdin = r
 

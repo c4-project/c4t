@@ -24,6 +24,14 @@ type ObsParser interface {
 
 // Config represents the configuration needed to run a Runner.
 type Config struct {
+	// Timeout is the timeout for each run, in minutes.
+	// Non-positive values disable the timeout.
+	Timeout int
+
+	// NWorkers is the number of parallel run workers that should be spawned.
+	// Anything less than or equal to 1 will sequentialise the run.
+	NWorkers int
+
 	// Logger is the logger that should be used for this Runner.
 	// If nil, logging will be suppressed.
 	Logger *log.Logger

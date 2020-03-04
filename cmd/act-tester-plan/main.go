@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
@@ -31,10 +31,10 @@ func main() {
 }
 
 func run(args []string, outw, errw io.Writer) error {
-	act := interop.ActRunner{Stderr: errw}
+	a := act.Runner{Stderr: errw}
 	l := log.New(errw, "", 0)
 	plan := planner.Planner{
-		Source:   &act,
+		Source:   &a,
 		Logger:   l,
 		Observer: ux.NewPbObserver(l),
 	}
@@ -42,7 +42,7 @@ func run(args []string, outw, errw io.Writer) error {
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	fs.StringVar(&plan.Filter, "c", "", usageCompPred)
 	pmach := fs.String(ux.FlagMachine, "", usageMach)
-	ux.ActRunnerFlags(fs, &act)
+	ux.ActRunnerFlags(fs, &a)
 	ux.CorpusSizeFlag(fs, &plan.CorpusSize)
 
 	if err := fs.Parse(args[1:]); err != nil {

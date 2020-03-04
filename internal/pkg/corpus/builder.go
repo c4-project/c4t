@@ -180,7 +180,7 @@ func ParBuild(ctx context.Context, src Corpus, cfg BuilderConfig, f func(context
 	}
 
 	var c Corpus
-	perr := src.Par(ctx,
+	perr := src.Par(ctx, 20,
 		func(ctx context.Context, named subject.Named) error {
 			return f(ctx, named, b.SendCh)
 		},

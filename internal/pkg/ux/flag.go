@@ -8,7 +8,7 @@ package ux
 import (
 	"flag"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 )
 
 const (
@@ -44,7 +44,7 @@ func OutDirFlag(fs *flag.FlagSet, out *string, defaultdir string) {
 }
 
 // ActRunnerFlags sets up a standard set of arguments on fs feeding into the ActRunner a.
-func ActRunnerFlags(fs *flag.FlagSet, a *interop.ActRunner) {
+func ActRunnerFlags(fs *flag.FlagSet, a *act.Runner) {
 	fs.StringVar(&a.ConfFile, flagActConfFile, "", usageConfFile)
 	fs.BoolVar(&a.DuneExec, flagActDuneExec, false, usageDuneExec)
 }

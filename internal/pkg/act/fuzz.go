@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package interop
+package act
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 const BinActFuzz = "act-fuzz"
 
 // FuzzSingle wraps the ACT one-file fuzzer, supplying the given seed.
-func (a *ActRunner) FuzzSingle(ctx context.Context, seed int32, inPath string, outPaths subject.FuzzFileset) error {
+func (a *Runner) FuzzSingle(ctx context.Context, seed int32, inPath string, outPaths subject.FuzzFileset) error {
 	sargs := StandardArgs{Verbose: false}
 	seedStr := strconv.Itoa(int(seed))
 	args := []string{"-seed", seedStr, "-o", outPaths.Litmus, "-trace-output", outPaths.Trace, inPath}

@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package interop
+package act
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	"os/exec"
 )
 
-// ActRunner stores information about how to run the core ACT binaries.
-type ActRunner struct {
+// Runner stores information about how to run the core ACT binaries.
+type Runner struct {
 	// DuneExec toggles whether ACT should be run through dune.
 	DuneExec bool
 
@@ -41,7 +41,7 @@ func (s StandardArgs) ToArgv() []string {
 
 // CommandContext constructs a Cmd for running the ACT command cmd with subcommand sub and arguments argv.
 // The command will terminate if ctx is cancelled.
-func (a *ActRunner) CommandContext(ctx context.Context, cmd, sub string, sargs StandardArgs, argv ...string) *exec.Cmd {
+func (a *Runner) CommandContext(ctx context.Context, cmd, sub string, sargs StandardArgs, argv ...string) *exec.Cmd {
 	fargv := a.actArgv(sub, sargs, argv)
 	dcmd, dargv := liftDuneExec(a.DuneExec, cmd, fargv)
 	c := exec.CommandContext(ctx, dcmd, dargv...)
@@ -49,7 +49,7 @@ func (a *ActRunner) CommandContext(ctx context.Context, cmd, sub string, sargs S
 	return c
 }
 
-func (a *ActRunner) actArgv(sub string, sargs StandardArgs, argv []string) []string {
+func (a *Runner) actArgv(sub string, sargs StandardArgs, argv []string) []string {
 	sargv := sargs.ToArgv()
 
 	// Reserving room for the subcommand, and optionally '-config FOO'.

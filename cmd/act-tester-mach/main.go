@@ -18,7 +18,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/runner"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/interop"
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )
 
@@ -35,24 +35,27 @@ func run(args []string, outw, errw io.Writer) error {
 		dir   string
 		pfile string
 	)
-	act := interop.ActRunner{Stderr: errw}
+	a := act.Runner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
+	// TODO(@MattWindsor91): sort this horrendous mess out
 	skipc := fs.Bool("c", false, "If given, skip the compiler")
 	skipr := fs.Bool("r", false, "If given, skip the runner")
-	ux.ActRunnerFlags(fs, &act)
+	timeout := fs.Int("t", 1, "A timeout, in `minutes`, to apply to each run")
+	nworkers := fs.Int("j", 1, "Number of `workers` to run in parallel")
+	ux.ActRunnerFlags(fs, &a)
 	ux.OutDirFlag(fs, &dir, defaultOutDir)
 	ux.PlanFileFlag(fs, &pfile)
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 
-	ccfg := makeCompilerConfig(*skipc, errw, act, dir)
-	rcfg := makeRunnerConfig(*skipr, errw, act, dir)
+	ccfg := makeCompilerConfig(*skipc, errw, a, dir)
+	rcfg := makeRunnerConfig(*skipr, errw, a, dir, *timeout, *nworkers)
 	return runOnConfigs(context.Background(), ccfg, rcfg, pfile, outw)
 }
 
-func makeCompilerConfig(skip bool, errw io.Writer, act interop.ActRunner, dir string) *compiler.Config {
+func makeCompilerConfig(skip bool, errw io.Writer, act act.Runner, dir string) *compiler.Config {
 	if skip {
 		return nil
 	}
@@ -66,7 +69,7 @@ func makeCompilerConfig(skip bool, errw io.Writer, act interop.ActRunner, dir st
 	}
 }
 
-func makeRunnerConfig(skip bool, errw io.Writer, act interop.ActRunner, dir string) *runner.Config {
+func makeRunnerConfig(skip bool, errw io.Writer, act act.Runner, dir string, timeout, nworkers int) *runner.Config {
 	if skip {
 		return nil
 	}
@@ -77,6 +80,8 @@ func makeRunnerConfig(skip bool, errw io.Writer, act interop.ActRunner, dir stri
 		Parser:   &act,
 		Paths:    runner.NewPathset(dir),
 		Observer: ux.NewPbObserver(rl),
+		Timeout:  timeout,
+		NWorkers: nworkers,
 	}
 }
 
