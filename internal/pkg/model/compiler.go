@@ -10,8 +10,11 @@ type Compiler struct {
 	// Style is the declared style of the backend.
 	Style ID `toml:"style"`
 
-	// Arch is the architecture (or 'emits') CompilerID for the compiler.
+	// Arch is the architecture (or 'emits') ID for the compiler.
 	Arch ID `toml:"arch"`
+
+	// Run contains information on how to run the compiler.
+	Run *CompilerRunInfo `toml:"run,omitempty"`
 }
 
 // NamedCompiler wraps a Compiler with its ID.
@@ -20,4 +23,28 @@ type NamedCompiler struct {
 	ID ID `toml:"id"`
 
 	Compiler
+}
+
+// CompilerRunInfo gives hints as to how to run a compiler.
+type CompilerRunInfo struct {
+	// Cmd overrides the command for the compiler.
+	Cmd string `toml:"cmd,omitzero"`
+
+	// Args specifies (extra) arguments to supply to the compiler.
+	Args []string `toml:"args,omitempty"`
+}
+
+// Override creates run information by overlaying this run information with that in new.
+func (c CompilerRunInfo) Override(new CompilerRunInfo) CompilerRunInfo {
+	return CompilerRunInfo{
+		Cmd:  overrideCmd(c.Cmd, new.Cmd),
+		Args: append(c.Args, new.Args...),
+	}
+}
+
+func overrideCmd(old, new string) string {
+	if new == "" {
+		return old
+	}
+	return new
 }

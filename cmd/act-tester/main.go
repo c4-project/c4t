@@ -8,6 +8,8 @@ package main
 import (
 	"context"
 	"flag"
+	"io"
+	"log"
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/config"
@@ -17,13 +19,13 @@ import (
 )
 
 func main() {
-	err := run(os.Args)
+	err := run(os.Args, os.Stderr)
 	ux.LogTopError(err)
 }
 
 const usageConfFile = "The `file` from which to load the tester configuration."
 
-func run(args []string) error {
+func run(args []string, errw io.Writer) error {
 	cfile := flag.String("C", "", usageConfFile)
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
@@ -36,7 +38,13 @@ func run(args []string) error {
 		return err
 	}
 
-	d, err := director.New(c)
+	l := log.New(errw, "", 0)
+	dc, err := director.ConfigFromGlobal(c, l)
+	if err != nil {
+		return nil
+	}
+
+	d, err := director.New(dc)
 	if err != nil {
 		return err
 	}

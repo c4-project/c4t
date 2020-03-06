@@ -5,22 +5,35 @@
 
 package director
 
-// pathset contains the pre-computed paths used by the director.
-type pathset struct {
-	CurRun runPathset
+import (
+	"path"
 
-	// DirLitmus is the directory to which litmus tests will be written.
-	DirLitmus string
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+)
 
-	// DirTrace is the directory to which traces will be written.
-	DirTrace string
+const (
+	segSaved   = "saved"
+	segScratch = "scratch"
+)
+
+// Pathset contains the pre-computed paths used by the director.
+type Pathset struct {
+	// DirSaved is the directory into which saved runs get copied.
+	DirSaved string
+
+	// DirScratch is the directory that the director uses for ephemeral run data.
+	DirScratch string
 }
 
-// runPathset contains the pre-computed paths used by a run of the director.
-type runPathset struct {
-	// DirFuzz is the fuzzing directory for this run.
-	DirFuzz string
+// NewPathset constructs a new pathset from the directory root.
+func NewPathset(root string) *Pathset {
+	return &Pathset{
+		DirSaved:   path.Join(root, segSaved),
+		DirScratch: path.Join(root, segScratch),
+	}
+}
 
-	// DirLift is the lifting directory for this run.
-	DirLift string
+// Prepare prepares this pathset by making its directories.
+func (p *Pathset) Prepare() error {
+	return iohelp.Mkdirs(p.DirSaved, p.DirScratch)
 }

@@ -13,6 +13,9 @@ type Machine struct {
 	SSH *MachineSSH `toml:"ssh,omitempty"`
 
 	model.Machine
+
+	// Compilers contains information about the compilers attached to this machine.
+	Compilers map[string]model.Compiler `toml:"compilers,omitempty"`
 }
 
 // MachineSSH is SSH configuration for a remote machine.

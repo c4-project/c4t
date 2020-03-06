@@ -64,7 +64,7 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, ErrMakerNil
 	}
 	// TODO(@MattWindsor91): this is a bit wonky
-	if l.Plan.Backend.ID.IsEmpty() {
+	if l.Plan.Backend == nil || l.Plan.Backend.ID.IsEmpty() {
 		return nil, ErrNoBackend
 	}
 

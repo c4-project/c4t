@@ -10,7 +10,14 @@
 package config
 
 import (
+	"errors"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+)
+
+var (
+	// ErrNil occurs when we try to build something using a nil config.
+	ErrNil = errors.New("config nil")
 )
 
 // Config is a top-level tester config struct.
