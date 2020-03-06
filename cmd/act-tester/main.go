@@ -24,11 +24,6 @@ func main() {
 const usageConfFile = "The `file` from which to load the tester configuration."
 
 func run(args []string) error {
-	var (
-		// direct is the Director being built and run by this command.
-		direct director.Director
-	)
-
 	cfile := flag.String("C", "", usageConfFile)
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
@@ -41,7 +36,9 @@ func run(args []string) error {
 		return err
 	}
 
-	direct.Config = c
-
-	return direct.Direct(context.Background())
+	d, err := director.New(c)
+	if err != nil {
+		return err
+	}
+	return d.Direct(context.Background())
 }

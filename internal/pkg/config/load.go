@@ -12,6 +12,13 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+const (
+	// dirConfig is the subdirectory under the user config directory in which act-tester will check for a config file.
+	dirConfig = "act"
+	// fileConfig is the default name that act-tester will use when looking for a config file.
+	fileConfig = "tester.toml"
+)
+
 // Load tries to load a tester config from various places.
 // If f is non-empty, it tries there.
 // Else, it first tries the current working directory, and then tries the user config directory.
@@ -36,7 +43,7 @@ func loadConfigUCD() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tryLoad(path.Join(cdir, fileConfig))
+	return tryLoad(path.Join(cdir, dirConfig, fileConfig))
 }
 
 func tryLoad(f string) (*Config, error) {

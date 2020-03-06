@@ -20,11 +20,7 @@ type Config struct {
 
 	// Machines enumerates the machines available for testing.
 	Machines map[string]Machine `toml:"machines,omitempty"`
-}
 
-const fileConfig = "act-tester.toml"
-
-// Machine is a config record for a particular machine.
-type Machine struct {
-	model.Machine
+	// OutDir is the output directory for fully directed test runs.
+	OutDir string `toml:"out_dir"`
 }
