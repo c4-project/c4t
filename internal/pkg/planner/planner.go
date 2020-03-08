@@ -26,18 +26,16 @@ type BackendFinder interface {
 	FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error)
 }
 
-// Source is the composite interface of types that can provide the requisite information a Planner needs about
-// backends, compilers, and subjects.
-type Source interface {
-	BackendFinder
-	CompilerLister
-	SubjectProber
-}
-
 // Planner holds all configuration for the test planner.
 type Planner struct {
-	// Source is the planner's information source.
-	Source Source
+	// BProbe is the backend prober.
+	BProbe BackendFinder
+
+	// CProbe is the compiler prober.
+	CProbe CompilerLister
+
+	// SProbe is the subject prober.
+	SProbe SubjectProber
 
 	// Filter is the compiler filter to use to select compilers to test.
 	Filter string

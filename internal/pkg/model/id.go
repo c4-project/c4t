@@ -15,13 +15,6 @@ const (
 	// SepTag is the identifier tag separator.
 	// It is exported for testing and sanitisation purposes.
 	SepTag = '.'
-
-	// SepQual is a separator used to distinguish two parts of a qualified ID when there should be no ambiguity.
-	// It is exported for testing and sanitisation purposes.
-	SepQual = ':'
-
-	// seps contains tagSep and qualSep.
-	seps = ".:"
 )
 
 var (
@@ -60,19 +53,25 @@ func validateTags(tags []string) error {
 		return ErrNoTags
 	}
 	for _, t := range tags {
-		if strings.ContainsAny(t, seps) {
+		if strings.ContainsRune(t, SepTag) {
 			return fmt.Errorf("%w: tag %q", ErrTagHasSep, t)
 		}
 	}
 	return nil
 }
 
+// TryIDFromString tries to convert a string to an ACT ID.
+// It returns any validation error arising.
+func TryIDFromString(s string) (ID, error) {
+	return NewID(strings.Split(s, string(SepTag))...)
+}
+
 // IDFromString converts a string to an ACT ID.
+// It returns the empty ID if there is an error.
 func IDFromString(s string) ID {
-	id, err := NewID(strings.Split(s, string(SepTag))...)
+	id, err := TryIDFromString(s)
 	if err != nil {
-		// TODO(@MattWindsor91): make a properly validating version of this
-		return ID{[]string{"[error]"}}
+		return ID{}
 	}
 	return id
 }
@@ -125,29 +124,4 @@ func (i ID) Less(i2 ID) bool {
 		}
 	}
 	return len(i.tags) < len(i2.tags)
-}
-
-// MachQualID is a type for IDs of things qualified by machine IDs.
-type MachQualID struct {
-	// MachineID is the ID of the qualifying machine.
-	MachineID ID
-
-	// ID is the ID of the qualified item.
-	ID ID
-}
-
-// String converts a machine-qualified ID to a string.
-//
-// It does so by joining the two IDs together with a distinct separator from the usual tag separator;
-// this is to prevent ambiguity.
-//
-// To combine the two IDs into one 'fully qualified ID', use FQID instead.
-func (m MachQualID) String() string {
-	strs := []string{m.MachineID.String(), m.ID.String()}
-	return strings.Join(strs, string(SepQual))
-}
-
-// FQID converts this machine-qualified ID into a single fully-qualified ID.
-func (m MachQualID) FQID() ID {
-	return m.MachineID.Join(m.ID)
 }

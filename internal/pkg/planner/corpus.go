@@ -25,7 +25,7 @@ type SubjectProber interface {
 func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error) {
 	c := CorpusPlanner{
 		Files:    p.InFiles,
-		Prober:   p.Source,
+		Prober:   p.SProbe,
 		Observer: p.Observer,
 		Rng:      rng,
 		Size:     p.CorpusSize,

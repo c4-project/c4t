@@ -6,6 +6,7 @@
 package compiler
 
 import (
+	"fmt"
 	"path"
 	"reflect"
 	"sort"
@@ -13,6 +14,21 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
+
+// ExamplePathset_Dirs is a testable example for Dirs.
+func ExamplePathset_Dirs() {
+	ps := Pathset{DirBins: "bins", DirLogs: "logs"}
+	for _, p := range ps.Dirs(model.IDFromString("foo"), model.IDFromString("bar.baz")) {
+		fmt.Println(p)
+	}
+	// Unordered output:
+	// bins
+	// bins/foo
+	// bins/bar/baz
+	// logs
+	// logs/foo
+	// logs/bar/baz
+}
 
 // Test_Pathset_Dirs_NoCompilers makes sure each of the expected paths appears in the pathset
 // when no compilers are involved.

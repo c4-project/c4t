@@ -45,8 +45,9 @@ func (p *Pathset) Prepare(compilers []model.ID) error {
 
 // Dirs gets all of the directories involved in a pathset over compiler ID set compilers.
 func (p *Pathset) Dirs(compilers ...model.ID) []string {
-	dirs := make([]string, 0, (len(compilers)+1)*2)
-	for _, root := range []string{p.DirBins, p.DirLogs} {
+	roots := []string{p.DirBins, p.DirLogs}
+	dirs := make([]string, 0, (len(compilers)+1)*len(roots))
+	for _, root := range roots {
 		dirs = append(dirs, root)
 		for _, c := range compilers {
 			elems := append([]string{root}, c.Tags()...)

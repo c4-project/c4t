@@ -24,3 +24,15 @@ func (h Harness) Paths() []string {
 	}
 	return paths
 }
+
+// CPaths retrieves the joined dir/file paths for each C file in the harness.
+func (h Harness) CPaths() []string {
+	ps := h.Paths()
+	cs := make([]string, 0, len(ps))
+	for _, p := range ps {
+		if path.Ext(p) == ".c" {
+			cs = append(cs, p)
+		}
+	}
+	return cs
+}

@@ -52,7 +52,7 @@ func (a *Runner) runFindBackend(ctx context.Context, style model.ID, machines []
 		return model.ID{}, err
 	}
 
-	return model.IDFromString(strings.TrimSpace(obuf.String())), nil
+	return model.TryIDFromString(strings.TrimSpace(obuf.String()))
 }
 
 // findBackendArgv constructs the argv for a backend find on style and machines.

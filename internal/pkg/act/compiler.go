@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
@@ -18,26 +19,28 @@ import (
 // BinActCompiler is the name of the ACT compiler services binary.
 const BinActCompiler = "act-compiler"
 
-// ListCompilers queries ACT for a list of compilers satisfying f.
-func (a *Runner) ListCompilers(ctx context.Context, f model.CompilerFilter) (map[string]map[string]model.Compiler, error) {
+// ListCompilers queries ACT for a list of compilers on machine mid.
+func (a *Runner) ListCompilers(ctx context.Context, mid model.ID) (map[string]model.Compiler, error) {
 	sargs := StandardArgs{Verbose: false}
 
 	var obuf bytes.Buffer
 
-	cmd := a.CommandContext(ctx, BinActCompiler, "list", sargs, f.ToArgv()...)
+	mpred := fmt.Sprintf(`(id (is "%s"))`, strconv.Quote(mid.String()))
+	cmd := a.CommandContext(ctx, BinActCompiler, "list", sargs, "-filter-machines", mpred)
 	cmd.Stdout = &obuf
 
 	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
 
-	return ParseCompilerList(&obuf)
+	m, err := ParseCompilerList(&obuf)
+	return m[mid.String()], err
 }
 
-func (a *Runner) RunCompiler(ctx context.Context, c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error {
+func (a *Runner) RunCompiler(ctx context.Context, c *model.NamedCompiler, j model.CompileJob, errw io.Writer) error {
 	sargs := StandardArgs{Verbose: false}
 
-	argv := runCompilerArgv(c.ID, infiles, outfile)
+	argv := runCompilerArgv(c.ID, j.In, j.Out)
 	cmd := a.CommandContext(ctx, BinActCompiler, "run", sargs, argv...)
 	cmd.Stderr = errw
 

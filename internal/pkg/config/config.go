@@ -10,12 +10,17 @@
 package config
 
 import (
+	"context"
 	"errors"
+	"fmt"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 var (
+	// ErrNoMachine occurs when we try to look up the compilers of a missing machine.
+	ErrNoMachine = errors.New("no such machine")
+
 	// ErrNil occurs when we try to build something using a nil config.
 	ErrNil = errors.New("config nil")
 )
@@ -30,4 +35,13 @@ type Config struct {
 
 	// OutDir is the output directory for fully directed test runs.
 	OutDir string `toml:"out_dir"`
+}
+
+func (c *Config) ListCompilers(_ context.Context, mid model.ID) (map[string]model.Compiler, error) {
+	mstr := mid.String()
+	m, ok := c.Machines[mstr]
+	if !ok {
+		return nil, fmt.Errorf("%w: %s", ErrNoMachine, mstr)
+	}
+	return m.Compilers, nil
 }

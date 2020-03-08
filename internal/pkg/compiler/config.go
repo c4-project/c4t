@@ -21,10 +21,10 @@ import (
 
 // SingleRunner is the interface of things that can run compilers.
 type SingleRunner interface {
-	// RunCompiler runs the compiler pointed to by c on the input files infiles.
-	// On success, it outputs a binary to outfile.
+	// RunCompiler runs the compiler pointed to by c on the input files in j.In.
+	// On success, it outputs a binary to j.Out.
 	// If applicable, errw will be connected to the compiler's standard error.
-	RunCompiler(ctx context.Context, c *model.NamedCompiler, infiles []string, outfile string, errw io.Writer) error
+	RunCompiler(ctx context.Context, c *model.NamedCompiler, j model.CompileJob, errw io.Writer) error
 }
 
 // SubjectPather is the interface of types that can produce path sets for compilations.

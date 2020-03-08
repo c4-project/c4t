@@ -21,12 +21,14 @@ const (
 	// FlagNum is a standard flag for 'number of' arguments.
 	FlagNum = "n"
 
-	flagActConfFile = "C"
+	flagActConfFile = "A"
 	flagActDuneExec = "x"
+	flagConfFile    = "C"
 	flagOutDir      = "d"
 
-	usageConfFile   = "read ACT config from this `file`"
-	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
+	usageConfFile    = "The `file` from which to load the tester configuration."
+	usageActConfFile = "read ACT config from this `file`"
+	usageCorpusSize  = "`number` of corpus files to select for this test plan;\n" +
 		"if non-positive, the planner will use all viable provided corpus files"
 	usageDuneExec = "if true, use 'dune exec' to run OCaml ACT binaries"
 	usageOutDir   = "`directory` to which outputs will be written"
@@ -45,8 +47,13 @@ func OutDirFlag(fs *flag.FlagSet, out *string, defaultdir string) {
 
 // ActRunnerFlags sets up a standard set of arguments on fs feeding into the ActRunner a.
 func ActRunnerFlags(fs *flag.FlagSet, a *act.Runner) {
-	fs.StringVar(&a.ConfFile, flagActConfFile, "", usageConfFile)
+	fs.StringVar(&a.ConfFile, flagActConfFile, "", usageActConfFile)
 	fs.BoolVar(&a.DuneExec, flagActDuneExec, false, usageDuneExec)
+}
+
+// ConfFileFlag sets up a standard argument on fs for loading a configuration file into f.
+func ConfFileFlag(fs *flag.FlagSet) *string {
+	return fs.String(flagConfFile, "", usageConfFile)
 }
 
 // PlanFileFlag sets up a standard argument on fs for loading a plan file into f.

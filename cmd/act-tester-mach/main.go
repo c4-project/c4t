@@ -13,6 +13,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/resolve"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
@@ -31,10 +33,7 @@ func main() {
 }
 
 func run(args []string, outw, errw io.Writer) error {
-	var (
-		dir   string
-		pfile string
-	)
+	var dir, pfile string
 	a := act.Runner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
@@ -50,19 +49,19 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
-	ccfg := makeCompilerConfig(*skipc, errw, a, dir)
+	ccfg := makeCompilerConfig(*skipc, errw, dir)
 	rcfg := makeRunnerConfig(*skipr, errw, a, dir, *timeout, *nworkers)
 	return runOnConfigs(context.Background(), ccfg, rcfg, pfile, outw)
 }
 
-func makeCompilerConfig(skip bool, errw io.Writer, act act.Runner, dir string) *compiler.Config {
+func makeCompilerConfig(skip bool, errw io.Writer, dir string) *compiler.Config {
 	if skip {
 		return nil
 	}
 
 	cl := log.New(errw, "compiler: ", 0)
 	return &compiler.Config{
-		Driver:   &act,
+		Driver:   &resolve.CResolve,
 		Logger:   cl,
 		Paths:    compiler.NewPathset(dir),
 		Observer: ux.NewPbObserver(cl),

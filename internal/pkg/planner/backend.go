@@ -13,5 +13,5 @@ import (
 
 func (p *Planner) planBackend(ctx context.Context) (*model.Backend, error) {
 	// TODO(@MattWindsor91): fix this pointer awfulness.
-	return p.Source.FindBackend(ctx, model.IDFromString("litmus"), p.MachineID)
+	return p.BProbe.FindBackend(ctx, model.IDFromString("litmus"), p.MachineID)
 }

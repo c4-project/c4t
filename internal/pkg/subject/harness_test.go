@@ -19,3 +19,15 @@ func ExampleHarness_Paths() {
 	// foo/bar/barbaz
 	// foo/bar/foobar
 }
+
+// ExampleHarness_CPaths is a testable example for CPaths.
+func ExampleHarness_CPaths() {
+	h := Harness{Dir: "foo/bar", Files: []string{"README.md", "baz.c", "barbaz.c", "foobar.h"}}
+	for _, f := range h.CPaths() {
+		fmt.Println(f)
+	}
+
+	// Output:
+	// foo/bar/baz.c
+	// foo/bar/barbaz.c
+}

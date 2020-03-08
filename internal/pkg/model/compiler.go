@@ -35,7 +35,10 @@ type CompilerRunInfo struct {
 }
 
 // Override creates run information by overlaying this run information with that in new.
-func (c CompilerRunInfo) Override(new CompilerRunInfo) CompilerRunInfo {
+func (c CompilerRunInfo) Override(new *CompilerRunInfo) CompilerRunInfo {
+	if new == nil {
+		return c
+	}
 	return CompilerRunInfo{
 		Cmd:  overrideCmd(c.Cmd, new.Cmd),
 		Args: append(c.Args, new.Args...),
