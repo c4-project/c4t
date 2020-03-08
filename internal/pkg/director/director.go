@@ -10,6 +10,12 @@ import (
 	"context"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/config"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+
+	"golang.org/x/sync/errgroup"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 )
 
@@ -20,9 +26,6 @@ type Director struct {
 
 	// l is the logger for the director.
 	l *log.Logger
-
-	// paths tells the director where to store its
-	paths *Pathset
 }
 
 // New creates a new Director given a global act-tester config.
@@ -42,16 +45,48 @@ func checkConfig(c *Config) error {
 	if c.Paths == nil {
 		return iohelp.ErrPathsetNil
 	}
+	if c.Machines == nil || len(c.Machines) == 0 {
+		return ErrNoMachines
+	}
 	return nil
 }
 
 // Direct runs the director d.
-func (d *Director) Direct(_ context.Context) error {
+func (d *Director) Direct(ctx context.Context) error {
 	d.l.Print("making directories")
-	if err := d.paths.Prepare(); err != nil {
+	if err := d.config.Paths.Prepare(); err != nil {
 		return err
 	}
 
-	// TODO(@MattWindsor91)
-	return nil
+	eg, ectx := errgroup.WithContext(ctx)
+	for midstr, c := range d.config.Machines {
+		m, err := d.makeMachine(midstr, c)
+		if err != nil {
+			return err
+		}
+		eg.Go(func() error {
+			return m.Run(ectx)
+		})
+	}
+
+	return eg.Wait()
+}
+
+func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error) {
+	l := log.New(d.l.Writer(), logPrefix(midstr), 0)
+	mid, err := model.TryIDFromString(midstr)
+	if err != nil {
+		return nil, err
+	}
+	m := Machine{
+		Config: c,
+		ID:     mid,
+		Paths:  d.config.Paths.MachineScratch(mid),
+		Logger: l,
+	}
+	return &m, nil
+}
+
+func logPrefix(midstr string) string {
+	return midstr + ": "
 }

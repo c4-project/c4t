@@ -16,6 +16,9 @@ var (
 	// ErrConfigNil occurs when we try to build a director from a nil config.
 	ErrConfigNil = errors.New("config nil")
 
+	// ErrNoMachines occurs when we try to build a director from a config with no machines defined.
+	ErrNoMachines = errors.New("no machines defined in config")
+
 	// ErrNoOutDir occurs when we try to build a Director with no output directory specified in the config.
 	ErrNoOutDir = errors.New("no output directory specified in config")
 )
@@ -28,6 +31,9 @@ type Config struct {
 
 	// Paths provides path resolving functionality for the director.
 	Paths *Pathset
+
+	// Machines contains the machines that will be used in the test.
+	Machines map[string]config.Machine
 }
 
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
@@ -42,5 +48,5 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger) (*Config, error) {
 		return nil, ErrNoOutDir
 	}
 
-	return &Config{Logger: l, Paths: NewPathset(g.OutDir)}, nil
+	return &Config{Logger: l, Paths: NewPathset(g.OutDir), Machines: g.Machines}, nil
 }
