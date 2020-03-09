@@ -70,9 +70,11 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, inFiles []string, m
 
 	l := log.New(errw, "", 0)
 	plan := planner.Planner{
-		BProbe:    &a,
-		CProbe:    c,
-		SProbe:    &a,
+		Source: planner.Source{
+			BProbe: &a,
+			CProbe: c,
+			SProbe: &a,
+		},
 		Logger:    l,
 		Observer:  ux.NewPbObserver(l),
 		InFiles:   inFiles,

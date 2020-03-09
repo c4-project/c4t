@@ -12,6 +12,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/act"
+	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/config"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director"
@@ -26,9 +29,11 @@ func main() {
 const usageConfFile = "The `file` from which to load the tester configuration."
 
 func run(args []string, errw io.Writer) error {
-	cfile := flag.String("C", "", usageConfFile)
+	a := act.Runner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
+	ux.ActRunnerFlags(fs, &a)
+	cfile := fs.String("C", "", usageConfFile)
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
@@ -38,13 +43,18 @@ func run(args []string, errw io.Writer) error {
 		return err
 	}
 
+	e := director.Env{Planner: planner.Source{
+		BProbe: &a,
+		CProbe: c,
+		SProbe: &a}}
+
 	l := log.New(errw, "", 0)
-	dc, err := director.ConfigFromGlobal(c, l)
+	dc, err := director.ConfigFromGlobal(c, l, e)
 	if err != nil {
 		return nil
 	}
 
-	d, err := director.New(dc)
+	d, err := director.New(dc, fs.Args())
 	if err != nil {
 		return err
 	}

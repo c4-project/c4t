@@ -18,5 +18,5 @@ type CompilerLister interface {
 }
 
 func (p *Planner) planCompilers(ctx context.Context) (map[string]model.Compiler, error) {
-	return p.CProbe.ListCompilers(ctx, p.MachineID)
+	return p.Source.CProbe.ListCompilers(ctx, p.MachineID)
 }

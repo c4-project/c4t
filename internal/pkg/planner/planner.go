@@ -19,15 +19,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
-// BackendFinder is the interface of things that can find backends for machines.
-type BackendFinder interface {
-	// FindBackend asks for a backend with the given style on any one of machines,
-	// or a default machine if none have such a backend.
-	FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error)
-}
-
-// Planner holds all configuration for the test planner.
-type Planner struct {
+// Source contains all of the various sources for a Planner's information.
+type Source struct {
 	// BProbe is the backend prober.
 	BProbe BackendFinder
 
@@ -36,6 +29,12 @@ type Planner struct {
 
 	// SProbe is the subject prober.
 	SProbe SubjectProber
+}
+
+// Planner holds all configuration for the test planner.
+type Planner struct {
+	// Source contains all of the various sources for a Planner's information.
+	Source Source
 
 	// Filter is the compiler filter to use to select compilers to test.
 	Filter string

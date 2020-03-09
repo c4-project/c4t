@@ -8,6 +8,11 @@ package director
 import (
 	"errors"
 	"log"
+	"path/filepath"
+
+	"github.com/mitchellh/go-homedir"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/config"
 )
@@ -34,10 +39,19 @@ type Config struct {
 
 	// Machines contains the machines that will be used in the test.
 	Machines map[string]config.Machine
+
+	// Env groups together the bits of configuration that pertain to dealing with the environment.
+	Env Env
+}
+
+// Env groups together the bits of configuration that pertain to dealing with the environment.
+type Env struct {
+	// Planner instructs any planners built for this director as to how to acquire information about compilers, etc.
+	Planner planner.Source
 }
 
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
-func ConfigFromGlobal(g *config.Config, l *log.Logger) (*Config, error) {
+func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env) (*Config, error) {
 	if g == nil {
 		return nil, config.ErrNil
 	}
@@ -48,5 +62,11 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger) (*Config, error) {
 		return nil, ErrNoOutDir
 	}
 
-	return &Config{Logger: l, Paths: NewPathset(g.OutDir), Machines: g.Machines}, nil
+	edir, err := homedir.Expand(g.OutDir)
+	if err != nil {
+		return nil, err
+	}
+	odir := filepath.ToSlash(edir)
+
+	return &Config{Logger: l, Env: e, Paths: NewPathset(odir), Machines: g.Machines}, nil
 }

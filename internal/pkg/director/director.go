@@ -8,7 +8,10 @@ package director
 
 import (
 	"context"
+	"fmt"
 	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/config"
 
@@ -24,18 +27,30 @@ type Director struct {
 	// config is the configuration for the director.
 	config *Config
 
+	// files is the input file set.
+	files []string
+
 	// l is the logger for the director.
 	l *log.Logger
 }
 
-// New creates a new Director given a global act-tester config.
+// New creates a new Director given a global act-tester config and the input file set files.
 // It fails if the config is missing or ill-formed.
-func New(c *Config) (*Director, error) {
-	if err := checkConfig(c); err != nil {
-		return nil, err
+func New(c *Config, files []string) (*Director, error) {
+	if len(files) == 0 {
+		return nil, liftInitError(corpus.ErrNoCorpus)
 	}
 
-	return &Director{config: c, l: iohelp.EnsureLog(c.Logger)}, nil
+	if err := checkConfig(c); err != nil {
+		return nil, liftInitError(err)
+	}
+
+	return &Director{config: c, files: files, l: iohelp.EnsureLog(c.Logger)}, nil
+}
+
+// liftInitError lifts err to mention that it occurred during initialisation of a director.
+func liftInitError(err error) error {
+	return fmt.Errorf("while initialising director: %w", err)
 }
 
 func checkConfig(c *Config) error {
@@ -79,10 +94,12 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error
 		return nil, err
 	}
 	m := Machine{
-		Config: c,
-		ID:     mid,
-		Paths:  d.config.Paths.MachineScratch(mid),
-		Logger: l,
+		Config:  c,
+		Env:     &d.config.Env,
+		ID:      mid,
+		InFiles: d.files,
+		Paths:   d.config.Paths.MachineScratch(mid),
+		Logger:  l,
 	}
 	return &m, nil
 }
