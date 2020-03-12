@@ -37,7 +37,7 @@ type SubjectPather interface {
 	SubjectPaths(sc SubjectCompile) subject.CompileFileset
 }
 
-// Config represents the configuration that goes into a batch compiler run.
+// MachConfig represents the configuration that goes into a batch compiler run.
 type Config struct {
 	// Driver is what the compiler should use to run single compiler jobs.
 	Driver SingleRunner

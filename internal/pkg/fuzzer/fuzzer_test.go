@@ -38,10 +38,12 @@ func (m *MockPathset) SubjectPaths(sc fuzzer.SubjectCycle) subject.FuzzFileset {
 // makeConfig makes a 'valid' fuzzer config.
 func makeConfig() fuzzer.Config {
 	return fuzzer.Config{
-		Driver:        fuzzer.NopFuzzer{},
-		Paths:         &MockPathset{},
-		CorpusSize:    0,
-		SubjectCycles: 10,
+		Driver: fuzzer.NopFuzzer{},
+		Paths:  &MockPathset{},
+		Quantities: fuzzer.QuantitySet{
+			CorpusSize:    0,
+			SubjectCycles: 10,
+		},
 	}
 }
 

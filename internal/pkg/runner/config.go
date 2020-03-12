@@ -22,7 +22,7 @@ type ObsParser interface {
 	ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error
 }
 
-// Config represents the configuration needed to run a Runner.
+// MachConfig represents the configuration needed to run a Runner.
 type Config struct {
 	// Timeout is the timeout for each run, in minutes.
 	// Non-positive values disable the timeout.

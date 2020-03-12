@@ -45,7 +45,7 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
-	plan, err := makePlanner(*cfile, errw, a, fs.Args(), *pmach)
+	plan, err := makePlanner(*cfile, errw, a, fs.Args(), *pmach, cs)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func run(args []string, outw, errw io.Writer) error {
 	return p.Dump(outw)
 }
 
-func makePlanner(cfile string, errw io.Writer, a act.Runner, inFiles []string, midstr string) (*planner.Planner, error) {
+func makePlanner(cfile string, errw io.Writer, a act.Runner, inFiles []string, midstr string, cs int) (*planner.Planner, error) {
 	c, err := config.Load(cfile)
 	if err != nil {
 		return nil, err
@@ -70,6 +70,7 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, inFiles []string, m
 
 	l := log.New(errw, "", 0)
 	plan := planner.Planner{
+		CorpusSize: cs,
 		Source: planner.Source{
 			BProbe: &a,
 			CProbe: c,

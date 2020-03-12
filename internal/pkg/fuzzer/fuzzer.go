@@ -69,7 +69,7 @@ func checkConfig(c *Config) error {
 	if c.Paths == nil {
 		return iohelp.ErrPathsetNil
 	}
-	if c.SubjectCycles <= 0 {
+	if c.Quantities.SubjectCycles <= 0 {
 		return fmt.Errorf("%w: non-positive subject cycle amount", corpus.ErrSmallCorpus)
 	}
 	return nil
@@ -82,8 +82,9 @@ func (f *Fuzzer) checkCount() error {
 	}
 
 	// Note that this inequality 'does the right thing' when f.CorpusSize = 0, ie no corpus size requirement.
-	if nruns < f.conf.CorpusSize {
-		return fmt.Errorf("%w: projected corpus size %d, want %d", corpus.ErrSmallCorpus, nruns, f.conf.CorpusSize)
+	csize := f.conf.Quantities.CorpusSize
+	if nruns < csize {
+		return fmt.Errorf("%w: projected corpus size %d, want %d", corpus.ErrSmallCorpus, nruns, csize)
 	}
 
 	return nil
@@ -109,7 +110,7 @@ func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 // sampleAndUpdatePlan samples fcs and places the result in the fuzzer's plan.
 func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand) (*plan.Plan, error) {
 	logrus.Infoln("sampling corpus")
-	scs, err := fcs.Sample(rng, f.conf.CorpusSize)
+	scs, err := fcs.Sample(rng, f.conf.Quantities.CorpusSize)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +124,7 @@ func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand) (*plan.P
 // count counts the number of subjects and individual fuzz runs to expect from this fuzzer.
 func (f *Fuzzer) count() (nsubjects, nruns int) {
 	nsubjects = len(f.plan.Corpus)
-	nruns = f.conf.SubjectCycles * nsubjects
+	nruns = f.conf.Quantities.SubjectCycles * nsubjects
 	return nsubjects, nruns
 }
 
@@ -154,7 +155,7 @@ func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- corpus.Builde
 	return &Job{
 		Driver:        f.conf.Driver,
 		Subject:       s,
-		SubjectCycles: f.conf.SubjectCycles,
+		SubjectCycles: f.conf.Quantities.SubjectCycles,
 		Pathset:       f.conf.Paths,
 		Rng:           rand.New(rand.NewSource(seed)),
 		ResCh:         resCh,

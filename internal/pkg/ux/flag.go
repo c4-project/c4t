@@ -8,6 +8,8 @@ package ux
 import (
 	"flag"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 )
 
@@ -21,23 +23,30 @@ const (
 	// FlagNum is a standard flag for 'number of' arguments.
 	FlagNum = "n"
 
-	flagActConfFile = "A"
-	flagActDuneExec = "x"
-	flagConfFile    = "C"
-	flagOutDir      = "d"
+	flagActConfFile   = "A"
+	flagConfFile      = "C"
+	flagOutDir        = "d"
+	flagSubjectCycles = "k"
+	flagActDuneExec   = "x"
 
 	usageConfFile    = "The `file` from which to load the tester configuration."
 	usageActConfFile = "read ACT config from this `file`"
 	usageCorpusSize  = "`number` of corpus files to select for this test plan;\n" +
 		"if non-positive, the planner will use all viable provided corpus files"
-	usageDuneExec = "if true, use 'dune exec' to run OCaml ACT binaries"
-	usageOutDir   = "`directory` to which outputs will be written"
-	usagePlanFile = "read from this plan `file` instead of stdin"
+	usageDuneExec      = "if true, use 'dune exec' to run OCaml ACT binaries"
+	usageOutDir        = "`directory` to which outputs will be written"
+	usagePlanFile      = "read from this plan `file` instead of stdin"
+	usageSubjectCycles = "number of `cycles` to run for each subject in the corpus"
 )
 
 // CorpusSizeFlag sets up a 'target corpus size' flag on fs.
 func CorpusSizeFlag(fs *flag.FlagSet, out *int) {
 	fs.IntVar(out, FlagNum, 0, usageCorpusSize)
+}
+
+// SubjectCycleFlag sets up a 'number of cycles' flag on fs.
+func SubjectCycleFlag(fs *flag.FlagSet, out *int) {
+	fs.IntVar(out, flagSubjectCycles, fuzzer.DefaultSubjectCycles, usageSubjectCycles)
 }
 
 // OutDirFlag sets up an 'output directory' flag on fs.

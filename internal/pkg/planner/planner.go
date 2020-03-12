@@ -65,7 +65,7 @@ func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 		return nil, corpus.ErrNoCorpus
 	}
 
-	// TODO(@MattWindsor91): separate Planner from Config to avoid this
+	// TODO(@MattWindsor91): separate Planner from MachConfig to avoid this
 	p.Logger = iohelp.EnsureLog(p.Logger)
 
 	hd := plan.NewHeader()

@@ -8,8 +8,11 @@ package director
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
@@ -63,6 +66,9 @@ func checkConfig(c *Config) error {
 	if c.Machines == nil || len(c.Machines) == 0 {
 		return ErrNoMachines
 	}
+	if c.Observer == nil {
+		return ErrObserverNil
+	}
 	return nil
 }
 
@@ -93,15 +99,39 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error
 	if err != nil {
 		return nil, err
 	}
+	obs := d.config.Observer(mid)
+	ps := d.config.Paths.MachineScratch(mid)
+	fz, ferr := makeFuzzConfig(d.config, ps.DirFuzz, obs)
+	if ferr != nil {
+		return nil, ferr
+	}
 	m := Machine{
-		Config:  c,
-		Env:     &d.config.Env,
-		ID:      mid,
-		InFiles: d.files,
-		Paths:   d.config.Paths.MachineScratch(mid),
-		Logger:  l,
+		MachConfig: c,
+		Env:        &d.config.Env,
+		FuzzConfig: fz,
+		ID:         mid,
+		InFiles:    d.files,
+		Observer:   obs,
+		Paths:      ps,
+		Logger:     l,
 	}
 	return &m, nil
+}
+
+func makeFuzzConfig(c *Config, dir string, obs corpus.BuilderObserver) (*fuzzer.Config, error) {
+	fz := c.Env.Fuzzer
+	if fz == nil {
+		return nil, errors.New("no single fuzzer provided")
+	}
+
+	fc := fuzzer.Config{
+		Driver:     fz,
+		Observer:   obs,
+		Paths:      fuzzer.NewPathset(dir),
+		Quantities: c.Quantities.Fuzz,
+	}
+
+	return &fc, nil
 }
 
 func logPrefix(midstr string) string {

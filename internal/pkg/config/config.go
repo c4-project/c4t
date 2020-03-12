@@ -33,6 +33,9 @@ type Config struct {
 	// Machines enumerates the machines available for testing.
 	Machines map[string]Machine `toml:"machines,omitempty"`
 
+	// Quantities gives the default quantities for the director.
+	Quantities QuantitySet `toml:"quantities,omitempty"`
+
 	// OutDir is the output directory for fully directed test runs.
 	OutDir string `toml:"out_dir"`
 }

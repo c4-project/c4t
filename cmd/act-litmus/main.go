@@ -54,7 +54,7 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 	fs.BoolVar(&cfg.Verbose, "v", false, usageVerbose)
 	fs.StringVar(&cfg.CArch, "carch", "", usageCArch)
 	fs.StringVar(&cfg.Pathset.DirOut, "o", "", usageOutDir)
-	// TODO(@MattWindsor91): ActRunner flags
+	ux.ActRunnerFlags(fs, &a)
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return nil, err

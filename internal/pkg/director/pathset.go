@@ -7,6 +7,7 @@ package director
 
 import (
 	"path"
+	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
@@ -70,4 +71,11 @@ func NewMachinePathset(root string) *MachinePathset {
 // Prepare prepares this pathset by making its directories.
 func (p *MachinePathset) Prepare() error {
 	return iohelp.Mkdirs(p.DirPlan, p.DirFuzz, p.DirLift)
+}
+
+// PlanForStage gets the path to the plan file for stage stage.
+// Note that neither Prepare nor this method create or otherwise access the plan file.
+func (p *MachinePathset) PlanForStage(stage string) string {
+	file := strings.Join([]string{"plan", stage, "toml"}, ".")
+	return path.Join(p.DirPlan, file)
 }

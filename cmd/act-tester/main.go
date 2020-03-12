@@ -26,14 +26,15 @@ func main() {
 	ux.LogTopError(err)
 }
 
-const usageConfFile = "The `file` from which to load the tester configuration."
-
 func run(args []string, errw io.Writer) error {
 	a := act.Runner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
+
 	ux.ActRunnerFlags(fs, &a)
-	cfile := fs.String("C", "", usageConfFile)
+	cfile := ux.ConfFileFlag(fs)
+	qs := setupQuantityOverrides(fs)
+
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
@@ -42,11 +43,9 @@ func run(args []string, errw io.Writer) error {
 	if err != nil {
 		return err
 	}
+	c.Quantities.Override(*qs)
 
-	e := director.Env{Planner: planner.Source{
-		BProbe: &a,
-		CProbe: c,
-		SProbe: &a}}
+	e := makeEnv(&a, c)
 
 	l := log.New(errw, "", 0)
 	dc, err := director.ConfigFromGlobal(c, l, e)
@@ -59,4 +58,23 @@ func run(args []string, errw io.Writer) error {
 		return err
 	}
 	return d.Direct(context.Background())
+}
+
+func makeEnv(a *act.Runner, c *config.Config) director.Env {
+	return director.Env{
+		Fuzzer: a,
+		Planner: planner.Source{
+			BProbe: a,
+			CProbe: c,
+			SProbe: a,
+		},
+	}
+}
+
+func setupQuantityOverrides(fs *flag.FlagSet) *config.QuantitySet {
+	var q config.QuantitySet
+	// TODO(@MattWindsor91): disambiguate the corpus size argument
+	ux.CorpusSizeFlag(fs, &q.Fuzz.CorpusSize)
+	ux.SubjectCycleFlag(fs, &q.Fuzz.SubjectCycles)
+	return &q
 }

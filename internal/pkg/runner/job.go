@@ -19,7 +19,7 @@ import (
 
 // Job contains all state required to perform a runner operation for a given subject.
 type Job struct {
-	// Config points to the runner config.
+	// MachConfig points to the runner config.
 	Conf *Config
 
 	// Backend is the backend used to produce the harnesses being run.
