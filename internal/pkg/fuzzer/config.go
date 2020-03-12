@@ -7,6 +7,7 @@ package fuzzer
 
 import (
 	"context"
+	"log"
 	"reflect"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -29,6 +30,9 @@ type SubjectPather interface {
 type Config struct {
 	// Driver holds the single-file fuzzer that the fuzzer is going to use.
 	Driver SingleFuzzer
+
+	// Logger is the logger to use while fuzzing.  It may be nil, which silences logging.
+	Logger *log.Logger
 
 	// Observer observes the fuzzer's progress across a corpus.
 	Observer corpus.BuilderObserver

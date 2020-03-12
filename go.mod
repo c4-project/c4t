@@ -7,6 +7,8 @@ require (
 	github.com/cheggaaa/pb v2.0.7+incompatible
 	github.com/cheggaaa/pb/v3 v3.0.4
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/mum4k/termdash v0.11.0
+	github.com/nsf/termbox-go v0.0.0-20200204031403-4d2b513ad8be // indirect
 	github.com/sirupsen/logrus v1.4.2
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	gopkg.in/VividCortex/ewma.v1 v1.1.1 // indirect

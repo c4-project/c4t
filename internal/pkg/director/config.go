@@ -6,6 +6,7 @@
 package director
 
 import (
+	"context"
 	"errors"
 	"log"
 	"path/filepath"
@@ -36,6 +37,16 @@ var (
 	ErrObserverNil = errors.New("observer func nil")
 )
 
+// Observer is an interface for types that implement multi-machine test progress observation.
+type Observer interface {
+	// Run runs the observer in a blocking manner using context ctx.
+	// It will use cancel to cancel ctx if needed.
+	Run(ctx context.Context, cancel func()) error
+
+	// Machine gets a sub-observer for the machine with ID id.
+	Machine(id model.ID) corpus.BuilderObserver
+}
+
 // Config groups together the various bits of configuration needed to create a director.
 type Config struct {
 	// Logger is the logger to which the director should log.
@@ -48,8 +59,8 @@ type Config struct {
 	// Machines contains the machines that will be used in the test.
 	Machines map[string]config.Machine
 
-	// Observer is a function that makes builder observers for machines.
-	Observer func(model.ID) corpus.BuilderObserver
+	// Observer is a multi-machine observer for the director.
+	Observer Observer
 
 	// Env groups together the bits of configuration that pertain to dealing with the environment.
 	Env Env
@@ -68,7 +79,7 @@ type Env struct {
 }
 
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
-func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env) (*Config, error) {
+func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o Observer) (*Config, error) {
 	if g == nil {
 		return nil, config.ErrNil
 	}
@@ -91,10 +102,7 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env) (*Config, error) {
 		Paths:      NewPathset(odir),
 		Machines:   g.Machines,
 		Quantities: g.Quantities,
-		Observer: func(_ model.ID) corpus.BuilderObserver {
-			// TODO(@MattWindsor91): replace this with a useful observer
-			return corpus.SilentObserver{}
-		},
+		Observer:   o,
 	}
 	return &c, nil
 }

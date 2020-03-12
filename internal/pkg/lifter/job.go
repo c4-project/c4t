@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -87,7 +85,6 @@ func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
 		OutDir:  dir,
 	}
 
-	logrus.WithField("spec", spec).Debugln("making harness")
 	files, err := j.Maker.MakeHarness(ctx, spec)
 	if err != nil {
 		return fmt.Errorf("when making harness for %s (arch %s): %w", s.Name, j.Arch.String(), err)

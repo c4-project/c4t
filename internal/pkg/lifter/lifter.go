@@ -11,8 +11,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"golang.org/x/sync/errgroup"
 
@@ -21,7 +24,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -47,6 +49,9 @@ type Lifter struct {
 	// Maker is a harness maker.
 	Maker HarnessMaker
 
+	// Logger is the logger to use for this lifter.
+	Logger *log.Logger
+
 	// Observer tracks the lifter's progress across a corpus.
 	Observer corpus.BuilderObserver
 
@@ -56,6 +61,9 @@ type Lifter struct {
 
 // Run runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
 func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	// TODO(@MattWindsor91): separate config and lifter structs to avoid this.
+	l.Logger = iohelp.EnsureLog(l.Logger)
+
 	if p == nil {
 		return nil, plan.ErrNil
 	}
@@ -68,7 +76,7 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, ErrNoBackend
 	}
 
-	logrus.Infoln("making output directory", l.OutDir)
+	l.Logger.Println("making output directory", l.OutDir)
 	if err := os.Mkdir(l.OutDir, 0744); err != nil {
 		return nil, err
 	}
@@ -78,7 +86,7 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (l *Lifter) lift(ctx context.Context) error {
-	logrus.Infoln("now lifting")
+	l.Logger.Println("now lifting")
 
 	b, err := corpus.NewBuilder(corpus.BuilderConfig{
 		Init:  l.Plan.Corpus,

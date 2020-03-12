@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -20,8 +21,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
-
-	"github.com/sirupsen/logrus"
 )
 
 // DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
@@ -37,6 +36,8 @@ var (
 
 // Fuzzer holds the configuration required to fuzz a plan file.
 type Fuzzer struct {
+	l *log.Logger
+
 	// plan is the plan on which this fuzzer is operating.
 	plan plan.Plan
 
@@ -53,7 +54,7 @@ func New(c *Config, p *plan.Plan) (*Fuzzer, error) {
 		return nil, plan.ErrNil
 	}
 
-	f := Fuzzer{plan: *p, conf: *c}
+	f := Fuzzer{plan: *p, l: iohelp.EnsureLog(c.Logger), conf: *c}
 
 	err := f.checkCount()
 	return &f, err
@@ -92,12 +93,12 @@ func (f *Fuzzer) checkCount() error {
 
 // Fuzz runs the fuzzer with context ctx.
 func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
-	logrus.Infoln("preparing directories")
+	f.l.Println("preparing directories")
 	if err := f.conf.Paths.Prepare(); err != nil {
 		return nil, err
 	}
 
-	logrus.Infoln("now fuzzing")
+	f.l.Println("now fuzzing")
 	rng := f.plan.Header.Rand()
 	fcs, ferr := f.fuzzInner(ctx, rng)
 	if ferr != nil {
@@ -109,13 +110,13 @@ func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 
 // sampleAndUpdatePlan samples fcs and places the result in the fuzzer's plan.
 func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand) (*plan.Plan, error) {
-	logrus.Infoln("sampling corpus")
+	f.l.Println("sampling corpus")
 	scs, err := fcs.Sample(rng, f.conf.Quantities.CorpusSize)
 	if err != nil {
 		return nil, err
 	}
 
-	logrus.Infoln("updating plan")
+	f.l.Println("updating plan")
 	f.plan.Corpus = scs
 	f.plan.Header = *plan.NewHeader()
 	return &f.plan, nil
@@ -132,7 +133,7 @@ func (f *Fuzzer) count() (nsubjects, nruns int) {
 func (f *Fuzzer) fuzzInner(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error) {
 	_, nfuzzes := f.count()
 
-	logrus.Infof("Fuzzing %d inputs\n", len(f.plan.Corpus))
+	f.l.Printf("Fuzzing %d inputs\n", len(f.plan.Corpus))
 
 	seeds := f.corpusSeeds(rng)
 

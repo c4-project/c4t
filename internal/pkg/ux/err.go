@@ -6,10 +6,11 @@
 package ux
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"os"
 	"os/exec"
-
-	"github.com/sirupsen/logrus"
 )
 
 // LogTopError logs err if non-nil, in a 'fatal top-level error' sort of way.
@@ -18,11 +19,20 @@ func LogTopError(err error) {
 		return
 	}
 
-	var perr *exec.ExitError
-	if errors.As(err, &perr) {
-		logrus.WithError(err).WithField("stderr", string(perr.Stderr)).Errorln("a child process encountered an error")
+	if errors.Is(err, context.Canceled) {
+		// Assume that a top-level cancellation is user-specified.
 		return
 	}
 
-	logrus.WithError(err).Errorln("fatal error")
+	var perr *exec.ExitError
+	if errors.As(err, &perr) {
+		_, _ = fmt.Fprintln(os.Stderr, "A child process encountered an error:")
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, "Any captured stderr follows.")
+		_, _ = fmt.Fprintln(os.Stderr, perr.Stderr)
+		return
+	}
+
+	_, _ = fmt.Fprintln(os.Stderr, "A fatal error has occurred:")
+	_, _ = fmt.Fprintln(os.Stderr, err)
 }

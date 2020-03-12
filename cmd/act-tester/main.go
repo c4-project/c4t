@@ -39,25 +39,45 @@ func run(args []string, errw io.Writer) error {
 		return err
 	}
 
+	return runWithArgs(cfile, qs, a, fs.Args())
+}
+
+func runWithArgs(cfile *string, qs *config.QuantitySet, a act.Runner, files []string) error {
 	c, err := config.Load(*cfile)
 	if err != nil {
 		return err
 	}
-	c.Quantities.Override(*qs)
-
-	e := makeEnv(&a, c)
-
-	l := log.New(errw, "", 0)
-	dc, err := director.ConfigFromGlobal(c, l, e)
+	dc, err := makeDirectorConfig(c, qs, a)
 	if err != nil {
-		return nil
+		return err
 	}
 
-	d, err := director.New(dc, fs.Args())
+	d, err := director.New(dc, files)
 	if err != nil {
 		return err
 	}
 	return d.Direct(context.Background())
+}
+
+func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner) (*director.Config, error) {
+	c.Quantities.Override(*qs)
+
+	// TODO(@MattWindsor91)
+	e := makeEnv(&a, c)
+	mids, err := c.MachineIDs()
+	if err != nil {
+		return nil, err
+	}
+	o, err := ux.NewDash(mids)
+	if err != nil {
+		return nil, err
+	}
+	l := log.New(o, "", 0)
+	dc, err := director.ConfigFromGlobal(c, l, e, o)
+	if err != nil {
+		return nil, err
+	}
+	return dc, nil
 }
 
 func makeEnv(a *act.Runner, c *config.Config) director.Env {

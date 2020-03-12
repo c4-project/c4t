@@ -44,6 +44,7 @@ func run(args []string, errw io.Writer) error {
 	cfg := fuzzer.Config{
 		Driver:     &a,
 		Observer:   ux.NewPbObserver(l),
+		Logger:     l,
 		Paths:      fuzzer.NewPathset(dir),
 		Quantities: *qs,
 	}

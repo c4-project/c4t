@@ -79,7 +79,10 @@ func (d *Director) Direct(ctx context.Context) error {
 		return err
 	}
 
-	eg, ectx := errgroup.WithContext(ctx)
+	cctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	eg, ectx := errgroup.WithContext(cctx)
 	for midstr, c := range d.config.Machines {
 		m, err := d.makeMachine(midstr, c)
 		if err != nil {
@@ -89,6 +92,9 @@ func (d *Director) Direct(ctx context.Context) error {
 			return m.Run(ectx)
 		})
 	}
+	eg.Go(func() error {
+		return d.config.Observer.Run(ectx, cancel)
+	})
 
 	return eg.Wait()
 }
@@ -99,9 +105,9 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error
 	if err != nil {
 		return nil, err
 	}
-	obs := d.config.Observer(mid)
+	obs := d.config.Observer.Machine(mid)
 	ps := d.config.Paths.MachineScratch(mid)
-	fz, ferr := makeFuzzConfig(d.config, ps.DirFuzz, obs)
+	fz, ferr := makeFuzzConfig(d.config, l, ps.DirFuzz, obs)
 	if ferr != nil {
 		return nil, ferr
 	}
@@ -118,7 +124,7 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error
 	return &m, nil
 }
 
-func makeFuzzConfig(c *Config, dir string, obs corpus.BuilderObserver) (*fuzzer.Config, error) {
+func makeFuzzConfig(c *Config, l *log.Logger, dir string, obs corpus.BuilderObserver) (*fuzzer.Config, error) {
 	fz := c.Env.Fuzzer
 	if fz == nil {
 		return nil, errors.New("no single fuzzer provided")
@@ -126,6 +132,7 @@ func makeFuzzConfig(c *Config, dir string, obs corpus.BuilderObserver) (*fuzzer.
 
 	fc := fuzzer.Config{
 		Driver:     fz,
+		Logger:     l,
 		Observer:   obs,
 		Paths:      fuzzer.NewPathset(dir),
 		Quantities: c.Quantities.Fuzz,

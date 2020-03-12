@@ -40,6 +40,25 @@ type Config struct {
 	OutDir string `toml:"out_dir"`
 }
 
+// MachineIDs gets a sorted slice of machine IDs present in the config.
+// It returns an error if any of the configured machines have an invalid ID.
+func (c *Config) MachineIDs() ([]model.ID, error) {
+	var (
+		err error
+		i   int
+	)
+
+	mids := make([]model.ID, len(c.Machines))
+	for id := range c.Machines {
+		if mids[i], err = model.TryIDFromString(id); err != nil {
+			return nil, err
+		}
+		i++
+	}
+	return mids, nil
+}
+
+// ListCompilers implements the compiler listing operation using a config.
 func (c *Config) ListCompilers(_ context.Context, mid model.ID) (map[string]model.Compiler, error) {
 	mstr := mid.String()
 	m, ok := c.Machines[mstr]

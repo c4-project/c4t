@@ -31,6 +31,7 @@ func run(args []string, errw io.Writer) error {
 	l := log.New(errw, "", 0)
 	lift := lifter.Lifter{
 		Maker:    &a,
+		Logger:   l,
 		Observer: ux.NewPbObserver(l),
 	}
 
