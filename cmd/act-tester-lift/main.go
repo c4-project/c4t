@@ -29,7 +29,7 @@ func run(args []string, errw io.Writer) error {
 	var pf string
 	a := act.Runner{Stderr: errw}
 	l := log.New(errw, "", 0)
-	lift := lifter.Lifter{
+	cfg := lifter.Config{
 		Maker:    &a,
 		Logger:   l,
 		Observer: ux.NewPbObserver(l),
@@ -37,11 +37,11 @@ func run(args []string, errw io.Writer) error {
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	ux.ActRunnerFlags(fs, &a)
-	ux.OutDirFlag(fs, &lift.OutDir, defaultOutDir)
+	ux.OutDirFlag(fs, &cfg.OutDir, defaultOutDir)
 	ux.PlanFileFlag(fs, &pf)
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 
-	return ux.RunOnPlanFile(context.Background(), &lift, pf)
+	return ux.RunOnPlanFile(context.Background(), &cfg, pf)
 }

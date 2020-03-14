@@ -15,13 +15,17 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// ExpectErrorIs checks whether got has an 'Is' relation to want.
+// ExpectErrorIs checks whether got has an 'Is' relation to want (or, if want is nil, whether got is non-nil).
 // If not, it fails the test with a message mentioning context.
 func ExpectErrorIs(t *testing.T, got, want error, context string) {
-	if got == nil {
+	switch {
+	case want == nil && got != nil:
+		t.Helper()
+		t.Errorf("%s: unexpected error: %q", context, got)
+	case want != nil && got == nil:
 		t.Helper()
 		t.Errorf("%s: error nil; want=%q", context, want)
-	} else if !errors.Is(got, want) {
+	case !errors.Is(got, want):
 		t.Helper()
 		t.Errorf("%s: error=%q; want=%q", context, got, want)
 	}
