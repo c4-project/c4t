@@ -65,7 +65,7 @@ func New(c *Config, p *plan.Plan) (*Runner, error) {
 
 func (r *Runner) check() error {
 	if len(r.plan.Corpus) == 0 {
-		return corpus.ErrNoCorpus
+		return corpus.ErrNone
 	}
 	return nil
 }

@@ -22,11 +22,11 @@ var (
 	// ErrMapRename occurs when we try to change the name of an entry inside a Map.
 	ErrMapRename = errors.New("tried to rename a corpus entry")
 
-	// ErrSmallCorpus occurs when the viable test corpus is smaller than that requested by the user.
-	ErrSmallCorpus = errors.New("test corpus too small")
+	// ErrSmall occurs when the viable test corpus is smaller than that requested by the user.
+	ErrSmall = errors.New("test corpus too small")
 
-	// ErrNoCorpus is a variant of ErrSmallCorpus that occurs when the viable test corpus is empty.
-	ErrNoCorpus = fmt.Errorf("%w: no corpus given", ErrSmallCorpus)
+	// ErrNone is a variant of ErrSmall that occurs when the viable test corpus is empty.
+	ErrNone = fmt.Errorf("%w: no corpus given", ErrSmall)
 )
 
 // Corpus is the type of test corpi (groups of test subjects).

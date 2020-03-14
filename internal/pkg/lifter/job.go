@@ -58,7 +58,7 @@ func (j *Job) check() error {
 		return ErrNoBackend
 	}
 	if j.Corpus == nil {
-		return corpus.ErrNoCorpus
+		return corpus.ErrNone
 	}
 	if j.Maker == nil {
 		return ErrMakerNil

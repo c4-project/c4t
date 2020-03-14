@@ -59,7 +59,7 @@ func TestCorpus_Sample_SmallErrors(t *testing.T) {
 			_, err := c.corpus.Sample(rand.New(rand.NewSource(1)), c.want)
 			if err == nil {
 				t.Errorf("no error when sampling small corpus (%v, want %d)", c.corpus, c.want)
-			} else if !errors.Is(err, corpus.ErrSmallCorpus) {
+			} else if !errors.Is(err, corpus.ErrSmall) {
 				t.Errorf("wrong error when sampling small corpus (%v, want %d): %v", c.corpus, c.want, err)
 			}
 		})

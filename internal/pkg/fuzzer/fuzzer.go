@@ -71,7 +71,7 @@ func checkConfig(c *Config) error {
 		return iohelp.ErrPathsetNil
 	}
 	if c.Quantities.SubjectCycles <= 0 {
-		return fmt.Errorf("%w: non-positive subject cycle amount", corpus.ErrSmallCorpus)
+		return fmt.Errorf("%w: non-positive subject cycle amount", corpus.ErrSmall)
 	}
 	return nil
 }
@@ -79,13 +79,13 @@ func checkConfig(c *Config) error {
 func (f *Fuzzer) checkCount() error {
 	nsubjects, nruns := f.count()
 	if nsubjects <= 0 {
-		return corpus.ErrNoCorpus
+		return corpus.ErrNone
 	}
 
 	// Note that this inequality 'does the right thing' when f.CorpusSize = 0, ie no corpus size requirement.
 	csize := f.conf.Quantities.CorpusSize
 	if nruns < csize {
-		return fmt.Errorf("%w: projected corpus size %d, want %d", corpus.ErrSmallCorpus, nruns, csize)
+		return fmt.Errorf("%w: projected corpus size %d, want %d", corpus.ErrSmall, nruns, csize)
 	}
 
 	return nil

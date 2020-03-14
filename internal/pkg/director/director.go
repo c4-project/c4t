@@ -41,7 +41,7 @@ type Director struct {
 // It fails if the config is missing or ill-formed.
 func New(c *Config, files []string) (*Director, error) {
 	if len(files) == 0 {
-		return nil, liftInitError(corpus.ErrNoCorpus)
+		return nil, liftInitError(corpus.ErrNone)
 	}
 
 	if err := checkConfig(c); err != nil {

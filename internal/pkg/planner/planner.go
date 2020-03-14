@@ -62,7 +62,7 @@ type Planner struct {
 func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(p.InFiles) == 0 {
-		return nil, corpus.ErrNoCorpus
+		return nil, corpus.ErrNone
 	}
 
 	// TODO(@MattWindsor91): separate Planner from MachConfig to avoid this

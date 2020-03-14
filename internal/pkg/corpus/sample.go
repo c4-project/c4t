@@ -19,14 +19,14 @@ func (c Corpus) Sample(rng *rand.Rand, want int) (Corpus, error) {
 	got := len(c)
 
 	if got == 0 {
-		return nil, ErrNoCorpus
+		return nil, ErrNone
 	}
 
 	if want <= 0 || got == want {
 		return c, nil
 	}
 	if got < want {
-		return nil, fmt.Errorf("%w: corpus size=%d, want %d", ErrSmallCorpus, got, want)
+		return nil, fmt.Errorf("%w: corpus size=%d, want %d", ErrSmall, got, want)
 	}
 
 	return c.actuallySample(rng, want), nil
