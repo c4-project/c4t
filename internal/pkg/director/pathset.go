@@ -18,6 +18,7 @@ const (
 	segFuzz    = "fuzz"
 	segLift    = "lift"
 	segPlan    = "plan"
+	segRun     = "run"
 	segSaved   = "saved"
 	segScratch = "scratch"
 )
@@ -52,25 +53,28 @@ func (p *Pathset) MachineScratch(mid model.ID) *MachinePathset {
 
 // MachinePathset contains the pre-computed paths for a machine run.
 type MachinePathset struct {
-	// DirPlan is the directory to which plans will be written.
-	DirPlan string
 	// DirFuzz is the directory to which fuzzed subjects will be output.
 	DirFuzz string
 	// DirLift is the directory to which lifted harnesses will be output.
 	DirLift string
+	// DirPlan is the directory to which plans will be written.
+	DirPlan string
+	// DirRun is the directory into which act-tester-mach output will go.
+	DirRun string
 }
 
 func NewMachinePathset(root string) *MachinePathset {
 	return &MachinePathset{
-		DirPlan: path.Join(root, segPlan),
 		DirFuzz: path.Join(root, segFuzz),
 		DirLift: path.Join(root, segLift),
+		DirPlan: path.Join(root, segPlan),
+		DirRun:  path.Join(root, segRun),
 	}
 }
 
 // Prepare prepares this pathset by making its directories.
 func (p *MachinePathset) Prepare() error {
-	return iohelp.Mkdirs(p.DirPlan, p.DirFuzz, p.DirLift)
+	return iohelp.Mkdirs(p.DirPlan, p.DirFuzz, p.DirLift, p.DirRun)
 }
 
 // PlanForStage gets the path to the plan file for stage stage.

@@ -28,6 +28,8 @@ type StageConfig struct {
 	Fuzz *fuzzer.Config
 	// Lift contains configuration for the instance's lift stage.
 	Lift *lifter.Config
+	// Mach contains configuration for the instance's machine-specific stage.
+	Mach *LocalMach
 }
 
 var ErrStageConfigMissing = errors.New("stage config missing")
@@ -46,6 +48,9 @@ func (c *StageConfig) Check() error {
 	if c.Lift == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, StageLift)
 	}
+	if c.Mach == nil {
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, StageMach)
+	}
 	return nil
 }
 
@@ -61,6 +66,7 @@ const (
 	StagePlan = "plan"
 	StageFuzz = "fuzz"
 	StageLift = "lift"
+	StageMach = "mach"
 )
 
 // Stages is the list of director stages.
@@ -81,6 +87,12 @@ var Stages = []stage{
 		Name: StageLift,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Lift.Run(ctx, p)
+		},
+	},
+	{
+		Name: StageMach,
+		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+			return c.Mach.Run(ctx, p)
 		},
 	},
 }

@@ -147,11 +147,13 @@ func (m *Instance) makeStageConfig() (*StageConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
+	c := &LocalMach{Dir: m.Paths.DirRun}
 	sc := StageConfig{
 		InFiles: m.InFiles,
 		Plan:    p,
 		Fuzz:    f,
 		Lift:    l,
+		Mach:    c,
 	}
 	return &sc, nil
 }
@@ -212,9 +214,3 @@ func (m *Instance) dump(name string, p *plan.Plan) error {
 	}
 	return f.Close()
 }
-
-/*
-func (m *Instance) mach(_ context.Context, _ *plan.Plan) (*plan.Plan, error) {
-	return nil, nil
-}
-*/
