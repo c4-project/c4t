@@ -8,6 +8,8 @@ package lifter_test
 import (
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
@@ -27,7 +29,7 @@ func makeConfig() *lifter.Config {
 		},
 		Logger:   nil,
 		Observer: builder.SilentObserver{},
-		OutDir:   "lifter",
+		Paths:    &lifter.MockPather{},
 	}
 }
 
@@ -67,6 +69,13 @@ func TestNew_errors(t *testing.T) {
 				return c
 			},
 			err: lifter.ErrMakerNil,
+		},
+		"nil-paths": {
+			cdelta: func(c *lifter.Config) *lifter.Config {
+				c.Paths = nil
+				return c
+			},
+			err: iohelp.ErrPathsetNil,
 		},
 		"nil-plan": {
 			pdelta: func(p *plan.Plan) *plan.Plan {

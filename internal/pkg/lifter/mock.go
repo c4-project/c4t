@@ -26,3 +26,24 @@ func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec model.HarnessSpec
 	m.SeenSpecs = append(m.SeenSpecs, spec)
 	return []string{path.Join(spec.OutDir, "out.c")}, m.Err
 }
+
+// MockPather mocks Pather.
+type MockPather struct {
+	// Arches captures the last-prepared set of architecture IDs.
+	Arches []model.ID
+
+	// Subjects captures the last-prepared set of subject names.
+	Subjects []string
+}
+
+// Prepare pretends to prepare a MockPather.
+func (m *MockPather) Prepare(arches []model.ID, subjects []string) error {
+	m.Arches = arches
+	m.Subjects = subjects
+	return nil
+}
+
+// Path pretends to resolve a path.
+func (m *MockPather) Path(_ model.ID, _ string) (string, error) {
+	return "foo", nil
+}

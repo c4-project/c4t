@@ -8,13 +8,8 @@ package director
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
@@ -83,7 +78,6 @@ func (d *Director) Direct(ctx context.Context) error {
 
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
 	eg, ectx := errgroup.WithContext(cctx)
 	for midstr, c := range d.config.Machines {
 		m, err := d.makeMachine(midstr, c)
@@ -94,6 +88,7 @@ func (d *Director) Direct(ctx context.Context) error {
 			return m.Run(ectx)
 		})
 	}
+
 	eg.Go(func() error {
 		return d.config.Observer.Run(ectx, cancel)
 	})
@@ -101,7 +96,7 @@ func (d *Director) Direct(ctx context.Context) error {
 	return eg.Wait()
 }
 
-func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error) {
+func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, error) {
 	l := log.New(d.l.Writer(), logPrefix(midstr), 0)
 	mid, err := model.TryIDFromString(midstr)
 	if err != nil {
@@ -109,38 +104,17 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error
 	}
 	obs := d.config.Observer.Machine(mid)
 	ps := d.config.Paths.MachineScratch(mid)
-	fz, ferr := makeFuzzConfig(d.config, l, ps.DirFuzz, obs)
-	if ferr != nil {
-		return nil, ferr
-	}
-	m := Machine{
+	m := Instance{
 		MachConfig: c,
 		Env:        &d.config.Env,
-		FuzzConfig: fz,
 		ID:         mid,
 		InFiles:    d.files,
 		Observer:   obs,
 		Paths:      ps,
 		Logger:     l,
+		Quantities: d.config.Quantities,
 	}
 	return &m, nil
-}
-
-func makeFuzzConfig(c *Config, l *log.Logger, dir string, obs builder.Observer) (*fuzzer.Config, error) {
-	fz := c.Env.Fuzzer
-	if fz == nil {
-		return nil, errors.New("no single fuzzer provided")
-	}
-
-	fc := fuzzer.Config{
-		Driver:     fz,
-		Logger:     l,
-		Observer:   obs,
-		Paths:      fuzzer.NewPathset(dir),
-		Quantities: c.Quantities.Fuzz,
-	}
-
-	return &fc, nil
 }
 
 func logPrefix(midstr string) string {

@@ -45,12 +45,12 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
-	plan, err := makePlanner(*cfile, errw, a, fs.Args(), *pmach, cs)
+	plan, err := makePlanner(*cfile, errw, a, *pmach, cs)
 	if err != nil {
 		return err
 	}
 
-	p, err := plan.Plan(context.Background())
+	p, err := plan.Plan(context.Background(), fs.Args())
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func run(args []string, outw, errw io.Writer) error {
 	return p.Dump(outw)
 }
 
-func makePlanner(cfile string, errw io.Writer, a act.Runner, inFiles []string, midstr string, cs int) (*planner.Planner, error) {
+func makePlanner(cfile string, errw io.Writer, a act.Runner, midstr string, cs int) (*planner.Planner, error) {
 	c, err := config.Load(cfile)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,6 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, inFiles []string, m
 		},
 		Logger:    l,
 		Observer:  ux.NewPbObserver(l),
-		InFiles:   inFiles,
 		MachineID: mid,
 	}
 	return &plan, nil

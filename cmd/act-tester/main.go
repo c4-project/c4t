@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/ux/dash"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 
@@ -68,7 +70,7 @@ func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner) 
 	if err != nil {
 		return nil, err
 	}
-	o, err := ux.NewDash(mids)
+	o, err := dash.New(mids)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +85,7 @@ func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner) 
 func makeEnv(a *act.Runner, c *config.Config) director.Env {
 	return director.Env{
 		Fuzzer: a,
+		Lifter: a,
 		Planner: planner.Source{
 			BProbe: a,
 			CProbe: c,

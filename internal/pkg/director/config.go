@@ -11,6 +11,8 @@ import (
 	"log"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -44,7 +46,7 @@ type Observer interface {
 	// It will use cancel to cancel ctx if needed.
 	Run(ctx context.Context, cancel func()) error
 
-	// Machine gets a sub-observer for the machine with ID id.
+	// Instance gets a sub-observer for the machine with ID id.
 	Machine(id model.ID) builder.Observer
 }
 
@@ -74,6 +76,9 @@ type Config struct {
 type Env struct {
 	// Fuzzer is a single-shot fuzzing driver.
 	Fuzzer fuzzer.SingleFuzzer
+
+	// Lifter is a single-shot harness maker.
+	Lifter lifter.HarnessMaker
 
 	// Planner instructs any planners built for this director as to how to acquire information about compilers, etc.
 	Planner planner.Source

@@ -12,9 +12,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
@@ -24,13 +26,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 )
 
-// Machine contains the state necessary to run a single machine loop of a director.
-type Machine struct {
+// Instance contains the state necessary to run a single machine loop of a director.
+type Instance struct {
 	// MachConfig contains the machine config for this machine.
 	MachConfig config.Machine
 
-	// FuzzConfig is the configuration for this machine's fuzzer.
-	FuzzConfig *fuzzer.Config
+	// StageConfig is the configuration for this instance's stages.
+	StageConfig *StageConfig
 
 	// ID is the ID for this machine.
 	ID model.ID
@@ -49,10 +51,13 @@ type Machine struct {
 
 	// Paths contains the scratch pathset for this machine.
 	Paths *MachinePathset
+
+	// Quantities contains the quantity set for this machine.
+	Quantities config.QuantitySet
 }
 
 // Run runs this machine's testing loop.
-func (m *Machine) Run(ctx context.Context) error {
+func (m *Instance) Run(ctx context.Context) error {
 	m.Logger = iohelp.EnsureLog(m.Logger)
 	if err := m.check(); err != nil {
 		return err
@@ -63,22 +68,28 @@ func (m *Machine) Run(ctx context.Context) error {
 		return err
 	}
 
+	m.Logger.Print("creating stage configurations")
+	sc, err := m.makeStageConfig()
+	if err != nil {
+		return err
+	}
+	m.Logger.Print("checking stage configurations")
+	if err := sc.Check(); err != nil {
+		return err
+	}
+
 	m.Logger.Print("starting loop")
-	return m.mainLoop(ctx)
+	return m.mainLoop(ctx, sc)
 }
 
 // check makes sure this machine has a valid configuration before starting loops.
-func (m *Machine) check() error {
+func (m *Instance) check() error {
 	if m.Paths == nil {
 		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, m.ID.String())
 	}
 
 	if m.Env == nil {
 		return errors.New("no environment configuration")
-	}
-
-	if m.FuzzConfig == nil {
-		return errors.New("no fuzzer config")
 	}
 
 	if m.MachConfig.SSH != nil {
@@ -93,9 +104,9 @@ func (m *Machine) check() error {
 }
 
 // mainLoop performs the main testing loop for one machine.
-func (m *Machine) mainLoop(ctx context.Context) error {
+func (m *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 	for {
-		if err := m.pass(ctx); err != nil {
+		if err := m.pass(ctx, sc); err != nil {
 			return err
 		}
 		if err := ctx.Err(); err != nil {
@@ -105,65 +116,91 @@ func (m *Machine) mainLoop(ctx context.Context) error {
 }
 
 // pass performs one iteration of the main testing loop for one machine.
-func (m *Machine) pass(ctx context.Context) error {
+func (m *Instance) pass(ctx context.Context, sc *StageConfig) error {
 	var (
 		p   *plan.Plan
 		err error
 	)
 
-	steps := []struct {
-		name string
-		f    func(context.Context, *plan.Plan) (*plan.Plan, error)
-	}{
-		{name: "init", f: m.plan},
-		{name: "fuzz", f: m.fuzz},
-		//{name: "lift", f: m.lift},
-	}
-
-	for _, s := range steps {
-		if p, err = s.f(ctx, p); err != nil {
-			return fmt.Errorf("in %s stage: %w", s.name, err)
+	for _, s := range Stages {
+		if p, err = s.Run(sc, ctx, p); err != nil {
+			return fmt.Errorf("in %s stage: %w", s.Name, err)
 		}
-		if err = m.dump(s.name, p); err != nil {
-			return fmt.Errorf("when dumping after %s stage: %w", s.name, err)
+		if err = m.dump(s.Name, p); err != nil {
+			return fmt.Errorf("when dumping after %s stage: %w", s.Name, err)
 		}
 	}
 
 	return nil
 }
 
-// plan creates a new plan using ctx.
-// It ignores the incoming plan; in practice, this will be a nil pointer,
-// and exists only to bring this method in line with the signatures of the other pass methods.
-func (m *Machine) plan(ctx context.Context, _ *plan.Plan) (*plan.Plan, error) {
+func (m *Instance) makeStageConfig() (*StageConfig, error) {
 	p, err := m.makePlanner()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("when making planner: %w", err)
 	}
-	return p.Plan(ctx)
+	f, err := m.makeFuzzerConfig()
+	if err != nil {
+		return nil, fmt.Errorf("when making fuzzer config: %w", err)
+	}
+	l, err := m.makeLifterConfig()
+	if err != nil {
+		return nil, fmt.Errorf("when making lifter config: %w", err)
+	}
+	sc := StageConfig{
+		InFiles: m.InFiles,
+		Plan:    p,
+		Fuzz:    f,
+		Lift:    l,
+	}
+	return &sc, nil
 }
 
-func (m *Machine) makePlanner() (*planner.Planner, error) {
+func (m *Instance) makePlanner() (*planner.Planner, error) {
 	p := planner.Planner{
 		Source:    m.Env.Planner,
 		Logger:    m.Logger,
 		Observer:  m.Observer,
-		InFiles:   m.InFiles,
 		MachineID: m.ID,
 	}
 	return &p, nil
 }
 
-func (m *Machine) fuzz(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	f, err := fuzzer.New(m.FuzzConfig, p)
-	if err != nil {
-		return nil, err
+func (m *Instance) makeFuzzerConfig() (*fuzzer.Config, error) {
+	fz := m.Env.Fuzzer
+	if fz == nil {
+		return nil, errors.New("no single fuzzer provided")
 	}
-	return f.Fuzz(ctx)
+
+	fc := fuzzer.Config{
+		Driver:     fz,
+		Logger:     m.Logger,
+		Observer:   m.Observer,
+		Paths:      fuzzer.NewPathset(m.Paths.DirFuzz),
+		Quantities: m.Quantities.Fuzz,
+	}
+
+	return &fc, nil
+}
+
+func (m *Instance) makeLifterConfig() (*lifter.Config, error) {
+	hm := m.Env.Lifter
+	if hm == nil {
+		return nil, errors.New("no single fuzzer provided")
+	}
+
+	lc := lifter.Config{
+		Maker:    hm,
+		Logger:   m.Logger,
+		Observer: m.Observer,
+		Paths:    lifter.NewPathset(m.Paths.DirLift),
+	}
+
+	return &lc, nil
 }
 
 // dump dumps a plan p to its expected plan file given the stage name name.
-func (m *Machine) dump(name string, p *plan.Plan) error {
+func (m *Instance) dump(name string, p *plan.Plan) error {
 	fname := m.Paths.PlanForStage(name)
 	f, err := os.Create(fname)
 	if err != nil {
@@ -177,11 +214,7 @@ func (m *Machine) dump(name string, p *plan.Plan) error {
 }
 
 /*
-func (m *Machine) lift(_ context.Context, _ *plan.Plan) (*plan.Plan, error) {
-	return nil, nil
-}
-
-func (m *Machine) mach(_ context.Context, _ *plan.Plan) (*plan.Plan, error) {
+func (m *Instance) mach(_ context.Context, _ *plan.Plan) (*plan.Plan, error) {
 	return nil, nil
 }
 */

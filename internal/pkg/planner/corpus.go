@@ -24,9 +24,9 @@ type SubjectProber interface {
 	ProbeSubject(ctx context.Context, litmus string) (subject.Named, error)
 }
 
-func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand) (corpus.Corpus, error) {
+func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, fs []string) (corpus.Corpus, error) {
 	c := CorpusPlanner{
-		Files:    p.InFiles,
+		Files:    fs,
 		Prober:   p.Source.SProbe,
 		Observer: p.Observer,
 		Rng:      rng,

@@ -55,15 +55,12 @@ type Planner struct {
 	// If nonzero, the corpus will be sampled if larger than the size, and an error occurs if the final size is below
 	// that requested.
 	CorpusSize int
-
-	// InFiles is a list of paths to files that form the incoming test corpus.
-	InFiles []string
 }
 
-// plan runs the test planner p.
-func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
+// plan runs the test planner p on input file paths fs.
+func (p *Planner) Plan(ctx context.Context, fs []string) (*plan.Plan, error) {
 	// Early out to prevent us from doing any planning if we received no files.
-	if len(p.InFiles) == 0 {
+	if len(fs) == 0 {
 		return nil, corpus.ErrNone
 	}
 
@@ -96,7 +93,7 @@ func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 	}
 
 	p.Logger.Println("Planning corpus...")
-	if pn.Corpus, err = p.planCorpus(ctx, rng); err != nil {
+	if pn.Corpus, err = p.planCorpus(ctx, rng, fs); err != nil {
 		return nil, err
 	}
 

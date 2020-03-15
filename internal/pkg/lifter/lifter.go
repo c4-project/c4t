@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
@@ -57,6 +56,9 @@ type Lifter struct {
 
 // New constructs a new Lifter given config c and plan p.
 func New(c *Config, p *plan.Plan) (*Lifter, error) {
+	if c.Paths == nil {
+		return nil, iohelp.ErrPathsetNil
+	}
 	if c.Maker == nil {
 		return nil, ErrMakerNil
 	}
@@ -77,8 +79,8 @@ func New(c *Config, p *plan.Plan) (*Lifter, error) {
 
 // Run runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
 func (l *Lifter) Run(ctx context.Context) (*plan.Plan, error) {
-	l.l.Println("making output directory", l.conf.OutDir)
-	if err := os.Mkdir(l.conf.OutDir, 0744); err != nil {
+	l.l.Println("preparing directories")
+	if err := l.conf.Paths.Prepare(l.plan.Arches(), l.plan.Corpus.Names()); err != nil {
 		return nil, err
 	}
 
@@ -109,11 +111,7 @@ func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *builder.Buil
 	var lc corpus.Corpus
 	// It's very likely this will be a single element array.
 	for _, a := range l.plan.Arches() {
-		dir, derr := buildAndMkDir(l.conf.OutDir, a.Tags()...)
-		if derr != nil {
-			return nil, derr
-		}
-		j := l.makeJob(a, dir, mrng, b.SendCh)
+		j := l.makeJob(a, mrng, b.SendCh)
 		eg.Go(func() error {
 			return j.Lift(ectx)
 		})
@@ -127,11 +125,11 @@ func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *builder.Buil
 	return lc, err
 }
 
-func (l *Lifter) makeJob(a model.ID, dir string, mrng *rand.Rand, resCh chan<- builder.Request) Job {
+func (l *Lifter) makeJob(a model.ID, mrng *rand.Rand, resCh chan<- builder.Request) Job {
 	return Job{
 		Arch:    a,
 		Backend: l.plan.Backend.FQID(),
-		OutDir:  dir,
+		Paths:   l.conf.Paths,
 		Maker:   l.conf.Maker,
 		Corpus:  l.plan.Corpus,
 		Rng:     rand.New(rand.NewSource(mrng.Int63())),

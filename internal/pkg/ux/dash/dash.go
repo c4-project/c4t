@@ -3,7 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package ux
+// Package dash contains the act-tester console dashboard.
+package dash
 
 import (
 	"context"
@@ -11,8 +12,6 @@ import (
 	"sort"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
-
-	"github.com/mum4k/termdash/cell"
 
 	"github.com/mum4k/termdash/widgets/text"
 
@@ -25,7 +24,6 @@ import (
 	"github.com/mum4k/termdash/container/grid"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 	"github.com/mum4k/termdash"
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/terminal/termbox"
@@ -36,7 +34,7 @@ type Dash struct {
 	container *container.Container
 	term      terminalapi.Terminal
 	log       *text.Text
-	machines  []DashObserver
+	machines  []Observer
 }
 
 // Write lets one write to the text console in the dash as if it were stderr.
@@ -46,8 +44,8 @@ func (d *Dash) Write(p []byte) (n int, err error) {
 	return len(sp), d.log.Write(sp)
 }
 
-// NewDash constructs a dashboard for the given machine IDs.
-func NewDash(mids []model.ID) (*Dash, error) {
+// New constructs a dashboard for the given machine IDs.
+func New(mids []model.ID) (*Dash, error) {
 	t, err := termbox.New()
 	if err != nil {
 		return nil, err
@@ -82,10 +80,10 @@ func NewDash(mids []model.ID) (*Dash, error) {
 	return &d, nil
 }
 
-func makeMachineGrid(mids []model.ID) ([]DashObserver, []container.Option, error) {
+func makeMachineGrid(mids []model.ID) ([]Observer, []container.Option, error) {
 	gb := grid.New()
 
-	obs := make([]DashObserver, len(mids))
+	obs := make([]Observer, len(mids))
 	pc := 100 / len(mids)
 	if pc == 100 {
 		pc = 99
@@ -103,7 +101,7 @@ func makeMachineGrid(mids []model.ID) ([]DashObserver, []container.Option, error
 	return obs, g, err
 }
 
-func addMachine(d *DashObserver, mid model.ID, gb *grid.Builder, pc int) error {
+func addMachine(d *Observer, mid model.ID, gb *grid.Builder, pc int) error {
 	d.mid = mid
 
 	var err error
@@ -144,53 +142,4 @@ func (d *Dash) Machine(mid model.ID) builder.Observer {
 		return builder.SilentObserver{}
 	}
 	return &d.machines[i]
-}
-
-// DashObserver is a BuilderObserver that attaches into a Dash.
-type DashObserver struct {
-	mid          model.ID
-	last         *text.Text
-	g            *gauge.Gauge
-	nreqs, ndone int
-}
-
-func (d *DashObserver) redraw(options ...gauge.Option) {
-	_ = d.g.Absolute(d.ndone, d.nreqs, options...)
-}
-
-// OnStart sets up a DashObserver for a test phase with nreqs incoming requests.
-func (d *DashObserver) OnStart(nreqs int) {
-	d.nreqs = nreqs
-	d.ndone = 0
-	d.redraw()
-}
-
-// OnAdd acknowledges the addition of a subject to a corpus being built.
-func (d *DashObserver) OnAdd(subject string) {
-	d.ndone++
-	_ = d.last.Write("ADD ", text.WriteCellOpts(cell.FgColor(cell.ColorGreen)))
-	_ = d.last.Write(subject + "\n")
-	d.redraw(gauge.Color(cell.ColorGreen))
-}
-
-// OnCompile acknowledges the addition of a compilation to a corpus being built.
-func (d *DashObserver) OnCompile(_ string, _ model.ID, _ bool) {
-	d.ndone++
-	d.redraw(gauge.Color(cell.ColorBlue))
-}
-
-// OnHarness acknowledges the addition of a harness to a corpus being built.
-func (d *DashObserver) OnHarness(_ string, _ model.ID) {
-	d.ndone++
-	d.redraw(gauge.Color(cell.ColorRed))
-}
-
-// OnRun acknowledges the addition of a run to a corpus being built.
-func (d *DashObserver) OnRun(_ string, _ model.ID, _ subject.Status) {
-	d.ndone++
-	d.redraw(gauge.Color(cell.ColorCyan))
-}
-
-// OnFinish does nothing, for now.
-func (d *DashObserver) OnFinish() {
 }

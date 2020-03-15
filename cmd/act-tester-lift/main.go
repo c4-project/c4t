@@ -37,11 +37,15 @@ func run(args []string, errw io.Writer) error {
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	ux.ActRunnerFlags(fs, &a)
-	ux.OutDirFlag(fs, &cfg.OutDir, defaultOutDir)
+	var od string
+	ux.OutDirFlag(fs, &od, defaultOutDir)
 	ux.PlanFileFlag(fs, &pf)
+
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
+
+	cfg.Paths = lifter.NewPathset(od)
 
 	return ux.RunOnPlanFile(context.Background(), &cfg, pf)
 }

@@ -30,8 +30,8 @@ type Job struct {
 	// Maker is the harness maker for this job.
 	Maker HarnessMaker
 
-	// OutDir is the root output directory for this lifter job.
-	OutDir string
+	// Paths is the path resolver for this job.
+	Paths Pather
 
 	// Corpus is the existing corpus that we are trying to lift.
 	Corpus corpus.Corpus
@@ -69,10 +69,9 @@ func (j *Job) check() error {
 }
 
 func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
-	// TODO(@MattWindsor91): bring this in line with the other stages' pathsets
-	dir, derr := buildAndMkDir(j.OutDir, s.Name)
+	dir, derr := j.Paths.Path(j.Arch, s.Name)
 	if derr != nil {
-		return fmt.Errorf("when making subject dir: %w", derr)
+		return fmt.Errorf("when getting subject dir: %w", derr)
 	}
 
 	path, perr := s.BestLitmus()
