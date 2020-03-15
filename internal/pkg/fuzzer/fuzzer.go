@@ -14,6 +14,8 @@ import (
 	"log"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -137,8 +139,8 @@ func (f *Fuzzer) fuzzInner(ctx context.Context, rng *rand.Rand) (corpus.Corpus, 
 
 	seeds := f.corpusSeeds(rng)
 
-	bc := corpus.BuilderConfig{NReqs: nfuzzes, Obs: f.conf.Observer}
-	return corpus.ParBuild(ctx, f.plan.Corpus, bc, func(ctx context.Context, s subject.Named, ch chan<- corpus.BuilderReq) error {
+	bc := builder.Config{NReqs: nfuzzes, Obs: f.conf.Observer}
+	return builder.ParBuild(ctx, f.plan.Corpus, bc, func(ctx context.Context, s subject.Named, ch chan<- builder.Request) error {
 		return f.makeJob(s, seeds[s.Name], ch).Fuzz(ctx)
 	})
 }
@@ -152,7 +154,7 @@ func (f *Fuzzer) corpusSeeds(rng *rand.Rand) map[string]int64 {
 	return seeds
 }
 
-func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- corpus.BuilderReq) *Job {
+func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- builder.Request) *Job {
 	return &Job{
 		Driver:        f.conf.Driver,
 		Subject:       s,

@@ -12,6 +12,8 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
@@ -36,7 +38,7 @@ type Job struct {
 	Runner SingleRunner
 
 	// ResCh is the channel to which the compile run should send compiled subject records.
-	ResCh chan<- corpus.BuilderReq
+	ResCh chan<- builder.Request
 
 	// Corpus is the corpus to compile.
 	Corpus corpus.Corpus
@@ -118,9 +120,9 @@ func (j *Job) makeCompileResult(sp subject.CompileFileset, cerr error) (subject.
 // sendResult tries to send a compile job result to the result channel.
 // If the context ctx has been cancelled, it will fail and instead terminate the job.
 func (j *Job) sendResult(ctx context.Context, name string, r subject.CompileResult) error {
-	return corpus.BuilderReq{
+	return builder.Request{
 		Name: name,
-		Req: corpus.AddCompileReq{
+		Req: builder.Compile{
 			CompilerID: j.Compiler.ID,
 			Result:     r,
 		},

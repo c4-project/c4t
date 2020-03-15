@@ -12,7 +12,10 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
@@ -26,7 +29,7 @@ type Job struct {
 	Backend *model.Backend
 
 	// ResCh is the channel to which we're sending the run result.
-	ResCh chan<- corpus.BuilderReq
+	ResCh chan<- builder.Request
 
 	// Subject is a pointer to the subject being run.
 	Subject *subject.Named
@@ -61,14 +64,14 @@ func (j *Job) runCompileInner(ctx context.Context, cid model.ID, c *subject.Comp
 		return subject.Run{Status: subject.StatusUnknown}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.Subject.Name, cid.String())
 	}
 
-	obs, runErr := j.runAndParseBin(ctx, cid, bin)
-	status, err := subject.StatusOfObs(obs, runErr)
+	o, runErr := j.runAndParseBin(ctx, cid, bin)
+	status, err := subject.StatusOfObs(o, runErr)
 
-	return subject.Run{Status: status, Obs: obs}, err
+	return subject.Run{Status: status, Obs: o}, err
 }
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
-func (j *Job) runAndParseBin(ctx context.Context, cid model.ID, bin string) (*model.Obs, error) {
+func (j *Job) runAndParseBin(ctx context.Context, cid model.ID, bin string) (*obs.Obs, error) {
 	// TODO(@MattWindsor91): make the timeout configurable
 	tctx, cancel := j.timeout(ctx)
 	defer cancel()
@@ -82,11 +85,11 @@ func (j *Job) runAndParseBin(ctx context.Context, cid model.ID, bin string) (*mo
 		return nil, j.liftError(cid, "starting", err)
 	}
 
-	var obs model.Obs
-	perr := j.Conf.Parser.ParseObs(tctx, *j.Backend, obsr, &obs)
+	var o obs.Obs
+	perr := j.Conf.Parser.ParseObs(tctx, *j.Backend, obsr, &o)
 	werr := cmd.Wait()
 
-	return &obs, mostRelevantError(werr, perr, tctx.Err())
+	return &o, mostRelevantError(werr, perr, tctx.Err())
 }
 
 func (j *Job) timeout(ctx context.Context) (context.Context, context.CancelFunc) {
@@ -116,10 +119,10 @@ func mostRelevantError(r, p, c error) error {
 	}
 }
 
-func (j *Job) makeBuilderReq(cid model.ID, run subject.Run) corpus.BuilderReq {
-	return corpus.BuilderReq{
+func (j *Job) makeBuilderReq(cid model.ID, run subject.Run) builder.Request {
+	return builder.Request{
 		Name: j.Subject.Name,
-		Req:  corpus.AddRunReq{CompilerID: cid, Result: run},
+		Req:  builder.Run{CompilerID: cid, Result: run},
 	}
 }
 

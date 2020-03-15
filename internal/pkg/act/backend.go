@@ -15,6 +15,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -93,7 +95,7 @@ func makeHarnessArgv(s model.HarnessSpec) []string {
 }
 
 // ParseObs uses act-backend to parse the observation coming in from r into o according to b.
-func (a *Runner) ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error {
+func (a *Runner) ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *obs.Obs) error {
 	cmd := a.CommandContext(ctx, BinActBackend, "parse", StandardArgs{}, "-backend", b.ID.String())
 	cmd.Stdin = r
 

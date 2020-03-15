@@ -11,7 +11,8 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
@@ -44,7 +45,7 @@ type Observer interface {
 	Run(ctx context.Context, cancel func()) error
 
 	// Machine gets a sub-observer for the machine with ID id.
-	Machine(id model.ID) corpus.BuilderObserver
+	Machine(id model.ID) builder.Observer
 }
 
 // Config groups together the various bits of configuration needed to create a director.

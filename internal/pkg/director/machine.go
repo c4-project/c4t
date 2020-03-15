@@ -12,7 +12,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 
@@ -45,7 +45,7 @@ type Machine struct {
 	Logger *log.Logger
 
 	// Observer is this machine's builder observer.
-	Observer corpus.BuilderObserver
+	Observer builder.Observer
 
 	// Paths contains the scratch pathset for this machine.
 	Paths *MachinePathset

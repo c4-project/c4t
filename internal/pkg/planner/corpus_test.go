@@ -12,9 +12,10 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -86,7 +87,7 @@ func makeCorpusPlanner(tp *TestProber) *planner.CorpusPlanner {
 	sort.Strings(in)
 	return &planner.CorpusPlanner{
 		Files:    in,
-		Observer: corpus.SilentObserver{},
+		Observer: builder.SilentObserver{},
 		Prober:   tp,
 		Rng:      r,
 		// This should enforce a degree of sampling.

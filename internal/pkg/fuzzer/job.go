@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
@@ -36,7 +36,7 @@ type Job struct {
 	Rng *rand.Rand
 
 	// ResCh is the channel onto which each fuzzed subject should be sent.
-	ResCh chan<- corpus.BuilderReq
+	ResCh chan<- builder.Request
 }
 
 // Fuzz performs a single fuzzing Job.
@@ -78,7 +78,7 @@ func (j *Job) fuzzCycle(ctx context.Context, cycle int) error {
 	}
 
 	nsub := j.fuzzedSubject(sc, &fz)
-	return corpus.SendAdd(ctx, j.ResCh, &nsub)
+	return builder.SendAdd(ctx, j.ResCh, &nsub)
 }
 
 // fuzzedSubject makes a copy of this Job's subject with the cycled name sc and fuzz fileset spaths.

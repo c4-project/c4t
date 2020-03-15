@@ -12,6 +12,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -81,12 +83,12 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 
 	eg, ectx := errgroup.WithContext(ctx)
 
-	bc := corpus.BuilderConfig{
+	bc := builder.Config{
 		Init:  c.plan.Corpus,
 		NReqs: c.count(),
 		Obs:   c.conf.Observer,
 	}
-	b, berr := corpus.NewBuilder(bc)
+	b, berr := builder.NewBuilder(bc)
 	if berr != nil {
 		return nil, berr
 	}
@@ -122,7 +124,7 @@ func (c *Compiler) prepareDirs() error {
 // makeJob makes a job for the named compiler nc, outputting results to resCh.
 // It also takes in a read-only copy, rc, of the corpus; this is because the result handling thread will be modifying
 // the corpus proper.
-func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- corpus.BuilderReq) *Job {
+func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- builder.Request) *Job {
 	return &Job{
 		MachineID: c.mid,
 		Compiler:  nc,

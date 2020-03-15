@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -38,7 +40,7 @@ type Job struct {
 	Rng *rand.Rand
 
 	// ResCh is the channel onto which each fuzzed subject should be sent.
-	ResCh chan<- corpus.BuilderReq
+	ResCh chan<- builder.Request
 }
 
 // Lift performs this lifting job.
@@ -93,10 +95,10 @@ func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
 	return j.makeBuilderReq(s, dir, files).SendTo(ctx, j.ResCh)
 }
 
-func (j *Job) makeBuilderReq(s *subject.Named, dir string, files []string) corpus.BuilderReq {
-	return corpus.BuilderReq{
+func (j *Job) makeBuilderReq(s *subject.Named, dir string, files []string) builder.Request {
+	return builder.Request{
 		Name: s.Name,
-		Req: corpus.AddHarnessReq{
+		Req: builder.Harness{
 			Arch:    j.Arch,
 			Harness: subject.Harness{Dir: dir, Files: files},
 		},

@@ -11,6 +11,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
@@ -72,12 +74,12 @@ func (r *Runner) check() error {
 
 // Run runs the runner.
 func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
-	bcfg := corpus.BuilderConfig{
+	bcfg := builder.Config{
 		Init:  r.plan.Corpus,
 		NReqs: r.count(),
 		Obs:   r.conf.Observer,
 	}
-	b, berr := corpus.NewBuilder(bcfg)
+	b, berr := builder.NewBuilder(bcfg)
 	if berr != nil {
 		return nil, berr
 	}
@@ -100,7 +102,7 @@ func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 	return &r.plan, err
 }
 
-func (r *Runner) makeJob(b *corpus.Builder, named subject.Named) *Job {
+func (r *Runner) makeJob(b *builder.Builder, named subject.Named) *Job {
 	return &Job{
 		Backend: r.plan.Backend,
 		Conf:    &r.conf,

@@ -10,7 +10,9 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
@@ -19,7 +21,7 @@ import (
 type ObsParser interface {
 	// ParseObs parses the observation in reader r into o according to the backend configuration in b.
 	// The backend described by b must have been used to produce the testcase outputting r.
-	ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *model.Obs) error
+	ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *obs.Obs) error
 }
 
 // MachConfig represents the configuration needed to run a Runner.
@@ -37,7 +39,7 @@ type Config struct {
 	Logger *log.Logger
 
 	// Observer observes the runner's progress across a corpus.
-	Observer corpus.BuilderObserver
+	Observer builder.Observer
 
 	// Parser handles the parsing of observations.
 	Parser ObsParser

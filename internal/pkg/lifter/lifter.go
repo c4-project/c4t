@@ -15,6 +15,8 @@ import (
 	"math/rand"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"golang.org/x/sync/errgroup"
@@ -87,7 +89,7 @@ func (l *Lifter) Run(ctx context.Context) (*plan.Plan, error) {
 func (l *Lifter) lift(ctx context.Context) error {
 	l.l.Println("now lifting")
 
-	b, err := corpus.NewBuilder(corpus.BuilderConfig{
+	b, err := builder.NewBuilder(builder.Config{
 		Init:  l.plan.Corpus,
 		NReqs: l.count(),
 		Obs:   l.conf.Observer,
@@ -102,7 +104,7 @@ func (l *Lifter) lift(ctx context.Context) error {
 	return lerr
 }
 
-func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *corpus.Builder) (corpus.Corpus, error) {
+func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *builder.Builder) (corpus.Corpus, error) {
 	eg, ectx := errgroup.WithContext(ctx)
 	var lc corpus.Corpus
 	// It's very likely this will be a single element array.
@@ -125,7 +127,7 @@ func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *corpus.Build
 	return lc, err
 }
 
-func (l *Lifter) makeJob(a model.ID, dir string, mrng *rand.Rand, resCh chan<- corpus.BuilderReq) Job {
+func (l *Lifter) makeJob(a model.ID, dir string, mrng *rand.Rand, resCh chan<- builder.Request) Job {
 	return Job{
 		Arch:    a,
 		Backend: l.plan.Backend.FQID(),

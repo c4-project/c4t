@@ -8,11 +8,12 @@ package lifter_test
 import (
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 )
@@ -25,7 +26,7 @@ func makeConfig() *lifter.Config {
 			Err:       nil,
 		},
 		Logger:   nil,
-		Observer: corpus.SilentObserver{},
+		Observer: builder.SilentObserver{},
 		OutDir:   "lifter",
 	}
 }

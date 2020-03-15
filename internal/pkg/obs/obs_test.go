@@ -3,26 +3,26 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package model_test
+package obs_test
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 )
 
 // ExampleObs_Sat is a testable example for Sat.
 func ExampleObs_Sat() {
-	o1 := model.Obs{}
+	o1 := obs.Obs{}
 	fmt.Println("o1:", o1.Sat())
 
-	o2 := model.Obs{Flags: model.ObsUnsat}
+	o2 := obs.Obs{Flags: obs.Unsat}
 	fmt.Println("o2:", o2.Sat())
 
-	o3 := model.Obs{Flags: model.ObsSat}
+	o3 := obs.Obs{Flags: obs.Sat}
 	fmt.Println("o3:", o3.Sat())
 
 	// Output:
@@ -33,13 +33,13 @@ func ExampleObs_Sat() {
 
 // ExampleObs_Unsat is a testable example for Unsat.
 func ExampleObs_Unsat() {
-	o1 := model.Obs{}
+	o1 := obs.Obs{}
 	fmt.Println("o1:", o1.Unsat())
 
-	o2 := model.Obs{Flags: model.ObsUnsat}
+	o2 := obs.Obs{Flags: obs.Unsat}
 	fmt.Println("o2:", o2.Unsat())
 
-	o3 := model.Obs{Flags: model.ObsSat}
+	o3 := obs.Obs{Flags: obs.Sat}
 	fmt.Println("o3:", o3.Unsat())
 
 	// Output:
@@ -51,16 +51,16 @@ func ExampleObs_Unsat() {
 func TestObs_TOML_RoundTrip(t *testing.T) {
 	t.Parallel()
 
-	cases := map[string]model.Obs{
+	cases := map[string]obs.Obs{
 		"empty":         {},
-		"undef-nostate": {Flags: model.ObsUndef},
+		"undef-nostate": {Flags: obs.Undef},
 		"multiple-flags": {
-			Flags: model.ObsSat | model.ObsUndef,
-			States: []model.ObsState{
+			Flags: obs.Sat | obs.Undef,
+			States: []obs.State{
 				{"x": "27", "y": "53"},
 				{"x": "27", "y": "42"},
 			},
-			Witnesses: []model.ObsState{
+			Witnesses: []obs.State{
 				{"x": "27", "y": "53"},
 			},
 		},

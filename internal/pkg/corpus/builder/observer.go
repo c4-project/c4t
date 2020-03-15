@@ -3,15 +3,15 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package corpus
+package builder
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
-// BuilderObserver is the interface for things that observe a builder.
-type BuilderObserver interface {
+// Observer is the interface for things that observe a builder.
+type Observer interface {
 	// OnStart executes when the builder starts processing.
 	OnStart(nreqs int)
 

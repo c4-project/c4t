@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -124,7 +126,7 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Machine, error
 	return &m, nil
 }
 
-func makeFuzzConfig(c *Config, l *log.Logger, dir string, obs corpus.BuilderObserver) (*fuzzer.Config, error) {
+func makeFuzzConfig(c *Config, l *log.Logger, dir string, obs builder.Observer) (*fuzzer.Config, error) {
 	fz := c.Env.Fuzzer
 	if fz == nil {
 		return nil, errors.New("no single fuzzer provided")

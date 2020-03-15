@@ -3,12 +3,14 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package corpus_test
+package builder_test
 
 import (
 	"context"
 	"reflect"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
@@ -80,13 +82,13 @@ func TestBuilder_Run_Adds(t *testing.T) {
 		},
 	}
 
-	c := corpus.BuilderConfig{
+	c := builder.Config{
 		Init:  nil,
 		NReqs: len(adds),
 		Obs:   &obs,
 	}
 
-	b, err := corpus.NewBuilder(c)
+	b, err := builder.NewBuilder(c)
 	if err != nil {
 		t.Fatal("unexpected NewBuilder error:", err)
 	}
@@ -101,7 +103,7 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	})
 	eg.Go(func() error {
 		for i := range adds {
-			if err := corpus.SendAdd(ectx, b.SendCh, &adds[i]); err != nil {
+			if err := builder.SendAdd(ectx, b.SendCh, &adds[i]); err != nil {
 				return err
 			}
 		}
@@ -128,7 +130,7 @@ func checkAddCorpus(t *testing.T, adds []subject.Named, got corpus.Corpus) {
 	}
 }
 
-func checkAddObs(t *testing.T, obs testObserver, c corpus.BuilderConfig) {
+func checkAddObs(t *testing.T, obs testObserver, c builder.Config) {
 	if obs.nreqs != c.NReqs {
 		t.Helper()
 		t.Errorf("observer told to expect %d requests; want %d", obs.nreqs, c.NReqs)
@@ -140,7 +142,7 @@ func checkAddObs(t *testing.T, obs testObserver, c corpus.BuilderConfig) {
 }
 
 func TestBuilderReq_SendTo(t *testing.T) {
-	ch := make(chan corpus.BuilderReq)
+	ch := make(chan builder.Request)
 
 	t.Run("success", func(t *testing.T) {
 		eg, ectx := errgroup.WithContext(context.Background())
@@ -157,10 +159,10 @@ func TestBuilderReq_SendTo(t *testing.T) {
 	})
 }
 
-func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan corpus.BuilderReq) error {
-	want := corpus.BuilderReq{
+func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan builder.Request) error {
+	want := builder.Request{
 		Name: "foo",
-		Req: corpus.AddReq(subject.Subject{
+		Req: builder.Add(subject.Subject{
 			Threads: 5,
 			Litmus:  "blah",
 		}),

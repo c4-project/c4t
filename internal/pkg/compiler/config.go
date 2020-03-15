@@ -10,7 +10,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
@@ -43,7 +43,7 @@ type Config struct {
 	Driver SingleRunner
 
 	// Observer observes the compiler's progress across a corpus.
-	Observer corpus.BuilderObserver
+	Observer builder.Observer
 
 	// Logger is the logger used for informational output during the compile.
 	Logger *log.Logger

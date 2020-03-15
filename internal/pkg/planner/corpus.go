@@ -9,6 +9,8 @@ import (
 	"context"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"golang.org/x/sync/errgroup"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -38,7 +40,7 @@ type CorpusPlanner struct {
 	// Files contains the files that are to be included in the plan.
 	Files []string
 	// Observer observes the process of building the corpus.
-	Observer corpus.BuilderObserver
+	Observer builder.Observer
 	// Prober tells the planner how to probe corpus files for specific information.
 	Prober SubjectProber
 	// Rng is the random number generator to use in corpus sampling.
@@ -80,16 +82,16 @@ func (p *CorpusPlanner) probe(ctx context.Context) (corpus.Corpus, error) {
 	return c, err
 }
 
-func (p *CorpusPlanner) makeBuilder() (*corpus.Builder, error) {
-	bc := corpus.BuilderConfig{
+func (p *CorpusPlanner) makeBuilder() (*builder.Builder, error) {
+	bc := builder.Config{
 		Init:  nil,
 		NReqs: len(p.Files),
 		Obs:   p.Observer,
 	}
-	return corpus.NewBuilder(bc)
+	return builder.NewBuilder(bc)
 }
 
-func (p *CorpusPlanner) probeInner(ctx context.Context, ch chan<- corpus.BuilderReq) error {
+func (p *CorpusPlanner) probeInner(ctx context.Context, ch chan<- builder.Request) error {
 	for _, f := range p.Files {
 		if err := p.probeSubject(ctx, f, ch); err != nil {
 			return err
@@ -98,12 +100,12 @@ func (p *CorpusPlanner) probeInner(ctx context.Context, ch chan<- corpus.Builder
 	return nil
 }
 
-func (p *CorpusPlanner) probeSubject(ctx context.Context, f string, ch chan<- corpus.BuilderReq) error {
+func (p *CorpusPlanner) probeSubject(ctx context.Context, f string, ch chan<- builder.Request) error {
 	s, err := p.Prober.ProbeSubject(ctx, f)
 	if err != nil {
 		return err
 	}
-	return corpus.SendAdd(ctx, ch, &s)
+	return builder.SendAdd(ctx, ch, &s)
 }
 
 func (p *CorpusPlanner) sample(c corpus.Corpus) (corpus.Corpus, error) {

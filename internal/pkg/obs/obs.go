@@ -3,32 +3,30 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package model
-
-// An observed state.
-type ObsState map[string]string
+// Package obs concerns 'observations': the end result of running a test harness on a particular machine.
+package obs
 
 // Obs represents an observation in ACT's JSON-based format.
 type Obs struct {
 	// Flags contains any flags that are active on Obs.
-	Flags ObsFlag `json:"flags,omitempty" toml:"flags,omitzero"`
+	Flags Flag `json:"flags,omitempty" toml:"flags,omitzero"`
 
 	// CounterExamples lists all states that passed validation.
-	CounterExamples []ObsState `json:"counter_examples,omitempty" toml:"counter_examples,omitempty"`
+	CounterExamples []State `json:"counter_examples,omitempty" toml:"counter_examples,omitempty"`
 
 	// Witnesses lists all states that passed validation.
-	Witnesses []ObsState `json:"witnesses,omitempty" toml:"witnesses,omitempty"`
+	Witnesses []State `json:"witnesses,omitempty" toml:"witnesses,omitempty"`
 
 	// States lists all observed states.
-	States []ObsState `json:"states" toml:"states,omitempty"`
+	States []State `json:"states" toml:"states,omitempty"`
 }
 
 // Sat gets whether the observation satisfies its validation.
 func (o *Obs) Sat() bool {
-	return o.Flags.Has(ObsSat)
+	return o.Flags.Has(Sat)
 }
 
 // Unsat gets whether the observation does not satisfy its validation.
 func (o *Obs) Unsat() bool {
-	return o.Flags.Has(ObsUnsat)
+	return o.Flags.Has(Unsat)
 }

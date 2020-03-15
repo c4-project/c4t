@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
 
 	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -43,12 +43,12 @@ status = "flagged"
 				Time:     time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
 				Duration: 8675309,
 				Status:   subject.StatusFlagged,
-				Obs: &model.Obs{
-					Flags: model.ObsUnsat,
-					CounterExamples: []model.ObsState{
+				Obs: &obs.Obs{
+					Flags: obs.Unsat,
+					CounterExamples: []obs.State{
 						{"0:r0": "1", "x": "1"},
 					},
-					States: []model.ObsState{
+					States: []obs.State{
 						{"0:r0": "1", "x": "1"},
 					},
 				},

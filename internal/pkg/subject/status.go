@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
 )
 
 // Status is the type of completed-run statuses.
@@ -90,7 +90,7 @@ func (s *Status) UnmarshalText(text []byte) error {
 // StatusOfObs determines the status of an observation o given various items of context.
 // The error runErr should contain any error that occurred when running the binary giving the observation.
 // StatusOfObs returns any error passed to it that it deems too fatal to represent in the status code.
-func StatusOfObs(o *model.Obs, runErr error) (Status, error) {
+func StatusOfObs(o *obs.Obs, runErr error) (Status, error) {
 	if runErr != nil {
 		return StatusOfError(runErr)
 	}

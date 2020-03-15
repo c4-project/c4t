@@ -10,6 +10,8 @@ import (
 	"context"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -43,7 +45,7 @@ type Planner struct {
 	Logger *log.Logger
 
 	// Observer watches the plan's corpus being built.
-	Observer corpus.BuilderObserver
+	Observer builder.Observer
 
 	// MachineID is the identifier of the target machine for the plan.
 	MachineID model.ID

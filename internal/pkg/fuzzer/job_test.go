@@ -10,7 +10,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -19,7 +19,7 @@ import (
 
 // TestJob_Fuzz tests various aspects of a job fuzz.
 func TestJob_Fuzz(t *testing.T) {
-	resCh := make(chan corpus.BuilderReq)
+	resCh := make(chan builder.Request)
 
 	j := fuzzer.Job{
 		Subject:       subject.Named{Name: "foo"},

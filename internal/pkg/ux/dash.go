@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/mum4k/termdash/cell"
 
 	"github.com/mum4k/termdash/widgets/text"
@@ -22,7 +24,6 @@ import (
 
 	"github.com/mum4k/termdash/container/grid"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 	"github.com/mum4k/termdash"
@@ -134,13 +135,13 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 }
 
 // Machine locates the observer for the machine with ID mid.
-func (d *Dash) Machine(mid model.ID) corpus.BuilderObserver {
+func (d *Dash) Machine(mid model.ID) builder.Observer {
 	n := len(d.machines)
 	i := sort.Search(n, func(i int) bool {
 		return reflect.DeepEqual(mid, d.machines[i].mid)
 	})
 	if n <= i {
-		return corpus.SilentObserver{}
+		return builder.SilentObserver{}
 	}
 	return &d.machines[i]
 }

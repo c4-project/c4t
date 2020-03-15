@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package model
+package obs
 
 import (
 	"encoding/json"
@@ -14,38 +14,38 @@ import (
 )
 
 // ObsFlag is the type of observation flags.
-type ObsFlag int
+type Flag int
 
 const (
-	// ObsSat represents a satisfying observation.
-	ObsSat ObsFlag = 1 << iota
-	// ObsUnat represents an unsatisfying observation.
-	ObsUnsat
-	// ObsUndef represents an undefined-behaviour observation.
-	ObsUndef
+	// Sat represents a satisfying observation.
+	Sat Flag = 1 << iota
+	// Unsat represents an unsatisfying observation.
+	Unsat
+	// Undef represents an undefined-behaviour observation.
+	Undef
 )
 
 var (
-	// ErrBadObsFlag occurs when we read an unknown observation flag.
-	ErrBadObsFlag = errors.New("bad observation flag")
+	// ErrBadFlag occurs when we read an unknown observation flag.
+	ErrBadFlag = errors.New("bad observation flag")
 
-	// ObsFlagNames maps the string representation of each observation flag to its flag value.
-	ObsFlagNames = map[string]ObsFlag{
-		"sat":   ObsSat,
-		"unsat": ObsUnsat,
-		"undef": ObsUndef,
+	// FlagNames maps the string representation of each observation flag to its flag value.
+	FlagNames = map[string]Flag{
+		"sat":   Sat,
+		"unsat": Unsat,
+		"undef": Undef,
 	}
 )
 
 // Has checks to see if f is present in this flagset.
-func (o ObsFlag) Has(f ObsFlag) bool {
-	return o&f != ObsFlag(0)
+func (o Flag) Has(f Flag) bool {
+	return o&f != Flag(0)
 }
 
 // Strings expands this ObsFlag into string equivalents for each set flag.
-func (o ObsFlag) Strings() []string {
+func (o Flag) Strings() []string {
 	strs := make([]string, 0, 3)
-	for str, f := range ObsFlagNames {
+	for str, f := range FlagNames {
 		if o.Has(f) {
 			strs = append(strs, str)
 		}
@@ -54,13 +54,13 @@ func (o ObsFlag) Strings() []string {
 	return strs
 }
 
-// ObsFlagOfStrings reconstitutes an observation flag given a representation as a list strs of strings.
-func ObsFlagOfStrings(strs ...string) (ObsFlag, error) {
-	var o ObsFlag
+// FlagOfStrings reconstitutes an observation flag given a representation as a list strs of strings.
+func FlagOfStrings(strs ...string) (Flag, error) {
+	var o Flag
 	for _, s := range strs {
-		f, ok := ObsFlagNames[s]
+		f, ok := FlagNames[s]
 		if !ok {
-			return o, fmt.Errorf("%w: %s", ErrBadObsFlag, s)
+			return o, fmt.Errorf("%w: %s", ErrBadFlag, s)
 		}
 		o |= f
 	}
@@ -72,32 +72,32 @@ func ObsFlagOfStrings(strs ...string) (ObsFlag, error) {
 // This may change if act-tester ever takes over backend parsing from OCaml ACT.
 
 // MarshalText marshals an observation flag as a space-delimited string list.
-func (o ObsFlag) MarshalText() ([]byte, error) {
+func (o Flag) MarshalText() ([]byte, error) {
 	return []byte(strings.Join(o.Strings(), " ")), nil
 }
 
 // UnmarshalText unmarshals an observation flag list from bs by interpreting it as a string list.
-func (o *ObsFlag) UnmarshalText(bs []byte) error {
+func (o *Flag) UnmarshalText(bs []byte) error {
 	strs := strings.Fields(string(bs))
 
 	var err error
-	*o, err = ObsFlagOfStrings(strs...)
+	*o, err = FlagOfStrings(strs...)
 	return err
 }
 
 // MarshalJSON marshals an observation flag list as a string list.
-func (o ObsFlag) MarshalJSON() ([]byte, error) {
+func (o Flag) MarshalJSON() ([]byte, error) {
 	return json.Marshal(o.Strings())
 }
 
 // MarshalJSON unmarshals an observation flag list from bs by interpreting it as a string list.
-func (o *ObsFlag) UnmarshalJSON(bs []byte) error {
+func (o *Flag) UnmarshalJSON(bs []byte) error {
 	var strs []string
 	if err := json.Unmarshal(bs, &strs); err != nil {
 		return err
 	}
 
 	var err error
-	*o, err = ObsFlagOfStrings(strs...)
+	*o, err = FlagOfStrings(strs...)
 	return err
 }

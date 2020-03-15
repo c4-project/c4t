@@ -8,7 +8,7 @@ package subject
 import (
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
 )
 
 // Run represents information about a single run of a subject.
@@ -23,5 +23,5 @@ type Run struct {
 	Status Status `toml:"status"`
 
 	// Obs is this run's processed observation, if any.
-	Obs *model.Obs `toml:"obs,omitempty"`
+	Obs *obs.Obs `toml:"obs,omitempty"`
 }
