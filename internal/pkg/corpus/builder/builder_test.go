@@ -15,57 +15,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 	"golang.org/x/sync/errgroup"
 )
 
-type testObserver struct {
-	done      bool
-	nreqs     int
-	adds      map[string]struct{}
-	compiles  map[string][]model.ID
-	harnesses map[string][]model.ID
-	runs      map[string][]model.ID
-}
-
-func (t *testObserver) OnStart(nreqs int) {
-	t.nreqs = nreqs
-}
-
-func (t *testObserver) OnAdd(sname string) {
-	if t.adds == nil {
-		t.adds = map[string]struct{}{}
-	}
-	t.adds[sname] = struct{}{}
-}
-
-func (t *testObserver) OnCompile(sname string, cid model.ID, _ bool) {
-	addID(&t.compiles, sname, cid)
-}
-
-func (t *testObserver) OnHarness(sname string, arch model.ID) {
-	addID(&t.harnesses, sname, arch)
-}
-
-func (t *testObserver) OnRun(sname string, cid model.ID, _ subject.Status) {
-	addID(&t.runs, sname, cid)
-}
-
-func addID(dest *map[string][]model.ID, key string, val model.ID) {
-	if *dest == nil {
-		*dest = map[string][]model.ID{}
-	}
-	(*dest)[key] = append((*dest)[key], val)
-}
-
-func (t *testObserver) OnFinish() {
-	t.done = true
-}
-
 // TestBuilder_Run_Adds is a long-form test for exercising a corpus builder on an add run.
 func TestBuilder_Run_Adds(t *testing.T) {
-	obs := testObserver{}
+	obs := builder.MockObserver{}
 
 	adds := []subject.Named{
 		{
@@ -83,9 +39,12 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	}
 
 	c := builder.Config{
-		Init:  nil,
-		NReqs: len(adds),
-		Obs:   &obs,
+		Init: nil,
+		Obs:  &obs,
+		Manifest: builder.Manifest{
+			Name:  "foobar",
+			NReqs: len(adds),
+		},
 	}
 
 	b, err := builder.NewBuilder(c)
@@ -103,7 +62,7 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	})
 	eg.Go(func() error {
 		for i := range adds {
-			if err := builder.SendAdd(ectx, b.SendCh, &adds[i]); err != nil {
+			if err := builder.AddRequest(&adds[i]).SendTo(ectx, b.SendCh); err != nil {
 				return err
 			}
 		}
@@ -130,12 +89,12 @@ func checkAddCorpus(t *testing.T, adds []subject.Named, got corpus.Corpus) {
 	}
 }
 
-func checkAddObs(t *testing.T, obs testObserver, c builder.Config) {
-	if obs.nreqs != c.NReqs {
+func checkAddObs(t *testing.T, obs builder.MockObserver, c builder.Config) {
+	if obs.Manifest.NReqs != c.NReqs {
 		t.Helper()
-		t.Errorf("observer told to expect %d requests; want %d", obs.nreqs, c.NReqs)
+		t.Errorf("observer told to expect %d requests; want %d", obs.Manifest.NReqs, c.NReqs)
 	}
-	if !obs.done {
+	if !obs.Done {
 		t.Helper()
 		t.Error("observer not told the builder was done")
 	}
@@ -160,13 +119,12 @@ func TestBuilderReq_SendTo(t *testing.T) {
 }
 
 func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan builder.Request) error {
-	want := builder.Request{
+	want := builder.AddRequest(&subject.Named{
 		Name: "foo",
-		Req: builder.Add(subject.Subject{
+		Subject: subject.Subject{
 			Threads: 5,
 			Litmus:  "blah",
-		}),
-	}
+		}})
 
 	eg.Go(func() error {
 		select {

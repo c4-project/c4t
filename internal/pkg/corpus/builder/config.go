@@ -14,9 +14,8 @@ type Config struct {
 	// Otherwise, it copies this corpus.
 	Init corpus.Corpus
 
-	// NReqs is the number of expected requests to be made to the Builder.
-	// The builder will finish listening for requests when this target is reached.
-	NReqs int
+	// Manifest gives us the name of the task and the number of requests in it.
+	Manifest
 
 	// Obs is the observer to notify as the builder performs various tasks.
 	Obs Observer

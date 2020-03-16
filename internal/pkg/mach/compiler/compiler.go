@@ -84,9 +84,12 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 	eg, ectx := errgroup.WithContext(ctx)
 
 	bc := builder.Config{
-		Init:  c.plan.Corpus,
-		NReqs: c.count(),
-		Obs:   c.conf.Observer,
+		Init: c.plan.Corpus,
+		Obs:  c.conf.Observer,
+		Manifest: builder.Manifest{
+			Name:  "compile",
+			NReqs: c.count(),
+		},
 	}
 	b, berr := builder.NewBuilder(bc)
 	if berr != nil {

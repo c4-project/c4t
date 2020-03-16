@@ -5,27 +5,13 @@
 
 package builder
 
-import (
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
-)
-
 // Observer is the interface for things that observe a builder.
 type Observer interface {
 	// OnStart executes when the builder starts processing.
-	OnStart(nreqs int)
+	OnStart(Manifest)
 
-	// OnAdd executes when the subject sname is added to the corpus.
-	OnAdd(sname string)
-
-	// OnCompile executes when the subject sname is compiled with compiler cid.
-	OnCompile(sname string, cid model.ID, success bool)
-
-	// OnHarness executes when the subject sname is lifted to a harness for architecture arch.
-	OnHarness(sname string, arch model.ID)
-
-	// OnRun executes when the subject sname's compilation over cid is run.
-	OnRun(sname string, cid model.ID, status subject.Status)
+	// OnRequest executes when a corpus builder request is processed.
+	OnRequest(Request)
 
 	// OnFinish executes when the builder stops processing.
 	OnFinish()
@@ -35,23 +21,11 @@ type Observer interface {
 type SilentObserver struct{}
 
 // OnStart does nothing.
-func (s SilentObserver) OnStart(int) {
+func (s SilentObserver) OnStart(Manifest) {
 }
 
-// OnAdd does nothing.
-func (s SilentObserver) OnAdd(string) {
-}
-
-// OnCompile does nothing.
-func (s SilentObserver) OnCompile(string, model.ID, bool) {
-}
-
-// OnHarness does nothing.
-func (s SilentObserver) OnHarness(string, model.ID) {
-}
-
-// OnRun does nothing.
-func (s SilentObserver) OnRun(string, model.ID, subject.Status) {
+// OnUpdate does nothing.
+func (s SilentObserver) OnRequest(Request) {
 }
 
 // OnFinish does nothing.

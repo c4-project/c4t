@@ -75,9 +75,12 @@ func (r *Runner) check() error {
 // Run runs the runner.
 func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 	bcfg := builder.Config{
-		Init:  r.plan.Corpus,
-		NReqs: r.count(),
-		Obs:   r.conf.Observer,
+		Init: r.plan.Corpus,
+		Obs:  r.conf.Observer,
+		Manifest: builder.Manifest{
+			Name:  "run",
+			NReqs: r.count(),
+		},
 	}
 	b, berr := builder.NewBuilder(bcfg)
 	if berr != nil {

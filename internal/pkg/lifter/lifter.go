@@ -92,9 +92,12 @@ func (l *Lifter) lift(ctx context.Context) error {
 	l.l.Println("now lifting")
 
 	b, err := builder.NewBuilder(builder.Config{
-		Init:  l.plan.Corpus,
-		NReqs: l.count(),
-		Obs:   l.conf.Observer,
+		Init: l.plan.Corpus,
+		Obs:  l.conf.Observer,
+		Manifest: builder.Manifest{
+			Name:  "lift",
+			NReqs: l.count(),
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("when making builder: %w", err)

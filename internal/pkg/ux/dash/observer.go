@@ -8,6 +8,8 @@ package dash
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 	"github.com/mum4k/termdash/cell"
@@ -33,24 +35,41 @@ type Observer struct {
 	nreqs, ndone int
 }
 
-// OnStart sets up a DashObserver for a test phase with nreqs incoming requests.
-func (d *Observer) OnStart(nreqs int) {
-	d.nreqs = nreqs
+// OnStart sets up a DashObserver for a test phase with manifest m
+func (d *Observer) OnStart(m builder.Manifest) {
+	// TODO(@MattWindsor91): use name
+	_ = d.last.Write(fmt.Sprintf("-- %s --\n", m.Name))
+
+	d.nreqs = m.NReqs
 	d.ndone = 0
 	_ = d.g.Absolute(d.ndone, d.nreqs)
 }
 
-// OnAdd acknowledges the addition of a subject to a corpus being built.
-func (d *Observer) OnAdd(sname string) {
+// OnRequest acknowledges a corpus-builder request.
+func (d *Observer) OnRequest(r builder.Request) {
+	switch {
+	case r.Add != nil:
+		d.onAdd(r.Name)
+	case r.Compile != nil:
+		d.onCompile(r.Name, r.Compile)
+	case r.Harness != nil:
+		d.onHarness(r.Name, r.Harness)
+	case r.Run != nil:
+		d.onRun(r.Name, r.Run)
+	}
+}
+
+// onAdd acknowledges the addition of a subject to a corpus being built.
+func (d *Observer) onAdd(sname string) {
 	d.logAndStepGauge("ADD", sname, colorAdd)
 }
 
-// OnCompile acknowledges the addition of a compilation to a corpus being built.
-func (d *Observer) OnCompile(sname string, compiler model.ID, success bool) {
+// onCompile acknowledges the addition of a compilation to a corpus being built.
+func (d *Observer) onCompile(sname string, b *builder.Compile) {
 	c := colorCompile
-	desc := idQualSubjectDesc(sname, compiler)
+	desc := idQualSubjectDesc(sname, b.CompilerID)
 
-	if !success {
+	if !b.Result.Success {
 		c = colorFailed
 		desc += " [FAILED]"
 	}
@@ -58,15 +77,15 @@ func (d *Observer) OnCompile(sname string, compiler model.ID, success bool) {
 	d.logAndStepGauge("COMPILE", desc, c)
 }
 
-// OnHarness acknowledges the addition of a harness to a corpus being built.
-func (d *Observer) OnHarness(sname string, arch model.ID) {
-	d.logAndStepGauge("LIFT", idQualSubjectDesc(sname, arch), colorHarness)
+// onHarness acknowledges the addition of a harness to a corpus being built.
+func (d *Observer) onHarness(sname string, b *builder.Harness) {
+	d.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colorHarness)
 }
 
-// OnRun acknowledges the addition of a run to a corpus being built.
-func (d *Observer) OnRun(sname string, compiler model.ID, s subject.Status) {
-	desc := idQualSubjectDesc(sname, compiler)
-	suff, c := runSuffixAndColour(s)
+// onRun acknowledges the addition of a run to a corpus being built.
+func (d *Observer) onRun(sname string, b *builder.Run) {
+	desc := idQualSubjectDesc(sname, b.CompilerID)
+	suff, c := runSuffixAndColour(b.Result.Status)
 	d.logAndStepGauge("RUN", desc+suff, c)
 }
 

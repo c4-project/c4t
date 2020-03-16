@@ -120,10 +120,7 @@ func mostRelevantError(r, p, c error) error {
 }
 
 func (j *Job) makeBuilderReq(cid model.ID, run subject.Run) builder.Request {
-	return builder.Request{
-		Name: j.Subject.Name,
-		Req:  builder.Run{CompilerID: cid, Result: run},
-	}
+	return builder.RunRequest(j.Subject.Name, cid, run)
 }
 
 // liftError wraps err with context about where it occurred.

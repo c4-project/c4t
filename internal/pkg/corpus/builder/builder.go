@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
@@ -35,8 +34,8 @@ type Builder struct {
 	// c is the corpus being built.
 	c corpus.Corpus
 
-	// n is the number of expected requests for the corpus.
-	n int
+	// m is the manifest for this builder task.
+	m Manifest
 
 	// obs is the observer for the builder.
 	obs Observer
@@ -58,7 +57,7 @@ func NewBuilder(cfg Config) (*Builder, error) {
 	reqCh := make(chan Request)
 	b := Builder{
 		c:      initCorpus(cfg.Init, cfg.NReqs),
-		n:      cfg.NReqs,
+		m:      cfg.Manifest,
 		obs:    obsOrDefault(cfg.Obs),
 		reqCh:  reqCh,
 		SendCh: reqCh,
@@ -85,10 +84,10 @@ func initCorpus(init corpus.Corpus, nreqs int) corpus.Corpus {
 // Run runs the builder in context ctx.
 // Run is not thread-safe.
 func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
-	b.obs.OnStart(b.n)
+	b.obs.OnStart(b.m)
 	defer b.obs.OnFinish()
 
-	for i := 0; i < b.n; i++ {
+	for i := 0; i < b.m.NReqs; i++ {
 		if err := b.runSingle(ctx); err != nil {
 			return nil, err
 		}
@@ -107,56 +106,41 @@ func (b *Builder) runSingle(ctx context.Context) error {
 }
 
 func (b *Builder) runRequest(r Request) error {
-	switch rq := r.Req.(type) {
-	case Add:
-		return b.add(r.Name, subject.Subject(rq))
-	case Compile:
-		return b.addCompile(r.Name, rq.CompilerID, rq.Result)
-	case Harness:
-		return b.addHarness(r.Name, rq.Arch, rq.Harness)
-	case Run:
-		return b.addRun(r.Name, rq.CompilerID, rq.Result)
+	b.obs.OnRequest(r)
+	switch {
+	case r.Add != nil:
+		return b.add(r.Name, subject.Subject(*r.Add))
+	case r.Compile != nil:
+		return b.addCompile(r.Name, r.Compile.CompilerID, r.Compile.Result)
+	case r.Harness != nil:
+		return b.addHarness(r.Name, r.Harness.Arch, r.Harness.Harness)
+	case r.Run != nil:
+		return b.addRun(r.Name, r.Run.CompilerID, r.Run.Result)
 	default:
-		return fmt.Errorf("%w: %s", ErrBadBuilderRequest, reflect.TypeOf(r.Req).Name())
+		return fmt.Errorf("%w: %v", ErrBadBuilderRequest, r)
 	}
 }
 
 func (b *Builder) add(name string, s subject.Subject) error {
-	if err := b.c.Add(subject.Named{Name: name, Subject: s}); err != nil {
-		return err
-	}
-	b.obs.OnAdd(name)
-	return nil
+	return b.c.Add(subject.Named{Name: name, Subject: s})
 }
 
 func (b *Builder) addCompile(name string, cid model.ID, res subject.CompileResult) error {
-	if err := b.rmwSubject(name, func(s *subject.Subject) error {
+	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddCompileResult(cid, res)
-	}); err != nil {
-		return err
-	}
-	b.obs.OnCompile(name, cid, res.Success)
-	return nil
+	})
 }
 
 func (b *Builder) addHarness(name string, arch model.ID, h subject.Harness) error {
-	if err := b.rmwSubject(name, func(s *subject.Subject) error {
+	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddHarness(arch, h)
-	}); err != nil {
-		return err
-	}
-	b.obs.OnHarness(name, arch)
-	return nil
+	})
 }
 
 func (b *Builder) addRun(name string, cid model.ID, r subject.Run) error {
-	if err := b.rmwSubject(name, func(s *subject.Subject) error {
+	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddRun(cid, r)
-	}); err != nil {
-		return err
-	}
-	b.obs.OnRun(name, cid, r.Status)
-	return nil
+	})
 }
 
 // rmwSubject hoists a mutating function over subjects so that it operates on the corpus subject name.

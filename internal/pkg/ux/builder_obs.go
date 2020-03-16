@@ -8,10 +8,11 @@ package ux
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/cheggaaa/pb/v3"
 )
 
@@ -26,37 +27,19 @@ func NewPbObserver(l *log.Logger) *PbObserver {
 	return &PbObserver{l: iohelp.EnsureLog(l)}
 }
 
-func (p *PbObserver) OnStart(nreqs int) {
-	p.bar = pb.StartNew(nreqs)
+func (p *PbObserver) OnStart(m builder.Manifest) {
+	p.bar = pb.StartNew(m.NReqs)
 }
 
-func (p *PbObserver) OnAdd(string) {
+func (p *PbObserver) OnRequest(r builder.Request) {
 	if p.bar != nil {
 		p.bar.Increment()
 	}
-}
-
-func (p *PbObserver) OnCompile(name string, cid model.ID, success bool) {
-	if !success {
-		p.l.Printf("subject %q on compiler %q: compilation failed", name, cid.String())
-	}
-	if p.bar != nil {
-		p.bar.Increment()
-	}
-}
-
-func (p *PbObserver) OnHarness(string, model.ID) {
-	if p.bar != nil {
-		p.bar.Increment()
-	}
-}
-
-func (p *PbObserver) OnRun(name string, cid model.ID, s subject.Status) {
-	if s != subject.StatusOk {
-		p.l.Printf("subject %q on compiler %q: %s", name, cid.String(), s.String())
-	}
-	if p.bar != nil {
-		p.bar.Increment()
+	switch {
+	case r.Compile != nil && !r.Compile.Result.Success:
+		p.l.Printf("subject %q on compiler %q: compilation failed", r.Name, r.Compile.CompilerID.String())
+	case r.Run != nil && r.Run.Result.Status != subject.StatusOk:
+		p.l.Printf("subject %q on compiler %q: %s", r.Name, r.Run.CompilerID.String(), r.Run.Result.Status.String())
 	}
 }
 

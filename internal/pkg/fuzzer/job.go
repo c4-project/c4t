@@ -78,7 +78,7 @@ func (j *Job) fuzzCycle(ctx context.Context, cycle int) error {
 	}
 
 	nsub := j.fuzzedSubject(sc, &fz)
-	return builder.SendAdd(ctx, j.ResCh, &nsub)
+	return builder.AddRequest(&nsub).SendTo(ctx, j.ResCh)
 }
 
 // fuzzedSubject makes a copy of this Job's subject with the cycled name sc and fuzz fileset spaths.

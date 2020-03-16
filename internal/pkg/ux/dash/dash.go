@@ -125,11 +125,13 @@ func addMachine(d *Observer, mid model.ID, gb *grid.Builder, pc int) error {
 
 // Run runs a dashboard in a blocking manner.
 func (d *Dash) Run(ctx context.Context, cancel func()) error {
-	return termdash.Run(ctx, d.term, d.container, termdash.KeyboardSubscriber(func(k *terminalapi.Keyboard) {
+	err := termdash.Run(ctx, d.term, d.container, termdash.KeyboardSubscriber(func(k *terminalapi.Keyboard) {
 		if k.Key == 'q' || k.Key == 'Q' {
 			cancel()
 		}
 	}))
+	d.term.Close()
+	return err
 }
 
 // Machine locates the observer for the machine with ID mid.

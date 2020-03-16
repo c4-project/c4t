@@ -7,18 +7,22 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/mach/forward"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/resolve"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/compiler"
+	"github.com/MattWindsor91/act-tester/internal/pkg/mach/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/runner"
+	"github.com/MattWindsor91/act-tester/internal/pkg/mach/runner"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
@@ -28,60 +32,92 @@ const defaultOutDir = "mach_results"
 
 func main() {
 	if err := run(os.Args, os.Stdout, os.Stderr); err != nil {
+		// TODO(@MattWindsor91): make this work properly with JSON output.
 		ux.LogTopError(err)
 	}
 }
 
 func run(args []string, outw, errw io.Writer) error {
-	var dir, pfile string
+	var pfile string
 	a := act.Runner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	// TODO(@MattWindsor91): sort this horrendous mess out
-	skipc := fs.Bool("c", false, "If given, skip the compiler")
-	skipr := fs.Bool("r", false, "If given, skip the runner")
-	timeout := fs.Int("t", 1, "A timeout, in `minutes`, to apply to each run")
-	nworkers := fs.Int("j", 1, "Number of `workers` to run in parallel")
+
+	c := makeConfigFlags(fs)
+
 	ux.ActRunnerFlags(fs, &a)
-	ux.OutDirFlag(fs, &dir, defaultOutDir)
 	ux.PlanFileFlag(fs, &pfile)
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 
-	ccfg := makeCompilerConfig(*skipc, errw, dir)
-	rcfg := makeRunnerConfig(*skipr, errw, a, dir, *timeout, *nworkers)
+	ccfg := c.makeCompilerConfig(errw)
+	rcfg := c.makeRunnerConfig(errw, a)
 	return runOnConfigs(context.Background(), ccfg, rcfg, pfile, outw)
 }
 
-func makeCompilerConfig(skip bool, errw io.Writer, dir string) *compiler.Config {
-	if skip {
+type Config struct {
+	// OutDir is the path to the output directory.
+	OutDir string
+	// SkipCompiler tells the machine-runner to skip compilation.
+	SkipCompiler bool
+	// SkipRunner tells the machine-runner to skip running.
+	SkipRunner bool
+	// Timeout is a timeout, in minutes, to apply to each run.
+	Timeout int
+	// NWorkers is the number of running workers to run in parallel.
+	NWorkers int
+	// JsonStatus switches the machine-runner from human-readable status output to JSON status output.
+	JsonStatus bool
+}
+
+func makeConfigFlags(fs *flag.FlagSet) *Config {
+	var c Config
+	fs.BoolVar(&c.SkipCompiler, "c", false, "if given, skip the compiler")
+	fs.BoolVar(&c.SkipRunner, "r", false, "if given, skip the runner")
+	fs.IntVar(&c.Timeout, "t", 1, "a timeout, in `minutes`, to apply to each run")
+	fs.IntVar(&c.NWorkers, "j", 1, "number of `workers` to run in parallel")
+	fs.BoolVar(&c.JsonStatus, "J", false, "emit progress reports in JSON form on stderr")
+	ux.OutDirFlag(fs, &c.OutDir, defaultOutDir)
+	return &c
+}
+
+func (c *Config) makeCompilerConfig(errw io.Writer) *compiler.Config {
+	if c.SkipCompiler {
 		return nil
 	}
 
-	cl := log.New(errw, "compiler: ", 0)
+	l, obs := c.makeLoggerAndObserver(errw, "compiler: ")
 	return &compiler.Config{
 		Driver:   &resolve.CResolve,
-		Logger:   cl,
-		Paths:    compiler.NewPathset(dir),
-		Observer: ux.NewPbObserver(cl),
+		Logger:   l,
+		Paths:    compiler.NewPathset(c.OutDir),
+		Observer: obs,
 	}
 }
 
-func makeRunnerConfig(skip bool, errw io.Writer, act act.Runner, dir string, timeout, nworkers int) *runner.Config {
-	if skip {
+func (c *Config) makeRunnerConfig(errw io.Writer, act act.Runner) *runner.Config {
+	if c.SkipRunner {
 		return nil
 	}
 
-	rl := log.New(errw, "runner: ", 0)
+	l, obs := c.makeLoggerAndObserver(errw, "runner: ")
 	return &runner.Config{
-		Logger:   rl,
+		Logger:   l,
 		Parser:   &act,
-		Paths:    runner.NewPathset(dir),
-		Observer: ux.NewPbObserver(rl),
-		Timeout:  timeout,
-		NWorkers: nworkers,
+		Paths:    runner.NewPathset(c.OutDir),
+		Observer: obs,
+		Timeout:  c.Timeout,
+		NWorkers: c.NWorkers,
 	}
+}
+
+func (c *Config) makeLoggerAndObserver(errw io.Writer, prefix string) (*log.Logger, builder.Observer) {
+	if c.JsonStatus {
+		return nil, &forward.Observer{Encoder: json.NewEncoder(errw)}
+	}
+	l := log.New(errw, prefix, log.LstdFlags)
+	return l, ux.NewPbObserver(l)
 }
 
 func runOnConfigs(ctx context.Context, cc *compiler.Config, rc *runner.Config, pfile string, outw io.Writer) error {

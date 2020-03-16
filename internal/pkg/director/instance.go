@@ -147,7 +147,7 @@ func (m *Instance) makeStageConfig() (*StageConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	c := &LocalMach{Dir: m.Paths.DirRun}
+	c := &LocalMach{Dir: m.Paths.DirRun, Observer: m.Observer}
 	sc := StageConfig{
 		InFiles: m.InFiles,
 		Plan:    p,

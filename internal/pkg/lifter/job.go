@@ -95,11 +95,9 @@ func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
 }
 
 func (j *Job) makeBuilderReq(s *subject.Named, dir string, files []string) builder.Request {
-	return builder.Request{
-		Name: s.Name,
-		Req: builder.Harness{
-			Arch:    j.Arch,
-			Harness: subject.Harness{Dir: dir, Files: files},
-		},
-	}
+	return builder.HarnessRequest(
+		s.Name,
+		j.Arch,
+		subject.Harness{Dir: dir, Files: files},
+	)
 }

@@ -84,9 +84,12 @@ func (p *CorpusPlanner) probe(ctx context.Context) (corpus.Corpus, error) {
 
 func (p *CorpusPlanner) makeBuilder() (*builder.Builder, error) {
 	bc := builder.Config{
-		Init:  nil,
-		NReqs: len(p.Files),
-		Obs:   p.Observer,
+		Init: nil,
+		Obs:  p.Observer,
+		Manifest: builder.Manifest{
+			Name:  "plan",
+			NReqs: len(p.Files),
+		},
 	}
 	return builder.NewBuilder(bc)
 }
@@ -105,7 +108,7 @@ func (p *CorpusPlanner) probeSubject(ctx context.Context, f string, ch chan<- bu
 	if err != nil {
 		return err
 	}
-	return builder.SendAdd(ctx, ch, &s)
+	return builder.AddRequest(&s).SendTo(ctx, ch)
 }
 
 func (p *CorpusPlanner) sample(c corpus.Corpus) (corpus.Corpus, error) {

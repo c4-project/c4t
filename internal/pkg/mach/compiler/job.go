@@ -120,11 +120,5 @@ func (j *Job) makeCompileResult(sp subject.CompileFileset, cerr error) (subject.
 // sendResult tries to send a compile job result to the result channel.
 // If the context ctx has been cancelled, it will fail and instead terminate the job.
 func (j *Job) sendResult(ctx context.Context, name string, r subject.CompileResult) error {
-	return builder.Request{
-		Name: name,
-		Req: builder.Compile{
-			CompilerID: j.Compiler.ID,
-			Result:     r,
-		},
-	}.SendTo(ctx, j.ResCh)
+	return builder.CompileRequest(name, j.Compiler.ID, r).SendTo(ctx, j.ResCh)
 }
