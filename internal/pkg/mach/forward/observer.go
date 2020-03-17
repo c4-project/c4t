@@ -33,7 +33,7 @@ func (o *Observer) OnFinish() {
 
 // Error forwards err to this Observer's encoder.
 func (o *Observer) Error(err error) {
-	_ = o.forward(Forward{Error: err})
+	_ = o.forward(Forward{Error: err.Error()})
 }
 
 func (o *Observer) forwardHandlingError(f Forward) {

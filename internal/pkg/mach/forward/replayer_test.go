@@ -8,8 +8,10 @@ package forward_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
@@ -92,6 +94,23 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	}
 	if len(tobs.Runs[run.Name]) != 1 {
 		t.Error("run not propagated")
+	}
+}
+
+// TestReplayer_Run_roundTripError tests an error round-trip between Observer and Replayer.
+func TestReplayer_Run_roundTripError(t *testing.T) {
+	t.Parallel()
+
+	e := fmt.Errorf("it's the end of the world as we know it")
+
+	_, err := roundTrip(context.Background(), func(obs *forward.Observer) {
+		obs.Error(e)
+	})
+
+	testhelp.ExpectErrorIs(t, err, forward.ErrRemote, "round-tripping an error")
+
+	if !strings.Contains(err.Error(), e.Error()) {
+		t.Fatalf("remote error didn't quote original; orig=%v, remote=%v", e, err)
 	}
 }
 

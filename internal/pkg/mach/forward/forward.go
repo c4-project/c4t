@@ -11,8 +11,8 @@ import "github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 // Forward describes a 'forwarded' message or error.
 type Forward struct {
-	// Error carries an error.
-	Error error `json:"error,omitempty"`
+	// Error carries an error's Error string.
+	Error string `json:"error,omitempty"`
 
 	// BuildStart carries information about the beginning of a corpus build.
 	BuildStart *builder.Manifest `json:"build_start,omitempty"`

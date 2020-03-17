@@ -15,6 +15,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 )
 
+var ErrRemote = errors.New("remote error")
+
 // Replayer coordinates reading forwarded builder-status messages from a JSON decoder and replaying them to an observer.
 type Replayer struct {
 	// Decoder is the decoder on which we are listening for messages to replay.
@@ -51,8 +53,8 @@ func (r *Replayer) forwardToObs(f Forward) error {
 	case f.BuildEnd:
 		r.Observer.OnFinish()
 		return nil
-	case f.Error != nil:
-		return f.Error
+	case f.Error != "":
+		return fmt.Errorf("%w: %s", ErrRemote, f.Error)
 	case f.BuildStart != nil:
 		r.Observer.OnStart(*f.BuildStart)
 		return nil
