@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/mach"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
@@ -29,7 +31,7 @@ type StageConfig struct {
 	// Lift contains configuration for the instance's lift stage.
 	Lift *lifter.Config
 	// Mach contains configuration for the instance's machine-specific stage.
-	Mach *LocalMach
+	Mach *mach.Mach
 }
 
 var ErrStageConfigMissing = errors.New("stage config missing")

@@ -54,24 +54,14 @@ func New(c *Config, p *plan.Plan) (*Compiler, error) {
 	if p == nil {
 		return nil, plan.ErrNil
 	}
-	if err := checkConfig(c); err != nil {
+	if c == nil {
+		return nil, ErrConfigNil
+	}
+	if err := c.Check(); err != nil {
 		return nil, err
 	}
 
 	return &Compiler{plan: *p, conf: *c, l: iohelp.EnsureLog(c.Logger)}, nil
-}
-
-func checkConfig(c *Config) error {
-	if c == nil {
-		return ErrConfigNil
-	}
-	if c.Driver == nil {
-		return ErrDriverNil
-	}
-	if c.Paths == nil {
-		return iohelp.ErrPathsetNil
-	}
-	return nil
 }
 
 // Run runs the batch compiler with context ctx.

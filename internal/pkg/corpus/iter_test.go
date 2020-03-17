@@ -65,8 +65,8 @@ func TestCorpus_Map(t *testing.T) {
 	}
 }
 
-// TestCorpus_Map_Rename makes sure Map fails if there is an attempt to rename a subject.
-func TestCorpus_Map_Rename(t *testing.T) {
+// TestCorpus_Map_rename makes sure Map fails if there is an attempt to rename a subject.
+func TestCorpus_Map_rename(t *testing.T) {
 	c := corpus.New("foo", "bar", "baz", "barbaz")
 	err := c.Map(func(s *subject.Named) error {
 		s.Name = s.Name + "2"
@@ -75,8 +75,8 @@ func TestCorpus_Map_Rename(t *testing.T) {
 	testhelp.ExpectErrorIs(t, err, corpus.ErrMapRename, "renaming in a Map")
 }
 
-// TestCorpus_Map_Error makes sure Map fails if there is an error inside an invocation.
-func TestCorpus_Map_Error(t *testing.T) {
+// TestCorpus_Map_error makes sure Map fails if there is an error inside an invocation.
+func TestCorpus_Map_error(t *testing.T) {
 	e := errors.New("test error")
 
 	c := corpus.New("foo", "bar", "baz", "barbaz")
@@ -96,22 +96,27 @@ func makeHugeCorpus() corpus.Corpus {
 
 // TestCorpus_Par tests the 'happy path' of Par across various sizes of corpus.
 func TestCorpus_Par(t *testing.T) {
-	cases := map[string]corpus.Corpus{
-		"empty": {},
-		"small": corpus.New("foo", "bar", "baz"),
-		"large": makeHugeCorpus(),
+	cases := map[string]struct {
+		n      int
+		corpus corpus.Corpus
+	}{
+		"empty":        {n: 10, corpus: corpus.Corpus{}},
+		"empty-single": {n: 1, corpus: corpus.Corpus{}},
+		"small":        {n: 10, corpus: corpus.New("foo", "bar", "baz")},
+		"small-single": {n: 1, corpus: corpus.New("foo", "bar", "baz")},
+		"large":        {n: 10, corpus: makeHugeCorpus()},
 	}
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
 			var sm sync.Map
-			if err := c.Par(context.Background(), 10, func(_ context.Context, s subject.Named) error {
+			if err := c.corpus.Par(context.Background(), c.n, func(_ context.Context, s subject.Named) error {
 				sm.Store(s.Name, true)
 				return nil
 			}); err != nil {
 				t.Errorf("par failed: %v", err)
 			}
 
-			for n := range c {
+			for n := range c.corpus {
 				if _, ok := sm.Load(n); !ok {
 					t.Errorf("par didn't store %s", n)
 				}

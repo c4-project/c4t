@@ -6,9 +6,21 @@
 package runner
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+)
+
+var (
+	// ErrNoBin occurs when a successful compile result	has no binary path attached.
+	ErrNoBin = errors.New("no binary in compile result")
+
+	// ErrConfigNil occurs when we try to construct a Runner using a nil config.
+	ErrConfigNil = errors.New("config nil")
+
+	// ErrParserNil occurs when a runner config doesn't specify an observation parser.
+	ErrParserNil = errors.New("obs-parser nil")
 )
 
 // Error is the main error type returned by the runner.
@@ -27,7 +39,7 @@ type Error struct {
 	Inner error
 }
 
-// Error implements the error protocol for Error
+// Error implements the error protocol for Error.
 func (e Error) Error() string {
 	return fmt.Sprintf("while %s subject %s compile %s: %s",
 		e.Stage, e.Subject, e.Compiler.String(), e.Inner.Error(),

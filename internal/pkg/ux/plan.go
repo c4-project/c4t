@@ -32,16 +32,8 @@ func LoadPlan(f string) (*plan.Plan, error) {
 	return &p, err
 }
 
-// PlanRunner is the interface of parts of the tester that transform plans.
-type PlanRunner interface {
-	// Run runs this type's processing stage on the plan pointed to by p.
-	// It also takes a context, which can be used to cancel the process.
-	// It returns an updated plan (which may or may not be p edited in-place), or an error.
-	Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
-}
-
 // RunOnPlanFile runs r on the plan pointed to by inf, dumping the resulting plan to stdout.
-func RunOnPlanFile(ctx context.Context, r PlanRunner, inf string) error {
+func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string) error {
 	p, perr := LoadPlan(inf)
 	if perr != nil {
 		return perr

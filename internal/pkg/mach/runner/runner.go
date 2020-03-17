@@ -8,7 +8,6 @@ package runner
 
 import (
 	"context"
-	"errors"
 	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
@@ -19,14 +18,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
-)
-
-var (
-	// ErrNoBin occurs when a successful compile result	has no binary path attached.
-	ErrNoBin = errors.New("no binary in compile result")
-
-	// ErrConfigNil occurs when we try to construct a Runner using a nil MachConfig.
-	ErrConfigNil = errors.New("config nil")
 )
 
 // Runner contains information necessary to run a plan's compiled test cases.
@@ -48,6 +39,10 @@ func New(c *Config, p *plan.Plan) (*Runner, error) {
 	if c == nil {
 		return nil, ErrConfigNil
 	}
+	if err := c.Check(); err != nil {
+		return nil, err
+	}
+
 	if p == nil {
 		return nil, plan.ErrNil
 	}

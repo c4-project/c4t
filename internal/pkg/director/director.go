@@ -66,6 +66,7 @@ func checkConfig(c *Config) error {
 	if c.Observer == nil {
 		return ErrObserverNil
 	}
+	// TODO(@MattWindsor91): SSH config?
 	return nil
 }
 
@@ -106,6 +107,7 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, erro
 	ps := d.config.Paths.MachineScratch(mid)
 	m := Instance{
 		MachConfig: c,
+		SSHConfig:  d.config.SSH,
 		Env:        &d.config.Env,
 		ID:         mid,
 		InFiles:    d.files,

@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
@@ -37,7 +39,7 @@ type SubjectPather interface {
 	SubjectPaths(sc SubjectCompile) subject.CompileFileset
 }
 
-// MachConfig represents the configuration that goes into a batch compiler run.
+// Config represents the configuration that goes into a batch compiler run.
 type Config struct {
 	// Driver is what the compiler should use to run single compiler jobs.
 	Driver SingleRunner
@@ -50,6 +52,17 @@ type Config struct {
 
 	// Paths is the pathset for this compiler run.
 	Paths SubjectPather
+}
+
+// Check checks for various problems with a config.
+func (c *Config) Check() error {
+	if c.Driver == nil {
+		return ErrDriverNil
+	}
+	if c.Paths == nil {
+		return iohelp.ErrPathsetNil
+	}
+	return nil
 }
 
 // Run runs a compiler configured by this config.

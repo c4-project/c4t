@@ -10,6 +10,10 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
@@ -46,4 +50,28 @@ type Config struct {
 
 	// Paths contains the pathset used for this runner's outputs.
 	Paths *Pathset
+}
+
+// Check checks various error conditions on the config.
+func (c *Config) Check() error {
+	if c.Parser == nil {
+		return ErrParserNil
+	}
+	if c.Paths == nil {
+		return iohelp.ErrPathsetNil
+	}
+	return nil
+}
+
+// Run constructs a new runner using this configuration, then runs it in ctx with p.
+func (c *Config) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	run, rerr := New(c, p)
+	if rerr != nil {
+		return nil, rerr
+	}
+	out, oerr := run.Run(ctx)
+	if oerr != nil {
+		return nil, oerr
+	}
+	return out, nil
 }

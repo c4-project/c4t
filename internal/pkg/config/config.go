@@ -14,6 +14,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -35,6 +37,9 @@ type Config struct {
 
 	// Quantities gives the default quantities for the director.
 	Quantities QuantitySet `toml:"quantities,omitempty"`
+
+	// SSH contains top-level SSH configuration.
+	SSH *remote.Config `toml:"ssh,omitempty"`
 
 	// OutDir is the output directory for fully directed test runs.
 	OutDir string `toml:"out_dir"`

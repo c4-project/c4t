@@ -11,6 +11,8 @@ import (
 	"log"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
@@ -68,6 +70,9 @@ type Config struct {
 	// Env groups together the bits of configuration that pertain to dealing with the environment.
 	Env Env
 
+	// SSH, if present, provides configuration for the director's remote invocation.
+	SSH *remote.Config
+
 	// Quantities contains various tunable quantities for the director's stages.
 	Quantities config.QuantitySet
 }
@@ -106,6 +111,7 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o Observer) (*Conf
 		Logger:     l,
 		Env:        e,
 		Paths:      NewPathset(odir),
+		SSH:        g.SSH,
 		Machines:   g.Machines,
 		Quantities: g.Quantities,
 		Observer:   o,

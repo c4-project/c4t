@@ -12,6 +12,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/mach"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
@@ -30,6 +34,9 @@ import (
 type Instance struct {
 	// MachConfig contains the machine config for this machine.
 	MachConfig config.Machine
+
+	// SSHConfig contains top-level SSH configuration.
+	SSHConfig *remote.Config
 
 	// StageConfig is the configuration for this instance's stages.
 	StageConfig *StageConfig
@@ -57,46 +64,44 @@ type Instance struct {
 }
 
 // Run runs this machine's testing loop.
-func (m *Instance) Run(ctx context.Context) error {
-	m.Logger = iohelp.EnsureLog(m.Logger)
-	if err := m.check(); err != nil {
+func (i *Instance) Run(ctx context.Context) error {
+	i.Logger = iohelp.EnsureLog(i.Logger)
+	if err := i.check(); err != nil {
 		return err
 	}
 
-	m.Logger.Print("preparing scratch directories")
-	if err := m.Paths.Prepare(); err != nil {
+	i.Logger.Print("preparing scratch directories")
+	if err := i.Paths.Prepare(); err != nil {
 		return err
 	}
 
-	m.Logger.Print("creating stage configurations")
-	sc, err := m.makeStageConfig()
+	i.Logger.Print("creating stage configurations")
+	sc, err := i.makeStageConfig()
 	if err != nil {
 		return err
 	}
-	m.Logger.Print("checking stage configurations")
+	i.Logger.Print("checking stage configurations")
 	if err := sc.Check(); err != nil {
 		return err
 	}
 
-	m.Logger.Print("starting loop")
-	return m.mainLoop(ctx, sc)
+	i.Logger.Print("starting loop")
+	return i.mainLoop(ctx, sc)
 }
 
 // check makes sure this machine has a valid configuration before starting loops.
-func (m *Instance) check() error {
-	if m.Paths == nil {
-		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, m.ID.String())
+func (i *Instance) check() error {
+	if i.Paths == nil {
+		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, i.ID.String())
 	}
 
-	if m.Env == nil {
+	if i.Env == nil {
 		return errors.New("no environment configuration")
 	}
 
-	if m.MachConfig.SSH != nil {
-		return errors.New("TODO: SSH support not yet available")
-	}
+	// TODO(@MattWindsor): check SSHConfig?
 
-	if m.Observer == nil {
+	if i.Observer == nil {
 		return errors.New("observer nil")
 	}
 
@@ -104,9 +109,9 @@ func (m *Instance) check() error {
 }
 
 // mainLoop performs the main testing loop for one machine.
-func (m *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
+func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 	for {
-		if err := m.pass(ctx, sc); err != nil {
+		if err := i.pass(ctx, sc); err != nil {
 			return err
 		}
 		if err := ctx.Err(); err != nil {
@@ -116,7 +121,7 @@ func (m *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 }
 
 // pass performs one iteration of the main testing loop for one machine.
-func (m *Instance) pass(ctx context.Context, sc *StageConfig) error {
+func (i *Instance) pass(ctx context.Context, sc *StageConfig) error {
 	var (
 		p   *plan.Plan
 		err error
@@ -126,7 +131,7 @@ func (m *Instance) pass(ctx context.Context, sc *StageConfig) error {
 		if p, err = s.Run(sc, ctx, p); err != nil {
 			return fmt.Errorf("in %s stage: %w", s.Name, err)
 		}
-		if err = m.dump(s.Name, p); err != nil {
+		if err = i.dump(s.Name, p); err != nil {
 			return fmt.Errorf("when dumping after %s stage: %w", s.Name, err)
 		}
 	}
@@ -134,76 +139,79 @@ func (m *Instance) pass(ctx context.Context, sc *StageConfig) error {
 	return nil
 }
 
-func (m *Instance) makeStageConfig() (*StageConfig, error) {
-	p, err := m.makePlanner()
+func (i *Instance) makeStageConfig() (*StageConfig, error) {
+	p, err := i.makePlanner()
 	if err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
-	f, err := m.makeFuzzerConfig()
+	f, err := i.makeFuzzerConfig()
 	if err != nil {
 		return nil, fmt.Errorf("when making fuzzer config: %w", err)
 	}
-	l, err := m.makeLifterConfig()
+	l, err := i.makeLifterConfig()
 	if err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	c := &LocalMach{Dir: m.Paths.DirRun, Observer: m.Observer}
+	m, err := mach.New(i.Observer, i.Paths.DirRun, i.SSHConfig, i.MachConfig.SSH)
+	if err != nil {
+		return nil, fmt.Errorf("when making machine-exec config: %w", err)
+	}
 	sc := StageConfig{
-		InFiles: m.InFiles,
+		InFiles: i.InFiles,
 		Plan:    p,
 		Fuzz:    f,
 		Lift:    l,
-		Mach:    c,
+		Mach:    m,
 	}
 	return &sc, nil
 }
 
-func (m *Instance) makePlanner() (*planner.Planner, error) {
+func (i *Instance) makePlanner() (*planner.Planner, error) {
 	p := planner.Planner{
-		Source:    m.Env.Planner,
-		Logger:    m.Logger,
-		Observer:  m.Observer,
-		MachineID: m.ID,
+		Source:    i.Env.Planner,
+		Logger:    i.Logger,
+		Observer:  i.Observer,
+		MachineID: i.ID,
 	}
 	return &p, nil
 }
 
-func (m *Instance) makeFuzzerConfig() (*fuzzer.Config, error) {
-	fz := m.Env.Fuzzer
+func (i *Instance) makeFuzzerConfig() (*fuzzer.Config, error) {
+	fz := i.Env.Fuzzer
 	if fz == nil {
 		return nil, errors.New("no single fuzzer provided")
 	}
 
 	fc := fuzzer.Config{
 		Driver:     fz,
-		Logger:     m.Logger,
-		Observer:   m.Observer,
-		Paths:      fuzzer.NewPathset(m.Paths.DirFuzz),
-		Quantities: m.Quantities.Fuzz,
+		Logger:     i.Logger,
+		Observer:   i.Observer,
+		Paths:      fuzzer.NewPathset(i.Paths.DirFuzz),
+		Quantities: i.Quantities.Fuzz,
 	}
 
 	return &fc, nil
 }
 
-func (m *Instance) makeLifterConfig() (*lifter.Config, error) {
-	hm := m.Env.Lifter
+func (i *Instance) makeLifterConfig() (*lifter.Config, error) {
+	hm := i.Env.Lifter
 	if hm == nil {
 		return nil, errors.New("no single fuzzer provided")
 	}
 
 	lc := lifter.Config{
 		Maker:    hm,
-		Logger:   m.Logger,
-		Observer: m.Observer,
-		Paths:    lifter.NewPathset(m.Paths.DirLift),
+		Logger:   i.Logger,
+		Observer: i.Observer,
+		Paths:    lifter.NewPathset(i.Paths.DirLift),
 	}
 
 	return &lc, nil
 }
 
 // dump dumps a plan p to its expected plan file given the stage name name.
-func (m *Instance) dump(name string, p *plan.Plan) error {
-	fname := m.Paths.PlanForStage(name)
+func (i *Instance) dump(name string, p *plan.Plan) error {
+	fname := i.Paths.PlanForStage(name)
 	f, err := os.Create(fname)
 	if err != nil {
 		return fmt.Errorf("while opening plan file for %s: %w", name, err)

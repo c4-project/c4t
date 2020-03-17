@@ -122,6 +122,6 @@ func roundTripPipe() (io.Closer, forward.Observer, *builder.MockObserver, forwar
 	pr, pw := io.Pipe()
 	obs := forward.Observer{Encoder: json.NewEncoder(pw)}
 	tobs := builder.MockObserver{}
-	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Obs: &tobs}
+	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observer: &tobs}
 	return pw, obs, &tobs, rep
 }
