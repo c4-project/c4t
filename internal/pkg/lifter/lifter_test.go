@@ -14,8 +14,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 )
@@ -30,21 +28,6 @@ func makeConfig() *lifter.Config {
 		Logger:   nil,
 		Observer: builder.SilentObserver{},
 		Paths:    &lifter.MockPather{},
-	}
-}
-
-// makePlan makes a valid, but mocked-up, plan.
-func makePlan() *plan.Plan {
-	return &plan.Plan{
-		Header:  plan.Header{},
-		Machine: model.Machine{},
-		Backend: &model.Backend{
-			ID:          model.IDFromString("litmus7"),
-			IDQualified: true,
-			Style:       model.IDFromString("litmus"),
-		},
-		Compilers: nil,
-		Corpus:    nil,
 	}
 }
 
@@ -102,7 +85,7 @@ func TestNew_errors(t *testing.T) {
 				cfg = f(cfg)
 			}
 
-			p := makePlan()
+			p := plan.Mock()
 			if f := c.pdelta; f != nil {
 				p = f(p)
 			}
