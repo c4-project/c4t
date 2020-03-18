@@ -5,6 +5,8 @@
 
 package model
 
+import "github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 // TODO(@MattWindsor91): backends are unusually complex, mostly because I originally expected that backends would need
 // to be accessible from machines other than the test compiler.  It's turned out that this isn't actually the case, and
 // so there is scope for scaling down the complexity eventually.
@@ -12,21 +14,21 @@ package model
 // Backend collects the test-relevant information about a backend.
 type Backend struct {
 	// CompilerID is the (likely unqualified) ACT CompilerID of the backend.
-	ID ID `toml:"id"`
+	ID id.ID `toml:"id"`
 
 	// IDQualified is true if Id is qualified by the machine CompilerID.
 	IDQualified bool `toml:"id_qualified,omitempty"`
 
 	// MachineID is the ACT CompilerID of the backend's parent machine.
 	// It may be empty if there is no need to track it.
-	MachineID *ID `toml:"machine_id,omitempty"`
+	MachineID *id.ID `toml:"machine_id,omitempty"`
 
 	// Style is the declared style of the service.
-	Style ID `toml:"style"`
+	Style id.ID `toml:"style"`
 }
 
 // FQID constructs the fully qualified CompilerID of this service.
-func (b Backend) FQID() ID {
+func (b Backend) FQID() id.ID {
 	if b.IDQualified || b.MachineID == nil {
 		return b.ID
 	}

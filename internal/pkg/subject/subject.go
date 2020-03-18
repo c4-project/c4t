@@ -12,7 +12,7 @@ package subject
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
 // Subject represents a single test subject in a corpus.
@@ -62,7 +62,7 @@ func (s *Subject) BestLitmus() (string, error) {
 // consequence of Go not (yet) having generics.
 
 // CompileResult gets the compilation result for the compiler ID cid.
-func (s *Subject) CompileResult(cid model.ID) (CompileResult, error) {
+func (s *Subject) CompileResult(cid id.ID) (CompileResult, error) {
 	key := cid.String()
 	c, ok := s.Compiles[key]
 	if !ok {
@@ -73,7 +73,7 @@ func (s *Subject) CompileResult(cid model.ID) (CompileResult, error) {
 
 // AddCompileResult sets the compilation information for compiler ID cid to c in this subject.
 // It fails if there already _is_ a compilation.
-func (s *Subject) AddCompileResult(cid model.ID, c CompileResult) error {
+func (s *Subject) AddCompileResult(cid id.ID, c CompileResult) error {
 	s.ensureCompileMap()
 	key := cid.String()
 	if _, ok := s.Compiles[key]; ok {
@@ -91,7 +91,7 @@ func (s *Subject) ensureCompileMap() {
 }
 
 // Harness gets the harness for the architecture with id arch.
-func (s *Subject) Harness(arch model.ID) (Harness, error) {
+func (s *Subject) Harness(arch id.ID) (Harness, error) {
 	key := arch.String()
 	h, ok := s.Harnesses[key]
 	if !ok {
@@ -102,7 +102,7 @@ func (s *Subject) Harness(arch model.ID) (Harness, error) {
 
 // AddHarness sets the harness information for arch to h in this subject.
 // It fails if there already _is_ a harness for arch.
-func (s *Subject) AddHarness(arch model.ID, h Harness) error {
+func (s *Subject) AddHarness(arch id.ID, h Harness) error {
 	s.ensureHarnessMap()
 	key := arch.String()
 	if _, ok := s.Harnesses[key]; ok {
@@ -120,7 +120,7 @@ func (s *Subject) ensureHarnessMap() {
 }
 
 // RunOf gets the run for the compiler with id cid.
-func (s *Subject) RunOf(cid model.ID) (Run, error) {
+func (s *Subject) RunOf(cid id.ID) (Run, error) {
 	key := cid.String()
 	h, ok := s.Runs[key]
 	if !ok {
@@ -131,7 +131,7 @@ func (s *Subject) RunOf(cid model.ID) (Run, error) {
 
 // AddRun sets the run information for cid to r in this subject.
 // It fails if there already _is_ a run for cid.
-func (s *Subject) AddRun(cid model.ID, r Run) error {
+func (s *Subject) AddRun(cid id.ID, r Run) error {
 	s.ensureRunMap()
 	key := cid.String()
 	if _, ok := s.Runs[key]; ok {

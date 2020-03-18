@@ -5,7 +5,9 @@
 
 package builder
 
-import "github.com/MattWindsor91/act-tester/internal/pkg/model"
+import (
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+)
 
 // MockObserver mocks Observer.
 type MockObserver struct {
@@ -16,11 +18,11 @@ type MockObserver struct {
 	// Adds tracks the add requests seen by the Observer.
 	Adds map[string]struct{}
 	// Compiles tracks the compile requests seen by the Observer.
-	Compiles map[string][]model.ID
+	Compiles map[string][]id.ID
 	// Harnesses tracks the harness requests seen by the Observer.
-	Harnesses map[string][]model.ID
+	Harnesses map[string][]id.ID
 	// Runs tracks the run requests seen by the Observer.
-	Runs map[string][]model.ID
+	Runs map[string][]id.ID
 }
 
 // OnStart mocks the OnStart interface method.
@@ -49,21 +51,21 @@ func (t *MockObserver) onAdd(sname string) {
 	t.Adds[sname] = struct{}{}
 }
 
-func (t *MockObserver) onCompile(sname string, cid model.ID) {
+func (t *MockObserver) onCompile(sname string, cid id.ID) {
 	addID(&t.Compiles, sname, cid)
 }
 
-func (t *MockObserver) onHarness(sname string, arch model.ID) {
+func (t *MockObserver) onHarness(sname string, arch id.ID) {
 	addID(&t.Harnesses, sname, arch)
 }
 
-func (t *MockObserver) onRun(sname string, cid model.ID) {
+func (t *MockObserver) onRun(sname string, cid id.ID) {
 	addID(&t.Runs, sname, cid)
 }
 
-func addID(dest *map[string][]model.ID, key string, val model.ID) {
+func addID(dest *map[string][]id.ID, key string, val id.ID) {
 	if *dest == nil {
-		*dest = map[string][]model.ID{}
+		*dest = map[string][]id.ID{}
 	}
 	(*dest)[key] = append((*dest)[key], val)
 }

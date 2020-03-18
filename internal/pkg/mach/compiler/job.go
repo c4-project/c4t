@@ -12,6 +12,8 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -26,7 +28,7 @@ import (
 // Job represents the state of a compiler run.
 type Job struct {
 	// MachineID is the ID of the machine.
-	MachineID model.ID
+	MachineID id.ID
 
 	// Compiler points to the compiler to run.
 	Compiler *model.NamedCompiler

@@ -5,7 +5,9 @@
 
 package compiler
 
-import "github.com/MattWindsor91/act-tester/internal/pkg/model"
+import (
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+)
 
 // SubjectCompile describes the unique name of a particular instance of the batch compiler.
 type SubjectCompile struct {
@@ -13,5 +15,5 @@ type SubjectCompile struct {
 	Name string
 
 	// CompilerID is the ID of the compiler.
-	CompilerID model.ID
+	CompilerID id.ID
 }

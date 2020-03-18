@@ -12,6 +12,8 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
@@ -38,7 +40,7 @@ type Job struct {
 // Run runs the job with context ctx.
 func (j *Job) Run(ctx context.Context) error {
 	for cidstr, c := range j.Subject.Compiles {
-		cid := model.IDFromString(cidstr)
+		cid := id.FromString(cidstr)
 		if err := j.runCompile(ctx, cid, &c); err != nil {
 			return err
 		}
@@ -46,7 +48,7 @@ func (j *Job) Run(ctx context.Context) error {
 	return nil
 }
 
-func (j *Job) runCompile(ctx context.Context, cid model.ID, c *subject.CompileResult) error {
+func (j *Job) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResult) error {
 	run, err := j.runCompileInner(ctx, cid, c)
 	if err != nil {
 		return err
@@ -54,7 +56,7 @@ func (j *Job) runCompile(ctx context.Context, cid model.ID, c *subject.CompileRe
 	return j.makeBuilderReq(cid, run).SendTo(ctx, j.ResCh)
 }
 
-func (j *Job) runCompileInner(ctx context.Context, cid model.ID, c *subject.CompileResult) (subject.Run, error) {
+func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.Run, error) {
 	if !c.Success {
 		return subject.Run{Status: subject.StatusCompileFail}, nil
 	}
@@ -71,7 +73,7 @@ func (j *Job) runCompileInner(ctx context.Context, cid model.ID, c *subject.Comp
 }
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
-func (j *Job) runAndParseBin(ctx context.Context, cid model.ID, bin string) (*obs.Obs, error) {
+func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.Obs, error) {
 	// TODO(@MattWindsor91): make the timeout configurable
 	tctx, cancel := j.timeout(ctx)
 	defer cancel()
@@ -119,12 +121,12 @@ func mostRelevantError(r, p, c error) error {
 	}
 }
 
-func (j *Job) makeBuilderReq(cid model.ID, run subject.Run) builder.Request {
+func (j *Job) makeBuilderReq(cid id.ID, run subject.Run) builder.Request {
 	return builder.RunRequest(j.Subject.Name, cid, run)
 }
 
 // liftError wraps err with context about where it occurred.
-func (j *Job) liftError(cid model.ID, stage string, err error) error {
+func (j *Job) liftError(cid id.ID, stage string, err error) error {
 	if err == nil {
 		return nil
 	}

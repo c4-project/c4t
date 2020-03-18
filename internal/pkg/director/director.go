@@ -11,11 +11,11 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/config"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 
 	"golang.org/x/sync/errgroup"
 
@@ -99,7 +99,7 @@ func (d *Director) Direct(ctx context.Context) error {
 
 func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, error) {
 	l := log.New(d.l.Writer(), logPrefix(midstr), 0)
-	mid, err := model.TryIDFromString(midstr)
+	mid, err := id.TryFromString(midstr)
 	if err != nil {
 		return nil, err
 	}

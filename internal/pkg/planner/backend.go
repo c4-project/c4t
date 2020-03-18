@@ -8,6 +8,8 @@ package planner
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -15,10 +17,10 @@ import (
 type BackendFinder interface {
 	// FindBackend asks for a backend with the given style on any one of machines,
 	// or a default machine if none have such a backend.
-	FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error)
+	FindBackend(ctx context.Context, style id.ID, machines ...id.ID) (*model.Backend, error)
 }
 
 func (p *Planner) planBackend(ctx context.Context) (*model.Backend, error) {
 	// TODO(@MattWindsor91): fix this pointer awfulness.
-	return p.Source.BProbe.FindBackend(ctx, model.IDFromString("litmus"), p.MachineID)
+	return p.Source.BProbe.FindBackend(ctx, id.FromString("litmus"), p.MachineID)
 }

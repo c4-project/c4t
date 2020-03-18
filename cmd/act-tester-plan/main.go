@@ -12,9 +12,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/config"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/config"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
@@ -63,7 +63,7 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, midstr string, cs i
 	if err != nil {
 		return nil, err
 	}
-	mid, err := model.TryIDFromString(midstr)
+	mid, err := id.TryFromString(midstr)
 	if err != nil {
 		return nil, err
 	}

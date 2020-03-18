@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
@@ -33,7 +35,7 @@ type SingleRunner interface {
 type SubjectPather interface {
 	// Prepare sets up the directories ready to serve through SubjectPaths.
 	// It takes the list of compiler IDs that are to be represented in the pathset.
-	Prepare(compilers []model.ID) error
+	Prepare(compilers []id.ID) error
 
 	// SubjectPaths gets the binary and log file paths for the subject/compiler pair sc.
 	SubjectPaths(sc SubjectCompile) subject.CompileFileset

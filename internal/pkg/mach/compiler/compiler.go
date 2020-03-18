@@ -12,6 +12,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -41,7 +43,7 @@ type Compiler struct {
 	plan plan.Plan
 
 	// mid is the ID of the machine on which this batch compiler is operating.
-	mid model.ID
+	mid id.ID
 
 	// conf is the configuration used to build this compiler.
 	conf Config
@@ -131,7 +133,7 @@ func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- builder.Request
 // nameCompiler sticks the name ids onto the compiler cc.
 func nameCompiler(ids string, cc model.Compiler) *model.NamedCompiler {
 	return &model.NamedCompiler{
-		ID:       model.IDFromString(ids),
+		ID:       id.FromString(ids),
 		Compiler: cc,
 	}
 }

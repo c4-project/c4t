@@ -8,7 +8,7 @@ package compiler
 import (
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
@@ -39,12 +39,12 @@ func NewPathset(root string) *Pathset {
 
 // Prepare prepares this pathset by making its directories.
 // It takes a slice of compilers for which directories should be made.
-func (p *Pathset) Prepare(compilers []model.ID) error {
+func (p *Pathset) Prepare(compilers []id.ID) error {
 	return iohelp.Mkdirs(p.Dirs(compilers...)...)
 }
 
 // Dirs gets all of the directories involved in a pathset over compiler ID set compilers.
-func (p *Pathset) Dirs(compilers ...model.ID) []string {
+func (p *Pathset) Dirs(compilers ...id.ID) []string {
 	roots := []string{p.DirBins, p.DirLogs}
 	dirs := make([]string, 0, (len(compilers)+1)*len(roots))
 	for _, root := range roots {

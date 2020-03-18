@@ -14,6 +14,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -47,15 +49,15 @@ type Config struct {
 
 // MachineIDs gets a sorted slice of machine IDs present in the config.
 // It returns an error if any of the configured machines have an invalid ID.
-func (c *Config) MachineIDs() ([]model.ID, error) {
+func (c *Config) MachineIDs() ([]id.ID, error) {
 	var (
 		err error
 		i   int
 	)
 
-	mids := make([]model.ID, len(c.Machines))
-	for id := range c.Machines {
-		if mids[i], err = model.TryIDFromString(id); err != nil {
+	mids := make([]id.ID, len(c.Machines))
+	for mstr := range c.Machines {
+		if mids[i], err = id.TryFromString(mstr); err != nil {
 			return nil, err
 		}
 		i++
@@ -64,7 +66,7 @@ func (c *Config) MachineIDs() ([]model.ID, error) {
 }
 
 // ListCompilers implements the compiler listing operation using a config.
-func (c *Config) ListCompilers(_ context.Context, mid model.ID) (map[string]model.Compiler, error) {
+func (c *Config) ListCompilers(_ context.Context, mid id.ID) (map[string]model.Compiler, error) {
 	mstr := mid.String()
 	m, ok := c.Machines[mstr]
 	if !ok {

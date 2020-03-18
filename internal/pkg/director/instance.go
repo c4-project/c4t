@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/mach"
@@ -22,7 +24,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 
@@ -42,7 +43,7 @@ type Instance struct {
 	StageConfig *StageConfig
 
 	// ID is the ID for this machine.
-	ID model.ID
+	ID id.ID
 
 	// InFiles is the list of files to use as the base corpus for this machine loop.
 	InFiles []string

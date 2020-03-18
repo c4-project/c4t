@@ -8,7 +8,7 @@ package director_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director"
 )
@@ -28,7 +28,7 @@ func ExampleNewPathset() {
 // ExamplePathset_MachineScratch is a runnable example for MachineScratch.
 func ExamplePathset_MachineScratch() {
 	p := director.Pathset{DirSaved: "saved", DirScratch: "scratch"}
-	mid := model.IDFromString("foo.bar.baz")
+	mid := id.FromString("foo.bar.baz")
 	mp := p.MachineScratch(mid)
 
 	fmt.Println(mp.DirFuzz)

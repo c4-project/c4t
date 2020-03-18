@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
 var (
@@ -30,7 +30,7 @@ type Error struct {
 	Stage string
 
 	// Compiler is the ID of the compiler that produced the binary whose run caused the error.
-	Compiler model.ID
+	Compiler id.ID
 
 	// Subject is the name of the subject that caused the error.
 	Subject string

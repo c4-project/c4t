@@ -10,7 +10,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
 type Pathset struct {
@@ -23,11 +23,11 @@ type Pathset struct {
 // Pather abstracts over the path resolution for a lifter.
 type Pather interface {
 	// Prepare sets up a pathset to deal with the architecture IDs arches and subject names subjects.
-	Prepare(arches []model.ID, subjects []string) error
+	Prepare(arches []id.ID, subjects []string) error
 
 	// Path gets the path to the directory prepared for arch and subject.
 	// It fails if no such directory has been prepared.
-	Path(arch model.ID, subject string) (string, error)
+	Path(arch id.ID, subject string) (string, error)
 }
 
 // NewPathset makes a pathset under root.
@@ -36,7 +36,7 @@ func NewPathset(root string) *Pathset {
 }
 
 // Prepare sets up a pathset to deal with the architecture IDs arches and subject names subjects.
-func (p *Pathset) Prepare(arches []model.ID, subjects []string) error {
+func (p *Pathset) Prepare(arches []id.ID, subjects []string) error {
 	p.paths = make(map[string]map[string]string, len(arches))
 	for _, a := range arches {
 		as := a.String()
@@ -55,7 +55,7 @@ func (p *Pathset) Prepare(arches []model.ID, subjects []string) error {
 
 // Path gets the path to the directory prepared for arch and subject.
 // It fails if no such directory has been prepared.
-func (p *Pathset) Path(arch model.ID, subject string) (string, error) {
+func (p *Pathset) Path(arch id.ID, subject string) (string, error) {
 	as := arch.String()
 	amap, ok := p.paths[as]
 	if !ok {
@@ -68,7 +68,7 @@ func (p *Pathset) Path(arch model.ID, subject string) (string, error) {
 	return dir, nil
 }
 
-func (p *Pathset) pathSegs(a model.ID, s string) []string {
+func (p *Pathset) pathSegs(a id.ID, s string) []string {
 	segs := make([]string, 1, 2+len(a.Tags()))
 	segs[0] = p.root
 	segs = append(append(segs, a.Tags()...), s)

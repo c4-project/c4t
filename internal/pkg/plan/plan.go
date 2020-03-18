@@ -10,6 +10,8 @@ import (
 	"io"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -48,17 +50,17 @@ func (p *Plan) Dump(w io.Writer) error {
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.
 // These architectures are in order of their string equivalents.
-func (p *Plan) Arches() []model.ID {
-	amap := make(map[string]model.ID)
+func (p *Plan) Arches() []id.ID {
+	amap := make(map[string]id.ID)
 
 	for _, c := range p.Compilers {
 		amap[c.Arch.String()] = c.Arch
 	}
 
-	arches := make([]model.ID, len(amap))
+	arches := make([]id.ID, len(amap))
 	i := 0
-	for _, id := range amap {
-		arches[i] = id
+	for _, arch := range amap {
+		arches[i] = arch
 		i++
 	}
 
@@ -69,11 +71,11 @@ func (p *Plan) Arches() []model.ID {
 }
 
 // CompilerIDs gets a sorted slice of all compiler IDs mentioned in this machine plan.
-func (p *Plan) CompilerIDs() []model.ID {
-	cids := make([]model.ID, len(p.Compilers))
+func (p *Plan) CompilerIDs() []id.ID {
+	cids := make([]id.ID, len(p.Compilers))
 	i := 0
 	for cid := range p.Compilers {
-		cids[i] = model.IDFromString(cid)
+		cids[i] = id.FromString(cid)
 		i++
 	}
 	sort.Slice(cids, func(i, j int) bool {

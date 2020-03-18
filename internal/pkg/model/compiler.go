@@ -5,13 +5,15 @@
 
 package model
 
+import "github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 // Compiler collects the test-relevant information about a compiler.
 type Compiler struct {
 	// Style is the declared style of the backend.
-	Style ID `toml:"style"`
+	Style id.ID `toml:"style"`
 
 	// Arch is the architecture (or 'emits') ID for the compiler.
-	Arch ID `toml:"arch"`
+	Arch id.ID `toml:"arch"`
 
 	// Run contains information on how to run the compiler.
 	Run *CompilerRunInfo `toml:"run,omitempty"`
@@ -20,7 +22,7 @@ type Compiler struct {
 // NamedCompiler wraps a Compiler with its ID.
 type NamedCompiler struct {
 	// ID is the ID of the compiler.
-	ID ID `toml:"id"`
+	ID id.ID `toml:"id"`
 
 	Compiler
 }

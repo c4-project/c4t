@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -25,7 +27,7 @@ var (
 )
 
 type Compiler interface {
-	Compile(ctx context.Context, arch model.ID, run *model.CompilerRunInfo, j model.CompileJob, errw io.Writer) error
+	Compile(ctx context.Context, arch id.ID, run *model.CompilerRunInfo, j model.CompileJob, errw io.Writer) error
 }
 
 type CompilerResolver struct {

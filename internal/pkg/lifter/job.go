@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
@@ -22,10 +24,10 @@ import (
 // Job is the type of per-architecture lifter jobs.
 type Job struct {
 	// Arch is the architecture for which this job is responsible.
-	Arch model.ID
+	Arch id.ID
 
 	// Backend is the ID of the backend that this job will use.
-	Backend model.ID
+	Backend id.ID
 
 	// Maker is the harness maker for this job.
 	Maker HarnessMaker

@@ -15,6 +15,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -27,23 +29,23 @@ const BinActBackend = "act-backend"
 var ErrNoBackend = errors.New("no backend reported")
 
 // FindBackend finds a backend using ACT.
-func (a *Runner) FindBackend(ctx context.Context, style model.ID, machines ...model.ID) (*model.Backend, error) {
-	id, err := a.runFindBackend(ctx, style, machines)
+func (a *Runner) FindBackend(ctx context.Context, style id.ID, machines ...id.ID) (*model.Backend, error) {
+	bid, err := a.runFindBackend(ctx, style, machines)
 	if err != nil {
 		return nil, err
 	}
 
-	if id.String() == "" {
+	if bid.IsEmpty() {
 		return nil, ErrNoBackend
 	}
 
 	return &model.Backend{
-		ID: id, IDQualified: true, Style: style,
+		ID: bid, IDQualified: true, Style: style,
 	}, nil
 }
 
 // runFindBackend does most of the legwork of running an ACT find-backend query.
-func (a *Runner) runFindBackend(ctx context.Context, style model.ID, machines []model.ID) (model.ID, error) {
+func (a *Runner) runFindBackend(ctx context.Context, style id.ID, machines []id.ID) (id.ID, error) {
 	argv := findBackendArgv(style, machines)
 	sargs := StandardArgs{Verbose: false}
 
@@ -51,14 +53,14 @@ func (a *Runner) runFindBackend(ctx context.Context, style model.ID, machines []
 	cmd := a.CommandContext(ctx, BinActBackend, "find", sargs, argv...)
 	cmd.Stdout = &obuf
 	if err := cmd.Run(); err != nil {
-		return model.ID{}, err
+		return id.ID{}, err
 	}
 
-	return model.TryIDFromString(strings.TrimSpace(obuf.String()))
+	return id.TryFromString(strings.TrimSpace(obuf.String()))
 }
 
 // findBackendArgv constructs the argv for a backend find on style and machines.
-func findBackendArgv(style model.ID, machines []model.ID) []string {
+func findBackendArgv(style id.ID, machines []id.ID) []string {
 	argv := make([]string, len(machines)+1)
 	argv[0] = style.String()
 	for i, m := range machines {

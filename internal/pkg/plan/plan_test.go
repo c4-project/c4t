@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/BurntSushi/toml"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
@@ -20,10 +22,10 @@ import (
 // ExamplePlan_CompilerIDs is a runnable example for CompilerIDs.
 func ExamplePlan_CompilerIDs() {
 	p := plan.Plan{Compilers: map[string]model.Compiler{
-		"gcc.ppc":   {Arch: model.ArchPPC},
-		"clang.ppc": {Arch: model.ArchPPC},
-		"gcc":       {Arch: model.ArchArm},
-		"clang":     {Arch: model.ArchArm},
+		"gcc.ppc":   {Arch: id.ArchPPC},
+		"clang.ppc": {Arch: id.ArchPPC},
+		"gcc":       {Arch: id.ArchArm},
+		"clang":     {Arch: id.ArchArm},
 	}}
 	for _, c := range p.CompilerIDs() {
 		fmt.Println(c.String())
@@ -42,22 +44,22 @@ func TestMachinePlan_Arches(t *testing.T) {
 
 	cases := map[string]struct {
 		plan plan.Plan
-		want []model.ID
+		want []id.ID
 	}{
-		"no arches": {plan.Plan{}, []model.ID{}},
+		"no arches": {plan.Plan{}, []id.ID{}},
 		"one compiler": {plan.Plan{Compilers: map[string]model.Compiler{
-			"gcc": {Arch: model.ArchX8664},
-		}}, []model.ID{model.ArchX8664}},
+			"gcc": {Arch: id.ArchX8664},
+		}}, []id.ID{id.ArchX8664}},
 		"same arch": {plan.Plan{Compilers: map[string]model.Compiler{
-			"gcc":   {Arch: model.ArchArm},
-			"clang": {Arch: model.ArchArm},
-		}}, []model.ID{model.ArchArm}},
+			"gcc":   {Arch: id.ArchArm},
+			"clang": {Arch: id.ArchArm},
+		}}, []id.ID{id.ArchArm}},
 		"two arches": {plan.Plan{Compilers: map[string]model.Compiler{
-			"gcc-ppc":   {Arch: model.ArchPPC},
-			"clang-ppc": {Arch: model.ArchPPC},
-			"gcc":       {Arch: model.ArchArm},
-			"clang":     {Arch: model.ArchArm},
-		}}, []model.ID{model.ArchArm, model.ArchPPC}},
+			"gcc-ppc":   {Arch: id.ArchPPC},
+			"clang-ppc": {Arch: id.ArchPPC},
+			"gcc":       {Arch: id.ArchArm},
+			"clang":     {Arch: id.ArchArm},
+		}}, []id.ID{id.ArchArm, id.ArchPPC}},
 	}
 
 	for name, c := range cases {

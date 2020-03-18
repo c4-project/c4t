@@ -14,6 +14,8 @@ import (
 	"log"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
@@ -128,7 +130,7 @@ func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *builder.Buil
 	return lc, err
 }
 
-func (l *Lifter) makeJob(a model.ID, mrng *rand.Rand, resCh chan<- builder.Request) Job {
+func (l *Lifter) makeJob(a id.ID, mrng *rand.Rand, resCh chan<- builder.Request) Job {
 	return Job{
 		Arch:    a,
 		Backend: l.plan.Backend.FQID(),

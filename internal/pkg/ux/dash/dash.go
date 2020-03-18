@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/mum4k/termdash/widgets/text"
@@ -23,7 +25,6 @@ import (
 
 	"github.com/mum4k/termdash/container/grid"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/mum4k/termdash"
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/terminal/termbox"
@@ -45,7 +46,7 @@ func (d *Dash) Write(p []byte) (n int, err error) {
 }
 
 // New constructs a dashboard for the given machine IDs.
-func New(mids []model.ID) (*Dash, error) {
+func New(mids []id.ID) (*Dash, error) {
 	t, err := termbox.New()
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func New(mids []model.ID) (*Dash, error) {
 	return &d, nil
 }
 
-func makeMachineGrid(mids []model.ID) ([]Observer, []container.Option, error) {
+func makeMachineGrid(mids []id.ID) ([]Observer, []container.Option, error) {
 	gb := grid.New()
 
 	obs := make([]Observer, len(mids))
@@ -101,7 +102,7 @@ func makeMachineGrid(mids []model.ID) ([]Observer, []container.Option, error) {
 	return obs, g, err
 }
 
-func addMachine(d *Observer, mid model.ID, gb *grid.Builder, pc int) error {
+func addMachine(d *Observer, mid id.ID, gb *grid.Builder, pc int) error {
 	d.mid = mid
 
 	var err error
@@ -135,7 +136,7 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 }
 
 // Machine locates the observer for the machine with ID mid.
-func (d *Dash) Machine(mid model.ID) builder.Observer {
+func (d *Dash) Machine(mid id.ID) builder.Observer {
 	n := len(d.machines)
 	i := sort.Search(n, func(i int) bool {
 		return reflect.DeepEqual(mid, d.machines[i].mid)

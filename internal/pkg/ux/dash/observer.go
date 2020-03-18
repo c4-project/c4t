@@ -8,9 +8,10 @@ package dash
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/widgets/gauge"
@@ -29,7 +30,7 @@ const (
 
 // Observer is a BuilderObserver that attaches into a Dash.
 type Observer struct {
-	mid          model.ID
+	mid          id.ID
 	last         *text.Text
 	g            *gauge.Gauge
 	nreqs, ndone int
@@ -107,7 +108,7 @@ func (d *Observer) OnFinish() {
 	_ = d.last.Write("-- DONE --\n")
 }
 
-func idQualSubjectDesc(sname string, id model.ID) string {
+func idQualSubjectDesc(sname string, id id.ID) string {
 	return fmt.Sprintf("%s (@%s)", sname, id)
 }
 

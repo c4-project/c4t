@@ -11,9 +11,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
@@ -125,19 +125,19 @@ func (b *Builder) add(name string, s subject.Subject) error {
 	return b.c.Add(subject.Named{Name: name, Subject: s})
 }
 
-func (b *Builder) addCompile(name string, cid model.ID, res subject.CompileResult) error {
+func (b *Builder) addCompile(name string, cid id.ID, res subject.CompileResult) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddCompileResult(cid, res)
 	})
 }
 
-func (b *Builder) addHarness(name string, arch model.ID, h subject.Harness) error {
+func (b *Builder) addHarness(name string, arch id.ID, h subject.Harness) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddHarness(arch, h)
 	})
 }
 
-func (b *Builder) addRun(name string, cid model.ID, r subject.Run) error {
+func (b *Builder) addRun(name string, cid id.ID, r subject.Run) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddRun(cid, r)
 	})

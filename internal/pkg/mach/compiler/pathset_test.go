@@ -12,13 +12,13 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
 // ExamplePathset_Dirs is a testable example for Dirs.
 func ExamplePathset_Dirs() {
 	ps := Pathset{DirBins: "bins", DirLogs: "logs"}
-	for _, p := range ps.Dirs(model.IDFromString("foo"), model.IDFromString("bar.baz")) {
+	for _, p := range ps.Dirs(id.FromString("foo"), id.FromString("bar.baz")) {
 		fmt.Println(p)
 	}
 	// Unordered output:
@@ -57,7 +57,7 @@ func TestPathset_OnCompiler(t *testing.T) {
 		DirBins: "bins",
 		DirLogs: "logs",
 	}
-	cid := model.IDFromString("foo.bar.baz")
+	cid := id.FromString("foo.bar.baz")
 	sps := ps.SubjectPaths(SubjectCompile{
 		Name:       "yeet",
 		CompilerID: cid,

@@ -7,15 +7,17 @@ package model
 
 import (
 	"io/ioutil"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
 // HarnessSpec is a specification of how to make a test harness.
 type HarnessSpec struct {
 	// Backend is the fully-qualified identifier of the backend to use to make this harness.
-	Backend ID
+	Backend id.ID
 
 	// Arch is the CompilerID of the architecture for which a harness should be prepared.
-	Arch ID
+	Arch id.ID
 
 	// InFile is the path to the input litmus test file.
 	InFile string

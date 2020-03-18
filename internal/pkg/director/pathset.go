@@ -9,7 +9,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 )
@@ -46,7 +46,7 @@ func (p *Pathset) Prepare() error {
 }
 
 // MachineScratch gets the scratch pathset for a machine with
-func (p *Pathset) MachineScratch(mid model.ID) *MachinePathset {
+func (p *Pathset) MachineScratch(mid id.ID) *MachinePathset {
 	segs := append([]string{p.DirScratch}, mid.Tags()...)
 	return NewMachinePathset(path.Join(segs...))
 }

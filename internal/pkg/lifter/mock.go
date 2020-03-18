@@ -9,6 +9,8 @@ import (
 	"context"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -30,20 +32,20 @@ func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec model.HarnessSpec
 // MockPather mocks Pather.
 type MockPather struct {
 	// Arches captures the last-prepared set of architecture IDs.
-	Arches []model.ID
+	Arches []id.ID
 
 	// Subjects captures the last-prepared set of subject names.
 	Subjects []string
 }
 
 // Prepare pretends to prepare a MockPather.
-func (m *MockPather) Prepare(arches []model.ID, subjects []string) error {
+func (m *MockPather) Prepare(arches []id.ID, subjects []string) error {
 	m.Arches = arches
 	m.Subjects = subjects
 	return nil
 }
 
 // Path pretends to resolve a path.
-func (m *MockPather) Path(_ model.ID, _ string) (string, error) {
+func (m *MockPather) Path(_ id.ID, _ string) (string, error) {
 	return "foo", nil
 }

@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package model
+package id
 
 var (
 	// ArchX8664 is the ACT architecture CompilerID for x86-64.

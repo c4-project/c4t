@@ -10,6 +10,8 @@ import (
 	"context"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
@@ -48,7 +50,7 @@ type Planner struct {
 	Observer builder.Observer
 
 	// MachineID is the identifier of the target machine for the plan.
-	MachineID model.ID
+	MachineID id.ID
 
 	// CorpusSize is the requested size of the test corpus.
 	// If zero, no corpus sampling is done, but the planner will still error if the final corpus size is 0.

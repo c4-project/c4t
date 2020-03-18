@@ -8,6 +8,8 @@ package plan
 import (
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -21,9 +23,9 @@ func Mock() *Plan {
 		},
 		Machine: model.Machine{},
 		Backend: &model.Backend{
-			ID:          model.IDFromString("litmus7"),
+			ID:          id.FromString("litmus7"),
 			IDQualified: true,
-			Style:       model.IDFromString("litmus"),
+			Style:       id.FromString("litmus"),
 		},
 		Compilers: nil,
 		Corpus:    nil,

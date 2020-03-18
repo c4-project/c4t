@@ -10,6 +10,8 @@ import (
 	"io"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
@@ -20,7 +22,7 @@ type GCC struct {
 }
 
 // Compile compiles j according to run using a GCC-friendly invocation.
-func (g GCC) Compile(ctx context.Context, _ model.ID, run *model.CompilerRunInfo, j model.CompileJob, errw io.Writer) error {
+func (g GCC) Compile(ctx context.Context, _ id.ID, run *model.CompilerRunInfo, j model.CompileJob, errw io.Writer) error {
 	orun := g.DefaultRun.Override(run)
 	args := GCCArgs(orun, j)
 	cmd := exec.CommandContext(ctx, orun.Cmd, args...)

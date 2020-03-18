@@ -14,9 +14,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
@@ -42,14 +43,14 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		})
 	harness := builder.HarnessRequest(
 		"foo",
-		model.ArchX8664,
+		id.ArchX8664,
 		subject.Harness{
 			Dir:   "harness",
 			Files: []string{"foo.c", "bar.c", "baz.c"},
 		})
 	compile := builder.CompileRequest(
 		"foo",
-		model.IDFromString("gcc"),
+		id.FromString("gcc"),
 		subject.CompileResult{
 			Success: true,
 			Files: subject.CompileFileset{
@@ -59,7 +60,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		})
 	run := builder.RunRequest(
 		"foo",
-		model.IDFromString("gcc"),
+		id.FromString("gcc"),
 		subject.Run{
 			Status: subject.StatusFlagged,
 		})

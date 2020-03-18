@@ -11,11 +11,11 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 // ExampleSubject_BestLitmus is a testable example for BestLitmus.
@@ -41,8 +41,8 @@ func ExampleSubject_CompileResult() {
 		"gcc":   {Success: true, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
 		"clang": {Success: false, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
-	gr, _ := s.CompileResult(model.IDFromString("gcc"))
-	cr, _ := s.CompileResult(model.IDFromString("clang"))
+	gr, _ := s.CompileResult(id.FromString("gcc"))
+	cr, _ := s.CompileResult(id.FromString("clang"))
 
 	fmt.Println("gcc:", gr.Success, gr.Files.Bin, gr.Files.Log)
 	fmt.Println("clang:", cr.Success, cr.Files.Bin, cr.Files.Log)
@@ -58,8 +58,8 @@ func ExampleSubject_Harness() {
 		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
-	xs, _ := s.Harness(model.ArchX8664)
-	as, _ := s.Harness(model.ArchArm)
+	xs, _ := s.Harness(id.ArchX8664)
+	as, _ := s.Harness(id.ArchArm)
 
 	for _, r := range xs.Files {
 		fmt.Println(r)
@@ -80,8 +80,8 @@ func ExampleSubject_RunOf() {
 		"gcc":   {Status: subject.StatusOk},
 		"clang": {Status: subject.StatusTimeout},
 	}}
-	gr, _ := s.RunOf(model.IDFromString("gcc"))
-	cr, _ := s.RunOf(model.IDFromString("clang"))
+	gr, _ := s.RunOf(id.FromString("gcc"))
+	cr, _ := s.RunOf(id.FromString("clang"))
 
 	fmt.Println("gcc:", gr.Status)
 	fmt.Println("clang:", cr.Status)
@@ -95,7 +95,7 @@ func ExampleSubject_RunOf() {
 // the appropriate error.
 func TestSubject_CompileResult_Missing(t *testing.T) {
 	var s subject.Subject
-	_, err := s.CompileResult(model.IDFromString("gcc"))
+	_, err := s.CompileResult(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompile, "missing compile result path")
 }
 
@@ -110,7 +110,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 		},
 	}
 
-	mcomp := model.IDFromString("gcc")
+	mcomp := id.FromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
 		if err := s.AddCompileResult(mcomp, c); err != nil {
@@ -136,7 +136,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 // the appropriate error.
 func TestSubject_Harness_Missing(t *testing.T) {
 	var s subject.Subject
-	_, err := s.Harness(model.IDFromString("x86.64"))
+	_, err := s.Harness(id.FromString("x86.64"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingHarness, "missing harness path")
 }
 
@@ -148,7 +148,7 @@ func TestSubject_AddHarness(t *testing.T) {
 		Files: []string{"bar", "baz"},
 	}
 
-	march := model.ArchX8664
+	march := id.ArchX8664
 
 	t.Run("initial-add", func(t *testing.T) {
 		if err := s.AddHarness(march, h); err != nil {
@@ -174,7 +174,7 @@ func TestSubject_AddHarness(t *testing.T) {
 // the appropriate error.
 func TestSubject_RunOf_Missing(t *testing.T) {
 	var s subject.Subject
-	_, err := s.RunOf(model.IDFromString("gcc"))
+	_, err := s.RunOf(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRun, "missing run result path")
 }
 
@@ -183,7 +183,7 @@ func TestSubject_AddRun(t *testing.T) {
 	var s subject.Subject
 	c := subject.Run{Status: subject.StatusTimeout}
 
-	mcomp := model.IDFromString("gcc")
+	mcomp := id.FromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
 		if err := s.AddRun(mcomp, c); err != nil {
