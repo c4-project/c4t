@@ -21,11 +21,11 @@ import (
 const defaultOutDir = "lift_results"
 
 func main() {
-	err := run(os.Args, os.Stderr)
+	err := run(os.Args, os.Stdout, os.Stderr)
 	ux.LogTopError(err)
 }
 
-func run(args []string, errw io.Writer) error {
+func run(args []string, outw, errw io.Writer) error {
 	var pf string
 	a := act.Runner{Stderr: errw}
 	l := log.New(errw, "", 0)
@@ -47,5 +47,5 @@ func run(args []string, errw io.Writer) error {
 
 	cfg.Paths = lifter.NewPathset(od)
 
-	return ux.RunOnPlanFile(context.Background(), &cfg, pf)
+	return ux.RunOnPlanFile(context.Background(), &cfg, pf, outw)
 }

@@ -61,7 +61,8 @@ func (r *SSHRunner) Wait() error {
 func (r *SSHRunner) invocation() string {
 	dir := path.Join(r.runner.Config.DirCopy, "mach")
 	qdir := shellescape.Quote(dir)
-	return strings.Join(runArgs(qdir), " ")
+	argv := append([]string{binName}, runArgs(qdir)...)
+	return strings.Join(argv, " ")
 }
 
 // openPipes tries to open stdin, stdout, and stderr pipes for c.

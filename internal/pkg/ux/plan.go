@@ -7,6 +7,7 @@ package ux
 
 import (
 	"context"
+	"io"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -32,8 +33,8 @@ func LoadPlan(f string) (*plan.Plan, error) {
 	return &p, err
 }
 
-// RunOnPlanFile runs r on the plan pointed to by inf, dumping the resulting plan to stdout.
-func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string) error {
+// RunOnPlanFile runs r on the plan pointed to by inf, dumping the resulting plan to outw.
+func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string, outw io.Writer) error {
 	p, perr := LoadPlan(inf)
 	if perr != nil {
 		return perr
@@ -42,6 +43,11 @@ func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string) error {
 	if qerr != nil {
 		return qerr
 	}
-	// TODO(@MattWindsor91): output to other files
-	return q.Dump(os.Stdout)
+
+	// There might not be a plan to output; this can happen if an error was handled/trapped earlier.
+	if q == nil {
+		return nil
+	}
+
+	return q.Dump(outw)
 }

@@ -21,11 +21,11 @@ import (
 const defaultOutDir = "fuzz_results"
 
 func main() {
-	err := run(os.Args, os.Stderr)
+	err := run(os.Args, os.Stdout, os.Stderr)
 	ux.LogTopError(err)
 }
 
-func run(args []string, errw io.Writer) error {
+func run(args []string, outw, errw io.Writer) error {
 	a := act.Runner{Stderr: errw}
 	l := log.New(errw, "", 0)
 
@@ -48,7 +48,7 @@ func run(args []string, errw io.Writer) error {
 		Paths:      fuzzer.NewPathset(dir),
 		Quantities: *qs,
 	}
-	return ux.RunOnPlanFile(context.Background(), &cfg, pf)
+	return ux.RunOnPlanFile(context.Background(), &cfg, pf, outw)
 }
 
 func setupQuantityFlags(fs *flag.FlagSet) *fuzzer.QuantitySet {

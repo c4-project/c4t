@@ -46,7 +46,7 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
-	return ux.RunOnPlanFile(context.Background(), c, pfile)
+	return ux.RunOnPlanFile(context.Background(), c, pfile, outw)
 }
 
 func makeConfigFlags(fs *flag.FlagSet) *mach.Config {
