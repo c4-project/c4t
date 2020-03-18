@@ -71,15 +71,7 @@ func (p *Plan) Arches() []id.ID {
 }
 
 // CompilerIDs gets a sorted slice of all compiler IDs mentioned in this machine plan.
-func (p *Plan) CompilerIDs() []id.ID {
-	cids := make([]id.ID, len(p.Compilers))
-	i := 0
-	for cid := range p.Compilers {
-		cids[i] = id.FromString(cid)
-		i++
-	}
-	sort.Slice(cids, func(i, j int) bool {
-		return cids[i].Less(cids[j])
-	})
-	return cids
+// It fails if any of the IDs are invalid.
+func (p *Plan) CompilerIDs() ([]id.ID, error) {
+	return id.MapKeys(p.Compilers)
 }

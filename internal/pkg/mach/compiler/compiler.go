@@ -113,7 +113,11 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 
 func (c *Compiler) prepareDirs() error {
 	c.l.Println("preparing directories")
-	return c.conf.Paths.Prepare(c.plan.CompilerIDs())
+	cids, err := c.plan.CompilerIDs()
+	if err != nil {
+		return err
+	}
+	return c.conf.Paths.Prepare(cids)
 }
 
 // makeJob makes a job for the named compiler nc, outputting results to resCh.

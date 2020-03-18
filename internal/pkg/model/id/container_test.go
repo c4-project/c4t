@@ -7,13 +7,12 @@ package id_test
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
-// ExampleID_Less is a runnable example for Less.
-func ExampleID_Less() {
+// ExampleSort is a runnable example for Sort.
+func ExampleSort() {
 	ids := []id.ID{
 		id.FromString("arm.7"),
 		id.FromString("arm.8"),
@@ -26,10 +25,7 @@ func ExampleID_Less() {
 		id.FromString("ppc.64"),
 		id.FromString("arm.6"),
 	}
-	// Note: in general, use id.Sort instead!
-	sort.Slice(ids, func(i, j int) bool {
-		return ids[i].Less(ids[j])
-	})
+	id.Sort(ids)
 	for _, i := range ids {
 		fmt.Println(i)
 	}
@@ -47,18 +43,22 @@ func ExampleID_Less() {
 	// x86.64
 }
 
-// ExampleID_Less is a runnable example for Equal.
-func ExampleID_Equal() {
-	fmt.Println(id.FromString("arm.7").Equal(id.FromString("arm.7")))
-	fmt.Println(id.FromString("arm.7").Equal(id.FromString("arm.8")))
-	fmt.Println(id.FromString("arm.7").Equal(id.FromString("ARM.8")))
-	fmt.Println(id.FromString("arm.7").Equal(id.FromString("arm")))
-	fmt.Println(id.ID{}.Equal(id.FromString("")))
+// ExampleMapKeys is a runnable example for MapKeys.
+func ExampleMapKeys() {
+	c := map[string]int{
+		"foo.bar":       1,
+		"BAR":           2,
+		"foobar.baz":    3,
+		"barbaz.Foobaz": 4,
+	}
+	ids, _ := id.MapKeys(c)
+	for _, x := range ids {
+		fmt.Println(x)
+	}
 
 	// Output:
-	// true
-	// false
-	// false
-	// false
-	// true
+	// bar
+	// barbaz.foobaz
+	// foo.bar
+	// foobar.baz
 }

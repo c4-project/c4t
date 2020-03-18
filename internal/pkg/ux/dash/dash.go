@@ -138,7 +138,9 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 func (d *Dash) Machine(mid id.ID) builder.Observer {
 	n := len(d.machines)
 	i := sort.Search(n, func(i int) bool {
-		return !mid.Less(d.machines[i].mid)
+		// see documentation for sort.Search in ascending order case for why we're doing this;
+		// you wouldn't believe how many times I got this wrong.
+		return !d.machines[i].mid.Less(mid)
 	})
 	if n <= i || !d.machines[i].mid.Equal(mid) {
 		return builder.SilentObserver{}

@@ -50,19 +50,7 @@ type Config struct {
 // MachineIDs gets a sorted slice of machine IDs present in the config.
 // It returns an error if any of the configured machines have an invalid ID.
 func (c *Config) MachineIDs() ([]id.ID, error) {
-	var (
-		err error
-		i   int
-	)
-
-	mids := make([]id.ID, len(c.Machines))
-	for mstr := range c.Machines {
-		if mids[i], err = id.TryFromString(mstr); err != nil {
-			return nil, err
-		}
-		i++
-	}
-	return mids, nil
+	return id.MapKeys(c.Machines)
 }
 
 // ListCompilers implements the compiler listing operation using a config.
