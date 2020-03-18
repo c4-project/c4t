@@ -46,6 +46,7 @@ func New(c *Config, p *plan.Plan) (*Mach, error) {
 	m := Mach{
 		compiler: c.makeCompilerConfig(),
 		runner:   c.makeRunnerConfig(),
+		plan:     p,
 	}
 	if c.JsonStatus {
 		m.json = &forward.Observer{json.NewEncoder(c.Stderr)}

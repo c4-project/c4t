@@ -8,7 +8,6 @@ package dash
 
 import (
 	"context"
-	"reflect"
 	"sort"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
@@ -139,9 +138,9 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 func (d *Dash) Machine(mid id.ID) builder.Observer {
 	n := len(d.machines)
 	i := sort.Search(n, func(i int) bool {
-		return reflect.DeepEqual(mid, d.machines[i].mid)
+		return !mid.Less(d.machines[i].mid)
 	})
-	if n <= i {
+	if n <= i || !d.machines[i].mid.Equal(mid) {
 		return builder.SilentObserver{}
 	}
 	return &d.machines[i]
