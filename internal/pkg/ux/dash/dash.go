@@ -8,7 +8,6 @@ package dash
 
 import (
 	"context"
-	"sort"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
@@ -34,7 +33,10 @@ type Dash struct {
 	container *container.Container
 	term      terminalapi.Terminal
 	log       *text.Text
-	machines  []Observer
+
+	// machines maps from stringified machine IDs to their observers.
+	// (There is a display order for the machines, but we don't track it ourselves.)
+	machines map[string]*Observer
 }
 
 // Write lets one write to the text console in the dash as if it were stderr.
@@ -80,10 +82,25 @@ func New(mids []id.ID) (*Dash, error) {
 	return &d, nil
 }
 
-func makeMachineGrid(mids []id.ID) ([]Observer, []container.Option, error) {
+func makeMachineGrid(mids []id.ID) (map[string]*Observer, []container.Option, error) {
 	gb := grid.New()
 
-	obs := make([]Observer, len(mids))
+	obs := make(map[string]*Observer, len(mids))
+	pc := machineGridPercent(mids)
+	for _, mid := range mids {
+		mstr := mid.String()
+		var err error
+		if obs[mstr], err = makeMachine(); err != nil {
+			return nil, nil, err
+		}
+		addMachineToGrid(gb, mstr, obs[mstr], pc)
+	}
+
+	g, err := gb.Build()
+	return obs, g, err
+}
+
+func machineGridPercent(mids []id.ID) int {
 	pc := 100 / len(mids)
 	if pc == 100 {
 		pc = 99
@@ -91,36 +108,31 @@ func makeMachineGrid(mids []id.ID) ([]Observer, []container.Option, error) {
 	if pc == 0 {
 		pc = 1
 	}
-	for i, mid := range mids {
-		if err := addMachine(&obs[i], mid, gb, pc); err != nil {
-			return nil, nil, err
-		}
-	}
-
-	g, err := gb.Build()
-	return obs, g, err
+	return pc
 }
 
-func addMachine(d *Observer, mid id.ID, gb *grid.Builder, pc int) error {
-	d.mid = mid
+func makeMachine() (*Observer, error) {
+	var d Observer
 
 	var err error
 
 	if d.g, err = gauge.New(); err != nil {
-		return err
+		return nil, err
 	}
 
 	if d.last, err = text.New(text.RollContent()); err != nil {
-		return err
+		return nil, err
 	}
 
-	gb.Add(grid.RowHeightPercWithOpts(pc,
-		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(mid.String())},
-		grid.RowHeightFixed(1, grid.Widget(d.g)),
-		grid.RowHeightFixed(1, grid.Widget(d.last)),
-	))
+	return &d, nil
+}
 
-	return err
+func addMachineToGrid(gb *grid.Builder, midstr string, o *Observer, pc int) {
+	gb.Add(grid.RowHeightPercWithOpts(pc,
+		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(midstr)},
+		grid.RowHeightFixed(1, grid.Widget(o.g)),
+		grid.RowHeightFixed(1, grid.Widget(o.last)),
+	))
 }
 
 // Run runs a dashboard in a blocking manner.
@@ -136,14 +148,9 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 
 // Machine locates the observer for the machine with ID mid.
 func (d *Dash) Machine(mid id.ID) builder.Observer {
-	n := len(d.machines)
-	i := sort.Search(n, func(i int) bool {
-		// see documentation for sort.Search in ascending order case for why we're doing this;
-		// you wouldn't believe how many times I got this wrong.
-		return !d.machines[i].mid.Less(mid)
-	})
-	if n <= i || !d.machines[i].mid.Equal(mid) {
+	o := d.machines[mid.String()]
+	if o == nil {
 		return builder.SilentObserver{}
 	}
-	return &d.machines[i]
+	return o
 }

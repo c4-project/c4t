@@ -30,7 +30,6 @@ const (
 
 // Observer is a BuilderObserver that attaches into a Dash.
 type Observer struct {
-	mid          id.ID
 	last         *text.Text
 	g            *gauge.Gauge
 	nreqs, ndone int
