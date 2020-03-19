@@ -31,12 +31,7 @@ func ExampleCorpus_Add() {
 }
 
 func TestCorpus_Copy(t *testing.T) {
-	c := corpus.Corpus{
-		"foo": subject.Subject{Threads: 1, Litmus: "foo.litmus"},
-		"bar": subject.Subject{Threads: 8, Litmus: "bar.litmus"},
-		"baz": subject.Subject{Threads: 2, Litmus: "baz.litmus"},
-	}
-
+	c := corpus.Mock()
 	cc := c.Copy()
 
 	for n := range c {
