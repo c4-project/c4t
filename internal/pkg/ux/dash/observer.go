@@ -112,6 +112,10 @@ func (o *Observer) OnIteration(iter uint64, t time.Time) {
 
 	_ = o.runStart.Write(t.Format(time.Stamp), text.WriteReplace())
 
+	o.addDurationToSparkline(t)
+}
+
+func (o *Observer) addDurationToSparkline(t time.Time) {
 	if !o.lastTime.IsZero() {
 		dur := t.Sub(o.lastTime)
 		_ = o.runTimeSpark.Add([]int{int(dur.Seconds())})
