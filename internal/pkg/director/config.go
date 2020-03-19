@@ -10,6 +10,8 @@ import (
 	"log"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
@@ -46,7 +48,7 @@ type Config struct {
 	Logger *log.Logger
 
 	// Paths provides path resolving functionality for the director.
-	Paths *Pathset
+	Paths *pathset.Pathset
 
 	// Machines contains the machines that will be used in the test.
 	Machines map[string]config.Machine
@@ -97,7 +99,7 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o Observer) (*Conf
 	c := Config{
 		Logger:     l,
 		Env:        e,
-		Paths:      NewPathset(odir),
+		Paths:      pathset.New(odir),
 		SSH:        g.SSH,
 		Machines:   g.Machines,
 		Quantities: g.Quantities,

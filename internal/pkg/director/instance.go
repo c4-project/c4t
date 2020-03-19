@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
@@ -57,7 +59,7 @@ type Instance struct {
 	Observer MachineObserver
 
 	// Paths contains the scratch pathset for this machine.
-	Paths *MachinePathset
+	Paths *pathset.Scratch
 
 	// Quantities contains the quantity set for this machine.
 	Quantities config.QuantitySet
