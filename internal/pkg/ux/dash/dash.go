@@ -9,17 +9,15 @@ package dash
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+	"github.com/MattWindsor91/act-tester/internal/pkg/director"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/mum4k/termdash/widgets/text"
 
 	"github.com/mum4k/termdash/linestyle"
 
 	"github.com/mum4k/termdash/terminal/terminalapi"
-
-	"github.com/mum4k/termdash/widgets/gauge"
 
 	"github.com/mum4k/termdash/container/grid"
 
@@ -90,10 +88,10 @@ func makeMachineGrid(mids []id.ID) (map[string]*Observer, []container.Option, er
 	for _, mid := range mids {
 		mstr := mid.String()
 		var err error
-		if obs[mstr], err = makeMachine(); err != nil {
+		if obs[mstr], err = NewObserver(); err != nil {
 			return nil, nil, err
 		}
-		addMachineToGrid(gb, mstr, obs[mstr], pc)
+		obs[mstr].AddToGrid(gb, mstr, pc)
 	}
 
 	g, err := gb.Build()
@@ -111,30 +109,6 @@ func machineGridPercent(mids []id.ID) int {
 	return pc
 }
 
-func makeMachine() (*Observer, error) {
-	var d Observer
-
-	var err error
-
-	if d.g, err = gauge.New(); err != nil {
-		return nil, err
-	}
-
-	if d.last, err = text.New(text.RollContent()); err != nil {
-		return nil, err
-	}
-
-	return &d, nil
-}
-
-func addMachineToGrid(gb *grid.Builder, midstr string, o *Observer, pc int) {
-	gb.Add(grid.RowHeightPercWithOpts(pc,
-		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(midstr)},
-		grid.RowHeightFixed(1, grid.Widget(o.g)),
-		grid.RowHeightFixed(1, grid.Widget(o.last)),
-	))
-}
-
 // Run runs a dashboard in a blocking manner.
 func (d *Dash) Run(ctx context.Context, cancel func()) error {
 	err := termdash.Run(ctx, d.term, d.container, termdash.KeyboardSubscriber(func(k *terminalapi.Keyboard) {
@@ -147,10 +121,10 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 }
 
 // Machine locates the observer for the machine with ID mid.
-func (d *Dash) Machine(mid id.ID) builder.Observer {
+func (d *Dash) Machine(mid id.ID) director.MachineObserver {
 	o := d.machines[mid.String()]
 	if o == nil {
-		return builder.SilentObserver{}
+		return director.SilentObserver{}
 	}
 	return o
 }

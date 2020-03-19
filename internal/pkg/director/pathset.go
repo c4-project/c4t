@@ -45,7 +45,7 @@ func (p *Pathset) Prepare() error {
 	return iohelp.Mkdirs(p.DirSaved, p.DirScratch)
 }
 
-// MachineScratch gets the scratch pathset for a machine with
+// MachineScratch gets the scratch pathset for a machine with ID mid.
 func (p *Pathset) MachineScratch(mid id.ID) *MachinePathset {
 	segs := append([]string{p.DirScratch}, mid.Tags()...)
 	return NewMachinePathset(path.Join(segs...))
@@ -63,6 +63,7 @@ type MachinePathset struct {
 	DirRun string
 }
 
+// NewMachinePathset creates a machine pathset rooted at root.
 func NewMachinePathset(root string) *MachinePathset {
 	return &MachinePathset{
 		DirFuzz: path.Join(root, segFuzz),

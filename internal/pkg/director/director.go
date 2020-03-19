@@ -41,7 +41,7 @@ func New(c *Config, files []string) (*Director, error) {
 		return nil, liftInitError(corpus.ErrNone)
 	}
 
-	if err := checkConfig(c); err != nil {
+	if err := c.Check(); err != nil {
 		return nil, liftInitError(err)
 	}
 
@@ -53,26 +53,9 @@ func liftInitError(err error) error {
 	return fmt.Errorf("while initialising director: %w", err)
 }
 
-func checkConfig(c *Config) error {
-	if c == nil {
-		return ErrConfigNil
-	}
-	if c.Paths == nil {
-		return iohelp.ErrPathsetNil
-	}
-	if c.Machines == nil || len(c.Machines) == 0 {
-		return ErrNoMachines
-	}
-	if c.Observer == nil {
-		return ErrObserverNil
-	}
-	// TODO(@MattWindsor91): SSH config?
-	return nil
-}
-
 // Direct runs the director d.
 func (d *Director) Direct(ctx context.Context) error {
-	d.l.Print("making directories")
+	d.l.Println("making directories")
 	if err := d.config.Paths.Prepare(); err != nil {
 		return err
 	}

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
@@ -21,8 +22,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
@@ -54,8 +53,8 @@ type Instance struct {
 	// Logger points to a logger for this machine's loop.
 	Logger *log.Logger
 
-	// Observer is this machine's builder observer.
-	Observer builder.Observer
+	// Observer is this machine's observer.
+	Observer MachineObserver
 
 	// Paths contains the scratch pathset for this machine.
 	Paths *MachinePathset
@@ -111,22 +110,26 @@ func (i *Instance) check() error {
 
 // mainLoop performs the main testing loop for one machine.
 func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
+	var iter uint64
 	for {
-		if err := i.pass(ctx, sc); err != nil {
+		if err := i.pass(ctx, iter, sc); err != nil {
 			return err
 		}
 		if err := ctx.Err(); err != nil {
 			return err
 		}
+		iter++
 	}
 }
 
-// pass performs one iteration of the main testing loop for one machine.
-func (i *Instance) pass(ctx context.Context, sc *StageConfig) error {
+// pass performs one iteration of the main testing loop (number iter) for one machine.
+func (i *Instance) pass(ctx context.Context, iter uint64, sc *StageConfig) error {
 	var (
 		p   *plan.Plan
 		err error
 	)
+
+	i.Observer.OnIteration(iter, time.Now())
 
 	for _, s := range Stages {
 		if p, err = s.Run(sc, ctx, p); err != nil {

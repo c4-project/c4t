@@ -6,18 +6,15 @@
 package director
 
 import (
-	"context"
 	"errors"
 	"log"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
 
@@ -41,16 +38,6 @@ var (
 	// ErrObserverNil occurs when we try to build a director from a config with no Observer func defined.
 	ErrObserverNil = errors.New("observer func nil")
 )
-
-// Observer is an interface for types that implement multi-machine test progress observation.
-type Observer interface {
-	// Run runs the observer in a blocking manner using context ctx.
-	// It will use cancel to cancel ctx if needed.
-	Run(ctx context.Context, cancel func()) error
-
-	// Instance gets a sub-observer for the machine with ID id.
-	Machine(id id.ID) builder.Observer
-}
 
 // Config groups together the various bits of configuration needed to create a director.
 type Config struct {
@@ -117,4 +104,22 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o Observer) (*Conf
 		Observer:   o,
 	}
 	return &c, nil
+}
+
+// Check checks various potential issues in this config.
+func (c *Config) Check() error {
+	if c == nil {
+		return ErrConfigNil
+	}
+	if c.Paths == nil {
+		return iohelp.ErrPathsetNil
+	}
+	if c.Machines == nil || len(c.Machines) == 0 {
+		return ErrNoMachines
+	}
+	if c.Observer == nil {
+		return ErrObserverNil
+	}
+	// TODO(@MattWindsor91): SSH config?
+	return nil
 }

@@ -7,6 +7,16 @@ package dash
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/mum4k/termdash/widgets/sparkline"
+
+	"github.com/mum4k/termdash/widgets/segmentdisplay"
+
+	"github.com/mum4k/termdash/container"
+	"github.com/mum4k/termdash/container/grid"
+	"github.com/mum4k/termdash/linestyle"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
@@ -30,42 +40,115 @@ const (
 
 // Observer is a BuilderObserver that attaches into a Dash.
 type Observer struct {
-	last         *text.Text
-	g            *gauge.Gauge
+	runCount     *segmentdisplay.SegmentDisplay
+	runStart     *text.Text
+	runTimeSpark *sparkline.SparkLine
+	buildLog     *text.Text
+	buildGauge   *gauge.Gauge
+	lastTime     time.Time
 	nreqs, ndone int
 }
 
-// OnStart sets up a DashObserver for a test phase with manifest m
-func (d *Observer) OnStart(m builder.Manifest) {
-	// TODO(@MattWindsor91): use name
-	_ = d.last.Write(fmt.Sprintf("-- %s --\n", m.Name))
+// NewObserver constructs an Observer, initialising its various widgets.
+func NewObserver() (*Observer, error) {
+	var (
+		d   Observer
+		err error
+	)
 
-	d.nreqs = m.NReqs
-	d.ndone = 0
-	_ = d.g.Absolute(d.ndone, d.nreqs)
+	if d.runCount, err = segmentdisplay.New(); err != nil {
+		return nil, err
+	}
+
+	if d.runStart, err = text.New(text.DisableScrolling()); err != nil {
+		return nil, err
+	}
+
+	if d.runTimeSpark, err = sparkline.New(); err != nil {
+		return nil, err
+	}
+
+	if d.buildGauge, err = gauge.New(); err != nil {
+		return nil, err
+	}
+
+	if d.buildLog, err = text.New(text.RollContent()); err != nil {
+		return nil, err
+	}
+
+	return &d, nil
+}
+
+// AddToGrid adds this observer to a grid builder gb.
+func (o *Observer) AddToGrid(gb *grid.Builder, midstr string, pc int) {
+	gb.Add(grid.RowHeightPercWithOpts(pc,
+		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(midstr)},
+		grid.ColWidthPerc(30,
+			grid.RowHeightFixed(1, grid.Widget(o.runStart)),
+			grid.RowHeightFixed(1, grid.Widget(o.runTimeSpark)),
+			grid.RowHeightFixed(1, grid.Widget(o.runCount, container.Border(linestyle.Round), container.BorderTitle("Run#"))),
+		),
+		o.currentRunColumn(),
+	))
+}
+
+func (o *Observer) currentRunColumn() grid.Element {
+	return grid.ColWidthPercWithOpts(70,
+		[]container.Option{
+			container.Border(linestyle.Light),
+			container.BorderTitle("Current Run"),
+		},
+		grid.RowHeightFixed(1, grid.Widget(o.buildGauge)),
+		grid.RowHeightFixed(1, grid.Widget(o.buildLog)),
+	)
+}
+
+// OnIteration logs that a new iteration has begun.
+func (o *Observer) OnIteration(iter uint64, t time.Time) {
+	ch := segmentdisplay.NewChunk(strconv.FormatUint(iter, 10))
+	_ = o.runCount.Write(
+		[]*segmentdisplay.TextChunk{ch},
+	)
+
+	_ = o.runStart.Write(t.Format(time.Stamp), text.WriteReplace())
+
+	if !o.lastTime.IsZero() {
+		dur := t.Sub(o.lastTime)
+		_ = o.runTimeSpark.Add([]int{int(dur.Seconds())})
+	}
+	o.lastTime = t
+}
+
+// OnStart sets up an observer for a test phase with manifest m.
+func (o *Observer) OnStart(m builder.Manifest) {
+	_ = o.buildLog.Write(fmt.Sprintf("-- %s --\n", m.Name))
+
+	o.nreqs = m.NReqs
+	o.ndone = 0
+	_ = o.buildGauge.Absolute(o.ndone, o.nreqs)
 }
 
 // OnRequest acknowledges a corpus-builder request.
-func (d *Observer) OnRequest(r builder.Request) {
+func (o *Observer) OnRequest(r builder.Request) {
 	switch {
 	case r.Add != nil:
-		d.onAdd(r.Name)
+		o.onAdd(r.Name)
 	case r.Compile != nil:
-		d.onCompile(r.Name, r.Compile)
+		o.onCompile(r.Name, r.Compile)
 	case r.Harness != nil:
-		d.onHarness(r.Name, r.Harness)
+		o.onHarness(r.Name, r.Harness)
 	case r.Run != nil:
-		d.onRun(r.Name, r.Run)
+		o.onRun(r.Name, r.Run)
 	}
 }
 
 // onAdd acknowledges the addition of a subject to a corpus being built.
-func (d *Observer) onAdd(sname string) {
-	d.logAndStepGauge("ADD", sname, colorAdd)
+func (o *Observer) onAdd(sname string) {
+	o.logAndStepGauge("ADD", sname, colorAdd)
 }
 
 // onCompile acknowledges the addition of a compilation to a corpus being built.
-func (d *Observer) onCompile(sname string, b *builder.Compile) {
+func (o *Observer) onCompile(sname string, b *builder.Compile) {
 	c := colorCompile
 	desc := idQualSubjectDesc(sname, b.CompilerID)
 
@@ -74,19 +157,19 @@ func (d *Observer) onCompile(sname string, b *builder.Compile) {
 		desc += " [FAILED]"
 	}
 
-	d.logAndStepGauge("COMPILE", desc, c)
+	o.logAndStepGauge("COMPILE", desc, c)
 }
 
 // onHarness acknowledges the addition of a harness to a corpus being built.
-func (d *Observer) onHarness(sname string, b *builder.Harness) {
-	d.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colorHarness)
+func (o *Observer) onHarness(sname string, b *builder.Harness) {
+	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colorHarness)
 }
 
 // onRun acknowledges the addition of a run to a corpus being built.
-func (d *Observer) onRun(sname string, b *builder.Run) {
+func (o *Observer) onRun(sname string, b *builder.Run) {
 	desc := idQualSubjectDesc(sname, b.CompilerID)
 	suff, c := runSuffixAndColour(b.Result.Status)
-	d.logAndStepGauge("RUN", desc+suff, c)
+	o.logAndStepGauge("RUN", desc+suff, c)
 }
 
 func runSuffixAndColour(s subject.Status) (string, cell.Color) {
@@ -103,8 +186,8 @@ func runSuffixAndColour(s subject.Status) (string, cell.Color) {
 }
 
 // OnFinish acknowledges the end of a run.
-func (d *Observer) OnFinish() {
-	_ = d.last.Write("-- DONE --\n")
+func (o *Observer) OnFinish() {
+	_ = o.buildLog.Write("-- DONE --\n")
 }
 
 func idQualSubjectDesc(sname string, id id.ID) string {
@@ -113,20 +196,20 @@ func idQualSubjectDesc(sname string, id id.ID) string {
 
 // logAndStepGauge logs a request with name rq and summary desc, then repopulates the gauge.
 // It uses c as the colour for both.
-func (d *Observer) logAndStepGauge(rq, desc string, c cell.Color) {
-	d.log(rq, desc, c)
-	d.stepGauge(c)
+func (o *Observer) logAndStepGauge(rq, desc string, c cell.Color) {
+	o.log(rq, desc, c)
+	o.stepGauge(c)
 }
 
 // log logs an observed builder request with name rq and summary desc to the per-machine log.
 // It colours the log with c.
-func (d *Observer) log(rq, desc string, c cell.Color) {
-	_ = d.last.Write(rq, text.WriteCellOpts(cell.FgColor(c)))
-	_ = d.last.Write(" " + desc + "\n")
+func (o *Observer) log(rq, desc string, c cell.Color) {
+	_ = o.buildLog.Write(rq, text.WriteCellOpts(cell.FgColor(c)))
+	_ = o.buildLog.Write(" " + desc + "\n")
 }
 
 // stepGauge increments the gauge and sets its colour to c.
-func (d *Observer) stepGauge(c cell.Color) {
-	d.ndone++
-	_ = d.g.Absolute(d.ndone, d.nreqs, gauge.Color(c))
+func (o *Observer) stepGauge(c cell.Color) {
+	o.ndone++
+	_ = o.buildGauge.Absolute(o.ndone, o.nreqs, gauge.Color(c))
 }
