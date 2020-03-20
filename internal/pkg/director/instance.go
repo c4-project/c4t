@@ -129,13 +129,13 @@ func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 				return fmt.Errorf("too many consecutive errors; last error was: %w", err)
 			}
 			i.Logger.Println("ERROR:", err)
-			continue
+		} else {
+			nErrors = 0
 		}
 		if err := ctx.Err(); err != nil {
 			return err
 		}
 		iter++
-		nErrors = 0
 	}
 }
 
