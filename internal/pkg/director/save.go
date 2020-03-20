@@ -9,6 +9,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -78,14 +79,14 @@ func (s *Save) tarSubjects(corp corpus.Corpus, tf func(string, time.Time) string
 			return nil
 		}
 		s.Logger.Printf("archiving %s (to %q)", name, tarpath)
-		if err := tarSubject(sub, tarpath); err != nil {
+		if err := s.tarSubject(sub, tarpath); err != nil {
 			return fmt.Errorf("tarring subject %s: %w", name, err)
 		}
 	}
 	return nil
 }
 
-func tarSubject(subject subject.Subject, tarpath string) error {
+func (s *Save) tarSubject(sub subject.Subject, tarpath string) error {
 	tarfile, err := os.Create(tarpath)
 	if err != nil {
 		return fmt.Errorf("create %s: %w", tarpath, err)
@@ -93,7 +94,7 @@ func tarSubject(subject subject.Subject, tarpath string) error {
 	gzw := gzip.NewWriter(tarfile)
 	tarw := tar.NewWriter(gzw)
 
-	werr := tarSubjectToWriter(subject, tarw)
+	werr := s.tarSubjectToWriter(sub, tarw)
 	terr := tarw.Close()
 	gerr := gzw.Close()
 
@@ -109,13 +110,13 @@ func tarSubject(subject subject.Subject, tarpath string) error {
 	return nil
 }
 
-func tarSubjectToWriter(s subject.Subject, tarw *tar.Writer) error {
-	fs, err := filesToTar(s)
+func (s *Save) tarSubjectToWriter(sub subject.Subject, tarw *tar.Writer) error {
+	fs, err := filesToTar(sub)
 	if err != nil {
 		return err
 	}
 	for wpath, rpath := range fs {
-		if err := tarFileToWriter(rpath, wpath, tarw); err != nil {
+		if err := s.tarFileToWriter(rpath, wpath, tarw); err != nil {
 			return fmt.Errorf("archiving %q: %w", rpath, err)
 		}
 	}
@@ -132,13 +133,17 @@ func filesToTar(s subject.Subject) (map[string]string, error) {
 
 // tarFileToWriter tars the file at rpath to wpath within the tar archive represented by tarw.
 // If rpath is empty, no tarring occurs.
-func tarFileToWriter(rpath, wpath string, tarw *tar.Writer) error {
+func (s *Save) tarFileToWriter(rpath, wpath string, tarw *tar.Writer) error {
 	if rpath == "" {
 		return nil
 	}
 
 	hdr, err := tarFileHeader(rpath, wpath)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			s.Logger.Println("file missing when archiving error:", rpath)
+			return nil
+		}
 		return err
 	}
 	if err := tarw.WriteHeader(hdr); err != nil {
