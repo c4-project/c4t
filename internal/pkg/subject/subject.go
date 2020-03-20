@@ -23,7 +23,7 @@ type Subject struct {
 	// Fuzz is the fuzzing pathset for this subject, if it has been fuzzed.
 	Fuzz *Fuzz `toml:"fuzz,omitempty"`
 
-	// Litmus is the path to this subject's original Litmus file.
+	// Litmus is the (slashed) path to this subject's original Litmus file.
 	Litmus string `toml:"litmus,omitempty"`
 
 	// Compiles contains information about this subject's compilation attempts.

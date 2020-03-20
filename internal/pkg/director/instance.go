@@ -32,14 +32,15 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 )
 
+// The maximum permitted number of times a loop can error out consecutively before the tester fails.
+const maxConsecutiveErrors = 10
+
 // Instance contains the state necessary to run a single machine loop of a director.
 type Instance struct {
 	// MachConfig contains the machine config for this machine.
 	MachConfig config.Machine
-
 	// SSHConfig contains top-level SSH configuration.
 	SSHConfig *remote.Config
-
 	// StageConfig is the configuration for this instance's stages.
 	StageConfig *StageConfig
 
@@ -58,8 +59,10 @@ type Instance struct {
 	// Observer is this machine's observer.
 	Observer MachineObserver
 
-	// Paths contains the scratch pathset for this machine.
-	Paths *pathset.Scratch
+	// SavedPaths contains the save pathset for this machine.
+	SavedPaths *pathset.Saved
+	// ScratchPaths contains the scratch pathset for this machine.
+	ScratchPaths *pathset.Scratch
 
 	// Quantities contains the quantity set for this machine.
 	Quantities config.QuantitySet
@@ -73,7 +76,7 @@ func (i *Instance) Run(ctx context.Context) error {
 	}
 
 	i.Logger.Print("preparing scratch directories")
-	if err := i.Paths.Prepare(); err != nil {
+	if err := i.ScratchPaths.Prepare(); err != nil {
 		return err
 	}
 
@@ -93,7 +96,7 @@ func (i *Instance) Run(ctx context.Context) error {
 
 // check makes sure this machine has a valid configuration before starting loops.
 func (i *Instance) check() error {
-	if i.Paths == nil {
+	if i.ScratchPaths == nil {
 		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, i.ID.String())
 	}
 
@@ -112,15 +115,27 @@ func (i *Instance) check() error {
 
 // mainLoop performs the main testing loop for one machine.
 func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
-	var iter uint64
+	var (
+		iter    uint64
+		nErrors uint
+	)
 	for {
 		if err := i.pass(ctx, iter, sc); err != nil {
-			return err
+			// This serves to stop the tester if we get stuck in a rapid failure loop on a particular machine.
+			// TODO(@MattWindsor91): ideally this should be timing the gap between errors, so that we stop if there
+			// are too many errors happening too quickly.
+			nErrors++
+			if maxConsecutiveErrors < nErrors {
+				return fmt.Errorf("too many consecutive errors; last error was: %w", err)
+			}
+			i.Logger.Println("ERROR:", err)
+			continue
 		}
 		if err := ctx.Err(); err != nil {
 			return err
 		}
 		iter++
+		nErrors = 0
 	}
 }
 
@@ -158,7 +173,7 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	m, err := mach.New(i.Observer, i.Paths.DirRun, i.SSHConfig, i.MachConfig.SSH)
+	m, err := mach.New(i.Observer, i.ScratchPaths.DirRun, i.SSHConfig, i.MachConfig.SSH)
 	if err != nil {
 		return nil, fmt.Errorf("when making machine-exec config: %w", err)
 	}
@@ -168,6 +183,11 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 		Fuzz:    f,
 		Lift:    l,
 		Mach:    m,
+		Save: &Save{
+			Logger:   i.Logger,
+			NWorkers: 10, // TODO(@MattWindsor91): get this from somewhere
+			Paths:    i.SavedPaths,
+		},
 	}
 	return &sc, nil
 }
@@ -192,7 +212,7 @@ func (i *Instance) makeFuzzerConfig() (*fuzzer.Config, error) {
 		Driver:     fz,
 		Logger:     i.Logger,
 		Observer:   i.Observer,
-		Paths:      fuzzer.NewPathset(i.Paths.DirFuzz),
+		Paths:      fuzzer.NewPathset(i.ScratchPaths.DirFuzz),
 		Quantities: i.Quantities.Fuzz,
 	}
 
@@ -209,7 +229,7 @@ func (i *Instance) makeLifterConfig() (*lifter.Config, error) {
 		Maker:    hm,
 		Logger:   i.Logger,
 		Observer: i.Observer,
-		Paths:    lifter.NewPathset(i.Paths.DirLift),
+		Paths:    lifter.NewPathset(i.ScratchPaths.DirLift),
 	}
 
 	return &lc, nil
@@ -217,7 +237,7 @@ func (i *Instance) makeLifterConfig() (*lifter.Config, error) {
 
 // dump dumps a plan p to its expected plan file given the stage name name.
 func (i *Instance) dump(name string, p *plan.Plan) error {
-	fname := i.Paths.PlanForStage(name)
+	fname := i.ScratchPaths.PlanForStage(name)
 	f, err := os.Create(fname)
 	if err != nil {
 		return fmt.Errorf("while opening plan file for %s: %w", name, err)

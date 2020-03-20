@@ -8,7 +8,6 @@ package director
 import (
 	"errors"
 	"log"
-	"path/filepath"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
 
@@ -94,12 +93,11 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o Observer) (*Conf
 	if err != nil {
 		return nil, err
 	}
-	odir := filepath.ToSlash(edir)
 
 	c := Config{
 		Logger:     l,
 		Env:        e,
-		Paths:      pathset.New(odir),
+		Paths:      pathset.New(edir),
 		SSH:        g.SSH,
 		Machines:   g.Machines,
 		Quantities: g.Quantities,

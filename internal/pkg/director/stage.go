@@ -32,6 +32,8 @@ type StageConfig struct {
 	Lift *lifter.Config
 	// Mach contains configuration for the instance's machine-specific stage.
 	Mach *mach.Mach
+	// Save contains configuration for the instance's error saving stage.
+	Save *Save
 }
 
 var ErrStageConfigMissing = errors.New("stage config missing")
@@ -42,16 +44,19 @@ func (c *StageConfig) Check() error {
 		return fmt.Errorf("%w: no input files", corpus.ErrNone)
 	}
 	if c.Plan == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, StagePlan)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stagePlan)
 	}
 	if c.Fuzz == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, StageFuzz)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageFuzz)
 	}
 	if c.Lift == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, StageLift)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageLift)
 	}
 	if c.Mach == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, StageMach)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageMach)
+	}
+	if c.Save == nil {
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageSave)
 	}
 	return nil
 }
@@ -65,36 +70,43 @@ type stage struct {
 }
 
 const (
-	StagePlan = "plan"
-	StageFuzz = "fuzz"
-	StageLift = "lift"
-	StageMach = "mach"
+	stagePlan = "plan"
+	stageFuzz = "fuzz"
+	stageLift = "lift"
+	stageMach = "mach"
+	stageSave = "save"
 )
 
 // Stages is the list of director stages.
 var Stages = []stage{
 	{
-		Name: StagePlan,
+		Name: stagePlan,
 		Run: func(c *StageConfig, ctx context.Context, _ *plan.Plan) (*plan.Plan, error) {
 			return c.Plan.Plan(ctx, c.InFiles)
 		},
 	},
 	{
-		Name: StageFuzz,
+		Name: stageFuzz,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Fuzz.Run(ctx, p)
 		},
 	},
 	{
-		Name: StageLift,
+		Name: stageLift,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Lift.Run(ctx, p)
 		},
 	},
 	{
-		Name: StageMach,
+		Name: stageMach,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Mach.Run(ctx, p)
+		},
+	},
+	{
+		Name: stageSave,
+		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+			return c.Save.Run(ctx, p)
 		},
 	},
 }

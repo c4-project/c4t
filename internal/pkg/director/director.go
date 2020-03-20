@@ -87,17 +87,19 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, erro
 		return nil, err
 	}
 	obs := d.config.Observer.Machine(mid)
-	ps := d.config.Paths.MachineScratch(mid)
+	sps := d.config.Paths.MachineScratch(mid)
+	vps := d.config.Paths.MachineSaved(mid)
 	m := Instance{
-		MachConfig: c,
-		SSHConfig:  d.config.SSH,
-		Env:        &d.config.Env,
-		ID:         mid,
-		InFiles:    d.files,
-		Observer:   obs,
-		Paths:      ps,
-		Logger:     l,
-		Quantities: d.config.Quantities,
+		MachConfig:   c,
+		SSHConfig:    d.config.SSH,
+		Env:          &d.config.Env,
+		ID:           mid,
+		InFiles:      d.files,
+		Observer:     obs,
+		ScratchPaths: sps,
+		SavedPaths:   vps,
+		Logger:       l,
+		Quantities:   d.config.Quantities,
 	}
 	return &m, nil
 }

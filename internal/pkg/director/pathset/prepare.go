@@ -20,6 +20,6 @@ func (p *Scratch) Prepare() error {
 }
 
 // Prepare prepares this pathset by making its directories.
-func (p *Saved) Prepare() error {
-	return iohelp.Mkdirs(p.DirCompileFailures, p.DirFlagged, p.DirRunFailures, p.DirTimeouts)
+func (s *Saved) Prepare() error {
+	return iohelp.Mkdirs(s.DirCompileFailures, s.DirFlagged, s.DirRunFailures, s.DirTimeouts)
 }
