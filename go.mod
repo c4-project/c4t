@@ -11,6 +11,7 @@ require (
 	github.com/mum4k/termdash v0.11.0
 	github.com/nsf/termbox-go v0.0.0-20200204031403-4d2b513ad8be // indirect
 	github.com/pkg/sftp v1.11.0
+	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 )

@@ -12,6 +12,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
@@ -51,8 +53,8 @@ func TestPathset_Dirs_NoCompilers(t *testing.T) {
 	}
 }
 
-// TestPathset_OnCompiler tests that SubjectPaths produces sensible paths.
-func TestPathset_OnCompiler(t *testing.T) {
+// TestPathset_SubjectPaths tests that SubjectPaths produces sensible paths.
+func TestPathset_SubjectPaths(t *testing.T) {
 	ps := Pathset{
 		DirBins: "bins",
 		DirLogs: "logs",
@@ -64,12 +66,8 @@ func TestPathset_OnCompiler(t *testing.T) {
 	})
 
 	wantb := path.Join("bins", "foo", "bar", "baz", "yeet")
-	if sps.Bin != wantb {
-		t.Errorf("bin for %s= %s, want %s", cid.String(), sps.Bin, wantb)
-	}
+	assert.Equal(t, wantb, sps.Bin, "bin on SubjectPaths not as expected")
 
 	wantl := path.Join("logs", "foo", "bar", "baz", "yeet")
-	if sps.Log != wantl {
-		t.Errorf("logs for %s= %s, want %s", cid.String(), sps.Log, wantl)
-	}
+	assert.Equal(t, wantl, sps.Log, "log on SubjectPaths not as expected")
 }

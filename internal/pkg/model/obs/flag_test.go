@@ -7,6 +7,10 @@ package obs_test
 
 import (
 	"fmt"
+	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 )
@@ -33,4 +37,53 @@ func ExampleFlag_Strings() {
 	// Output:
 	// sat
 	// undef
+}
+
+func TestFlagOfStrings(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		in  []string
+		out obs.Flag
+		err error
+	}{
+		"sat": {
+			in:  []string{"sat"},
+			out: obs.Sat,
+		},
+		"unsat": {
+			in:  []string{"unsat"},
+			out: obs.Unsat,
+		},
+		"undef": {
+			in:  []string{"undef"},
+			out: obs.Undef,
+		},
+		"sat-undef": {
+			in:  []string{"sat", "undef"},
+			out: obs.Sat | obs.Undef,
+		},
+		"unsat-undef": {
+			in:  []string{"unsat", "undef"},
+			out: obs.Unsat | obs.Undef,
+		},
+		"unknown": {
+			in:  []string{"blurble"},
+			err: obs.ErrBadFlag,
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			out, err := obs.FlagOfStrings(c.in...)
+			if testhelp.ExpectErrorIs(t, err, c.err, "FlagOfStrings") {
+				if err == nil {
+					assert.Equal(t, c.out, out, "FlagOfStrings on:", c.in)
+				}
+			}
+		})
+	}
 }
