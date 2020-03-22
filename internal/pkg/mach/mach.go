@@ -49,7 +49,7 @@ func New(c *Config, p *plan.Plan) (*Mach, error) {
 		plan:     p,
 	}
 	if c.JsonStatus {
-		m.json = &forward.Observer{json.NewEncoder(c.Stderr)}
+		m.json = &forward.Observer{Encoder: json.NewEncoder(c.Stderr)}
 	}
 
 	return &m, nil

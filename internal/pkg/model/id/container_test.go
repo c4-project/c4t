@@ -7,6 +7,9 @@ package id_test
 
 import (
 	"fmt"
+	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
@@ -61,4 +64,41 @@ func ExampleMapKeys() {
 	// barbaz.foobaz
 	// foo.bar
 	// foobar.baz
+}
+
+// TestMapKeys_errors tests MapKeys's error handling.
+func TestMapKeys_errors(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		in  interface{}
+		out error
+	}{
+		"normal": {
+			in: map[string]string{
+				"a": "A",
+				"b": "B",
+				"c": "C",
+			},
+			out: nil,
+		},
+		"not-a-map": {
+			in:  5,
+			out: id.ErrNotMap,
+		},
+		"not-an-id": {
+			in: map[string]int{
+				"fus..ro": 6,
+			},
+			out: id.ErrTagEmpty,
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			_, err := id.MapKeys(c.in)
+			testhelp.ExpectErrorIs(t, err, c.out, "testing MapKeys")
+		})
+	}
 }
