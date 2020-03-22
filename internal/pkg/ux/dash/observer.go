@@ -31,6 +31,7 @@ import (
 const (
 	colorAdd     = cell.ColorBlue
 	colorCompile = cell.ColorMagenta
+	colorCopy    = cell.ColorWhite
 	colorFailed  = cell.ColorRed
 	colorFlagged = cell.ColorYellow
 	colorHarness = cell.ColorCyan
@@ -125,11 +126,7 @@ func (o *Observer) addDurationToSparkline(t time.Time) {
 
 // OnStart sets up an observer for a test phase with manifest m.
 func (o *Observer) OnStart(m builder.Manifest) {
-	_ = o.buildLog.Write(fmt.Sprintf("-- %s --\n", m.Name))
-
-	o.nreqs = m.NReqs
-	o.ndone = 0
-	_ = o.buildGauge.Absolute(o.ndone, o.nreqs)
+	o.onTaskStart(m.Name, m.NReqs)
 }
 
 // OnRequest acknowledges a corpus-builder request.
@@ -192,6 +189,28 @@ func runSuffixAndColour(s subject.Status) (string, cell.Color) {
 // OnFinish acknowledges the end of a run.
 func (o *Observer) OnFinish() {
 	_ = o.buildLog.Write("-- DONE --\n")
+}
+
+func (o *Observer) OnCopyStart(nfiles int) {
+	o.onTaskStart("COPYING FILES", nfiles)
+}
+
+func (o *Observer) OnCopy(src, dst string) {
+	desc := fmt.Sprintf("%s -> %s", src, dst)
+	o.logAndStepGauge("COPY", desc, colorCopy)
+}
+
+func (o *Observer) OnCopyFinish() {
+	// TODO(@MattWindsor91): abstract this properly
+	o.OnFinish()
+}
+
+func (o *Observer) onTaskStart(name string, n int) {
+	_ = o.buildLog.Write(fmt.Sprintf("-- %s --\n", name))
+
+	o.nreqs = n
+	o.ndone = 0
+	_ = o.buildGauge.Absolute(o.ndone, o.nreqs)
 }
 
 func idQualSubjectDesc(sname string, id id.ID) string {

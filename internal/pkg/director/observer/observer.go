@@ -34,4 +34,19 @@ type Instance interface {
 
 	// Instance observers can observe corpus building operations.
 	builder.Observer
+
+	// Instance observers can observe file copies.
+	Copy
+}
+
+// Copy is an interface for types that observe a file copy.
+type Copy interface {
+	// OnCopyStart lets the observer know when a file copy (of nfiles files) is beginning.
+	OnCopyStart(nfiles int)
+
+	// OnCopy lets the observer know that a file copy (from path src to path dst) has happened.
+	OnCopy(src, dst string)
+
+	// OnCopyFinish lets the observer know when a file copy has finished.
+	OnCopyFinish()
 }

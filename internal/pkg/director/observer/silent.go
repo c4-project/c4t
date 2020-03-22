@@ -11,9 +11,17 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 )
 
-// SilentObserver wraps the builder silent-observer to add the additional Instance functions.
-type SilentObserver struct{ builder.SilentObserver }
+// Silent wraps the builder silent-observer to add the additional Instance functions.
+type Silent struct{ builder.SilentObserver }
 
 // OnIteration does nothing.
-func (o SilentObserver) OnIteration(uint64, time.Time) {
-}
+func (o Silent) OnIteration(uint64, time.Time) {}
+
+// OnCopyStart does nothing.
+func (o Silent) OnCopyStart(int) {}
+
+// OnCopy does nothing.
+func (o Silent) OnCopy(string, string) {}
+
+// OnCopyFinish does nothing.
+func (o Silent) OnCopyFinish() {}

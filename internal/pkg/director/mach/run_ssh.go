@@ -15,6 +15,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
 
 	"github.com/pkg/sftp"
@@ -29,6 +31,8 @@ import (
 
 // SSHRunner runs the machine-runner via SSH.
 type SSHRunner struct {
+	// observer observes any copying this SSHRunner does.
+	observer observer.Copy
 	// runner tells us how to run SSH.
 	runner *remote.MachineRunner
 	// session receives the session once we start running the command.
@@ -36,8 +40,8 @@ type SSHRunner struct {
 }
 
 // NewSSHRunner creates a new SSHRunner.
-func NewSSHRunner(r *remote.MachineRunner) *SSHRunner {
-	return &SSHRunner{runner: r}
+func NewSSHRunner(r *remote.MachineRunner, o observer.Copy) *SSHRunner {
+	return &SSHRunner{runner: r, observer: o}
 }
 
 func (r *SSHRunner) Start(_ context.Context) (*Pipeset, error) {
@@ -75,6 +79,9 @@ func (r *SSHRunner) Send(p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (r *SSHRunner) sftpMappings(ms map[string]string) error {
+	r.observer.OnCopyStart(len(ms))
+	defer r.observer.OnCopyFinish()
+
 	cli, err := r.runner.NewSFTP()
 	if err != nil {
 		return err
@@ -84,6 +91,7 @@ func (r *SSHRunner) sftpMappings(ms map[string]string) error {
 			_ = cli.Close()
 			return err
 		}
+		r.observer.OnCopy(lpath, rpath)
 	}
 	return cli.Close()
 }
