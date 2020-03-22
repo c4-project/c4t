@@ -7,8 +7,9 @@ package transfer_test
 
 import (
 	"path"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
 
@@ -24,18 +25,21 @@ func TestNormaliser_Subject(t *testing.T) {
 	cases := map[string]struct {
 		in   subject.Subject
 		out  subject.Subject
-		maps map[string]string
+		maps map[string]transfer.Normalisation
 	}{
 		"empty": {
 			in:   subject.Subject{},
 			out:  subject.Subject{},
-			maps: map[string]string{},
+			maps: map[string]transfer.Normalisation{},
 		},
 		"litmus": {
 			in:  subject.Subject{Litmus: path.Join("foo", "bar", "baz.litmus")},
 			out: subject.Subject{Litmus: transfer.FileOrigLitmus},
-			maps: map[string]string{
-				transfer.FileOrigLitmus: path.Join("foo", "bar", "baz.litmus"),
+			maps: map[string]transfer.Normalisation{
+				transfer.FileOrigLitmus: {
+					Original: path.Join("foo", "bar", "baz.litmus"),
+					Kind:     transfer.NKOrigLitmus,
+				},
 			},
 		},
 		"fuzz": {
@@ -55,9 +59,15 @@ func TestNormaliser_Subject(t *testing.T) {
 					},
 				},
 			},
-			maps: map[string]string{
-				transfer.FileFuzzLitmus: path.Join("barbaz", "baz.1.litmus"),
-				transfer.FileFuzzTrace:  path.Join("barbaz", "baz.1.trace"),
+			maps: map[string]transfer.Normalisation{
+				transfer.FileFuzzLitmus: {
+					Original: path.Join("barbaz", "baz.1.litmus"),
+					Kind:     transfer.NKFuzz,
+				},
+				transfer.FileFuzzTrace: {
+					Original: path.Join("barbaz", "baz.1.trace"),
+					Kind:     transfer.NKFuzz,
+				},
 			},
 		},
 		"harness": {
@@ -85,11 +95,23 @@ func TestNormaliser_Subject(t *testing.T) {
 					},
 				},
 			},
-			maps: map[string]string{
-				path.Join(transfer.DirHarnesses, "arm", "inky.c"):  path.Join("burble", "armv8", "inky.c"),
-				path.Join(transfer.DirHarnesses, "arm", "pinky.c"): path.Join("burble", "armv8", "pinky.c"),
-				path.Join(transfer.DirHarnesses, "x86", "inky.c"):  path.Join("burble", "i386", "inky.c"),
-				path.Join(transfer.DirHarnesses, "x86", "pinky.c"): path.Join("burble", "i386", "pinky.c"),
+			maps: map[string]transfer.Normalisation{
+				path.Join(transfer.DirHarnesses, "arm", "inky.c"): {
+					Original: path.Join("burble", "armv8", "inky.c"),
+					Kind:     transfer.NKHarness,
+				},
+				path.Join(transfer.DirHarnesses, "arm", "pinky.c"): {
+					Original: path.Join("burble", "armv8", "pinky.c"),
+					Kind:     transfer.NKHarness,
+				},
+				path.Join(transfer.DirHarnesses, "x86", "inky.c"): {
+					Original: path.Join("burble", "i386", "inky.c"),
+					Kind:     transfer.NKHarness,
+				},
+				path.Join(transfer.DirHarnesses, "x86", "pinky.c"): {
+					Original: path.Join("burble", "i386", "pinky.c"),
+					Kind:     transfer.NKHarness,
+				},
 			},
 		},
 		"compile": {
@@ -129,11 +151,23 @@ func TestNormaliser_Subject(t *testing.T) {
 					},
 				},
 			},
-			maps: map[string]string{
-				path.Join(transfer.DirCompiles, "clang", transfer.FileBin):        path.Join("foobaz", "clang", "a.out"),
-				path.Join(transfer.DirCompiles, "gcc", transfer.FileBin):          path.Join("foobaz", "gcc", "a.out"),
-				path.Join(transfer.DirCompiles, "clang", transfer.FileCompileLog): path.Join("foobaz", "clang", "errors"),
-				path.Join(transfer.DirCompiles, "gcc", transfer.FileCompileLog):   path.Join("foobaz", "gcc", "errors"),
+			maps: map[string]transfer.Normalisation{
+				path.Join(transfer.DirCompiles, "clang", transfer.FileBin): {
+					Original: path.Join("foobaz", "clang", "a.out"),
+					Kind:     transfer.NKCompile,
+				},
+				path.Join(transfer.DirCompiles, "gcc", transfer.FileBin): {
+					Original: path.Join("foobaz", "gcc", "a.out"),
+					Kind:     transfer.NKCompile,
+				},
+				path.Join(transfer.DirCompiles, "clang", transfer.FileCompileLog): {
+					Original: path.Join("foobaz", "clang", "errors"),
+					Kind:     transfer.NKCompile,
+				},
+				path.Join(transfer.DirCompiles, "gcc", transfer.FileCompileLog): {
+					Original: path.Join("foobaz", "gcc", "errors"),
+					Kind:     transfer.NKCompile,
+				},
 			},
 		},
 	}
@@ -144,14 +178,9 @@ func TestNormaliser_Subject(t *testing.T) {
 			t.Parallel()
 			n := transfer.NewNormaliser("")
 			s, err := n.Subject(c.in)
-			if err != nil {
-				t.Fatal("unexpected error:", err)
-			}
-			if !reflect.DeepEqual(*s, c.out) {
-				t.Errorf("unexpected subject: got=%v, want=%v", s, c.out)
-			}
-			if !reflect.DeepEqual(n.Mappings, c.maps) {
-				t.Errorf("unexpected mappings: got=%v, want=%v", n.Mappings, c.maps)
+			if assert.NoError(t, err) {
+				assert.Equal(t, c.out, *s)
+				assert.Equal(t, c.maps, n.Mappings)
 			}
 		})
 	}

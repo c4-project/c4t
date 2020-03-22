@@ -39,14 +39,37 @@ type Normaliser struct {
 
 	// Mappings contains maps from normalised names to original names.
 	// (The mappings are this way around to help us notice collisions.)
-	Mappings map[string]string
+	Mappings map[string]Normalisation
 }
+
+// Normalisation is a record in the normaliser's mappings.
+type Normalisation struct {
+	// Original is the original path.
+	Original string
+	// Kind is the kind of path to which this mapping belongs.
+	// This exists mainly to make it possible to use a Normaliser to work out how to copy a plan to another host,
+	// but only copy selective subsets of files.
+	Kind NormalisationKind
+}
+
+type NormalisationKind int
+
+const (
+	// NKFuzz marks that a mapping pertains to the original litmus file.
+	NKOrigLitmus NormalisationKind = iota
+	// NKFuzz marks that a mapping is part of a fuzz.
+	NKFuzz
+	// NKCompile marks that a mapping is part of a compile.
+	NKCompile
+	// NKHarness marks that a mapping is part of a harness.
+	NKHarness
+)
 
 // NewNormaliser constructs a new Normaliser relative to root.
 func NewNormaliser(root string) *Normaliser {
 	return &Normaliser{
 		root:     root,
-		Mappings: make(map[string]string),
+		Mappings: make(map[string]Normalisation),
 	}
 }
 
@@ -68,7 +91,7 @@ func (n *Normaliser) Corpus(c corpus.Corpus) (corpus.Corpus, error) {
 // Subject normalises mappings from subject component files to 'normalised' names.
 func (n *Normaliser) Subject(s subject.Subject) (*subject.Subject, error) {
 	var err error
-	s.Litmus, err = n.replaceAndAdd(s.Litmus, n.root, FileOrigLitmus)
+	s.Litmus, err = n.replaceAndAdd(s.Litmus, NKOrigLitmus, FileOrigLitmus)
 	if s.Fuzz != nil && err == nil {
 		s.Fuzz, err = n.fuzz(*s.Fuzz)
 	}
@@ -84,10 +107,10 @@ func (n *Normaliser) Subject(s subject.Subject) (*subject.Subject, error) {
 
 func (n *Normaliser) fuzz(f subject.Fuzz) (*subject.Fuzz, error) {
 	var err error
-	if f.Files.Litmus, err = n.replaceAndAdd(f.Files.Litmus, n.root, FileFuzzLitmus); err != nil {
+	if f.Files.Litmus, err = n.replaceAndAdd(f.Files.Litmus, NKFuzz, FileFuzzLitmus); err != nil {
 		return nil, err
 	}
-	f.Files.Trace, err = n.replaceAndAdd(f.Files.Trace, n.root, FileFuzzTrace)
+	f.Files.Trace, err = n.replaceAndAdd(f.Files.Trace, NKFuzz, FileFuzzTrace)
 	return &f, err
 }
 
@@ -107,7 +130,7 @@ func (n *Normaliser) harness(archstr string, h subject.Harness) (subject.Harness
 	oldPaths := h.Paths()
 	h.Dir = path.Join(n.root, DirHarnesses, archstr)
 	for i, np := range h.Paths() {
-		if err := n.add(oldPaths[i], np); err != nil {
+		if err := n.add(oldPaths[i], np, NKHarness); err != nil {
 			return h, err
 		}
 	}
@@ -129,31 +152,34 @@ func (n *Normaliser) compiles(cs map[string]subject.CompileResult) (map[string]s
 
 func (n *Normaliser) compile(cidstr string, c subject.CompileResult) (subject.CompileResult, error) {
 	var err error
-	if c.Files.Bin, err = n.replaceAndAdd(c.Files.Bin, n.root, DirCompiles, cidstr, FileBin); err != nil {
+	if c.Files.Bin, err = n.replaceAndAdd(c.Files.Bin, NKCompile, DirCompiles, cidstr, FileBin); err != nil {
 		return c, err
 	}
-	c.Files.Log, err = n.replaceAndAdd(c.Files.Log, n.root, DirCompiles, cidstr, FileCompileLog)
+	c.Files.Log, err = n.replaceAndAdd(c.Files.Log, NKCompile, DirCompiles, cidstr, FileCompileLog)
 	return c, err
 }
 
 // replaceAndAdd adds the path assembled by joining segs together as a mapping from opath.
 // If opath is empty, this just returns ("", nil) and does no addition.
-func (n *Normaliser) replaceAndAdd(opath string, segs ...string) (string, error) {
+func (n *Normaliser) replaceAndAdd(opath string, nk NormalisationKind, segs ...string) (string, error) {
 	if opath == "" {
 		return "", nil
 	}
 
-	npath := path.Join(segs...)
-	err := n.add(opath, npath)
+	npath := path.Join(n.root, path.Join(segs...))
+	err := n.add(opath, npath, nk)
 	return npath, err
 }
 
 // add tries to add the mapping between opath and npath to the normaliser's mappings.
 // It fails if there is a collision.
-func (n *Normaliser) add(opath, npath string) error {
+func (n *Normaliser) add(opath, npath string, nk NormalisationKind) error {
 	if _, ok := n.Mappings[npath]; ok {
 		return fmt.Errorf("%w: %q", ErrCollision, npath)
 	}
-	n.Mappings[npath] = opath
+	n.Mappings[npath] = Normalisation{
+		Original: opath,
+		Kind:     nk,
+	}
 	return nil
 }

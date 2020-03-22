@@ -117,7 +117,8 @@ func (s *Save) tarSubjectToWriter(sub subject.Subject, tarw *tar.Writer) error {
 	if err != nil {
 		return err
 	}
-	for wpath, rpath := range fs {
+	for wpath, norm := range fs {
+		rpath := norm.Original
 		if err := s.tarFileToWriter(rpath, wpath, tarw); err != nil {
 			return fmt.Errorf("archiving %q: %w", rpath, err)
 		}
@@ -125,7 +126,7 @@ func (s *Save) tarSubjectToWriter(sub subject.Subject, tarw *tar.Writer) error {
 	return nil
 }
 
-func filesToTar(s subject.Subject) (map[string]string, error) {
+func filesToTar(s subject.Subject) (map[string]transfer.Normalisation, error) {
 	n := transfer.NewNormaliser("")
 	if _, err := n.Subject(s); err != nil {
 		return nil, err

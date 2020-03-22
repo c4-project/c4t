@@ -75,7 +75,19 @@ func (r *SSHRunner) Send(p *plan.Plan) (*plan.Plan, error) {
 		return nil, err
 	}
 
-	return &rp, r.sftpMappings(n.Mappings)
+	return &rp, r.sftpMappings(harnessFiles(n.Mappings))
+}
+
+// harnessFiles filters a normalisation map to only the harness files.
+// (Copying anything else would waste time and bandwidth.)
+func harnessFiles(ns map[string]transfer.Normalisation) map[string]string {
+	fs := make(map[string]string)
+	for k, v := range ns {
+		if v.Kind == transfer.NKHarness {
+			fs[k] = v.Original
+		}
+	}
+	return fs
 }
 
 func (r *SSHRunner) sftpMappings(ms map[string]string) error {
