@@ -8,8 +8,9 @@ package dash
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/director"
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
@@ -120,11 +121,11 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 	return err
 }
 
-// Machine locates the observer for the machine with ID mid.
-func (d *Dash) Machine(mid id.ID) director.MachineObserver {
+// Instance locates the observer for the machine with ID mid.
+func (d *Dash) Instance(mid id.ID) (observer.Instance, error) {
 	o := d.machines[mid.String()]
 	if o == nil {
-		return director.SilentObserver{}
+		return nil, fmt.Errorf("instance not prepared for machine %s", mid.String())
 	}
-	return o
+	return o, nil
 }

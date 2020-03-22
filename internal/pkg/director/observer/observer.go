@@ -3,7 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package director
+// Package observer defines interfaces and basic implementations of the director's 'observer' pattern.
+package observer
 
 import (
 	"context"
@@ -20,22 +21,17 @@ type Observer interface {
 	Run(ctx context.Context, cancel func()) error
 
 	// Instance gets a sub-observer for the machine with ID id.
-	Machine(id id.ID) MachineObserver
+	// It can fail if no such observer is available.
+	Instance(id id.ID) (Instance, error)
 }
 
-// MachineObserver is an interface for types that observe a director machine loop.
-type MachineObserver interface {
+// Instance is an interface for types that observe a director loop.
+type Instance interface {
 	// OnIteration lets the observer know that the machine loop has started anew.
 	// iter is, modulo eventual overflow, the current iteration number;
 	// time is the time at which the iteration started.
 	OnIteration(iter uint64, time time.Time)
 
+	// Instance observers can observe corpus building operations.
 	builder.Observer
-}
-
-// SilentObserver wraps the builder silent-observer to add the additional MachineObserver functions.
-type SilentObserver struct{ builder.SilentObserver }
-
-// OnIteration does nothing.
-func (o SilentObserver) OnIteration(uint64, time.Time) {
 }

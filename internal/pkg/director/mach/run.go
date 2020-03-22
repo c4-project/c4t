@@ -20,6 +20,10 @@ import (
 
 // Runner is the interface that the local and SSH runners have in common.
 type Runner interface {
+	// Send performs any copying and transformation needed for p to run.
+	// It returns a pointer to the plan to send to the machine runner, which may or may not be p.
+	Send(p *plan.Plan) (*plan.Plan, error)
+
 	// Start starts the machine binary, returning a set of pipe readers and writers to use for communication with it.
 	Start(ctx context.Context) (*Pipeset, error)
 
@@ -32,6 +36,11 @@ type Runner interface {
 func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	eg, ectx := errgroup.WithContext(ctx)
 
+	rp, err := m.runner.Send(p)
+	if err != nil {
+		return nil, fmt.Errorf("while copying files to machine: %w", err)
+	}
+
 	ps, err := m.runner.Start(ectx)
 	if err != nil {
 		return nil, fmt.Errorf("while starting command: %w", err)
@@ -39,7 +48,7 @@ func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 
 	var p2 plan.Plan
 	eg.Go(func() error {
-		return sendPlan(p, ps.Stdin)
+		return sendPlan(rp, ps.Stdin)
 	})
 	eg.Go(func() error {
 		if _, err := toml.DecodeReader(ps.Stdout, &p2); err != nil {

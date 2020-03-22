@@ -17,6 +17,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/collate"
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
@@ -124,7 +126,7 @@ func (s *Save) tarSubjectToWriter(sub subject.Subject, tarw *tar.Writer) error {
 }
 
 func filesToTar(s subject.Subject) (map[string]string, error) {
-	n := NewNormaliser("")
+	n := transfer.NewNormaliser("")
 	if _, err := n.Subject(s); err != nil {
 		return nil, err
 	}

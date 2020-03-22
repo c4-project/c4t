@@ -3,12 +3,14 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package director
+package transfer
 
 import (
 	"errors"
 	"fmt"
 	"path"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
@@ -23,8 +25,10 @@ const (
 	FileOrigLitmus = "orig.litmus"
 	FileFuzzLitmus = "fuzz.litmus"
 	FileFuzzTrace  = "fuzz.trace"
-	DirCompiles    = "compiles"
-	DirHarnesses   = "harnesses"
+	// DirCompiles is the normalised directory for compile results.
+	DirCompiles = "compiles"
+	// DirHarnesses is the normalised directory for harness results.
+	DirHarnesses = "harnesses"
 )
 
 // Normaliser contains state necessary to normalise a single subject's paths.
@@ -46,10 +50,25 @@ func NewNormaliser(root string) *Normaliser {
 	}
 }
 
-// Subject normalises mappings from subject component files to 'normalised' names, relative to root.
+// Corpus normalises mappings for each subject in c.
+func (n *Normaliser) Corpus(c corpus.Corpus) (corpus.Corpus, error) {
+	c2 := make(corpus.Corpus, len(c))
+	for name, s := range c {
+		// The aliasing of Mappings here is deliberate.
+		snorm := Normaliser{root: path.Join(n.root, name), Mappings: n.Mappings}
+		ns, err := snorm.Subject(s)
+		if err != nil {
+			return nil, fmt.Errorf("normalising %s: %w", name, err)
+		}
+		c2[name] = *ns
+	}
+	return c2, nil
+}
+
+// Subject normalises mappings from subject component files to 'normalised' names.
 func (n *Normaliser) Subject(s subject.Subject) (*subject.Subject, error) {
 	var err error
-	s.Litmus, err = n.replaceAndAdd(s.Litmus, FileOrigLitmus)
+	s.Litmus, err = n.replaceAndAdd(s.Litmus, n.root, FileOrigLitmus)
 	if s.Fuzz != nil && err == nil {
 		s.Fuzz, err = n.fuzz(*s.Fuzz)
 	}
@@ -65,10 +84,10 @@ func (n *Normaliser) Subject(s subject.Subject) (*subject.Subject, error) {
 
 func (n *Normaliser) fuzz(f subject.Fuzz) (*subject.Fuzz, error) {
 	var err error
-	if f.Files.Litmus, err = n.replaceAndAdd(f.Files.Litmus, FileFuzzLitmus); err != nil {
+	if f.Files.Litmus, err = n.replaceAndAdd(f.Files.Litmus, n.root, FileFuzzLitmus); err != nil {
 		return nil, err
 	}
-	f.Files.Trace, err = n.replaceAndAdd(f.Files.Trace, FileFuzzTrace)
+	f.Files.Trace, err = n.replaceAndAdd(f.Files.Trace, n.root, FileFuzzTrace)
 	return &f, err
 }
 
@@ -110,10 +129,10 @@ func (n *Normaliser) compiles(cs map[string]subject.CompileResult) (map[string]s
 
 func (n *Normaliser) compile(cidstr string, c subject.CompileResult) (subject.CompileResult, error) {
 	var err error
-	if c.Files.Bin, err = n.replaceAndAdd(c.Files.Bin, DirCompiles, cidstr, FileBin); err != nil {
+	if c.Files.Bin, err = n.replaceAndAdd(c.Files.Bin, n.root, DirCompiles, cidstr, FileBin); err != nil {
 		return c, err
 	}
-	c.Files.Log, err = n.replaceAndAdd(c.Files.Log, DirCompiles, cidstr, FileCompileLog)
+	c.Files.Log, err = n.replaceAndAdd(c.Files.Log, n.root, DirCompiles, cidstr, FileCompileLog)
 	return c, err
 }
 

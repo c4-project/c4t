@@ -3,16 +3,19 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package director_test
+package transfer_test
 
 import (
 	"path"
 	"reflect"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/director"
+	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
+
+// TODO(@MattWindsor91): test rooting
 
 // TestNormaliser_Subject checks the normaliser on various small subject cases.
 func TestNormaliser_Subject(t *testing.T) {
@@ -30,9 +33,9 @@ func TestNormaliser_Subject(t *testing.T) {
 		},
 		"litmus": {
 			in:  subject.Subject{Litmus: path.Join("foo", "bar", "baz.litmus")},
-			out: subject.Subject{Litmus: director.FileOrigLitmus},
+			out: subject.Subject{Litmus: transfer.FileOrigLitmus},
 			maps: map[string]string{
-				director.FileOrigLitmus: path.Join("foo", "bar", "baz.litmus"),
+				transfer.FileOrigLitmus: path.Join("foo", "bar", "baz.litmus"),
 			},
 		},
 		"fuzz": {
@@ -47,14 +50,14 @@ func TestNormaliser_Subject(t *testing.T) {
 			out: subject.Subject{
 				Fuzz: &subject.Fuzz{
 					Files: subject.FuzzFileset{
-						Litmus: director.FileFuzzLitmus,
-						Trace:  director.FileFuzzTrace,
+						Litmus: transfer.FileFuzzLitmus,
+						Trace:  transfer.FileFuzzTrace,
 					},
 				},
 			},
 			maps: map[string]string{
-				director.FileFuzzLitmus: path.Join("barbaz", "baz.1.litmus"),
-				director.FileFuzzTrace:  path.Join("barbaz", "baz.1.trace"),
+				transfer.FileFuzzLitmus: path.Join("barbaz", "baz.1.litmus"),
+				transfer.FileFuzzTrace:  path.Join("barbaz", "baz.1.trace"),
 			},
 		},
 		"harness": {
@@ -73,20 +76,20 @@ func TestNormaliser_Subject(t *testing.T) {
 			out: subject.Subject{
 				Harnesses: map[string]subject.Harness{
 					"arm": {
-						Dir:   path.Join(director.DirHarnesses, "arm"),
+						Dir:   path.Join(transfer.DirHarnesses, "arm"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 					"x86": {
-						Dir:   path.Join(director.DirHarnesses, "x86"),
+						Dir:   path.Join(transfer.DirHarnesses, "x86"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 				},
 			},
 			maps: map[string]string{
-				path.Join(director.DirHarnesses, "arm", "inky.c"):  path.Join("burble", "armv8", "inky.c"),
-				path.Join(director.DirHarnesses, "arm", "pinky.c"): path.Join("burble", "armv8", "pinky.c"),
-				path.Join(director.DirHarnesses, "x86", "inky.c"):  path.Join("burble", "i386", "inky.c"),
-				path.Join(director.DirHarnesses, "x86", "pinky.c"): path.Join("burble", "i386", "pinky.c"),
+				path.Join(transfer.DirHarnesses, "arm", "inky.c"):  path.Join("burble", "armv8", "inky.c"),
+				path.Join(transfer.DirHarnesses, "arm", "pinky.c"): path.Join("burble", "armv8", "pinky.c"),
+				path.Join(transfer.DirHarnesses, "x86", "inky.c"):  path.Join("burble", "i386", "inky.c"),
+				path.Join(transfer.DirHarnesses, "x86", "pinky.c"): path.Join("burble", "i386", "pinky.c"),
 			},
 		},
 		"compile": {
@@ -113,24 +116,24 @@ func TestNormaliser_Subject(t *testing.T) {
 					"clang": {
 						Success: true,
 						Files: subject.CompileFileset{
-							Bin: path.Join(director.DirCompiles, "clang", director.FileBin),
-							Log: path.Join(director.DirCompiles, "clang", director.FileCompileLog),
+							Bin: path.Join(transfer.DirCompiles, "clang", transfer.FileBin),
+							Log: path.Join(transfer.DirCompiles, "clang", transfer.FileCompileLog),
 						},
 					},
 					"gcc": {
 						Success: true,
 						Files: subject.CompileFileset{
-							Bin: path.Join(director.DirCompiles, "gcc", director.FileBin),
-							Log: path.Join(director.DirCompiles, "gcc", director.FileCompileLog),
+							Bin: path.Join(transfer.DirCompiles, "gcc", transfer.FileBin),
+							Log: path.Join(transfer.DirCompiles, "gcc", transfer.FileCompileLog),
 						},
 					},
 				},
 			},
 			maps: map[string]string{
-				path.Join(director.DirCompiles, "clang", director.FileBin):        path.Join("foobaz", "clang", "a.out"),
-				path.Join(director.DirCompiles, "gcc", director.FileBin):          path.Join("foobaz", "gcc", "a.out"),
-				path.Join(director.DirCompiles, "clang", director.FileCompileLog): path.Join("foobaz", "clang", "errors"),
-				path.Join(director.DirCompiles, "gcc", director.FileCompileLog):   path.Join("foobaz", "gcc", "errors"),
+				path.Join(transfer.DirCompiles, "clang", transfer.FileBin):        path.Join("foobaz", "clang", "a.out"),
+				path.Join(transfer.DirCompiles, "gcc", transfer.FileBin):          path.Join("foobaz", "gcc", "a.out"),
+				path.Join(transfer.DirCompiles, "clang", transfer.FileCompileLog): path.Join("foobaz", "clang", "errors"),
+				path.Join(transfer.DirCompiles, "gcc", transfer.FileCompileLog):   path.Join("foobaz", "gcc", "errors"),
 			},
 		},
 	}
@@ -139,7 +142,7 @@ func TestNormaliser_Subject(t *testing.T) {
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			n := director.NewNormaliser("")
+			n := transfer.NewNormaliser("")
 			s, err := n.Subject(c.in)
 			if err != nil {
 				t.Fatal("unexpected error:", err)

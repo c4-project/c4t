@@ -9,6 +9,8 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
 )
 
 // LocalRunner runs the machine-runner locally.
@@ -37,6 +39,10 @@ func (r *LocalRunner) Start(ctx context.Context) (*Pipeset, error) {
 		return nil, fmt.Errorf("starting command: %w", err)
 	}
 	return ps, nil
+}
+
+func (r *LocalRunner) Send(p *plan.Plan) (*plan.Plan, error) {
+	return p, nil
 }
 
 // Wait waits for the running machine-runner binary to terminate.

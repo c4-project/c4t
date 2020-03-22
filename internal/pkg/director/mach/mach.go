@@ -8,7 +8,7 @@ package mach
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
-	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
+	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 )
 
 // Mach runs the machine-runner, through SSH if needed.

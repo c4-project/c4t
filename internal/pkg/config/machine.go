@@ -7,7 +7,7 @@ package config
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
+	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 )
 
 // Machine is a config record for a particular machine.

@@ -13,11 +13,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
+	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/mach"
 
@@ -57,7 +59,7 @@ type Instance struct {
 	Logger *log.Logger
 
 	// Observer is this machine's observer.
-	Observer MachineObserver
+	Observer observer.Instance
 
 	// SavedPaths contains the save pathset for this machine.
 	SavedPaths *pathset.Saved

@@ -9,11 +9,13 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/remote"
+	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 
@@ -53,7 +55,7 @@ type Config struct {
 	Machines map[string]config.Machine
 
 	// Observer is a multi-machine observer for the director.
-	Observer Observer
+	Observer observer.Observer
 
 	// Env groups together the bits of configuration that pertain to dealing with the environment.
 	Env Env
@@ -78,7 +80,7 @@ type Env struct {
 }
 
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
-func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o Observer) (*Config, error) {
+func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o observer.Observer) (*Config, error) {
 	if g == nil {
 		return nil, config.ErrNil
 	}

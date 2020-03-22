@@ -86,7 +86,10 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, erro
 	if err != nil {
 		return nil, err
 	}
-	obs := d.config.Observer.Machine(mid)
+	obs, err := d.config.Observer.Instance(mid)
+	if err != nil {
+		return nil, err
+	}
 	sps := d.config.Paths.MachineScratch(mid)
 	vps := d.config.Paths.MachineSaved(mid)
 	m := Instance{
