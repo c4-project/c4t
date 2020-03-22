@@ -11,7 +11,7 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
 // StdinFile is the special file path that the plan loader treats as a request to load from stdin instead.

@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/mach/forward"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
 // Runner is the interface that the local and SSH runners have in common.

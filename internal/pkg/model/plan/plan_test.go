@@ -16,7 +16,7 @@ import (
 	"github.com/BurntSushi/toml"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
 // ExamplePlan_CompilerIDs is a runnable example for CompilerIDs.

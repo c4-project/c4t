@@ -8,7 +8,7 @@ package fuzzer
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // SingleFuzzer represents types that can commune with a C litmus test fuzzer.

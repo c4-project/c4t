@@ -10,12 +10,12 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
 // makeConfig makes a valid, but mocked-up, lifter config.

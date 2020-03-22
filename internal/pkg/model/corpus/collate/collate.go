@@ -9,9 +9,9 @@ package collate
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // Collation represents a grouping of corpus subjects according to various issues.

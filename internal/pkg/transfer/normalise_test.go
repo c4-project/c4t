@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // TODO(@MattWindsor91): test rooting

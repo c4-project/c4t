@@ -7,7 +7,7 @@
 package mach
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 )
 

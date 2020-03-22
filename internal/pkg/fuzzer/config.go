@@ -10,11 +10,11 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
 // SubjectPather is the interface of things that serve file-paths for subject outputs during a fuzz batch.

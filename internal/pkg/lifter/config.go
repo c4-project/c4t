@@ -9,9 +9,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
 // Config contains configuration used to run a lifter for a particular machine, perhaps across multiple plans.

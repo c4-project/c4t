@@ -17,7 +17,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )

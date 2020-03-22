@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
 )
 
 // TestCollate_empty tests that collating an empty corpus gives an empty collation.

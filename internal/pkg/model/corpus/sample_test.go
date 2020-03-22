@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 )
 
 // smallCorpi contains test cases for the overly-small-corpus error handling of SampleCorpus.

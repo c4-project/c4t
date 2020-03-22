@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // ErrCollision occurs if the normaliser tries to map two files to the same normalised path.

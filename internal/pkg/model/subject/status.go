@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 )
 
 // Status is the type of completed-run statuses.

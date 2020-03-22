@@ -12,13 +12,13 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
 )
 
 type TestProber struct {

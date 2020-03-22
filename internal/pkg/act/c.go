@@ -10,7 +10,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // BinActC is the name of the ACT C services binary.

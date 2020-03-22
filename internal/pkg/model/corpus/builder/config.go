@@ -5,7 +5,7 @@
 
 package builder
 
-import "github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+import "github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
 // Config is a configuration for a Builder.
 type Config struct {

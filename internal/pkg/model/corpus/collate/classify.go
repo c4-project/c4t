@@ -5,7 +5,7 @@
 
 package collate
 
-import "github.com/MattWindsor91/act-tester/internal/pkg/subject"
+import "github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 
 func classify(named subject.Named) collationFlag {
 	var f collationFlag

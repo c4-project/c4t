@@ -9,13 +9,13 @@ import (
 	"context"
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // SubjectProber is the interface of types that allow filling in of subject information.

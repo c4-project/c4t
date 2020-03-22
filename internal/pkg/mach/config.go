@@ -12,10 +12,10 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/pkg/mach/forward"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/mach/compiler"

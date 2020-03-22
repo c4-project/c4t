@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // Mock produces a representative corpus including the following features:

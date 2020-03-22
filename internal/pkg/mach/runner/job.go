@@ -14,12 +14,12 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // Job contains all state required to perform a runner operation for a given subject.

@@ -8,7 +8,7 @@ package forward
 import (
 	"encoding/json"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 )
 
 // Observer wraps a JSON encoder, lifting it to an Observer that sends JSON-encoded Forwards.

@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 
 	"github.com/BurntSushi/toml"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // TestRun_TomlDecode tests the decoding of a test run from various TOML examples.

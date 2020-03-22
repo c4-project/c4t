@@ -7,7 +7,7 @@
 // and errors from a machine-runner to a director, potentially over SSH.
 package forward
 
-import "github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+import "github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 // Forward describes a 'forwarded' message or error.
 type Forward struct {

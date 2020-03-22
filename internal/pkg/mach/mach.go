@@ -13,7 +13,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/plan"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/mach/compiler"
 	"github.com/MattWindsor91/act-tester/internal/pkg/mach/forward"

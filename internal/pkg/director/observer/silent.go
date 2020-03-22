@@ -8,7 +8,7 @@ package observer
 import (
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 )
 
 // SilentObserver wraps the builder silent-observer to add the additional Instance functions.

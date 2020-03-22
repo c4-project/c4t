@@ -10,12 +10,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/corpus"
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 	"golang.org/x/sync/errgroup"
 )
 

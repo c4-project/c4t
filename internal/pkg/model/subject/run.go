@@ -8,7 +8,7 @@ package subject
 import (
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 )
 
 // Run represents information about a single run of a subject.

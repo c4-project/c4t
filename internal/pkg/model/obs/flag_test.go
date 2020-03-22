@@ -8,7 +8,7 @@ package obs_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/obs"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 )
 
 // ExampleFlagOfStrings is a testable example for ObsFlagOfStrings.

@@ -9,7 +9,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/subject"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 // BinActFuzz is the name of the ACT fuzzer binary.
