@@ -13,8 +13,6 @@ import (
 	"path/filepath"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
-
-	"github.com/pkg/sftp"
 )
 
 // CopyObserver is an interface for types that observe an SFTP file copy.
@@ -32,7 +30,7 @@ type CopyObserver interface {
 // SFTPer provides a mockable interface for SFTP.
 type SFTPer interface {
 	// Create tries to create a file at path, and, if successful, opens a File pointing to it.
-	Create(path string) (*sftp.File, error)
+	Create(path string) (io.WriteCloser, error)
 	// MkdirAll recursively makes the directories mentioned in dir.
 	MkdirAll(dir string) error
 }

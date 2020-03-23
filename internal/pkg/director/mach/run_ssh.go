@@ -8,9 +8,12 @@ package mach
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"path"
 	"strings"
+
+	"github.com/pkg/sftp"
 
 	"golang.org/x/sync/errgroup"
 
@@ -119,13 +122,25 @@ func (r *SSHRunner) Recv(locp, remp *plan.Plan) (*plan.Plan, error) {
 	return locp, nil
 }
 
+type sftpClient sftp.Client
+
+// Create wraps sftp.Client's Create in such a way as to implement SFTPer.
+func (s *sftpClient) Create(path string) (io.WriteCloser, error) {
+	return (*sftp.Client)(s).Create(path)
+}
+
+// MkdirAll wraps sftp.Client's MkdirAll in such a way as to implement SFTPer.
+func (s *sftpClient) MkdirAll(dir string) error {
+	return (*sftp.Client)(s).MkdirAll(dir)
+}
+
 func (r *SSHRunner) sftpMappings(ctx context.Context, ms map[string]string) error {
 	cli, err := r.runner.NewSFTP()
 	if err != nil {
 		return err
 	}
 
-	perr := remote.PutMapping(ctx, cli, r.observer, ms)
+	perr := remote.PutMapping(ctx, (*sftpClient)(cli), r.observer, ms)
 	cerr := cli.Close()
 
 	if perr != nil {
