@@ -20,14 +20,19 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type mockSFTP struct{ mock.Mock }
+type mockCopier struct{ mock.Mock }
 
-func (m *mockSFTP) Create(path string) (io.WriteCloser, error) {
+func (m *mockCopier) Create(path string) (io.WriteCloser, error) {
 	args := m.Called(path)
 	return args.Get(0).(io.WriteCloser), args.Error(1)
 }
 
-func (m *mockSFTP) MkdirAll(dir string) error {
+func (m *mockCopier) Open(path string) (io.ReadCloser, error) {
+	args := m.Called(path)
+	return args.Get(0).(io.ReadCloser), args.Error(1)
+}
+
+func (m *mockCopier) MkdirAll(dir string) error {
 	args := m.Called(dir)
 	return args.Error(0)
 }
@@ -38,8 +43,8 @@ func (m *mockObserver) OnCopyStart(nfiles int) {
 	m.Called(nfiles)
 }
 
-func (m *mockObserver) OnCopy(src, dst string) {
-	m.Called(src, dst)
+func (m *mockObserver) OnCopy(dst, src string) {
+	m.Called(dst, src)
 }
 
 func (m *mockObserver) OnCopyFinish() {
@@ -57,18 +62,18 @@ func (c *closeBuffer) Close() error {
 	return nil
 }
 
-// TestPutMapping tests PutMapping on a representative mapping.
+// TestPutMapping tests CopyMapping on a representative mapping.
 func TestPutMapping(t *testing.T) {
 	t.Parallel()
 
 	// NB: the 'local' files here actually exist in the filesystem relative to this test.
 	mapping := map[string]string{
-		path.Join("remote", "bin", "a.out"):         path.Join("testdata", "sftp_test", "put1.txt"),
-		path.Join("remote", "include", "foo.h"):     path.Join("testdata", "sftp_test", "put2.txt"),
-		path.Join("remote", "src", "blah", "baz.c"): path.Join("testdata", "sftp_test", "put3.txt"),
+		path.Join("remote", "bin", "a.out"):         path.Join("testdata", "copy_test", "put1.txt"),
+		path.Join("remote", "include", "foo.h"):     path.Join("testdata", "copy_test", "put2.txt"),
+		path.Join("remote", "src", "blah", "baz.c"): path.Join("testdata", "copy_test", "put3.txt"),
 	}
 
-	var m mockSFTP
+	var m mockCopier
 
 	for _, d := range []string{"bin", "include", path.Join("src", "blah")} {
 		m.On("MkdirAll", path.Join("remote", d)).Return(nil).Once()
@@ -86,10 +91,10 @@ func TestPutMapping(t *testing.T) {
 		On("OnCopyStart", len(mapping)).Return().Once().
 		On("OnCopyFinish").Return().Once()
 	for r, l := range mapping {
-		o.On("OnCopy", l, r).Return().Once()
+		o.On("OnCopy", r, l).Return().Once()
 	}
 
-	err := remote.PutMapping(context.Background(), &m, &o, mapping)
+	err := remote.CopyMapping(context.Background(), &m, remote.LocalCopier{}, &o, mapping)
 	assert.NoError(t, err)
 
 	if m.AssertExpectations(t) {

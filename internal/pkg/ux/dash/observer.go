@@ -251,7 +251,7 @@ func (o *Observer) OnCopyStart(nfiles int) {
 	o.onTaskStart("COPYING FILES", nfiles)
 }
 
-func (o *Observer) OnCopy(src, dst string) {
+func (o *Observer) OnCopy(dst, src string) {
 	desc := fmt.Sprintf("%s -> %s", src, dst)
 	o.logAndStepGauge("COPY", desc, colorCopy)
 }
