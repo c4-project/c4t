@@ -15,6 +15,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
@@ -37,15 +39,21 @@ type SSHRunner struct {
 	runner *remote.MachineRunner
 	// session receives the session once we start running the command.
 	session *ssh.Session
+	// recvRoot is the slash-path of the root directory into which compile files should be received.
+	recvRoot string
+	// eg is used to coordinate the combination of waiting for the SSH transaction to close and listening for the
+	// context cancelling underneath it.
+	eg errgroup.Group
 }
 
 // NewSSHRunner creates a new SSHRunner.
 func NewSSHRunner(r *remote.MachineRunner, o observer.Copy) *SSHRunner {
+	// TODO(@MattWindsor91): recvRoot
 	return &SSHRunner{runner: r, observer: o}
 }
 
-func (r *SSHRunner) Start(_ context.Context) (*Pipeset, error) {
-	// TODO(@MattWindsor): handle context
+func (r *SSHRunner) Start(ctx context.Context) (*Pipeset, error) {
+	// TODO(@MattWindsor91): handle context
 	var err error
 
 	r.session, err = r.runner.NewSession()
@@ -63,7 +71,28 @@ func (r *SSHRunner) Start(_ context.Context) (*Pipeset, error) {
 		return nil, fmt.Errorf("while starting local runner: %w", err)
 	}
 
+	makeSSHWaiter(&r.eg, r, ctx)
+
 	return ps, nil
+}
+
+func makeSSHWaiter(eg *errgroup.Group, r *SSHRunner, ctx context.Context) {
+	// This channel makes sure that the context monitoring goroutine doesn't block.
+	cl := make(chan struct{})
+	*eg = errgroup.Group{}
+	eg.Go(func() error {
+		err := r.session.Wait()
+		close(cl)
+		return err
+	})
+	eg.Go(func() error {
+		select {
+		case <-cl:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	})
 }
 
 // Send normalises p against the remote directory, then SFTPs each affected file into place on the remote machine.
@@ -75,19 +104,26 @@ func (r *SSHRunner) Send(p *plan.Plan) (*plan.Plan, error) {
 		return nil, err
 	}
 
-	return &rp, r.sftpMappings(harnessFiles(n.Mappings))
+	return &rp, r.sftpMappings(n.HarnessMappings())
 }
 
-// harnessFiles filters a normalisation map to only the harness files.
-// (Copying anything else would waste time and bandwidth.)
-func harnessFiles(ns map[string]transfer.Normalisation) map[string]string {
-	fs := make(map[string]string)
-	for k, v := range ns {
-		if v.Kind == transfer.NKHarness {
-			fs[k] = v.Original
+func (r *SSHRunner) Recv(locp, remp *plan.Plan) (*plan.Plan, error) {
+	for n, rs := range remp.Corpus {
+		norm := transfer.NewNormaliser(path.Join(r.recvRoot, n))
+		ls, ok := locp.Corpus[n]
+		if !ok {
+			return nil, fmt.Errorf("subject not in local corpus: %s", n)
 		}
+		ns, err := norm.Subject(rs)
+		if err != nil {
+			return nil, err
+		}
+		ls.Runs = ns.Runs
+		// TODO(@MattWindsor91): receive
+		locp.Corpus[n] = ls
 	}
-	return fs
+
+	return locp, nil
 }
 
 func (r *SSHRunner) sftpMappings(ms map[string]string) error {
@@ -136,8 +172,9 @@ func sftpMapping(cli *sftp.Client, rpath string, lpath string) error {
 	return rcerr
 }
 
+// Wait waits for either the SSH session to finish, or the context supplied to Start to close.
 func (r *SSHRunner) Wait() error {
-	return r.session.Wait()
+	return r.eg.Wait()
 }
 
 // invocation works out what the SSH command invocation for the tester should be.

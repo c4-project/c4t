@@ -27,8 +27,13 @@ type Runner interface {
 	// Start starts the machine binary, returning a set of pipe readers and writers to use for communication with it.
 	Start(ctx context.Context) (*Pipeset, error)
 
-	// Wait blocks waiting for the command to finish.
+	// Wait blocks waiting for the command to finish (or the context passed into Start to cancel).
 	Wait() error
+
+	// Recv merges the post-run plan runp into the original plan origp, copying back any files needed.
+	// It returns a pointer to the final 'merged', which may or may not be origp and runp.
+	// It may modify origp in place.
+	Recv(origp, runp *plan.Plan) (*plan.Plan, error)
 }
 
 // Run runs the machine binary on p.
@@ -71,7 +76,11 @@ func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &p2, werr
+	if werr != nil {
+		return nil, werr
+	}
+
+	return m.runner.Recv(p, &p2)
 }
 
 // binName is the name of the machine-runner binary.

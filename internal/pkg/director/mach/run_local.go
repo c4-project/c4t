@@ -41,6 +41,7 @@ func (r *LocalRunner) Start(ctx context.Context) (*Pipeset, error) {
 	return ps, nil
 }
 
+// Send effectively does nothing but implement the general runner interface obligations.
 func (r *LocalRunner) Send(p *plan.Plan) (*plan.Plan, error) {
 	return p, nil
 }
@@ -48,6 +49,12 @@ func (r *LocalRunner) Send(p *plan.Plan) (*plan.Plan, error) {
 // Wait waits for the running machine-runner binary to terminate.
 func (r *LocalRunner) Wait() error {
 	return r.cmd.Wait()
+}
+
+// Recv effectively does nothing but implement the general runner interface obligations.
+func (r *LocalRunner) Recv(_, rp *plan.Plan) (*plan.Plan, error) {
+	// rp has been created on the local machine without any modifications, and needs no merging into the local plan.
+	return rp, nil
 }
 
 // openLocalPipes tries to open stdin, stdout, and stderr pipes for c.
