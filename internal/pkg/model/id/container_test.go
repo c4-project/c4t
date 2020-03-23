@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )

@@ -5,7 +5,7 @@
 
 package pathset
 
-import "github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+import "github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 
 // All of these methods alter the filesystem, and so are quite hard to test...!
 

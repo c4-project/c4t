@@ -11,7 +11,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 )
 
 // TestEnsureLog tests various properties of EnsureLog.

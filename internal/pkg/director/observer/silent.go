@@ -8,6 +8,8 @@ package observer
 import (
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 )
 
@@ -16,6 +18,9 @@ type Silent struct{ builder.SilentObserver }
 
 // OnIteration does nothing.
 func (o Silent) OnIteration(uint64, time.Time) {}
+
+// OnCollation does nothing.
+func (o Silent) OnCollation(*collate.Collation) {}
 
 // OnCopyStart does nothing.
 func (o Silent) OnCopyStart(int) {}

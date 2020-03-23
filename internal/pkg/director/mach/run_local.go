@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
@@ -41,9 +43,9 @@ func (r *LocalRunner) Start(ctx context.Context) (*Pipeset, error) {
 	return ps, nil
 }
 
-// Send effectively does nothing but implement the general runner interface obligations.
-func (r *LocalRunner) Send(p *plan.Plan) (*plan.Plan, error) {
-	return p, nil
+// Send effectively does nothing but implement the general runner interface obligations and make sure the context is live.
+func (r *LocalRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	return p, iohelp.CheckDone(ctx)
 }
 
 // Wait waits for the running machine-runner binary to terminate.

@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"

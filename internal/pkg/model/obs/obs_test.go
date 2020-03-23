@@ -11,7 +11,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 )
 
 // ExampleObs_Sat is a testable example for Sat.

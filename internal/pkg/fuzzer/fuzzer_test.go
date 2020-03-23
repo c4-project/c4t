@@ -9,15 +9,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
 )
 
 // makeConfig makes a 'valid' fuzzer config.

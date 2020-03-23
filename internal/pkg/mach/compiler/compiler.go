@@ -21,7 +21,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )

@@ -8,11 +8,11 @@ package lifter_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"

@@ -31,7 +31,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/config"
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 )
 
 // The maximum permitted number of times a loop can error out consecutively before the tester fails.
@@ -185,13 +185,18 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 		Fuzz:    f,
 		Lift:    l,
 		Mach:    m,
-		Save: &Save{
-			Logger:   i.Logger,
-			NWorkers: 10, // TODO(@MattWindsor91): get this from somewhere
-			Paths:    i.SavedPaths,
-		},
+		Save:    i.makeSave(),
 	}
 	return &sc, nil
+}
+
+func (i *Instance) makeSave() *Save {
+	return &Save{
+		Logger:   i.Logger,
+		Observer: i.Observer,
+		NWorkers: 10, // TODO(@MattWindsor91): get this from somewhere
+		Paths:    i.SavedPaths,
+	}
 }
 
 func (i *Instance) makePlanner() (*planner.Planner, error) {

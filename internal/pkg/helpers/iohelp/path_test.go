@@ -8,7 +8,7 @@ package iohelp_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 )
 
 // ExampleExtlessFile is a runnable example for ExtlessFile.

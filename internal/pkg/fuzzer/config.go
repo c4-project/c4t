@@ -48,10 +48,10 @@ type Config struct {
 type QuantitySet struct {
 	// CorpusSize is the sampling size for the corpus after fuzzing.
 	// It has a similar effect to CorpusSize in planner.Planner.
-	CorpusSize int
+	CorpusSize int `toml:"corpus_size,omitzero"`
 
 	// SubjectCycles is the number of times to fuzz each file.
-	SubjectCycles int
+	SubjectCycles int `toml:"subject_cycles,omitzero"`
 }
 
 // Override substitutes any quantities in new that are non-zero for those in this set.

@@ -17,10 +17,12 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
@@ -31,6 +33,9 @@ import (
 type Save struct {
 	// Logger is the logger to use when announcing that we're saving subjects.
 	Logger *log.Logger
+
+	// Observer is the instance observer.
+	Observer observer.Instance
 
 	// NWorkers is the number of workers to use for the collator.
 	NWorkers int
@@ -45,6 +50,10 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if s.Paths == nil {
 		return nil, iohelp.ErrPathsetNil
 	}
+	if s.Observer == nil {
+		s.Observer = observer.Silent{}
+	}
+
 	s.Logger = iohelp.EnsureLog(s.Logger)
 
 	if err := s.Paths.Prepare(); err != nil {
@@ -55,6 +64,7 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err != nil {
 		return nil, fmt.Errorf("when collating: %w", err)
 	}
+	s.Observer.OnCollation(coll)
 
 	// TODO(@MattWindsor91): find a better way of doing this - this is quite verbose...
 	cases := []struct {

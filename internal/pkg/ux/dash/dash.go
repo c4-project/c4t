@@ -52,7 +52,7 @@ func New(mids []id.ID) (*Dash, error) {
 		return nil, err
 	}
 
-	x, err := text.New()
+	x, err := text.New(text.RollContent())
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func New(mids []id.ID) (*Dash, error) {
 	if err != nil {
 		return nil, err
 	}
-	g = append(g, container.Border(linestyle.Light))
 	c, err := container.New(t,
 		container.SplitVertical(
 			container.Left(container.Border(linestyle.Double), container.BorderTitle("Log"), container.PlaceWidget(x)),
 			container.Right(g...),
+			container.SplitPercent(30),
 		),
 	)
 	if err != nil {

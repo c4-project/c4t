@@ -10,6 +10,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
@@ -32,21 +36,12 @@ type Instance interface {
 	// time is the time at which the iteration started.
 	OnIteration(iter uint64, time time.Time)
 
+	// OnCollation lets the observer know that the run results have been received and collated into c.
+	OnCollation(c *collate.Collation)
+
 	// Instance observers can observe corpus building operations.
 	builder.Observer
 
 	// Instance observers can observe file copies.
-	Copy
-}
-
-// Copy is an interface for types that observe a file copy.
-type Copy interface {
-	// OnCopyStart lets the observer know when a file copy (of nfiles files) is beginning.
-	OnCopyStart(nfiles int)
-
-	// OnCopy lets the observer know that a file copy (from path src to path dst) has happened.
-	OnCopy(src, dst string)
-
-	// OnCopyFinish lets the observer know when a file copy has finished.
-	OnCopyFinish()
+	remote.CopyObserver
 }

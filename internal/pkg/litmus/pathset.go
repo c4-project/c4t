@@ -9,7 +9,7 @@ import (
 	"errors"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 )
 
 var (

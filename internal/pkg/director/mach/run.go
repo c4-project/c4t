@@ -22,7 +22,7 @@ import (
 type Runner interface {
 	// Send performs any copying and transformation needed for p to run.
 	// It returns a pointer to the plan to send to the machine runner, which may or may not be p.
-	Send(p *plan.Plan) (*plan.Plan, error)
+	Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
 
 	// Start starts the machine binary, returning a set of pipe readers and writers to use for communication with it.
 	Start(ctx context.Context) (*Pipeset, error)
@@ -39,18 +39,17 @@ type Runner interface {
 // Run runs the machine binary on p.
 // It presumes that p has already been amended
 func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	eg, ectx := errgroup.WithContext(ctx)
-
-	rp, err := m.runner.Send(p)
+	rp, err := m.runner.Send(ctx, p)
 	if err != nil {
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
 
-	ps, err := m.runner.Start(ectx)
+	ps, err := m.runner.Start(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("while starting command: %w", err)
 	}
 
+	eg, ectx := errgroup.WithContext(ctx)
 	var p2 plan.Plan
 	eg.Go(func() error {
 		return sendPlan(rp, ps.Stdin)

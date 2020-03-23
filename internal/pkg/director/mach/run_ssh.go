@@ -8,20 +8,13 @@ package mach
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
-
-	"github.com/pkg/sftp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 
@@ -34,7 +27,7 @@ import (
 // SSHRunner runs the machine-runner via SSH.
 type SSHRunner struct {
 	// observer observes any copying this SSHRunner does.
-	observer observer.Copy
+	observer remote.CopyObserver
 	// runner tells us how to run SSH.
 	runner *remote.MachineRunner
 	// session receives the session once we start running the command.
@@ -47,7 +40,7 @@ type SSHRunner struct {
 }
 
 // NewSSHRunner creates a new SSHRunner.
-func NewSSHRunner(r *remote.MachineRunner, o observer.Copy) *SSHRunner {
+func NewSSHRunner(r *remote.MachineRunner, o remote.CopyObserver) *SSHRunner {
 	// TODO(@MattWindsor91): recvRoot
 	return &SSHRunner{runner: r, observer: o}
 }
@@ -96,7 +89,7 @@ func makeSSHWaiter(eg *errgroup.Group, r *SSHRunner, ctx context.Context) {
 }
 
 // Send normalises p against the remote directory, then SFTPs each affected file into place on the remote machine.
-func (r *SSHRunner) Send(p *plan.Plan) (*plan.Plan, error) {
+func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	n := transfer.NewNormaliser(r.runner.Config.DirCopy)
 	rp := *p
 	var err error
@@ -104,7 +97,7 @@ func (r *SSHRunner) Send(p *plan.Plan) (*plan.Plan, error) {
 		return nil, err
 	}
 
-	return &rp, r.sftpMappings(n.HarnessMappings())
+	return &rp, r.sftpMappings(ctx, n.HarnessMappings())
 }
 
 func (r *SSHRunner) Recv(locp, remp *plan.Plan) (*plan.Plan, error) {
@@ -126,50 +119,19 @@ func (r *SSHRunner) Recv(locp, remp *plan.Plan) (*plan.Plan, error) {
 	return locp, nil
 }
 
-func (r *SSHRunner) sftpMappings(ms map[string]string) error {
-	r.observer.OnCopyStart(len(ms))
-	defer r.observer.OnCopyFinish()
-
+func (r *SSHRunner) sftpMappings(ctx context.Context, ms map[string]string) error {
 	cli, err := r.runner.NewSFTP()
 	if err != nil {
 		return err
 	}
-	for rpath, lpath := range ms {
-		if err := sftpMapping(cli, rpath, lpath); err != nil {
-			_ = cli.Close()
-			return err
-		}
-		r.observer.OnCopy(lpath, rpath)
-	}
-	return cli.Close()
-}
 
-func sftpMapping(cli *sftp.Client, rpath string, lpath string) error {
-	if err := cli.MkdirAll(path.Dir(rpath)); err != nil {
-		return err
-	}
+	perr := remote.PutMapping(ctx, cli, r.observer, ms)
+	cerr := cli.Close()
 
-	r, err := os.Open(filepath.FromSlash(lpath))
-	if err != nil {
-		return err
+	if perr != nil {
+		return perr
 	}
-	w, err := cli.Create(rpath)
-	if err != nil {
-		_ = r.Close()
-		return err
-	}
-
-	_, cperr := io.Copy(w, r)
-	wcerr := w.Close()
-	rcerr := r.Close()
-
-	if cperr != nil {
-		return cperr
-	}
-	if wcerr != nil {
-		return wcerr
-	}
-	return rcerr
+	return cerr
 }
 
 // Wait waits for either the SSH session to finish, or the context supplied to Start to close.

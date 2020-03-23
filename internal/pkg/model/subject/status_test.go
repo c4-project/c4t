@@ -11,7 +11,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 )
 
 // TestStatusOfString_RoundTrip checks that converting a status to and back from its string is the identity.

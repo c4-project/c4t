@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
+
 	"github.com/mum4k/termdash/widgets/sparkline"
 
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
@@ -43,11 +45,54 @@ const (
 type Observer struct {
 	runCount     *segmentdisplay.SegmentDisplay
 	runStart     *text.Text
-	runTimeSpark *sparkline.SparkLine
+	sparks       *sparkset
 	buildLog     *text.Text
 	buildGauge   *gauge.Gauge
 	lastTime     time.Time
 	nreqs, ndone int
+}
+
+// sparks contains the sparklines for a machine.
+type sparkset struct {
+	runTime  *sparkline.SparkLine
+	cfails   *sparkline.SparkLine
+	timeouts *sparkline.SparkLine
+	flags    *sparkline.SparkLine
+}
+
+func newSparkset() (*sparkset, error) {
+	var (
+		s   sparkset
+		err error
+	)
+	for _, pp := range []struct {
+		p **sparkline.SparkLine
+		c cell.Color
+		l string
+	}{
+		{l: "Time ", p: &s.runTime, c: cell.ColorGreen},
+		{l: "CFail", p: &s.cfails, c: cell.ColorRed},
+		{l: "T/Out", p: &s.timeouts, c: cell.ColorMagenta},
+		{l: "Flags", p: &s.flags, c: cell.ColorYellow},
+	} {
+		if *pp.p, err = sparkline.New(sparkline.Color(pp.c), sparkline.Label(pp.l)); err != nil {
+			return nil, err
+		}
+	}
+	return &s, err
+}
+
+func (s *sparkset) sparkLines() []*sparkline.SparkLine {
+	return []*sparkline.SparkLine{s.runTime, s.cfails, s.timeouts, s.flags}
+}
+
+func (s *sparkset) gridRows() []grid.Element {
+	sls := s.sparkLines()
+	els := make([]grid.Element, len(sls))
+	for i, sl := range sls {
+		els[i] = grid.RowHeightFixed(2, grid.Widget(sl))
+	}
+	return els
 }
 
 // NewObserver constructs an Observer, initialising its various widgets.
@@ -65,7 +110,7 @@ func NewObserver() (*Observer, error) {
 		return nil, err
 	}
 
-	if d.runTimeSpark, err = sparkline.New(); err != nil {
+	if d.sparks, err = newSparkset(); err != nil {
 		return nil, err
 	}
 
@@ -84,17 +129,21 @@ func NewObserver() (*Observer, error) {
 func (o *Observer) AddToGrid(gb *grid.Builder, midstr string, pc int) {
 	gb.Add(grid.RowHeightPercWithOpts(pc,
 		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(midstr)},
-		grid.ColWidthPerc(30,
-			grid.RowHeightFixed(1, grid.Widget(o.runStart)),
-			grid.RowHeightFixed(1, grid.Widget(o.runTimeSpark)),
-			grid.RowHeightFixed(1, grid.Widget(o.runCount, container.Border(linestyle.Round), container.BorderTitle("Run#"))),
+		grid.ColWidthPerc(15,
+			grid.RowHeightFixed(1, grid.Widget(o.runCount, container.Border(linestyle.Light), container.BorderTitle("Run#"))),
+		),
+		grid.ColWidthPerc(25,
+			grid.RowHeightFixed(3, grid.Widget(o.runStart, container.Border(linestyle.Light), container.BorderTitle("Start"))),
+			grid.RowHeightFixedWithOpts(10,
+				[]container.Option{container.Border(linestyle.Light), container.BorderTitle("Sparklines")},
+				o.sparks.gridRows()...),
 		),
 		o.currentRunColumn(),
 	))
 }
 
 func (o *Observer) currentRunColumn() grid.Element {
-	return grid.ColWidthPercWithOpts(70,
+	return grid.ColWidthPercWithOpts(60,
 		[]container.Option{
 			container.Border(linestyle.Light),
 			container.BorderTitle("Current Run"),
@@ -119,9 +168,16 @@ func (o *Observer) OnIteration(iter uint64, t time.Time) {
 func (o *Observer) addDurationToSparkline(t time.Time) {
 	if !o.lastTime.IsZero() {
 		dur := t.Sub(o.lastTime)
-		_ = o.runTimeSpark.Add([]int{int(dur.Seconds())})
+		_ = o.sparks.runTime.Add([]int{int(dur.Seconds())})
 	}
 	o.lastTime = t
+}
+
+// OnCollation observes a collation by adding failure/timeout/flag rates to the sparklines.
+func (o *Observer) OnCollation(c *collate.Collation) {
+	_ = o.sparks.flags.Add([]int{len(c.Flagged)})
+	_ = o.sparks.timeouts.Add([]int{len(c.Timeouts)})
+	_ = o.sparks.cfails.Add([]int{len(c.CompileFailures)})
 }
 
 // OnStart sets up an observer for a test phase with manifest m.

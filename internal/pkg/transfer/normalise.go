@@ -73,6 +73,17 @@ func NewNormaliser(root string) *Normaliser {
 	}
 }
 
+// HarnessMappings filters this normaliser's map to only the harness files.
+func (n *Normaliser) HarnessMappings() map[string]string {
+	fs := make(map[string]string)
+	for k, v := range n.Mappings {
+		if v.Kind == NKHarness {
+			fs[k] = v.Original
+		}
+	}
+	return fs
+}
+
 // Corpus normalises mappings for each subject in c.
 func (n *Normaliser) Corpus(c corpus.Corpus) (corpus.Corpus, error) {
 	c2 := make(corpus.Corpus, len(c))
