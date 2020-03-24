@@ -30,3 +30,14 @@ func (o *Obs) Sat() bool {
 func (o *Obs) Unsat() bool {
 	return o.Flags.Has(Unsat)
 }
+
+// AddState adds the state s in accordance with the tag t.
+func (o *Obs) AddState(t Tag, s State) {
+	o.States = append(o.States, s)
+	switch t {
+	case TagWitness:
+		o.Witnesses = append(o.Witnesses, s)
+	case TagCounter:
+		o.CounterExamples = append(o.CounterExamples, s)
+	}
+}

@@ -11,7 +11,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/resolve"
+	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/mach"
 
@@ -37,8 +39,8 @@ func run(args []string, outw, errw io.Writer) error {
 	c := makeConfigFlags(fs)
 	c.Stdout = outw
 	c.Stderr = errw
-	c.RDriver = &a
-	c.CDriver = &resolve.CResolve
+	c.RDriver = &backend.BResolve
+	c.CDriver = &compiler.CResolve
 
 	ux.ActRunnerFlags(fs, &a)
 	ux.PlanFileFlag(fs, &pfile)

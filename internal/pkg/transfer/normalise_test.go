@@ -219,7 +219,7 @@ func ExampleNormaliser_HarnessMappings() {
 		},
 	}
 	_, _ = n.Subject(s)
-	for k, v := range n.HarnessMappings() {
+	for k, v := range n.MappingsOfKind(transfer.NKHarness) {
 		fmt.Println(k, "<-", v)
 	}
 

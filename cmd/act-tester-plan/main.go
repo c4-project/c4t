@@ -72,7 +72,7 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, midstr string, cs i
 	plan := planner.Planner{
 		CorpusSize: cs,
 		Source: planner.Source{
-			BProbe: &a,
+			BProbe: c,
 			CProbe: c,
 			SProbe: &a,
 		},

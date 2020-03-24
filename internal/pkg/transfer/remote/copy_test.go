@@ -62,8 +62,8 @@ func (c *closeBuffer) Close() error {
 	return nil
 }
 
-// TestPutMapping tests CopyMapping on a representative mapping.
-func TestPutMapping(t *testing.T) {
+// TestSendMapping tests SendMapping on a representative mapping.
+func TestSendMapping(t *testing.T) {
 	t.Parallel()
 
 	// NB: the 'local' files here actually exist in the filesystem relative to this test.
@@ -94,7 +94,7 @@ func TestPutMapping(t *testing.T) {
 		o.On("OnCopy", r, l).Return().Once()
 	}
 
-	err := remote.CopyMapping(context.Background(), &m, remote.LocalCopier{}, &o, mapping)
+	err := remote.SendMapping(context.Background(), &m, &o, mapping)
 	assert.NoError(t, err)
 
 	if m.AssertExpectations(t) {

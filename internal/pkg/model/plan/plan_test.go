@@ -11,17 +11,18 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/BurntSushi/toml"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 )
 
 // ExamplePlan_CompilerIDs is a runnable example for CompilerIDs.
 func ExamplePlan_CompilerIDs() {
-	p := plan.Plan{Compilers: map[string]model.Compiler{
+	p := plan.Plan{Compilers: map[string]service.Compiler{
 		"gcc.ppc":   {Arch: id.ArchPPC},
 		"clang.ppc": {Arch: id.ArchPPC},
 		"gcc":       {Arch: id.ArchArm},
@@ -48,14 +49,14 @@ func TestMachinePlan_Arches(t *testing.T) {
 		want []id.ID
 	}{
 		"no arches": {plan.Plan{}, []id.ID{}},
-		"one compiler": {plan.Plan{Compilers: map[string]model.Compiler{
+		"one compiler": {plan.Plan{Compilers: map[string]service.Compiler{
 			"gcc": {Arch: id.ArchX8664},
 		}}, []id.ID{id.ArchX8664}},
-		"same arch": {plan.Plan{Compilers: map[string]model.Compiler{
+		"same arch": {plan.Plan{Compilers: map[string]service.Compiler{
 			"gcc":   {Arch: id.ArchArm},
 			"clang": {Arch: id.ArchArm},
 		}}, []id.ID{id.ArchArm}},
-		"two arches": {plan.Plan{Compilers: map[string]model.Compiler{
+		"two arches": {plan.Plan{Compilers: map[string]service.Compiler{
 			"gcc-ppc":   {Arch: id.ArchPPC},
 			"clang-ppc": {Arch: id.ArchPPC},
 			"gcc":       {Arch: id.ArchArm},

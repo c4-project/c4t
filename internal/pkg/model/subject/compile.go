@@ -5,6 +5,11 @@
 
 package subject
 
+import (
+	"os"
+	"path/filepath"
+)
+
 // CompileResult is a record about an attempt to compile a subject.
 type CompileResult struct {
 	// Success is true if the compilation succeeded.
@@ -20,4 +25,19 @@ type CompileFileset struct {
 	Bin string `toml:"bin,omitempty"`
 	// Log is the path to this subject's compiler stderr log file.
 	Log string `toml:"log,omitempty"`
+}
+
+// StripMissing removes referenced files in sp that don't exist on the filesystem.
+func (c CompileFileset) StripMissing() CompileFileset {
+	c.Bin = stripSingleMissing(c.Bin)
+	c.Log = stripSingleMissing(c.Log)
+	return c
+}
+
+func stripSingleMissing(f string) string {
+	_, err := os.Stat(filepath.FromSlash(f))
+	if os.IsNotExist(err) {
+		return ""
+	}
+	return f
 }

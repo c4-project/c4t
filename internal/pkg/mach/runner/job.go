@@ -12,13 +12,14 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
@@ -28,7 +29,7 @@ type Job struct {
 	Conf *Config
 
 	// Backend is the backend used to produce the harnesses being run.
-	Backend *model.Backend
+	Backend *service.Backend
 
 	// ResCh is the channel to which we're sending the run result.
 	ResCh chan<- builder.Request
@@ -88,7 +89,7 @@ func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.O
 	}
 
 	var o obs.Obs
-	perr := j.Conf.Parser.ParseObs(tctx, *j.Backend, obsr, &o)
+	perr := j.Conf.Parser.ParseObs(tctx, j.Backend, obsr, &o)
 	werr := cmd.Wait()
 
 	return &o, mostRelevantError(werr, perr, tctx.Err())

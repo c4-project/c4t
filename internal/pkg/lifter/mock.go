@@ -9,22 +9,22 @@ import (
 	"context"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
 // MockHarnessMaker mocks HarnessMaker.
 type MockHarnessMaker struct {
 	// SeenSpecs collects the HarnessSpecs that the harness maker has seen.
-	SeenSpecs []model.HarnessSpec
+	SeenSpecs []job.Harness
 
 	// Err is the error to return on calls to MakeHarness.
 	Err error
 }
 
 // MakeHarness mocks MakeHarness.
-func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec model.HarnessSpec) (outFiles []string, err error) {
+func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec job.Harness) (outFiles []string, err error) {
 	m.SeenSpecs = append(m.SeenSpecs, spec)
 	return []string{path.Join(spec.OutDir, "out.c")}, m.Err
 }

@@ -50,7 +50,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		})
 	compile := builder.CompileRequest(
 		"foo",
-		id.FromString("gcc"),
+		id.CStyleGCC,
 		subject.CompileResult{
 			Success: true,
 			Files: subject.CompileFileset{
@@ -60,7 +60,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		})
 	run := builder.RunRequest(
 		"foo",
-		id.FromString("gcc"),
+		id.CStyleGCC,
 		subject.Run{
 			Status: subject.StatusFlagged,
 		})

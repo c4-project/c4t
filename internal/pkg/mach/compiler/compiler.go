@@ -12,13 +12,14 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
@@ -123,7 +124,7 @@ func (c *Compiler) prepareDirs() error {
 // makeJob makes a job for the named compiler nc, outputting results to resCh.
 // It also takes in a read-only copy, rc, of the corpus; this is because the result handling thread will be modifying
 // the corpus proper.
-func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- builder.Request) *Job {
+func (c *Compiler) makeJob(nc *service.NamedCompiler, resCh chan<- builder.Request) *Job {
 	return &Job{
 		MachineID: c.mid,
 		Compiler:  nc,
@@ -135,8 +136,8 @@ func (c *Compiler) makeJob(nc *model.NamedCompiler, resCh chan<- builder.Request
 }
 
 // nameCompiler sticks the name ids onto the compiler cc.
-func nameCompiler(ids string, cc model.Compiler) *model.NamedCompiler {
-	return &model.NamedCompiler{
+func nameCompiler(ids string, cc service.Compiler) *service.NamedCompiler {
+	return &service.NamedCompiler{
 		ID:       id.FromString(ids),
 		Compiler: cc,
 	}

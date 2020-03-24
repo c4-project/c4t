@@ -10,6 +10,8 @@ import (
 	"io"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
@@ -31,11 +33,11 @@ type Plan struct {
 	Machine model.Machine `toml:"machine"`
 
 	// Backend represents the backend targeted by this plan.
-	Backend *model.Backend `toml:"backend, omitempty"`
+	Backend *service.Backend `toml:"backend, omitempty"`
 
 	// Compilers represents the compilers to be targeted by this plan.
 	// Each compiler's key is a stringified form of its machine CompilerID.
-	Compilers map[string]model.Compiler `toml:"compilers"`
+	Compilers map[string]service.Compiler `toml:"compilers"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
 	Corpus corpus.Corpus `toml:"corpus"`

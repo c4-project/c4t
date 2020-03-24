@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
@@ -17,15 +19,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 // ObsParser is the interface of things that can parse test outcomes.
 type ObsParser interface {
 	// ParseObs parses the observation in reader r into o according to the backend configuration in b.
 	// The backend described by b must have been used to produce the testcase outputting r.
-	ParseObs(ctx context.Context, b model.Backend, r io.Reader, o *obs.Obs) error
+	ParseObs(ctx context.Context, b *service.Backend, r io.Reader, o *obs.Obs) error
 }
 
 // MachConfig represents the configuration needed to run a Runner.

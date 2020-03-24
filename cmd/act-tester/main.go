@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux/dash"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/act"
@@ -85,9 +87,9 @@ func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner) 
 func makeEnv(a *act.Runner, c *config.Config) director.Env {
 	return director.Env{
 		Fuzzer: a,
-		Lifter: a,
+		Lifter: &backend.BResolve,
 		Planner: planner.Source{
-			BProbe: a,
+			BProbe: c,
 			CProbe: c,
 			SProbe: a,
 		},

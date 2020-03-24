@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
@@ -19,16 +21,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 // SingleRunner is the interface of things that can run compilers.
 type SingleRunner interface {
-	// RunCompiler runs the compiler pointed to by c on the input files in j.In.
-	// On success, it outputs a binary to j.Out.
+	// RunCompiler runs the compiler job j.
 	// If applicable, errw will be connected to the compiler's standard error.
-	RunCompiler(ctx context.Context, c *model.NamedCompiler, j model.CompileJob, errw io.Writer) error
+	RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) error
 }
 
 // SubjectPather is the interface of types that can produce path sets for compilations.

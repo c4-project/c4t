@@ -7,6 +7,7 @@ package config
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 )
 
@@ -18,5 +19,5 @@ type Machine struct {
 	model.Machine
 
 	// Compilers contains information about the compilers attached to this machine.
-	Compilers map[string]model.Compiler `toml:"compilers,omitempty"`
+	Compilers map[string]service.Compiler `toml:"compilers,omitempty"`
 }

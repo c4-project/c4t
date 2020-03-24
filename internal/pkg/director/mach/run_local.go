@@ -53,10 +53,10 @@ func (r *LocalRunner) Wait() error {
 	return r.cmd.Wait()
 }
 
-// Recv effectively does nothing but implement the general runner interface obligations.
-func (r *LocalRunner) Recv(_, rp *plan.Plan) (*plan.Plan, error) {
+// Recv effectively does nothing but implement the general runner interface obligations and make sure the context is live.
+func (r *LocalRunner) Recv(ctx context.Context, _, rp *plan.Plan) (*plan.Plan, error) {
 	// rp has been created on the local machine without any modifications, and needs no merging into the local plan.
-	return rp, nil
+	return rp, iohelp.CheckDone(ctx)
 }
 
 // openLocalPipes tries to open stdin, stdout, and stderr pipes for c.

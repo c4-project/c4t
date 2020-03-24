@@ -73,11 +73,11 @@ func NewNormaliser(root string) *Normaliser {
 	}
 }
 
-// HarnessMappings filters this normaliser's map to only the harness files.
-func (n *Normaliser) HarnessMappings() map[string]string {
+// MappingsOfKind filters this normaliser's map to only the files matching kind nk.
+func (n *Normaliser) MappingsOfKind(nk NormalisationKind) map[string]string {
 	fs := make(map[string]string)
 	for k, v := range n.Mappings {
-		if v.Kind == NKHarness {
+		if v.Kind == nk {
 			fs[k] = v.Original
 		}
 	}

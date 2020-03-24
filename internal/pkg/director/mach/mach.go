@@ -22,16 +22,20 @@ type Mach struct {
 
 // New constructs a new Mach with ssh configuration ssh (if any) and local directory dir.
 func New(o observer.Instance, dir string, c *remote.Config, ssh *remote.MachineConfig) (*Mach, error) {
-	m := Mach{observer: o}
-	if ssh == nil {
-		m.runner = NewLocalRunner(dir)
-		return &m, nil
+	r, err := newRunner(o, dir, c, ssh)
+	if err != nil {
+		return nil, err
 	}
+	return &Mach{observer: o, runner: r}, nil
+}
 
+func newRunner(o remote.CopyObserver, dir string, c *remote.Config, ssh *remote.MachineConfig) (Runner, error) {
+	if ssh == nil {
+		return NewLocalRunner(dir), nil
+	}
 	sc, err := ssh.MachineRunner(c)
 	if err != nil {
 		return nil, err
 	}
-	m.runner = NewSSHRunner(sc, o)
-	return &m, nil
+	return NewSSHRunner(sc, o, dir), nil
 }

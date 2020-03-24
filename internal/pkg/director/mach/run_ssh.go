@@ -8,18 +8,11 @@ package mach
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"path"
 	"strings"
 
-	"github.com/pkg/sftp"
-
 	"golang.org/x/sync/errgroup"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/transfer"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 
@@ -43,9 +36,8 @@ type SSHRunner struct {
 }
 
 // NewSSHRunner creates a new SSHRunner.
-func NewSSHRunner(r *remote.MachineRunner, o remote.CopyObserver) *SSHRunner {
-	// TODO(@MattWindsor91): recvRoot
-	return &SSHRunner{runner: r, observer: o}
+func NewSSHRunner(r *remote.MachineRunner, o remote.CopyObserver, recvRoot string) *SSHRunner {
+	return &SSHRunner{runner: r, observer: o, recvRoot: recvRoot}
 }
 
 func (r *SSHRunner) Start(ctx context.Context) (*Pipeset, error) {
@@ -89,69 +81,6 @@ func makeSSHWaiter(eg *errgroup.Group, r *SSHRunner, ctx context.Context) {
 			return ctx.Err()
 		}
 	})
-}
-
-// Send normalises p against the remote directory, then SFTPs each affected file into place on the remote machine.
-func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	n := transfer.NewNormaliser(r.runner.Config.DirCopy)
-	rp := *p
-	var err error
-	if rp.Corpus, err = n.Corpus(rp.Corpus); err != nil {
-		return nil, err
-	}
-
-	return &rp, r.sftpMappings(ctx, n.HarnessMappings())
-}
-
-func (r *SSHRunner) Recv(locp, remp *plan.Plan) (*plan.Plan, error) {
-	for n, rs := range remp.Corpus {
-		norm := transfer.NewNormaliser(path.Join(r.recvRoot, n))
-		ls, ok := locp.Corpus[n]
-		if !ok {
-			return nil, fmt.Errorf("subject not in local corpus: %s", n)
-		}
-		ns, err := norm.Subject(rs)
-		if err != nil {
-			return nil, err
-		}
-		ls.Runs = ns.Runs
-		// TODO(@MattWindsor91): receive
-		locp.Corpus[n] = ls
-	}
-
-	return locp, nil
-}
-
-type sftpCopier sftp.Client
-
-// Create wraps sftp.Client's Create in such a way as to implement Copier.
-func (s *sftpCopier) Create(path string) (io.WriteCloser, error) {
-	return (*sftp.Client)(s).Create(path)
-}
-
-// Open wraps sftp.Client's Open in such a way as to implement Copier.
-func (s *sftpCopier) Open(path string) (io.ReadCloser, error) {
-	return (*sftp.Client)(s).Open(path)
-}
-
-// MkdirAll wraps sftp.Client's MkdirAll in such a way as to implement Copier.
-func (s *sftpCopier) MkdirAll(dir string) error {
-	return (*sftp.Client)(s).MkdirAll(dir)
-}
-
-func (r *SSHRunner) sftpMappings(ctx context.Context, ms map[string]string) error {
-	cli, err := r.runner.NewSFTP()
-	if err != nil {
-		return err
-	}
-
-	perr := remote.CopyMapping(ctx, (*sftpCopier)(cli), remote.LocalCopier{}, r.observer, ms)
-	cerr := cli.Close()
-
-	if perr != nil {
-		return perr
-	}
-	return cerr
 }
 
 // Wait waits for either the SSH session to finish, or the context supplied to Start to close.

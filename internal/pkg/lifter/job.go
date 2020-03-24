@@ -10,6 +10,10 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
@@ -17,8 +21,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 // Job is the type of per-architecture lifter jobs.
@@ -26,8 +28,8 @@ type Job struct {
 	// Arch is the architecture for which this job is responsible.
 	Arch id.ID
 
-	// Backend is the ID of the backend that this job will use.
-	Backend id.ID
+	// Backend is the backend that this job will use.
+	Backend *service.Backend
 
 	// Maker is the harness maker for this job.
 	Maker HarnessMaker
@@ -58,7 +60,7 @@ func (j *Job) Lift(ctx context.Context) error {
 
 // check does some basic checking on the Job before starting to run it.
 func (j *Job) check() error {
-	if j.Backend.IsEmpty() {
+	if j.Backend == nil {
 		return ErrNoBackend
 	}
 	if j.Corpus == nil {
@@ -81,7 +83,7 @@ func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
 		return perr
 	}
 
-	spec := model.HarnessSpec{
+	spec := job.Harness{
 		Backend: j.Backend,
 		Arch:    j.Arch,
 		InFile:  path,

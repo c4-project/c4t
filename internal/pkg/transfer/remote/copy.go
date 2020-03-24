@@ -7,6 +7,7 @@ package remote
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -55,6 +56,16 @@ func (l LocalCopier) MkdirAll(dir string) error {
 	return os.MkdirAll(dir, 0744)
 }
 
+// SendMapping is shorthand for CopyMapping where the source is a LocalCopier.
+func SendMapping(ctx context.Context, dst Copier, o CopyObserver, mapping map[string]string) error {
+	return CopyMapping(ctx, dst, LocalCopier{}, o, mapping)
+}
+
+// RecvMapping is shorthand for CopyMapping where the source is a LocalCopier.
+func RecvMapping(ctx context.Context, src Copier, o CopyObserver, mapping map[string]string) error {
+	return CopyMapping(ctx, LocalCopier{}, src, o, mapping)
+}
+
 // CopyMapping copies the files in the (dest-to-src) map mapping from dst to src.
 // It checks ctx for cancellation between operations.
 func CopyMapping(ctx context.Context, dst, src Copier, o CopyObserver, mapping map[string]string) error {
@@ -73,7 +84,7 @@ func copyFiles(ctx context.Context, dst, src Copier, o CopyObserver, mapping map
 			return err
 		}
 		if err := copyFile(dst, src, dpath, spath); err != nil {
-			return err
+			return fmt.Errorf("copying %s to %s: %w", spath, dpath, err)
 		}
 		o.OnCopy(dpath, spath)
 	}

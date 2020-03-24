@@ -12,6 +12,10 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
@@ -21,8 +25,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 // Job represents the state of a compiler run.
@@ -31,7 +33,7 @@ type Job struct {
 	MachineID id.ID
 
 	// Compiler points to the compiler to run.
-	Compiler *model.NamedCompiler
+	Compiler *service.NamedCompiler
 
 	// Pathset is the pathset to use for this compiler run.
 	Pathset SubjectPather
@@ -79,7 +81,7 @@ func (j *Job) runCompiler(ctx context.Context, sp subject.CompileFileset, h subj
 	}
 
 	// Some compiler errors are recoverable, so we don't immediately bail on them.
-	cerr := j.Runner.RunCompiler(ctx, j.Compiler, compileJob(h, sp), logf)
+	cerr := j.Runner.RunCompiler(ctx, j.compileJob(h, sp), logf)
 
 	// We could close the log file here, but we want fatal compiler errors to take priority over log file close errors.
 	res, rerr := j.makeCompileResult(sp, cerr)
@@ -92,8 +94,12 @@ func (j *Job) runCompiler(ctx context.Context, sp subject.CompileFileset, h subj
 	return res, lerr
 }
 
-func compileJob(h subject.Harness, sp subject.CompileFileset) model.CompileJob {
-	return model.CompileJob{In: h.CPaths(), Out: sp.Bin}
+func (j *Job) compileJob(h subject.Harness, sp subject.CompileFileset) job.Compile {
+	return job.Compile{
+		In:       h.CPaths(),
+		Out:      sp.Bin,
+		Compiler: &j.Compiler.Compiler,
+	}
 }
 
 // makeCompileResult makes a compile result given a possible compile error cerr and fileset sp.
@@ -102,7 +108,7 @@ func (j *Job) makeCompileResult(sp subject.CompileFileset, cerr error) (subject.
 	cr := subject.CompileResult{
 		// Potentially overridden further down.
 		Success: false,
-		Files:   sp,
+		Files:   sp.StripMissing(),
 	}
 
 	if cerr != nil {

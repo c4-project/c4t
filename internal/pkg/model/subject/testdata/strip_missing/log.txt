@@ -1,0 +1,2 @@
+This file exists to test the ability to strip missing files from a compile fileset;
+it pretends to be a log file.

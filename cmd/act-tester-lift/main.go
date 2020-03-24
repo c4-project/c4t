@@ -12,7 +12,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/act"
+	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )
@@ -27,16 +28,9 @@ func main() {
 
 func run(args []string, outw, errw io.Writer) error {
 	var pf string
-	a := act.Runner{Stderr: errw}
 	l := log.New(errw, "", 0)
-	cfg := lifter.Config{
-		Maker:    &a,
-		Logger:   l,
-		Observer: ux.NewPbObserver(l),
-	}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	ux.ActRunnerFlags(fs, &a)
 	var od string
 	ux.OutDirFlag(fs, &od, defaultOutDir)
 	ux.PlanFileFlag(fs, &pf)
@@ -45,7 +39,12 @@ func run(args []string, outw, errw io.Writer) error {
 		return err
 	}
 
-	cfg.Paths = lifter.NewPathset(od)
+	cfg := lifter.Config{
+		Maker:    &backend.BResolve,
+		Logger:   l,
+		Observer: ux.NewPbObserver(l),
+		Paths:    lifter.NewPathset(od),
+	}
 
 	return ux.RunOnPlanFile(context.Background(), &cfg, pf, outw)
 }

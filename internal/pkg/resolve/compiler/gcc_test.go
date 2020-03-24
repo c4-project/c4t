@@ -3,21 +3,24 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package resolve_test
+package compiler_test
 
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
-	"github.com/MattWindsor91/act-tester/internal/pkg/resolve"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/compiler"
 )
 
 // ExampleGCCArgs is a runnable example for GCCArgs.
 func ExampleGCCArgs() {
-	args := resolve.GCCArgs(model.CompilerRunInfo{
+	args := compiler.GCCArgs(service.RunInfo{
 		Cmd:  "gcc7",
 		Args: []string{"-funroll-loops"},
-	}, model.CompileJob{
+	}, job.Compile{
 		In:  []string{"foo.c", "bar.c"},
 		Out: "a.out",
 	})

@@ -3,20 +3,22 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package model
+package job
 
 import (
 	"io/ioutil"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 )
 
-// HarnessSpec is a specification of how to make a test harness.
-type HarnessSpec struct {
-	// Backend is the fully-qualified identifier of the backend to use to make this harness.
-	Backend id.ID
+// Harness is a specification of how to make a test harness.
+type Harness struct {
+	// Backend is the backend to use to make this harness.
+	Backend *service.Backend
 
-	// Arch is the CompilerID of the architecture for which a harness should be prepared.
+	// Arch is the ID of the architecture for which a harness should be prepared.
 	Arch id.ID
 
 	// InFile is the path to the input litmus test file.
@@ -27,7 +29,8 @@ type HarnessSpec struct {
 }
 
 // OutFiles reads s.OutDir as a directory and returns its contents as qualified paths.
-func (s HarnessSpec) OutFiles() ([]string, error) {
+// This is useful for using a harness job to feed a compiler job.
+func (s Harness) OutFiles() ([]string, error) {
 	fs, err := ioutil.ReadDir(s.OutDir)
 	if err != nil {
 		return nil, err

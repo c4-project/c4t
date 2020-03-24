@@ -4,7 +4,6 @@
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package lifter contains the part of the tester framework that lifts litmus tests to compilable C.
-// It does so by means of a backend HarnessMaker.
 package lifter
 
 import (
@@ -13,6 +12,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
@@ -25,8 +26,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/plan"
-
-	"github.com/MattWindsor91/act-tester/internal/pkg/model"
 )
 
 var (
@@ -39,9 +38,9 @@ var (
 
 // HarnessMaker is an interface capturing the ability to make test harnesses.
 type HarnessMaker interface {
-	// MakeHarness asks the harness maker to make the test harness described by spec.
-	// It returns a list outfiles of files created (C files, header files, etc.), and/or an error err.
-	MakeHarness(ctx context.Context, spec model.HarnessSpec) (outFiles []string, err error)
+	// MakeHarness asks the harness maker to make the test harness described by j.
+	// It returns a list outFiles of files created (C files, header files, etc.), and/or an error err.
+	MakeHarness(ctx context.Context, j job.Harness) (outFiles []string, err error)
 }
 
 // Lifter holds the main configuration for the lifter part of the tester framework.
@@ -67,7 +66,7 @@ func New(c *Config, p *plan.Plan) (*Lifter, error) {
 	if p == nil {
 		return nil, plan.ErrNil
 	}
-	if p.Backend == nil || p.Backend.ID.IsEmpty() {
+	if p.Backend == nil {
 		return nil, ErrNoBackend
 	}
 
@@ -133,7 +132,7 @@ func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *builder.Buil
 func (l *Lifter) makeJob(a id.ID, mrng *rand.Rand, resCh chan<- builder.Request) Job {
 	return Job{
 		Arch:    a,
-		Backend: l.plan.Backend.FQID(),
+		Backend: l.plan.Backend,
 		Paths:   l.conf.Paths,
 		Maker:   l.conf.Maker,
 		Corpus:  l.plan.Corpus,

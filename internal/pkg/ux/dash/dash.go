@@ -52,7 +52,7 @@ func New(mids []id.ID) (*Dash, error) {
 		return nil, err
 	}
 
-	x, err := text.New(text.RollContent())
+	x, err := text.New(text.RollContent(), text.WrapAtWords())
 	if err != nil {
 		return nil, err
 	}
