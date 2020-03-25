@@ -44,7 +44,7 @@ func (h Backend) ParseObs(_ context.Context, _ *service.Backend, r io.Reader, o 
 	return p.checkFinalState()
 }
 
-func (h Backend) MakeHarness(ctx context.Context, j job.Harness) (outFiles []string, err error) {
+func (h Backend) MakeHarness(ctx context.Context, j job.Harness, errw io.Writer) (outFiles []string, err error) {
 	b := j.Backend
 	if b == nil {
 		return nil, fmt.Errorf("%w: backend in harness job", service.ErrNil)
@@ -57,6 +57,7 @@ func (h Backend) MakeHarness(ctx context.Context, j job.Harness) (outFiles []str
 	}
 
 	cmd := exec.CommandContext(ctx, r.Cmd, args...)
+	cmd.Stderr = errw
 	if err := cmd.Run(); err != nil {
 		return nil, fmt.Errorf("running %s: %w", r.Cmd, err)
 	}

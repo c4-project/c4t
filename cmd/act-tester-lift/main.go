@@ -44,6 +44,7 @@ func run(args []string, outw, errw io.Writer) error {
 		Logger:   l,
 		Observer: ux.NewPbObserver(l),
 		Paths:    lifter.NewPathset(od),
+		Stderr:   errw,
 	}
 
 	return ux.RunOnPlanFile(context.Background(), &cfg, pf, outw)

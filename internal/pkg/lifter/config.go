@@ -7,6 +7,7 @@ package lifter
 
 import (
 	"context"
+	"io"
 	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
@@ -28,6 +29,9 @@ type Config struct {
 
 	// Paths does path resolution and preparation for the incoming lifter.
 	Paths Pather
+
+	// Stderr is the writer to which standard error (eg from the harness maker) should be sent.
+	Stderr io.Writer
 }
 
 // Run is shorthand for constructing a Lifter using c, then running it with p.

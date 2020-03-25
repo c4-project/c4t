@@ -7,6 +7,7 @@ package lifter
 
 import (
 	"context"
+	"io"
 	"path"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
@@ -24,7 +25,7 @@ type MockHarnessMaker struct {
 }
 
 // MakeHarness mocks MakeHarness.
-func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec job.Harness) (outFiles []string, err error) {
+func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec job.Harness, _ io.Writer) (outFiles []string, err error) {
 	m.SeenSpecs = append(m.SeenSpecs, spec)
 	return []string{path.Join(spec.OutDir, "out.c")}, m.Err
 }

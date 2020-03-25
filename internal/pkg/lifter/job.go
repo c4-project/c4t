@@ -8,6 +8,7 @@ package lifter
 import (
 	"context"
 	"fmt"
+	"io"
 	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
@@ -36,6 +37,9 @@ type Job struct {
 
 	// Paths is the path resolver for this job.
 	Paths Pather
+
+	// Stderr is the writer to which harness maker stderr should be redirected.
+	Stderr io.Writer
 
 	// Corpus is the existing corpus that we are trying to lift.
 	Corpus corpus.Corpus
@@ -69,6 +73,7 @@ func (j *Job) check() error {
 	if j.Maker == nil {
 		return ErrMakerNil
 	}
+	// It's ok for j.Stderr to be nil, as the HarnessMaker is expected to deal with it.
 	return nil
 }
 
@@ -90,7 +95,7 @@ func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
 		OutDir:  dir,
 	}
 
-	files, err := j.Maker.MakeHarness(ctx, spec)
+	files, err := j.Maker.MakeHarness(ctx, spec, j.Stderr)
 	if err != nil {
 		return fmt.Errorf("when making harness for %s (arch %s): %w", s.Name, j.Arch.String(), err)
 	}
