@@ -27,7 +27,7 @@ var (
 
 	// CResolve is a pre-populated compiler resolver.
 	CResolve = Resolver{Compilers: map[string]compiler.SingleRunner{
-		"gcc": GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=c11"}}},
+		"gcc": GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}}},
 	}}
 )
 
