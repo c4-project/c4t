@@ -12,6 +12,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/1set/gut/yos"
 )
 
 const (
@@ -57,7 +59,8 @@ func (l *Litmus) patch() error {
 		_ = w.Close()
 		return err
 	}
-	return os.Rename(wpath, path)
+	// NOT os.Rename, which doesn't work between filesystems.
+	return yos.MoveFile(wpath, path)
 }
 
 // PatchMainFile patches the main C file represented by rw according to this fixset.

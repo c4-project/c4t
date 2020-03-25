@@ -3,6 +3,7 @@ module github.com/MattWindsor91/act-tester
 go 1.13
 
 require (
+	github.com/1set/gut v0.0.0-20200225162230-3995492b8589
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alessio/shellescape v1.2.2
 	github.com/cheggaaa/pb/v3 v3.0.4
