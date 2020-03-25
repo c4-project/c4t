@@ -50,7 +50,10 @@ func (h Backend) MakeHarness(ctx context.Context, j job.Harness, errw io.Writer)
 		return nil, fmt.Errorf("%w: backend in harness job", service.ErrNil)
 	}
 
-	r := h.DefaultRun.Override(b.Run)
+	r := h.DefaultRun
+	if b.Run != nil {
+		r.Override(*b.Run)
+	}
 	args, err := h.Impl.Args(j, r)
 	if err != nil {
 		return nil, err

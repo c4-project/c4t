@@ -14,14 +14,11 @@ type RunInfo struct {
 	Args []string `toml:"args,omitempty"`
 }
 
-// Override creates run information by overlaying this run information with that in new.
-func (r RunInfo) Override(new *RunInfo) RunInfo {
-	if new == nil {
-		return r
-	}
+// Override overlays this run information with that in new.
+func (r *RunInfo) Override(new RunInfo) {
 	r.Cmd = overrideCmd(r.Cmd, new.Cmd)
+	// TODO(@MattWindsor91): we might need a way to replace arguments rather than appending to them.
 	r.Args = append(r.Args, new.Args...)
-	return r
 }
 
 func overrideCmd(old, new string) string {

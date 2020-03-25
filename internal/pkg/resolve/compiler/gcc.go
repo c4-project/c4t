@@ -24,7 +24,10 @@ type GCC struct {
 // RunCompiler compiles j according to run using a GCC-friendly invocation.
 
 func (g GCC) RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) error {
-	orun := g.DefaultRun.Override(j.Compiler.Run)
+	orun := g.DefaultRun
+	if j.Compiler.Run != nil {
+		orun.Override(*j.Compiler.Run)
+	}
 	args := GCCArgs(orun, j)
 	cmd := exec.CommandContext(ctx, orun.Cmd, args...)
 	cmd.Stderr = errw
