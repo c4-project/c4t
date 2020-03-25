@@ -6,12 +6,18 @@
 package herdtools
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
 )
 
 // Herd describes the parts of a Backend invocation that are specific to Herd.
 type Herd struct{}
+
+var ErrNotSupported = errors.New("service doesn't support action")
 
 // ParseStateCount parses a Herd state count.
 func (h Herd) ParseStateCount(fields []string) (uint64, error) {
@@ -28,4 +34,10 @@ func (h Herd) ParseStateCount(fields []string) (uint64, error) {
 // Herd state lines need no actual processing, and just get passed through verbatim.
 func (h Herd) ParseStateLine(_ TestType, fields []string) (*StateLine, error) {
 	return &StateLine{Rest: fields}, nil
+}
+
+// Args deduces the appropriate arguments for running Herd on job j, with the merged run information r.
+func (h Herd) Args(j job.Harness, r service.RunInfo) ([]string, error) {
+	// TODO(@MattWindsor91): once we extend this to deal with non-harness jobs, add functionality here.
+	return nil, fmt.Errorf("%w: harness making", ErrNotSupported)
 }

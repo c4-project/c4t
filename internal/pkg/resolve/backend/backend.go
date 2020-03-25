@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend/herdtools"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
@@ -28,7 +30,16 @@ var (
 	ErrUnknownStyle = errors.New("unknown backend style")
 
 	// BResolve is a pre-populated compiler resolver.
-	BResolve = Resolver{Backends: map[string]Backend{}}
+	BResolve = Resolver{Backends: map[string]Backend{
+		"herd": herdtools.Backend{
+			DefaultRun: service.RunInfo{Cmd: "herd7"},
+			Impl:       herdtools.Herd{},
+		},
+		"litmus": herdtools.Backend{
+			DefaultRun: service.RunInfo{Cmd: "litmus7"},
+			Impl:       herdtools.Litmus{},
+		},
+	}}
 )
 
 // Backend contains the various interfaces that a backend can implement.

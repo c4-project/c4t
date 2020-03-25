@@ -30,9 +30,12 @@ func LogTopError(err error) {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		_, _ = fmt.Fprintln(os.Stderr, "Any captured stderr follows.")
 		_, _ = fmt.Fprintln(os.Stderr, perr.Stderr)
+		os.Exit(perr.ExitCode())
 		return
 	}
 
 	_, _ = fmt.Fprintln(os.Stderr, "A fatal error has occurred:")
 	_, _ = fmt.Fprintln(os.Stderr, err)
+
+	os.Exit(1)
 }

@@ -6,9 +6,14 @@
 package herdtools
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/obs"
 )
@@ -106,4 +111,60 @@ func parseTagSigilLine(sigil rune, onEmph, onNorm obs.Tag) (obs.Tag, error) {
 	default:
 		return obs.TagUnknown, fmt.Errorf("%w: unknown sigil %q", ErrBadStateLine, sigil)
 	}
+}
+
+// archMap maps specific ACT architectures to Litmus7 arch names.
+var archMap = map[string]string{
+	"x86.64": "X86_64",
+}
+
+// familyMap maps ACT architecture families to Litmus7 arch names.
+var familyMap = map[string]string{
+	id.ArchFamilyArm: "ARM", // 32-bit
+	id.ArchFamilyPPC: "PPC",
+	id.ArchFamilyX86: "X86", // 32-bit
+}
+
+var (
+	// ErrEmptyArch occurs when the arch ID sent to the Litmus backend is empty.
+	ErrEmptyArch = errors.New("arch empty")
+	// ErrBadArch occurs when the arch ID sent to the Litmus backend doesn't match any of the ones known to it.
+	ErrBadArch = errors.New("arch family unknown")
+)
+
+func lookupArch(arch id.ID) (string, error) {
+	if arch.IsEmpty() {
+		return "", ErrEmptyArch
+	}
+
+	larch, ok := archMap[arch.String()]
+	if !ok {
+		return lookupArchFamily(arch.Tags()[0])
+	}
+	return larch, nil
+}
+
+func lookupArchFamily(fam string) (string, error) {
+	larch, ok := familyMap[fam]
+	if !ok {
+		mk, _ := id.MapKeys(familyMap)
+		return "", fmt.Errorf("%w: %s (valid: %q)", ErrBadArch, larch, mk)
+	}
+	return larch, nil
+}
+
+// Args deduces the appropriate arguments for running Litmus on job j, with the merged run information r.
+func (l Litmus) Args(j job.Harness, r service.RunInfo) ([]string, error) {
+	larch, err := lookupArch(j.Arch)
+	if err != nil {
+		return nil, fmt.Errorf("when looking up -carch: %w", err)
+	}
+	args := []string{
+		"-o", j.OutDir,
+		"-carch", larch,
+		"-c11", "true",
+	}
+	args = append(args, r.Args...)
+	args = append(args, j.InFile)
+	return args, nil
 }
