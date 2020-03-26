@@ -9,6 +9,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
@@ -21,15 +24,16 @@ import (
 )
 
 // makeConfig makes a 'valid' fuzzer config.
-func makeConfig() *fuzzer.Config {
+func makeConfig() (*fuzzer.Config, *fuzzer.MockPathset) {
+	mp := new(fuzzer.MockPathset)
 	return &fuzzer.Config{
 		Driver: fuzzer.NopFuzzer{},
-		Paths:  &fuzzer.MockPathset{},
+		Paths:  mp,
 		Quantities: fuzzer.QuantitySet{
 			CorpusSize:    0,
 			SubjectCycles: 10,
 		},
-	}
+	}, mp
 }
 
 // makePlan makes a 'valid' plan.
@@ -121,7 +125,8 @@ func TestNew_error(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			cfg := makeConfig()
+			cfg, _ := makeConfig()
+
 			if f := c.cdelta; f != nil {
 				cfg = f(cfg)
 			}
@@ -141,7 +146,13 @@ func TestNew_error(t *testing.T) {
 func TestFuzzer_Fuzz_nop(t *testing.T) {
 	t.Parallel()
 
-	cfg := makeConfig()
+	cfg, mp := makeConfig()
+	mp.On("Prepare").Return(nil).Once()
+	mp.On("SubjectPaths", mock.Anything).Return(subject.FuzzFileset{
+		Litmus: "fuzz.litmus",
+		Trace:  "fuzz.trace.txt",
+	})
+
 	p := makePlan()
 
 	f, err := fuzzer.New(cfg, p)
@@ -155,14 +166,10 @@ func TestFuzzer_Fuzz_nop(t *testing.T) {
 
 	for name, s := range p2.Corpus {
 		sc, err := fuzzer.ParseSubjectCycle(name)
-		if err != nil {
-			t.Fatal("name of fuzzer output not a subject-cycle name:", name)
-		}
+		require.NoError(t, err, "name of fuzzer output not a subject-cycle name:", name)
 
 		sf, ok := p.Corpus[sc.Name]
-		if !ok {
-			t.Fatalf("subject %s in fuzzer output has no corresponding input", name)
-		}
+		require.Truef(t, ok, "subject %s in fuzzer output has no corresponding input", name)
 
 		// This isn't exhaustive, but should be enough to catch out issues.
 		if s.Threads != sf.Threads {

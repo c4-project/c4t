@@ -6,26 +6,21 @@
 package fuzzer
 
 import (
-	"path"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
+	"github.com/stretchr/testify/mock"
 )
 
 // MockPathset mocks the SubjectPather interface.
 type MockPathset struct {
-	HasPrepared   bool
-	SubjectCycles []SubjectCycle
+	mock.Mock
 }
 
 func (m *MockPathset) Prepare() error {
-	m.HasPrepared = true
-	return nil
+	args := m.Called()
+	return args.Error(0)
 }
 
 func (m *MockPathset) SubjectPaths(sc SubjectCycle) subject.FuzzFileset {
-	m.SubjectCycles = append(m.SubjectCycles, sc)
-	return subject.FuzzFileset{
-		Litmus: path.Join("litmus", sc.String()),
-		Trace:  path.Join("trace", sc.String()),
-	}
+	args := m.Called(sc)
+	return args.Get(0).(subject.FuzzFileset)
 }
