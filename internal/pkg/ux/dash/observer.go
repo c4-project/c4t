@@ -163,6 +163,8 @@ func (o *Observer) OnIteration(iter uint64, t time.Time) {
 	_ = o.runStart.Write(t.Format(time.Stamp), text.WriteReplace())
 
 	o.addDurationToSparkline(t)
+
+	o.buildLog.Reset()
 }
 
 func (o *Observer) addDurationToSparkline(t time.Time) {
