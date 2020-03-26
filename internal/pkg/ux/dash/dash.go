@@ -34,16 +34,40 @@ type Dash struct {
 	log       *text.Text
 	resultLog *ResultLog
 
+	// nlines is the number of lines written, so far, to the log.
+	nlines uint
+
 	// machines maps from stringified machine IDs to their observers.
 	// (There is a display order for the machines, but we don't track it ourselves.)
 	machines map[string]*Observer
 }
 
+// MaxLogLines is the maximum number of lines that can be written to the log before it resets.
+const MaxLogLines = 1000
+
 // Write lets one write to the text console in the dash as if it were stderr.
 func (d *Dash) Write(p []byte) (n int, err error) {
 	// TODO(@MattWindsor91): mitigate against invalid input
 	sp := string(p)
+
+	d.nlines += countNewlines(sp)
+	if MaxLogLines <= d.nlines {
+		d.nlines -= MaxLogLines
+		d.log.Reset()
+		_ = d.log.Write("[log reset]")
+	}
+
 	return len(sp), d.log.Write(sp)
+}
+
+func countNewlines(sp string) uint {
+	var n uint
+	for _, c := range sp {
+		if c == '\n' {
+			n++
+		}
+	}
+	return n
 }
 
 // New constructs a dashboard for the given machine IDs.

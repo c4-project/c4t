@@ -53,6 +53,9 @@ func (r *ResultLog) Log(mid id.ID, iter uint64, start time.Time, c *collate.Coll
 }
 
 func (r *ResultLog) logBucket(name string, bucket corpus.Corpus) error {
+	if len(bucket) == 0 {
+		return nil
+	}
 	header := fmt.Sprintf("  [%s]\n", name)
 	if err := r.log.Write(header, text.WriteCellOpts(cell.FgColor(colorFailed))); err != nil {
 		return err
