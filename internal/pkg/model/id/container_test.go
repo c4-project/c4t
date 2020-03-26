@@ -66,6 +66,72 @@ func ExampleMapKeys() {
 	// foobar.baz
 }
 
+// ExampleMapGlob is a runnable example for MapGlob.
+func ExampleMapGlob() {
+	c := map[string]int{
+		"foo.baz":     1,
+		"foo.bar.baz": 2,
+		"foo.bar":     3,
+		"bar.baz":     4,
+	}
+	c2, _ := id.MapGlob(c, id.FromString("foo.*.baz"))
+	for k, v := range c2.(map[string]int) {
+		fmt.Println(k, v)
+	}
+
+	// Unordered output:
+	// foo.baz 1
+	// foo.bar.baz 2
+}
+
+// TestMapGlob_errors tests MapKeys's error handling.
+func TestMapGlob_errors(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		in   interface{}
+		glob id.ID
+		out  error
+	}{
+		"normal": {
+			in: map[string]string{
+				"a": "A",
+				"b": "B",
+				"c": "C",
+			},
+			glob: id.FromString("a.*"),
+			out:  nil,
+		},
+		"not-a-map": {
+			in:   5,
+			glob: id.FromString("a.*"),
+			out:  id.ErrNotMap,
+		},
+		"key-not-an-id": {
+			in: map[string]int{
+				"fus..ro": 6,
+			},
+			glob: id.FromString("a.*"),
+			out:  id.ErrTagEmpty,
+		},
+		"glob-not-a-glob": {
+			in: map[string]int{
+				"a.b.c": 6,
+			},
+			glob: id.FromString("a.*.b.*"),
+			out:  id.ErrBadGlob,
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			_, err := id.MapGlob(c.in, c.glob)
+			testhelp.ExpectErrorIs(t, err, c.out, "testing MapGlob")
+		})
+	}
+}
+
 // TestMapKeys_errors tests MapKeys's error handling.
 func TestMapKeys_errors(t *testing.T) {
 	t.Parallel()

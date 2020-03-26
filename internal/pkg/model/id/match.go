@@ -48,7 +48,7 @@ func (i ID) HasSuffix(suffix ID) bool {
 // Matches tests whether this ID matches the glob ID expression glob.
 // glob should be either a literal ID, or an ID with exactly one tag equal to TagGlob.
 func (i ID) Matches(glob ID) (bool, error) {
-	prefix, suffix, exact, err := split(glob)
+	prefix, suffix, exact, err := splitGlob(glob)
 	if err != nil {
 		return false, err
 	}
@@ -62,9 +62,9 @@ func (i ID) slice(from int, to int) ID {
 	return ID{tags: i.tags[from:to]}
 }
 
-// split splits a glob ID into a prefix, suffix, and error.
+// splitGlob splits a glob ID into a prefix, suffix, and error.
 // If there is no glob character, we return a flag that specifies that the match should be exact.
-func split(glob ID) (prefix ID, suffix ID, exact bool, err error) {
+func splitGlob(glob ID) (prefix ID, suffix ID, exact bool, err error) {
 	globIndex := -1
 	for i, tag := range glob.tags {
 		if tag == TagGlob {
