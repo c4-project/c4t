@@ -59,6 +59,16 @@ func (c *Config) FindBackend(_ context.Context, style id.ID, _ ...id.ID) (*servi
 	return c.Backend, nil
 }
 
+// FilterMachines filters this Config's machines according to glob.
+func (c *Config) FilterMachines(glob id.ID) error {
+	nm, err := id.MapGlob(c.Machines, glob)
+	if err != nil {
+		return err
+	}
+	c.Machines = nm.(map[string]Machine)
+	return nil
+}
+
 // MachineIDs gets a sorted slice of machine IDs present in the config.
 // It returns an error if any of the configured machines have an invalid ID.
 func (c *Config) MachineIDs() ([]id.ID, error) {

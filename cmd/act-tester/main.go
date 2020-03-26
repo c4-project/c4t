@@ -8,9 +8,12 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend"
 
@@ -38,20 +41,21 @@ func run(args []string, errw io.Writer) error {
 	ux.ActRunnerFlags(fs, &a)
 	cfile := ux.ConfFileFlag(fs)
 	qs := setupQuantityOverrides(fs)
+	mfilter := fs.String(ux.FlagMachine, "", "A `glob` to use to filter incoming machines by ID.")
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 
-	return runWithArgs(cfile, qs, a, fs.Args())
+	return runWithArgs(cfile, qs, a, *mfilter, fs.Args())
 }
 
-func runWithArgs(cfile *string, qs *config.QuantitySet, a act.Runner, files []string) error {
+func runWithArgs(cfile *string, qs *config.QuantitySet, a act.Runner, mfilter string, files []string) error {
 	c, err := config.Load(*cfile)
 	if err != nil {
 		return err
 	}
-	dc, err := makeDirectorConfig(c, qs, a)
+	dc, err := makeDirectorConfig(c, qs, a, mfilter)
 	if err != nil {
 		return err
 	}
@@ -63,8 +67,14 @@ func runWithArgs(cfile *string, qs *config.QuantitySet, a act.Runner, files []st
 	return d.Direct(context.Background())
 }
 
-func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner) (*director.Config, error) {
+func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner, mfilter string) (*director.Config, error) {
 	c.Quantities.Override(*qs)
+
+	if mfilter != "" {
+		if err := applyMachineFilter(mfilter, c); err != nil {
+			return nil, err
+		}
+	}
 
 	// TODO(@MattWindsor91)
 	e := makeEnv(&a, c)
@@ -82,6 +92,17 @@ func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner) 
 		return nil, err
 	}
 	return dc, nil
+}
+
+func applyMachineFilter(mfilter string, c *config.Config) error {
+	mglob, err := id.TryFromString(mfilter)
+	if err != nil {
+		return fmt.Errorf("parsing machine filter: %w", err)
+	}
+	if err := c.FilterMachines(mglob); err != nil {
+		return fmt.Errorf("applying machine filter: %w", err)
+	}
+	return nil
 }
 
 func makeEnv(a *act.Runner, c *config.Config) director.Env {
