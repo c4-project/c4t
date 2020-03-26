@@ -10,21 +10,21 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/mum4k/termdash/linestyle"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/mum4k/termdash/widgets/text"
 
-	"github.com/mum4k/termdash/linestyle"
-
+	"github.com/mum4k/termdash/terminal/tcell"
 	"github.com/mum4k/termdash/terminal/terminalapi"
 
 	"github.com/mum4k/termdash/container/grid"
 
 	"github.com/mum4k/termdash"
 	"github.com/mum4k/termdash/container"
-	"github.com/mum4k/termdash/terminal/termbox"
 )
 
 // Dash is a director observer that displays all of the current director machines in a terminal dashboard.
@@ -32,6 +32,7 @@ type Dash struct {
 	container *container.Container
 	term      terminalapi.Terminal
 	log       *text.Text
+	resultLog *ResultLog
 
 	// machines maps from stringified machine IDs to their observers.
 	// (There is a display order for the machines, but we don't track it ourselves.)
@@ -47,7 +48,7 @@ func (d *Dash) Write(p []byte) (n int, err error) {
 
 // New constructs a dashboard for the given machine IDs.
 func New(mids []id.ID) (*Dash, error) {
-	t, err := termbox.New()
+	t, err := tcell.New()
 	if err != nil {
 		return nil, err
 	}
@@ -57,13 +58,28 @@ func New(mids []id.ID) (*Dash, error) {
 		return nil, err
 	}
 
-	obs, g, err := makeMachineGrid(mids)
+	rl, err := NewResultLog()
 	if err != nil {
 		return nil, err
 	}
+
+	obs, g, err := makeMachineGrid(mids, rl)
+	if err != nil {
+		return nil, err
+	}
+
+	logs := container.SplitHorizontal(
+		container.Top(
+			container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(x),
+		),
+		container.Bottom(
+			container.Border(linestyle.Double), container.BorderTitle("Results Log"), container.PlaceWidget(rl.log),
+		),
+	)
+
 	c, err := container.New(t,
 		container.SplitVertical(
-			container.Left(container.Border(linestyle.Double), container.BorderTitle("Log"), container.PlaceWidget(x)),
+			container.Left(logs),
 			container.Right(g...),
 			container.SplitPercent(30),
 		),
@@ -76,12 +92,13 @@ func New(mids []id.ID) (*Dash, error) {
 		container: c,
 		term:      t,
 		log:       x,
+		resultLog: rl,
 		machines:  obs,
 	}
 	return &d, nil
 }
 
-func makeMachineGrid(mids []id.ID) (map[string]*Observer, []container.Option, error) {
+func makeMachineGrid(mids []id.ID, rl *ResultLog) (map[string]*Observer, []container.Option, error) {
 	gb := grid.New()
 
 	obs := make(map[string]*Observer, len(mids))
@@ -89,7 +106,7 @@ func makeMachineGrid(mids []id.ID) (map[string]*Observer, []container.Option, er
 	for _, mid := range mids {
 		mstr := mid.String()
 		var err error
-		if obs[mstr], err = NewObserver(); err != nil {
+		if obs[mstr], err = NewObserver(mid, rl); err != nil {
 			return nil, nil, err
 		}
 		obs[mstr].AddToGrid(gb, mstr, pc)

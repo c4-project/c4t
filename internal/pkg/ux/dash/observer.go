@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
 
 	"github.com/mum4k/termdash/widgets/sparkline"
@@ -43,12 +45,18 @@ const (
 
 // Observer is a BuilderObserver that attaches into a Dash.
 type Observer struct {
-	runCount     *segmentdisplay.SegmentDisplay
-	runStart     *text.Text
-	sparks       *sparkset
-	buildLog     *text.Text
-	buildGauge   *gauge.Gauge
-	lastTime     time.Time
+	mid id.ID
+
+	rlog *ResultLog
+
+	runCount   *segmentdisplay.SegmentDisplay
+	runStart   *text.Text
+	sparks     *sparkset
+	buildLog   *text.Text
+	buildGauge *gauge.Gauge
+	lastTime   time.Time
+
+	nruns        uint64
 	nreqs, ndone int
 }
 
@@ -96,11 +104,13 @@ func (s *sparkset) gridRows() []grid.Element {
 }
 
 // NewObserver constructs an Observer, initialising its various widgets.
-func NewObserver() (*Observer, error) {
-	var (
-		d   Observer
-		err error
-	)
+func NewObserver(mid id.ID, rlog *ResultLog) (*Observer, error) {
+	var err error
+
+	d := Observer{
+		mid:  mid,
+		rlog: rlog,
+	}
 
 	if d.runCount, err = segmentdisplay.New(); err != nil {
 		return nil, err
@@ -155,6 +165,7 @@ func (o *Observer) currentRunColumn() grid.Element {
 
 // OnIteration logs that a new iteration has begun.
 func (o *Observer) OnIteration(iter uint64, t time.Time) {
+	o.nruns = iter
 	ch := segmentdisplay.NewChunk(strconv.FormatUint(iter, 10))
 	_ = o.runCount.Write(
 		[]*segmentdisplay.TextChunk{ch},
@@ -177,9 +188,20 @@ func (o *Observer) addDurationToSparkline(t time.Time) {
 
 // OnCollation observes a collation by adding failure/timeout/flag rates to the sparklines.
 func (o *Observer) OnCollation(c *collate.Collation) {
-	_ = o.sparks.flags.Add([]int{len(c.Flagged)})
-	_ = o.sparks.timeouts.Add([]int{len(c.Timeouts)})
-	_ = o.sparks.cfails.Add([]int{len(c.CompileFailures)})
+	serr := o.sparkCollation(c)
+	lerr := o.logCollation(c)
+	o.logError(iohelp.FirstError(serr, lerr))
+}
+
+func (o *Observer) sparkCollation(c *collate.Collation) error {
+	ferr := o.sparks.flags.Add([]int{len(c.Flagged)})
+	terr := o.sparks.timeouts.Add([]int{len(c.Timeouts)})
+	cerr := o.sparks.cfails.Add([]int{len(c.CompileFailures)})
+	return iohelp.FirstError(ferr, terr, cerr)
+}
+
+func (o *Observer) logCollation(c *collate.Collation) error {
+	return o.rlog.Log(o.mid, o.nruns, o.lastTime, c)
 }
 
 // OnStart sets up an observer for a test phase with manifest m.
@@ -278,19 +300,28 @@ func idQualSubjectDesc(sname string, id id.ID) string {
 // logAndStepGauge logs a request with name rq and summary desc, then repopulates the gauge.
 // It uses c as the colour for both.
 func (o *Observer) logAndStepGauge(rq, desc string, c cell.Color) {
-	o.log(rq, desc, c)
-	o.stepGauge(c)
+	lerr := o.log(rq, desc, c)
+	serr := o.stepGauge(c)
+	o.logError(iohelp.FirstError(lerr, serr))
 }
 
 // log logs an observed builder request with name rq and summary desc to the per-machine log.
 // It colours the log with c.
-func (o *Observer) log(rq, desc string, c cell.Color) {
-	_ = o.buildLog.Write(rq, text.WriteCellOpts(cell.FgColor(c)))
-	_ = o.buildLog.Write(" " + desc + "\n")
+func (o *Observer) log(rq, desc string, c cell.Color) error {
+	ferr := o.buildLog.Write(rq, text.WriteCellOpts(cell.FgColor(c)))
+	lerr := o.buildLog.Write(" " + desc + "\n")
+	return iohelp.FirstError(ferr, lerr)
 }
 
 // stepGauge increments the gauge and sets its colour to c.
-func (o *Observer) stepGauge(c cell.Color) {
+func (o *Observer) stepGauge(c cell.Color) error {
 	o.ndone++
-	_ = o.buildGauge.Absolute(o.ndone, o.nreqs, gauge.Color(c))
+	return o.buildGauge.Absolute(o.ndone, o.nreqs, gauge.Color(c))
+}
+
+func (o *Observer) logError(err error) {
+	if err == nil {
+		return
+	}
+	_ = o.buildLog.Write(err.Error(), text.WriteCellOpts(cell.FgColor(cell.ColorRed)))
 }

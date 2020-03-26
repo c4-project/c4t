@@ -7,6 +7,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alessio/shellescape v1.2.2
 	github.com/cheggaaa/pb/v3 v3.0.4
+	github.com/gdamore/tcell v1.3.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mum4k/termdash v0.11.0
