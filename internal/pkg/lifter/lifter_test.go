@@ -10,8 +10,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/lifter"
@@ -25,9 +23,8 @@ func makeConfig() *lifter.Config {
 			SeenSpecs: nil,
 			Err:       nil,
 		},
-		Logger:   nil,
-		Observer: builder.SilentObserver{},
-		Paths:    &lifter.MockPather{},
+		Logger: nil,
+		Paths:  &lifter.MockPather{},
 	}
 }
 

@@ -39,8 +39,8 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	}
 
 	c := builder.Config{
-		Init: nil,
-		Obs:  &obs,
+		Init:      nil,
+		Observers: []builder.Observer{&obs},
 		Manifest: builder.Manifest{
 			Name:  "foobar",
 			NReqs: len(adds),

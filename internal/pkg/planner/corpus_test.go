@@ -12,8 +12,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
-
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/helpers/iohelp"
@@ -86,10 +84,9 @@ func makeCorpusPlanner(tp *TestProber) *planner.CorpusPlanner {
 	in := []string{"foo.litmus", "bar.litmus", "baz.litmus", "foobar.litmus", "foobaz.litmus", "barbaz.litmus"}
 	sort.Strings(in)
 	return &planner.CorpusPlanner{
-		Files:    in,
-		Observer: builder.SilentObserver{},
-		Prober:   tp,
-		Rng:      r,
+		Files:  in,
+		Prober: tp,
+		Rng:    r,
 		// This should enforce a degree of sampling.
 		Size: len(in) / 2,
 	}

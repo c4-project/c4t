@@ -45,3 +45,35 @@ type Instance interface {
 	// Instance observers can observe file copies.
 	remote.CopyObserver
 }
+
+// OnIteration sends OnIteration to every instance observer in obs.
+func OnIteration(iter uint64, time time.Time, obs ...Instance) {
+	for _, o := range obs {
+		o.OnIteration(iter, time)
+	}
+}
+
+// OnCollation sends OnCollation to every instance observer in obs.
+func OnCollation(c *collate.Collation, obs ...Instance) {
+	for _, o := range obs {
+		o.OnCollation(c)
+	}
+}
+
+// LowerToBuilder lowers a slice of instance observers to a slice of builder observers.
+func LowerToBuilder(obs []Instance) []builder.Observer {
+	cos := make([]builder.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
+}
+
+// LowerToCopy lowers a slice of instance observers to a slice of copy observers.
+func LowerToCopy(obs []Instance) []remote.CopyObserver {
+	cos := make([]remote.CopyObserver, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
+}

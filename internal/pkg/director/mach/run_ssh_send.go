@@ -33,7 +33,7 @@ func (r *SSHRunner) sendMapping(ctx context.Context, ms map[string]string) error
 		return err
 	}
 
-	perr := remote.SendMapping(ctx, (*remote.SFTPCopier)(cli), r.observer, ms)
+	perr := remote.SendMapping(ctx, (*remote.SFTPCopier)(cli), ms, r.observers...)
 	cerr := cli.Close()
 
 	if perr != nil {

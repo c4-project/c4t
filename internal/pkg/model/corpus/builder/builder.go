@@ -37,8 +37,8 @@ type Builder struct {
 	// m is the manifest for this builder task.
 	m Manifest
 
-	// obs is the observer for the builder.
-	obs Observer
+	// obs is the observer set for the builder.
+	obs []Observer
 
 	// reqCh is the receiving channel for requests.
 	reqCh <-chan Request
@@ -58,19 +58,11 @@ func NewBuilder(cfg Config) (*Builder, error) {
 	b := Builder{
 		c:      initCorpus(cfg.Init, cfg.NReqs),
 		m:      cfg.Manifest,
-		obs:    obsOrDefault(cfg.Obs),
+		obs:    cfg.Observers,
 		reqCh:  reqCh,
 		SendCh: reqCh,
 	}
 	return &b, nil
-}
-
-// obsOrDefault fills in a default observer if o is nil.
-func obsOrDefault(o Observer) Observer {
-	if o == nil {
-		return SilentObserver{}
-	}
-	return o
 }
 
 func initCorpus(init corpus.Corpus, nreqs int) corpus.Corpus {
@@ -84,8 +76,8 @@ func initCorpus(init corpus.Corpus, nreqs int) corpus.Corpus {
 // Run runs the builder in context ctx.
 // Run is not thread-safe.
 func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
-	b.obs.OnStart(b.m)
-	defer b.obs.OnFinish()
+	b.onStart()
+	defer b.onFinish()
 
 	for i := 0; i < b.m.NReqs; i++ {
 		if err := b.runSingle(ctx); err != nil {
@@ -94,6 +86,18 @@ func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
 	}
 
 	return b.c, nil
+}
+
+func (b *Builder) onStart() {
+	for _, o := range b.obs {
+		o.OnBuildStart(b.m)
+	}
+}
+
+func (b *Builder) onFinish() {
+	for _, o := range b.obs {
+		o.OnBuildFinish()
+	}
 }
 
 func (b *Builder) runSingle(ctx context.Context) error {
@@ -106,7 +110,7 @@ func (b *Builder) runSingle(ctx context.Context) error {
 }
 
 func (b *Builder) runRequest(r Request) error {
-	b.obs.OnRequest(r)
+	b.onRequest(r)
 	switch {
 	case r.Add != nil:
 		return b.add(r.Name, subject.Subject(*r.Add))
@@ -118,6 +122,12 @@ func (b *Builder) runRequest(r Request) error {
 		return b.addRun(r.Name, r.Run.CompilerID, r.Run.Result)
 	default:
 		return fmt.Errorf("%w: %v", ErrBadBuilderRequest, r)
+	}
+}
+
+func (b *Builder) onRequest(r Request) {
+	for _, o := range b.obs {
+		o.OnBuildRequest(r)
 	}
 }
 

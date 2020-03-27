@@ -13,6 +13,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend"
@@ -76,22 +78,35 @@ func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner, 
 		}
 	}
 
-	// TODO(@MattWindsor91)
 	e := makeEnv(&a, c)
+
 	mids, err := c.MachineIDs()
 	if err != nil {
 		return nil, err
 	}
-	o, err := dash.New(mids)
+
+	o, lw, err := makeObservers(mids)
 	if err != nil {
 		return nil, err
 	}
-	l := log.New(o, "", 0)
+
+	l := log.New(lw, "", 0)
+
 	dc, err := director.ConfigFromGlobal(c, l, e, o)
 	if err != nil {
 		return nil, err
 	}
 	return dc, nil
+}
+
+func makeObservers(mids []id.ID) ([]observer.Observer, io.Writer, error) {
+	do, err := dash.New(mids)
+	if err != nil {
+		return nil, nil, err
+	}
+	return []observer.Observer{
+		do,
+	}, do, err
 }
 
 func applyMachineFilter(mfilter string, c *config.Config) error {

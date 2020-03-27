@@ -45,8 +45,8 @@ type Config struct {
 	// Driver is what the compiler should use to run single compiler jobs.
 	Driver SingleRunner
 
-	// Observer observes the compiler's progress across a corpus.
-	Observer builder.Observer
+	// Observers observe the compiler's progress across a corpus.
+	Observers []builder.Observer
 
 	// Logger is the logger used for informational output during the compile.
 	Logger *log.Logger

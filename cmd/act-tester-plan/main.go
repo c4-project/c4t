@@ -77,7 +77,7 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, midstr string, cs i
 			SProbe: &a,
 		},
 		Logger:    l,
-		Observer:  ux.NewPbObserver(l),
+		Observers: ux.Observers(l),
 		MachineID: mid,
 	}
 	return &plan, nil

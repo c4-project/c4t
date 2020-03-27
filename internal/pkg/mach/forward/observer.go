@@ -16,18 +16,18 @@ type Observer struct {
 	*json.Encoder
 }
 
-// OnStart sends a 'started' message through this Observer's encoder.
-func (o *Observer) OnStart(m builder.Manifest) {
+// OnBuildStart sends a 'started' message through this Observer's encoder.
+func (o *Observer) OnBuildStart(m builder.Manifest) {
 	o.forwardHandlingError(Forward{BuildStart: &m})
 }
 
-// OnRequest forwards r to this Observer's encoder.
-func (o *Observer) OnRequest(r builder.Request) {
+// OnBuildRequest forwards r to this Observer's encoder.
+func (o *Observer) OnBuildRequest(r builder.Request) {
 	o.forwardHandlingError(Forward{BuildUpdate: &r})
 }
 
-// OnRequest sends a 'finished' message through this Observer's encoder.
-func (o *Observer) OnFinish() {
+// OnBuildRequest sends a 'finished' message through this Observer's encoder.
+func (o *Observer) OnBuildFinish() {
 	o.forwardHandlingError(Forward{BuildEnd: true})
 }
 

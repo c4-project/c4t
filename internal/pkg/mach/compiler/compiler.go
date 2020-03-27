@@ -77,8 +77,8 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 	eg, ectx := errgroup.WithContext(ctx)
 
 	bc := builder.Config{
-		Init: c.plan.Corpus,
-		Obs:  c.conf.Observer,
+		Init:      c.plan.Corpus,
+		Observers: c.conf.Observers,
 		Manifest: builder.Manifest{
 			Name:  "compile",
 			NReqs: c.count(),

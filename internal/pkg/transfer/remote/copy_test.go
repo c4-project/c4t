@@ -94,7 +94,7 @@ func TestSendMapping(t *testing.T) {
 		o.On("OnCopy", r, l).Return().Once()
 	}
 
-	err := remote.SendMapping(context.Background(), &m, &o, mapping)
+	err := remote.SendMapping(context.Background(), &m, mapping, &o)
 	assert.NoError(t, err)
 
 	if m.AssertExpectations(t) {

@@ -22,8 +22,8 @@ import (
 
 // SSHRunner runs the machine-runner via SSH.
 type SSHRunner struct {
-	// observer observes any copying this SSHRunner does.
-	observer remote.CopyObserver
+	// observers observe any copying this SSHRunner does.
+	observers []remote.CopyObserver
 	// runner tells us how to run SSH.
 	runner *remote.MachineRunner
 	// session receives the session once we start running the command.
@@ -36,8 +36,8 @@ type SSHRunner struct {
 }
 
 // NewSSHRunner creates a new SSHRunner.
-func NewSSHRunner(r *remote.MachineRunner, o remote.CopyObserver, recvRoot string) *SSHRunner {
-	return &SSHRunner{runner: r, observer: o, recvRoot: recvRoot}
+func NewSSHRunner(r *remote.MachineRunner, o []remote.CopyObserver, recvRoot string) *SSHRunner {
+	return &SSHRunner{runner: r, observers: o, recvRoot: recvRoot}
 }
 
 func (r *SSHRunner) Start(ctx context.Context) (*Pipeset, error) {

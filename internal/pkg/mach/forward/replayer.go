@@ -22,8 +22,8 @@ type Replayer struct {
 	// Decoder is the decoder on which we are listening for messages to replay.
 	Decoder *json.Decoder
 
-	// Observer is the observer to which we are forwarding observations.
-	Observer builder.Observer
+	// Observers is the set of observers to which we are forwarding observations.
+	Observers []builder.Observer
 }
 
 // Run runs the replayer.
@@ -51,15 +51,15 @@ func (r *Replayer) Run(ctx context.Context) error {
 func (r *Replayer) forwardToObs(f Forward) error {
 	switch {
 	case f.BuildEnd:
-		r.Observer.OnFinish()
+		builder.OnBuildFinish(r.Observers...)
 		return nil
 	case f.Error != "":
 		return fmt.Errorf("%w: %s", ErrRemote, f.Error)
 	case f.BuildStart != nil:
-		r.Observer.OnStart(*f.BuildStart)
+		builder.OnBuildStart(*f.BuildStart, r.Observers...)
 		return nil
 	case f.BuildUpdate != nil:
-		r.Observer.OnRequest(*f.BuildUpdate)
+		builder.OnBuildRequest(*f.BuildUpdate, r.Observers...)
 		return nil
 	default:
 		return errors.New("received forward with nothing present")

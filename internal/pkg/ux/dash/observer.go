@@ -159,13 +159,13 @@ func (o *Observer) logCollation(c *collate.Collation) error {
 	return o.rlog.Log(o.mid, o.nruns, o.lastTime, c)
 }
 
-// OnStart sets up an observer for a test phase with manifest m.
-func (o *Observer) OnStart(m builder.Manifest) {
+// OnBuildStart sets up an observer for a test phase with manifest m.
+func (o *Observer) OnBuildStart(m builder.Manifest) {
 	o.onTaskStart(m.Name, m.NReqs)
 }
 
-// OnRequest acknowledges a corpus-builder request.
-func (o *Observer) OnRequest(r builder.Request) {
+// OnBuildRequest acknowledges a corpus-builder request.
+func (o *Observer) OnBuildRequest(r builder.Request) {
 	switch {
 	case r.Add != nil:
 		o.onAdd(r.Name)
@@ -221,8 +221,8 @@ func runSuffixAndColour(s subject.Status) (string, cell.Color) {
 	}
 }
 
-// OnFinish acknowledges the end of a run.
-func (o *Observer) OnFinish() {
+// OnBuildFinish acknowledges the end of a run.
+func (o *Observer) OnBuildFinish() {
 	_ = o.buildLog.Write("-- DONE --\n")
 }
 
@@ -237,7 +237,7 @@ func (o *Observer) OnCopy(dst, src string) {
 
 func (o *Observer) OnCopyFinish() {
 	// TODO(@MattWindsor91): abstract this properly
-	o.OnFinish()
+	o.OnBuildFinish()
 }
 
 func (o *Observer) onTaskStart(name string, n int) {

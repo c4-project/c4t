@@ -63,10 +63,10 @@ func (c *Config) makeCompilerConfig() *compiler.Config {
 
 	l, obs := c.makeLoggerAndObserver("compiler: ")
 	return &compiler.Config{
-		Driver:   c.CDriver,
-		Logger:   l,
-		Paths:    compiler.NewPathset(c.OutDir),
-		Observer: obs,
+		Driver:    c.CDriver,
+		Logger:    l,
+		Paths:     compiler.NewPathset(c.OutDir),
+		Observers: obs,
 	}
 }
 
@@ -77,27 +77,28 @@ func (c *Config) makeRunnerConfig() *runner.Config {
 
 	l, obs := c.makeLoggerAndObserver("runner: ")
 	return &runner.Config{
-		Logger:   l,
-		Parser:   c.RDriver,
-		Paths:    runner.NewPathset(c.OutDir),
-		Observer: obs,
-		Timeout:  c.Timeout,
-		NWorkers: c.NWorkers,
+		Logger:    l,
+		Parser:    c.RDriver,
+		Paths:     runner.NewPathset(c.OutDir),
+		Observers: obs,
+		Timeout:   c.Timeout,
+		NWorkers:  c.NWorkers,
 	}
 }
 
-func (c *Config) makeLoggerAndObserver(prefix string) (*log.Logger, builder.Observer) {
+func (c *Config) makeLoggerAndObserver(prefix string) (*log.Logger, []builder.Observer) {
 	errw := c.Stderr
 	if errw == nil {
 		errw = ioutil.Discard
 	}
 
 	if c.JsonStatus {
-		return nil, &forward.Observer{Encoder: json.NewEncoder(errw)}
+		return nil, []builder.Observer{&forward.Observer{Encoder: json.NewEncoder(errw)}}
 	}
 
 	l := log.New(errw, prefix, log.LstdFlags)
-	return l, ux.NewPbObserver(l)
+	// TODO(@MattWindsor91): decouple this?
+	return l, ux.Observers(l)
 }
 
 // Run creates a new machine-dependent phase runner from this config, then runs it on p using ctx.

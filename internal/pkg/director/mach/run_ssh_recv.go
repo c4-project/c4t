@@ -48,7 +48,7 @@ func (r *SSHRunner) recvMapping(ctx context.Context, ms map[string]string) error
 		return err
 	}
 
-	perr := remote.RecvMapping(ctx, (*remote.SFTPCopier)(cli), r.observer, ms)
+	perr := remote.RecvMapping(ctx, (*remote.SFTPCopier)(cli), ms, r.observers...)
 	cerr := cli.Close()
 
 	if perr != nil {

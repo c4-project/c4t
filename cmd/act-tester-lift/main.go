@@ -40,11 +40,11 @@ func run(args []string, outw, errw io.Writer) error {
 	}
 
 	cfg := lifter.Config{
-		Maker:    &backend.BResolve,
-		Logger:   l,
-		Observer: ux.NewPbObserver(l),
-		Paths:    lifter.NewPathset(od),
-		Stderr:   errw,
+		Maker:     &backend.BResolve,
+		Logger:    l,
+		Observers: ux.Observers(l),
+		Paths:     lifter.NewPathset(od),
+		Stderr:    errw,
 	}
 
 	return ux.RunOnPlanFile(context.Background(), &cfg, pf, outw)

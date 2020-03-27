@@ -66,12 +66,12 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		})
 
 	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {
-		obs.OnStart(m)
-		obs.OnRequest(add)
-		obs.OnRequest(harness)
-		obs.OnRequest(compile)
-		obs.OnRequest(run)
-		obs.OnFinish()
+		obs.OnBuildStart(m)
+		obs.OnBuildRequest(add)
+		obs.OnBuildRequest(harness)
+		obs.OnBuildRequest(compile)
+		obs.OnBuildRequest(run)
+		obs.OnBuildFinish()
 	})
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -81,7 +81,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		t.Errorf("manifest mismatch: recv=%v, send=%v", tobs.Manifest, m)
 	}
 	if !tobs.Done {
-		t.Error("test observer didn't receive OnFinish")
+		t.Error("test observer didn't receive OnBuildFinish")
 	}
 
 	if _, addOk := tobs.Adds[add.Name]; !addOk {
@@ -142,6 +142,6 @@ func roundTripPipe() (io.Closer, forward.Observer, *builder.MockObserver, forwar
 	pr, pw := io.Pipe()
 	obs := forward.Observer{Encoder: json.NewEncoder(pw)}
 	tobs := builder.MockObserver{}
-	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observer: &tobs}
+	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observers: []builder.Observer{&tobs}}
 	return pw, obs, &tobs, rep
 }

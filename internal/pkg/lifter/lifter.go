@@ -95,8 +95,8 @@ func (l *Lifter) lift(ctx context.Context) error {
 	l.l.Println("now lifting")
 
 	b, err := builder.NewBuilder(builder.Config{
-		Init: l.plan.Corpus,
-		Obs:  l.conf.Observer,
+		Init:      l.plan.Corpus,
+		Observers: l.conf.Observers,
 		Manifest: builder.Manifest{
 			Name:  "lift",
 			NReqs: l.count(),

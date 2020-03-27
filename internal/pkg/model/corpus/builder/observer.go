@@ -7,27 +7,33 @@ package builder
 
 // Observer is the interface for things that observe a builder.
 type Observer interface {
-	// OnStart executes when the builder starts processing.
-	OnStart(Manifest)
+	// OnBuildStart executes when the builder starts processing.
+	OnBuildStart(Manifest)
 
-	// OnRequest executes when a corpus builder request is processed.
-	OnRequest(Request)
+	// OnBuildRequest executes when a corpus builder request is processed.
+	OnBuildRequest(Request)
 
-	// OnFinish executes when the builder stops processing.
-	OnFinish()
+	// OnBuildFinish executes when the builder stops processing.
+	OnBuildFinish()
 }
 
-// SilentObserver is an observer that does nothing.
-type SilentObserver struct{}
-
-// OnStart does nothing.
-func (s SilentObserver) OnStart(Manifest) {
+// OnBuildStart sends an OnBuildStart message to each observer in obs.
+func OnBuildStart(m Manifest, obs ...Observer) {
+	for _, o := range obs {
+		o.OnBuildStart(m)
+	}
 }
 
-// OnUpdate does nothing.
-func (s SilentObserver) OnRequest(Request) {
+// OnBuildRequest sends an OnBuildRequest message to each observer in obs.
+func OnBuildRequest(r Request, obs ...Observer) {
+	for _, o := range obs {
+		o.OnBuildRequest(r)
+	}
 }
 
-// OnFinish does nothing.
-func (s SilentObserver) OnFinish() {
+// OnBuildStart sends an OnBuildFinish message to each observer in obs.
+func OnBuildFinish(obs ...Observer) {
+	for _, o := range obs {
+		o.OnBuildFinish()
+	}
 }

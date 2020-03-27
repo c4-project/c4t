@@ -42,8 +42,8 @@ type Config struct {
 	// If nil, logging will be suppressed.
 	Logger *log.Logger
 
-	// Observer observes the runner's progress across a corpus.
-	Observer builder.Observer
+	// Observers observe the runner's progress across a corpus.
+	Observers []builder.Observer
 
 	// Parser handles the parsing of observations.
 	Parser ObsParser

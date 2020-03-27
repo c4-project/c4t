@@ -62,8 +62,8 @@ func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	})
 	eg.Go(func() error {
 		r := forward.Replayer{
-			Decoder:  json.NewDecoder(ps.Stderr),
-			Observer: m.observer,
+			Decoder:   json.NewDecoder(ps.Stderr),
+			Observers: m.observers,
 		}
 		return r.Run(ectx)
 	})

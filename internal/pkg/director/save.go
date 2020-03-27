@@ -34,8 +34,8 @@ type Save struct {
 	// Logger is the logger to use when announcing that we're saving subjects.
 	Logger *log.Logger
 
-	// Observer is the instance observer.
-	Observer observer.Instance
+	// Observers is the list of instance observers.
+	Observers []observer.Instance
 
 	// NWorkers is the number of workers to use for the collator.
 	NWorkers int
@@ -50,9 +50,6 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if s.Paths == nil {
 		return nil, iohelp.ErrPathsetNil
 	}
-	if s.Observer == nil {
-		s.Observer = observer.Silent{}
-	}
 
 	s.Logger = iohelp.EnsureLog(s.Logger)
 
@@ -64,7 +61,7 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err != nil {
 		return nil, fmt.Errorf("when collating: %w", err)
 	}
-	s.Observer.OnCollation(coll)
+	observer.OnCollation(coll, s.Observers...)
 
 	for st, c := range coll.ByStatus() {
 		if st < subject.FirstBadStatus {

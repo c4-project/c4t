@@ -46,8 +46,8 @@ type Planner struct {
 	// Logger is the logger used by the planner.
 	Logger *log.Logger
 
-	// Observer watches the plan's corpus being built.
-	Observer builder.Observer
+	// Observers watch the plan's corpus being built.
+	Observers []builder.Observer
 
 	// MachineID is the identifier of the target machine for the plan.
 	MachineID id.ID

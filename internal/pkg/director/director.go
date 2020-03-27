@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
@@ -68,14 +70,13 @@ func (d *Director) Direct(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		eg.Go(func() error {
-			return m.Run(ectx)
-		})
+		eg.Go(func() error { return m.Run(ectx) })
 	}
 
-	eg.Go(func() error {
-		return d.config.Observer.Run(ectx, cancel)
-	})
+	for _, o := range d.config.Observers {
+		o := o
+		eg.Go(func() error { return o.Run(ectx, cancel) })
+	}
 
 	return eg.Wait()
 }
@@ -86,7 +87,7 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, erro
 	if err != nil {
 		return nil, err
 	}
-	obs, err := d.config.Observer.Instance(mid)
+	obs, err := d.instanceObservers(mid)
 	if err != nil {
 		return nil, err
 	}
@@ -98,13 +99,24 @@ func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, erro
 		Env:          &d.config.Env,
 		ID:           mid,
 		InFiles:      d.files,
-		Observer:     obs,
+		Observers:    obs,
 		ScratchPaths: sps,
 		SavedPaths:   vps,
 		Logger:       l,
 		Quantities:   d.config.Quantities,
 	}
 	return &m, nil
+}
+
+func (d *Director) instanceObservers(mid id.ID) ([]observer.Instance, error) {
+	var err error
+	ios := make([]observer.Instance, len(d.config.Observers))
+	for i, o := range d.config.Observers {
+		if ios[i], err = o.Instance(mid); err != nil {
+			return nil, err
+		}
+	}
+	return ios, nil
 }
 
 func logPrefix(midstr string) string {

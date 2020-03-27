@@ -17,6 +17,6 @@ type Config struct {
 	// Manifest gives us the name of the task and the number of requests in it.
 	Manifest
 
-	// Obs is the observer to notify as the builder performs various tasks.
-	Obs Observer
+	// Obs is the list of observers to notify as the builder performs various tasks.
+	Observers []Observer
 }

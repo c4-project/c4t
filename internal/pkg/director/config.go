@@ -37,9 +37,6 @@ var (
 
 	// ErrNoOutDir occurs when we try to build a director with no output directory specified in the config.
 	ErrNoOutDir = errors.New("no output directory specified in config")
-
-	// ErrObserverNil occurs when we try to build a director from a config with no Observer func defined.
-	ErrObserverNil = errors.New("observer func nil")
 )
 
 // Config groups together the various bits of configuration needed to create a director.
@@ -54,8 +51,8 @@ type Config struct {
 	// Machines contains the machines that will be used in the test.
 	Machines map[string]config.Machine
 
-	// Observer is a multi-machine observer for the director.
-	Observer observer.Observer
+	// Observers contains multi-machine observers for the director.
+	Observers []observer.Observer
 
 	// Env groups together the bits of configuration that pertain to dealing with the environment.
 	Env Env
@@ -80,7 +77,7 @@ type Env struct {
 }
 
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
-func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o observer.Observer) (*Config, error) {
+func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, os []observer.Observer) (*Config, error) {
 	if g == nil {
 		return nil, config.ErrNil
 	}
@@ -103,7 +100,7 @@ func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, o observer.Observe
 		SSH:        g.SSH,
 		Machines:   g.Machines,
 		Quantities: g.Quantities,
-		Observer:   o,
+		Observers:  os,
 	}
 	return &c, nil
 }
@@ -118,9 +115,6 @@ func (c *Config) Check() error {
 	}
 	if c.Machines == nil || len(c.Machines) == 0 {
 		return ErrNoMachines
-	}
-	if c.Observer == nil {
-		return ErrObserverNil
 	}
 	// TODO(@MattWindsor91): SSH config?
 	return nil

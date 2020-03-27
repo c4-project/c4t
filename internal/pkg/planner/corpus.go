@@ -26,11 +26,11 @@ type SubjectProber interface {
 
 func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, fs []string) (corpus.Corpus, error) {
 	c := CorpusPlanner{
-		Files:    fs,
-		Prober:   p.Source.SProbe,
-		Observer: p.Observer,
-		Rng:      rng,
-		Size:     p.CorpusSize,
+		Files:     fs,
+		Prober:    p.Source.SProbe,
+		Observers: p.Observers,
+		Rng:       rng,
+		Size:      p.CorpusSize,
 	}
 	return c.Plan(ctx)
 }
@@ -39,8 +39,8 @@ func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, fs []string) (
 type CorpusPlanner struct {
 	// Files contains the files that are to be included in the plan.
 	Files []string
-	// Observer observes the process of building the corpus.
-	Observer builder.Observer
+	// Observers observe the process of building the corpus.
+	Observers []builder.Observer
 	// Prober tells the planner how to probe corpus files for specific information.
 	Prober SubjectProber
 	// Rng is the random number generator to use in corpus sampling.
@@ -84,8 +84,8 @@ func (p *CorpusPlanner) probe(ctx context.Context) (corpus.Corpus, error) {
 
 func (p *CorpusPlanner) makeBuilder() (*builder.Builder, error) {
 	bc := builder.Config{
-		Init: nil,
-		Obs:  p.Observer,
+		Init:      nil,
+		Observers: p.Observers,
 		Manifest: builder.Manifest{
 			Name:  "plan",
 			NReqs: len(p.Files),

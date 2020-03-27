@@ -8,28 +8,29 @@ package mach
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/pkg/transfer/remote"
 )
 
 // Mach runs the machine-runner, through SSH if needed.
 type Mach struct {
-	// observer is the observer to which we are sending updates from the machine-runner.
-	observer observer.Instance
+	// observers is the set of observers to which we are sending updates from the machine-runner.
+	observers []builder.Observer
 
 	// runner describes how to run the machine-runner binary.
 	runner Runner
 }
 
 // New constructs a new Mach with ssh configuration ssh (if any) and local directory dir.
-func New(o observer.Instance, dir string, c *remote.Config, ssh *remote.MachineConfig) (*Mach, error) {
-	r, err := newRunner(o, dir, c, ssh)
+func New(obs []observer.Instance, dir string, c *remote.Config, ssh *remote.MachineConfig) (*Mach, error) {
+	r, err := newRunner(observer.LowerToCopy(obs), dir, c, ssh)
 	if err != nil {
 		return nil, err
 	}
-	return &Mach{observer: o, runner: r}, nil
+	return &Mach{observers: observer.LowerToBuilder(obs), runner: r}, nil
 }
 
-func newRunner(o remote.CopyObserver, dir string, c *remote.Config, ssh *remote.MachineConfig) (Runner, error) {
+func newRunner(o []remote.CopyObserver, dir string, c *remote.Config, ssh *remote.MachineConfig) (Runner, error) {
 	if ssh == nil {
 		return NewLocalRunner(dir), nil
 	}

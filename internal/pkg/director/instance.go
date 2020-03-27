@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/pathset"
@@ -58,8 +60,8 @@ type Instance struct {
 	// Logger points to a logger for this machine's loop.
 	Logger *log.Logger
 
-	// Observer is this machine's observer.
-	Observer observer.Instance
+	// Observers is this machine's observer set.
+	Observers []observer.Instance
 
 	// SavedPaths contains the save pathset for this machine.
 	SavedPaths *pathset.Saved
@@ -108,10 +110,6 @@ func (i *Instance) check() error {
 
 	// TODO(@MattWindsor): check SSHConfig?
 
-	if i.Observer == nil {
-		return errors.New("observer nil")
-	}
-
 	return nil
 }
 
@@ -148,7 +146,7 @@ func (i *Instance) pass(ctx context.Context, iter uint64, sc *StageConfig) error
 		err error
 	)
 
-	i.Observer.OnIteration(iter, time.Now())
+	observer.OnIteration(iter, time.Now(), i.Observers...)
 
 	for _, s := range Stages {
 		if p, err = s.Run(sc, ctx, p); err != nil {
@@ -163,19 +161,21 @@ func (i *Instance) pass(ctx context.Context, iter uint64, sc *StageConfig) error
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
-	p, err := i.makePlanner()
+	obs := observer.LowerToBuilder(i.Observers)
+
+	p, err := i.makePlanner(obs)
 	if err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
-	f, err := i.makeFuzzerConfig()
+	f, err := i.makeFuzzerConfig(obs)
 	if err != nil {
 		return nil, fmt.Errorf("when making fuzzer config: %w", err)
 	}
-	l, err := i.makeLifterConfig()
+	l, err := i.makeLifterConfig(obs)
 	if err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	m, err := mach.New(i.Observer, i.ScratchPaths.DirRun, i.SSHConfig, i.MachConfig.SSH)
+	m, err := mach.New(i.Observers, i.ScratchPaths.DirRun, i.SSHConfig, i.MachConfig.SSH)
 	if err != nil {
 		return nil, fmt.Errorf("when making machine-exec config: %w", err)
 	}
@@ -192,24 +192,24 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 
 func (i *Instance) makeSave() *Save {
 	return &Save{
-		Logger:   i.Logger,
-		Observer: i.Observer,
-		NWorkers: 10, // TODO(@MattWindsor91): get this from somewhere
-		Paths:    i.SavedPaths,
+		Logger:    i.Logger,
+		Observers: i.Observers,
+		NWorkers:  10, // TODO(@MattWindsor91): get this from somewhere
+		Paths:     i.SavedPaths,
 	}
 }
 
-func (i *Instance) makePlanner() (*planner.Planner, error) {
+func (i *Instance) makePlanner(obs []builder.Observer) (*planner.Planner, error) {
 	p := planner.Planner{
 		Source:    i.Env.Planner,
 		Logger:    i.Logger,
-		Observer:  i.Observer,
+		Observers: obs,
 		MachineID: i.ID,
 	}
 	return &p, nil
 }
 
-func (i *Instance) makeFuzzerConfig() (*fuzzer.Config, error) {
+func (i *Instance) makeFuzzerConfig(obs []builder.Observer) (*fuzzer.Config, error) {
 	fz := i.Env.Fuzzer
 	if fz == nil {
 		return nil, errors.New("no single fuzzer provided")
@@ -218,7 +218,7 @@ func (i *Instance) makeFuzzerConfig() (*fuzzer.Config, error) {
 	fc := fuzzer.Config{
 		Driver:     fz,
 		Logger:     i.Logger,
-		Observer:   i.Observer,
+		Observers:  obs,
 		Paths:      fuzzer.NewPathset(i.ScratchPaths.DirFuzz),
 		Quantities: i.Quantities.Fuzz,
 	}
@@ -226,17 +226,17 @@ func (i *Instance) makeFuzzerConfig() (*fuzzer.Config, error) {
 	return &fc, nil
 }
 
-func (i *Instance) makeLifterConfig() (*lifter.Config, error) {
+func (i *Instance) makeLifterConfig(obs []builder.Observer) (*lifter.Config, error) {
 	hm := i.Env.Lifter
 	if hm == nil {
 		return nil, errors.New("no single fuzzer provided")
 	}
 
 	lc := lifter.Config{
-		Maker:    hm,
-		Logger:   i.Logger,
-		Observer: i.Observer,
-		Paths:    lifter.NewPathset(i.ScratchPaths.DirLift),
+		Maker:     hm,
+		Logger:    i.Logger,
+		Observers: obs,
+		Paths:     lifter.NewPathset(i.ScratchPaths.DirLift),
 	}
 
 	return &lc, nil

@@ -28,6 +28,27 @@ type CopyObserver interface {
 	OnCopyFinish()
 }
 
+// OnCopyStart sends an OnCopyStart observation to multiple observers.
+func OnCopyStart(nfiles int, cos ...CopyObserver) {
+	for _, o := range cos {
+		o.OnCopyStart(nfiles)
+	}
+}
+
+// OnCopy sends an OnCopy observation to multiple observers.
+func OnCopy(dst, src string, cos ...CopyObserver) {
+	for _, o := range cos {
+		o.OnCopy(dst, src)
+	}
+}
+
+// OnCopyFinish sends an OnCopyFinish observation to multiple observers.
+func OnCopyFinish(cos ...CopyObserver) {
+	for _, o := range cos {
+		o.OnCopyFinish()
+	}
+}
+
 // Copier provides a mockable interface for remote copying.
 type Copier interface {
 	// Create tries to create a file at path, and, if successful, opens a write-closer pointing to it.
@@ -57,28 +78,28 @@ func (l LocalCopier) MkdirAll(dir string) error {
 }
 
 // SendMapping is shorthand for CopyMapping where the source is a LocalCopier.
-func SendMapping(ctx context.Context, dst Copier, o CopyObserver, mapping map[string]string) error {
-	return CopyMapping(ctx, dst, LocalCopier{}, o, mapping)
+func SendMapping(ctx context.Context, dst Copier, mapping map[string]string, o ...CopyObserver) error {
+	return CopyMapping(ctx, dst, LocalCopier{}, mapping, o...)
 }
 
 // RecvMapping is shorthand for CopyMapping where the source is a LocalCopier.
-func RecvMapping(ctx context.Context, src Copier, o CopyObserver, mapping map[string]string) error {
-	return CopyMapping(ctx, LocalCopier{}, src, o, mapping)
+func RecvMapping(ctx context.Context, src Copier, mapping map[string]string, o ...CopyObserver) error {
+	return CopyMapping(ctx, LocalCopier{}, src, mapping, o...)
 }
 
 // CopyMapping copies the files in the (dest-to-src) map mapping from dst to src.
 // It checks ctx for cancellation between operations.
-func CopyMapping(ctx context.Context, dst, src Copier, o CopyObserver, mapping map[string]string) error {
-	o.OnCopyStart(len(mapping))
-	defer o.OnCopyFinish()
+func CopyMapping(ctx context.Context, dst, src Copier, mapping map[string]string, o ...CopyObserver) error {
+	OnCopyStart(len(mapping), o...)
+	defer OnCopyFinish(o...)
 
 	if err := mkdirs(ctx, dst, mappingDirs(mapping)); err != nil {
 		return err
 	}
-	return copyFiles(ctx, dst, src, o, mapping)
+	return copyFiles(ctx, dst, src, mapping, o...)
 }
 
-func copyFiles(ctx context.Context, dst, src Copier, o CopyObserver, mapping map[string]string) error {
+func copyFiles(ctx context.Context, dst, src Copier, mapping map[string]string, o ...CopyObserver) error {
 	for dpath, spath := range mapping {
 		if err := iohelp.CheckDone(ctx); err != nil {
 			return err
@@ -86,7 +107,7 @@ func copyFiles(ctx context.Context, dst, src Copier, o CopyObserver, mapping map
 		if err := copyFile(dst, src, dpath, spath); err != nil {
 			return fmt.Errorf("copying %s to %s: %w", spath, dpath, err)
 		}
-		o.OnCopy(dpath, spath)
+		OnCopy(dpath, spath, o...)
 	}
 	return nil
 }

@@ -24,8 +24,8 @@ type Config struct {
 	// This may be nil, in which case the lifter will log silently.
 	Logger *log.Logger
 
-	// Observer tracks the lifter's progress across a corpus.
-	Observer builder.Observer
+	// Observers track the lifter's progress across a corpus.
+	Observers []builder.Observer
 
 	// Paths does path resolution and preparation for the incoming lifter.
 	Paths Pather

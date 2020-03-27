@@ -11,9 +11,9 @@ import (
 
 // MockObserver mocks Observer.
 type MockObserver struct {
-	// Manifest populates with the manifest when the observer observes OnStart.
+	// Manifest populates with the manifest when the observer observes OnBuildStart.
 	Manifest Manifest
-	// Done sets to true when the observer observes OnFinish.
+	// Done sets to true when the observer observes OnBuildFinish.
 	Done bool
 	// Adds tracks the add requests seen by the Observer.
 	Adds map[string]struct{}
@@ -25,13 +25,13 @@ type MockObserver struct {
 	Runs map[string][]id.ID
 }
 
-// OnStart mocks the OnStart interface method.
-func (t *MockObserver) OnStart(m Manifest) {
+// OnBuildStart mocks the OnBuildStart interface method.
+func (t *MockObserver) OnBuildStart(m Manifest) {
 	t.Manifest = m
 }
 
-// OnRequest mocks the OnRequest interface method.
-func (t *MockObserver) OnRequest(r Request) {
+// OnBuildRequest mocks the OnBuildRequest interface method.
+func (t *MockObserver) OnBuildRequest(r Request) {
 	switch {
 	case r.Add != nil:
 		t.onAdd(r.Name)
@@ -70,7 +70,7 @@ func addID(dest *map[string][]id.ID, key string, val id.ID) {
 	(*dest)[key] = append((*dest)[key], val)
 }
 
-// OnFinish mocks the OnFinish interface method.
-func (t *MockObserver) OnFinish() {
+// OnBuildFinish mocks the OnBuildFinish interface method.
+func (t *MockObserver) OnBuildFinish() {
 	t.Done = true
 }
