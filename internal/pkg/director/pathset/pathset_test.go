@@ -32,16 +32,16 @@ func ExamplePathset_MachineSaved() {
 	mid := id.FromString("foo.bar.baz")
 	mp := p.MachineSaved(mid)
 
-	fmt.Println(filepath.ToSlash(mp.DirCompileFailures))
-	fmt.Println(filepath.ToSlash(mp.DirFlagged))
-	fmt.Println(filepath.ToSlash(mp.DirRunFailures))
-	fmt.Println(filepath.ToSlash(mp.DirTimeouts))
+	for _, path := range mp.DirList() {
+		fmt.Println(filepath.ToSlash(path))
+	}
 
 	// Output:
-	// saved/foo/bar/baz/compile_fail
 	// saved/foo/bar/baz/flagged
+	// saved/foo/bar/baz/compile_fail
+	// saved/foo/bar/baz/compile_timeout
 	// saved/foo/bar/baz/run_fail
-	// saved/foo/bar/baz/timeout
+	// saved/foo/bar/baz/run_timeout
 }
 
 // ExamplePathset_MachineScratch is a runnable example for MachineScratch.

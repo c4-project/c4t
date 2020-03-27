@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
@@ -37,15 +39,9 @@ func (r *ResultLog) Log(mid id.ID, iter uint64, start time.Time, c *collate.Coll
 		return err
 	}
 
-	for _, b := range []struct {
-		name   string
-		bucket corpus.Corpus
-	}{
-		{name: "compile failures", bucket: c.CompileFailures},
-		{name: "run failures", bucket: c.RunFailures},
-		{name: "timeouts", bucket: c.Timeouts},
-	} {
-		if err := r.logBucket(b.name, b.bucket); err != nil {
+	sc := c.ByStatus()
+	for i := subject.FirstBadStatus; i < subject.NumStatus; i++ {
+		if err := r.logBucket(i.String(), sc[i]); err != nil {
 			return err
 		}
 	}
@@ -69,21 +65,11 @@ func (r *ResultLog) logBucket(name string, bucket corpus.Corpus) error {
 }
 
 func (r *ResultLog) logHeader(mid id.ID, iter uint64, start time.Time, c *collate.Collation) error {
-	ncfails := len(c.CompileFailures)
-	ntimeouts := len(c.Timeouts)
-	nrfails := len(c.RunFailures)
-	nsuccesses := len(c.Successes)
-
-	return r.log.Write(
-		fmt.Sprintf(
-			"[%s #%d %s] %d success, %d c/fail, %d t/out, %d r/fail\n",
-			mid.String(),
-			iter,
-			start.Format(time.Stamp),
-			nsuccesses,
-			ncfails,
-			ntimeouts,
-			nrfails,
-		),
-	)
+	sc := collate.Sourced{
+		MachineID: mid,
+		Iter:      iter,
+		Start:     start,
+		Collation: c,
+	}
+	return r.log.Write(sc.String())
 }

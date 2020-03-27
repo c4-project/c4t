@@ -15,7 +15,6 @@ import (
 // If want is non-positive, no sampling occurs.
 // If sampling occurs, seed becomes the seed for the random number generator used.
 func (c Corpus) Sample(rng *rand.Rand, want int) (Corpus, error) {
-	// TODO(@MattWindsor91): test
 	got := len(c)
 
 	if got == 0 {

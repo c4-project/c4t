@@ -25,12 +25,19 @@ const (
 	// StatusFlagged indicates that a run completed successfully, but its observation was interesting.
 	// Usually this means a counter-example occurred.
 	StatusFlagged
-	// StatusTimeout indicates that a run timed out.
-	StatusTimeout
 	// StatusCompileFail indicates that a run failed because of the compilation failing.
 	StatusCompileFail
+	// StatusCompileTimeout indicates that a run failed because the compilation timed out.
+	StatusCompileTimeout // TODO(@MattWindsor91): use
+	// StatusCompileFail indicates that a run failed directly.
+	StatusRunFail // TODO(@MattWindsor91): use
+	// StatusRunTimeout indicates that a run timed out.
+	StatusRunTimeout
+
 	// NumStatus is the number of status flags.
 	NumStatus
+	// FirstBadStatus refers to the first status that is neither OK nor 'unknown'.
+	FirstBadStatus = StatusFlagged
 )
 
 var (
@@ -42,8 +49,10 @@ var (
 		"unknown",
 		"ok",
 		"flagged",
-		"timeout",
-		"compile_fail",
+		"compile/fail",
+		"compile/timeout",
+		"run/fail",
+		"run/timeout",
 	}
 )
 
@@ -52,7 +61,7 @@ var (
 // Otherwise, it propagates the error forwards.
 func StatusOfError(err error) (Status, error) {
 	if errors.Is(err, context.DeadlineExceeded) {
-		return StatusTimeout, nil
+		return StatusRunTimeout, nil
 	}
 	return StatusUnknown, err
 }

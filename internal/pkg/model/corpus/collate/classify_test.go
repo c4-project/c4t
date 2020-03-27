@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
 )
@@ -22,20 +24,8 @@ func TestCollate_empty(t *testing.T) {
 	if err != nil {
 		t.Fatal("unexpected error collating empty corpus:", err)
 	}
-	if len(c.Timeouts) != 0 {
-		t.Error("timeouts not empty")
-	}
-	if len(c.Flagged) != 0 {
-		t.Error("flagged not empty")
-	}
-	if len(c.RunFailures) != 0 {
-		t.Error("run-failures not empty")
-	}
-	if len(c.CompileFailures) != 0 {
-		t.Error("compile-failures not empty")
-	}
-	if len(c.Successes) != 0 {
-		t.Error("successes not empty")
+	for k, coll := range c.ByStatus() {
+		assert.Emptyf(t, coll, "%s not empty", k)
 	}
 }
 
@@ -53,10 +43,11 @@ func TestCollate_mock(t *testing.T) {
 		subc         corpus.Corpus
 		wantSubjects []string
 	}{
-		"timeouts":         {subc: c.Timeouts, wantSubjects: []string{"barbaz"}},
 		"flagged":          {subc: c.Flagged, wantSubjects: []string{"baz"}},
-		"run-failures":     {subc: c.RunFailures, wantSubjects: []string{}},
-		"compile-failures": {subc: c.CompileFailures, wantSubjects: []string{"bar"}},
+		"run-failures":     {subc: c.Run.Failures, wantSubjects: []string{}},
+		"run-timeouts":     {subc: c.Run.Timeouts, wantSubjects: []string{"barbaz"}},
+		"compile-failures": {subc: c.Compile.Failures, wantSubjects: []string{"bar"}},
+		"compile-timeouts": {subc: c.Compile.Timeouts, wantSubjects: []string{}},
 		"successes":        {subc: c.Successes, wantSubjects: []string{"foo"}},
 	}
 	for name, c := range cases {

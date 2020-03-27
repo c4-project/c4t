@@ -7,43 +7,45 @@ package collate
 
 import "github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 
-func classify(named subject.Named) collationFlag {
-	var f collationFlag
+func classify(named subject.Named) flag {
+	var f flag
 	f |= classifyCompiles(named.Compiles)
 	f |= classifyRuns(named.Runs)
 	return f
 }
 
-func classifyCompiles(cs map[string]subject.CompileResult) collationFlag {
+func classifyCompiles(cs map[string]subject.CompileResult) flag {
 	for _, c := range cs {
 		if !c.Success {
-			return ccCompile
+			return flagCompileFail
 		}
 	}
-	return ccOk
+	return flagOk
 }
 
-func classifyRuns(rs map[string]subject.Run) collationFlag {
-	f := ccOk
+func classifyRuns(rs map[string]subject.Run) flag {
+	f := flagOk
 	for _, r := range rs {
-		f |= classifyRun(r.Status)
+		f |= classifyRunStatus(r.Status)
 	}
 	return f
 }
 
-func classifyRun(s subject.Status) collationFlag {
+func classifyRunStatus(s subject.Status) flag {
 	switch s {
 	case subject.StatusFlagged:
-		return ccFlag
+		return flagFlagged
+	case subject.StatusCompileTimeout:
+		// This (will be) probably redundant, as we classify the compile too.
+		return flagCompileTimeout
 	case subject.StatusCompileFail:
 		// This is probably redundant, as we classify the compile too.
-		return ccCompile
-	case subject.StatusTimeout:
-		return ccTimeout
-	case subject.StatusUnknown:
-		// TODO(@MattWindsor91): run failure
-		return ccRunFailure
+		return flagCompileFail
+	case subject.StatusRunTimeout:
+		return flagRunTimeout
+	case subject.StatusRunFail:
+		return flagRunFailure
 	default:
-		return ccOk
+		return flagOk
 	}
 }

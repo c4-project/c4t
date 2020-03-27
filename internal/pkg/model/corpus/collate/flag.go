@@ -5,21 +5,29 @@
 
 package collate
 
-type collationFlag int
+// flag programmatically represents, as a bitwise flag set, the possible classifications for a subject in a collation.
+type flag int
 
 const (
-	ccOk      collationFlag = 0
-	ccCompile collationFlag = 1 << iota
-	ccFlag
-	ccRunFailure
-	ccTimeout
+	// flagOk signifies the absence of collation flags.
+	flagOk flag = 0
+	// flagFlagged signifies that a subject was 'flagged'.
+	flagFlagged flag = 1 << iota
+	// flagCompileFail signifies a compile failure.
+	flagCompileFail
+	// flagCompileTimeout signifies a compile timeout.
+	flagCompileTimeout
+	// flagRunFailure signifies a runtime failure.
+	flagRunFailure
+	// flagRunTimeout signifies a runtime timeout.
+	flagRunTimeout
 )
 
 // matches tests whether this flag matches expected.
-// Generally this a bitwise test, except that ccOk only matches ccOk.
-func (f collationFlag) matches(expected collationFlag) bool {
-	if expected == ccOk {
-		return f == ccOk
+// Generally this a bitwise test, except that flagOk only matches flagOk.
+func (f flag) matches(expected flag) bool {
+	if expected == flagOk {
+		return f == flagOk
 	}
 
 	return (f & expected) == expected

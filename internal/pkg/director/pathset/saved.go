@@ -6,63 +6,60 @@
 package pathset
 
 import (
+	"fmt"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 )
 
 const (
-	segCompileFailures = "compile_fail"
 	segFlagged         = "flagged"
+	segCompileFailures = "compile_fail"
+	segCompileTimeouts = "compile_timeout"
 	segRunFailures     = "run_fail"
-	segTimeouts        = "timeout"
+	segRunTimeouts     = "run_timeout"
 	tarSuffix          = ".tar.gz"
 )
 
 // Saved contains the pre-computed paths for saving 'interesting' run results.
 type Saved struct {
-	// DirCompileFailures stores subjects that ran into compiler failures.
-	DirCompileFailures string
-	// DirFlagged stores subjects that have been flagged as possibly buggy.
-	DirFlagged string
-	// DirRunFailures stores subjects that met run failures.
-	DirRunFailures string
-	// DirTimeouts stores subjects that timed out.
-	DirTimeouts string
+	// Dirs maps 'interesting' statuses to directories.
+	Dirs map[subject.Status]string
 }
 
 // NewSaved creates a save pathset rooted at root.
 func NewSaved(root string) *Saved {
 	return &Saved{
-		DirCompileFailures: filepath.Join(root, segCompileFailures),
-		DirFlagged:         filepath.Join(root, segFlagged),
-		DirRunFailures:     filepath.Join(root, segRunFailures),
-		DirTimeouts:        filepath.Join(root, segTimeouts),
+		Dirs: map[subject.Status]string{
+			subject.StatusFlagged:        filepath.Join(root, segFlagged),
+			subject.StatusCompileFail:    filepath.Join(root, segCompileFailures),
+			subject.StatusCompileTimeout: filepath.Join(root, segCompileTimeouts),
+			subject.StatusRunFail:        filepath.Join(root, segRunFailures),
+			subject.StatusRunTimeout:     filepath.Join(root, segRunTimeouts),
+		},
 	}
 }
 
+// DirList gets the list of directories in the save pathset, ordered by subject number.
+func (s *Saved) DirList() []string {
+	b := subject.FirstBadStatus
+	dirs := make([]string, subject.NumStatus-b)
+	for i := b; i < subject.NumStatus; i++ {
+		dirs[i-b] = s.Dirs[i]
+	}
+	return dirs
+}
+
 // CompileFailureTarFile gets the path to which a tarball for compile-failed subject sname,
-// from the test at time iterTime, should be saved.
-func (s *Saved) CompileFailureTarFile(sname string, iterTime time.Time) string {
-	return tarFile(s.DirCompileFailures, sname, iterTime)
-}
-
-// Flagged gets the path to which a tarball for flagged subject sname,
-// from the test at time iterTime, should be saved.
-func (s *Saved) FlaggedTarFile(sname string, iterTime time.Time) string {
-	return tarFile(s.DirFlagged, sname, iterTime)
-}
-
-// RunFailureTarFile gets the path to which a tarball for run-failed subject sname,
-// from the test at time iterTime, should be saved.
-func (s *Saved) RunFailureTarFile(sname string, iterTime time.Time) string {
-	return tarFile(s.DirRunFailures, sname, iterTime)
-}
-
-// TimeoutTarFile gets the path to which a tarball for compile-failed subject sname,
-// from the test at time iterTime, should be saved.
-func (s *Saved) TimeoutTarFile(sname string, iterTime time.Time) string {
-	return tarFile(s.DirTimeouts, sname, iterTime)
+// from the test at time iterTime and with final status st, should be saved.
+func (s *Saved) SubjectTarFile(sname string, st subject.Status, iterTime time.Time) (string, error) {
+	dir, ok := s.Dirs[st]
+	if !ok {
+		return "", fmt.Errorf("%w: not an 'interesting' status", subject.ErrBadStatus)
+	}
+	return tarFile(dir, sname, iterTime), nil
 }
 
 // tarFile decides what to call the tarball of the subject with name sname, from the test at time iterTime,

@@ -78,7 +78,7 @@ func ExampleSubject_Harness() {
 func ExampleSubject_RunOf() {
 	s := subject.Subject{Runs: map[string]subject.Run{
 		"gcc":   {Status: subject.StatusOk},
-		"clang": {Status: subject.StatusTimeout},
+		"clang": {Status: subject.StatusRunTimeout},
 	}}
 	gr, _ := s.RunOf(id.FromString("gcc"))
 	cr, _ := s.RunOf(id.FromString("clang"))
@@ -88,7 +88,7 @@ func ExampleSubject_RunOf() {
 
 	// Output:
 	// gcc: ok
-	// clang: timeout
+	// clang: run/timeout
 }
 
 // TestSubject_CompileResult_Missing checks that trying to get a compile for a missing compiler triggers
@@ -181,7 +181,7 @@ func TestSubject_RunOf_Missing(t *testing.T) {
 // TestSubject_AddRun checks that AddRun is working properly.
 func TestSubject_AddRun(t *testing.T) {
 	var s subject.Subject
-	c := subject.Run{Status: subject.StatusTimeout}
+	c := subject.Run{Status: subject.StatusRunTimeout}
 
 	mcomp := id.FromString("gcc")
 

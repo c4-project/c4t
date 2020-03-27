@@ -21,7 +21,7 @@ func Mock() *Plan {
 	// TODO(@MattWindsor91): add things to this plan as time goes on.
 	return &Plan{
 		Header: Header{
-			Creation: time.Date(2011, time.November, 11, 11, 11, 11, 0, time.FixedZone("PST", -8)),
+			Creation: time.Date(2011, time.November, 11, 11, 11, 11, 0, time.FixedZone("PST", -8*60*60)),
 			Seed:     8675309,
 		},
 		Machine: model.Machine{},

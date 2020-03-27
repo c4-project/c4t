@@ -8,6 +8,8 @@ package collate
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 
@@ -16,27 +18,67 @@ import (
 
 // Collation represents a grouping of corpus subjects according to various issues.
 type Collation struct {
-	// CompileFailures contains the subset of the collated corpus that ran into compiler failures.
-	CompileFailures corpus.Corpus
-	// Flagged contains the subset of the collated corpus that has been flagged as possibly buggy.
-	Flagged corpus.Corpus
-	// RunFailures contains the subset of the collated corpus that ran into runtime failures.
-	RunFailures corpus.Corpus
-	// Timeouts contains the subset of the collated corpus that timed out.
-	Timeouts corpus.Corpus
 	// Successes contains the subset of the collated corpus that doesn't fit into any of the above boxes.
 	Successes corpus.Corpus
+	// Flagged contains the subset of the collated corpus that has been flagged as possibly buggy.
+	Flagged corpus.Corpus
+	// Compile contains the subset of the collated corpus that ran into compiler failures.
+	Compile FailCollation
+	// Run contains the subset of the collated corpus that ran into runtime failures.
+	Run FailCollation
+}
+
+// FailCollation represents a grouping of failed corpus subjects under a particular stage (compile, run, etc).
+type FailCollation struct {
+	// Failures contains 'pure' failures.
+	Failures corpus.Corpus
+	// Timeouts contains failures due to timeouts.
+	Timeouts corpus.Corpus
+}
+
+// String summarises this collation as a string.
+func (c *Collation) String() string {
+	var sb strings.Builder
+
+	bf := c.ByStatus()
+
+	// We range over this to enforce a deterministic order.
+	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+		if i != subject.StatusOk {
+			sb.WriteString(", ")
+		}
+		_, _ = fmt.Fprintf(&sb, "%d %s", len(bf[i]), i.String())
+	}
+
+	return sb.String()
+}
+
+// ByStatus gets the corpi that make up this collation, mapped to each subject status.
+func (c *Collation) ByStatus() map[subject.Status]corpus.Corpus {
+	return map[subject.Status]corpus.Corpus{
+		subject.StatusOk:             c.Successes,
+		subject.StatusFlagged:        c.Flagged,
+		subject.StatusCompileFail:    c.Compile.Failures,
+		subject.StatusCompileTimeout: c.Compile.Timeouts,
+		subject.StatusRunFail:        c.Run.Failures,
+		subject.StatusRunTimeout:     c.Run.Timeouts,
+	}
 }
 
 // Collate collates a corpus c using up to nworkers workers.
 func Collate(ctx context.Context, c corpus.Corpus, nworkers int) (*Collation, error) {
 	l := len(c)
 	col := Collation{
-		CompileFailures: make(corpus.Corpus, l),
-		RunFailures:     make(corpus.Corpus, l),
-		Timeouts:        make(corpus.Corpus, l),
-		Flagged:         make(corpus.Corpus, l),
-		Successes:       make(corpus.Corpus, l),
+		Successes: make(corpus.Corpus, l),
+		Flagged:   make(corpus.Corpus, l),
+		Compile: FailCollation{
+			Failures: make(corpus.Corpus, l),
+			Timeouts: make(corpus.Corpus, l),
+		},
+		Run: FailCollation{
+			Failures: make(corpus.Corpus, l),
+			Timeouts: make(corpus.Corpus, l),
+		},
 	}
 
 	// Various bits of the collator expect there to be at least one subject.
@@ -78,21 +120,14 @@ func (c *Collation) build(ctx context.Context, ch <-chan collationRequest, count
 }
 
 func (c *Collation) file(rq collationRequest) {
-	cases := map[collationFlag]corpus.Corpus{
-		ccOk:         c.Successes,
-		ccCompile:    c.CompileFailures,
-		ccRunFailure: c.RunFailures,
-		ccFlag:       c.Flagged,
-		ccTimeout:    c.Timeouts,
-	}
-	for f, c := range cases {
-		if rq.flags.matches(f) {
+	for s, c := range c.ByStatus() {
+		if rq.flags.matches(classifyRunStatus(s)) {
 			c[rq.sub.Name] = rq.sub.Subject
 		}
 	}
 }
 
 type collationRequest struct {
-	flags collationFlag
+	flags flag
 	sub   subject.Named
 }

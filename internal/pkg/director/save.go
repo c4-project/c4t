@@ -66,27 +66,24 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	}
 	s.Observer.OnCollation(coll)
 
-	// TODO(@MattWindsor91): find a better way of doing this - this is quite verbose...
-	cases := []struct {
-		corp corpus.Corpus
-		tf   func(string, time.Time) string
-	}{
-		{corp: coll.CompileFailures, tf: s.Paths.CompileFailureTarFile},
-		{corp: coll.RunFailures, tf: s.Paths.RunFailureTarFile},
-		{corp: coll.Timeouts, tf: s.Paths.TimeoutTarFile},
-		{corp: coll.Flagged, tf: s.Paths.FlaggedTarFile},
-	}
-	for _, c := range cases {
-		if err := s.tarSubjects(c.corp, c.tf, p.Header.Creation); err != nil {
+	for st, c := range coll.ByStatus() {
+		if st < subject.FirstBadStatus {
+			continue
+		}
+
+		if err := s.tarSubjects(st, c, p.Header.Creation); err != nil {
 			return nil, err
 		}
 	}
 	return p, nil
 }
 
-func (s *Save) tarSubjects(corp corpus.Corpus, tf func(string, time.Time) string, creation time.Time) error {
+func (s *Save) tarSubjects(st subject.Status, corp corpus.Corpus, creation time.Time) error {
 	for name, sub := range corp {
-		tarpath := tf(name, creation)
+		tarpath, err := s.Paths.SubjectTarFile(name, st, creation)
+		if err != nil {
+			return err
+		}
 		if err := os.MkdirAll(filepath.Dir(tarpath), 0744); err != nil {
 			return nil
 		}

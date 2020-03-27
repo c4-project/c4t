@@ -85,7 +85,7 @@ func MockTimeoutRun(name string) subject.Subject {
 			"msvc": MockSuccessfulCompile("msvc", name),
 		},
 		Runs: map[string]subject.Run{
-			"msvc": {Status: subject.StatusTimeout},
+			"msvc": {Status: subject.StatusRunTimeout},
 		},
 	}
 }

@@ -21,5 +21,5 @@ func (p *Scratch) Prepare() error {
 
 // Prepare prepares this pathset by making its directories.
 func (s *Saved) Prepare() error {
-	return iohelp.Mkdirs(s.DirCompileFailures, s.DirFlagged, s.DirRunFailures, s.DirTimeouts)
+	return iohelp.Mkdirs(s.DirList()...)
 }

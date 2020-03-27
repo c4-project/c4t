@@ -14,8 +14,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
 
-	"github.com/mum4k/termdash/widgets/sparkline"
-
 	"github.com/mum4k/termdash/widgets/segmentdisplay"
 
 	"github.com/mum4k/termdash/container"
@@ -58,49 +56,6 @@ type Observer struct {
 
 	nruns        uint64
 	nreqs, ndone int
-}
-
-// sparks contains the sparklines for a machine.
-type sparkset struct {
-	runTime  *sparkline.SparkLine
-	cfails   *sparkline.SparkLine
-	timeouts *sparkline.SparkLine
-	flags    *sparkline.SparkLine
-}
-
-func newSparkset() (*sparkset, error) {
-	var (
-		s   sparkset
-		err error
-	)
-	for _, pp := range []struct {
-		p **sparkline.SparkLine
-		c cell.Color
-		l string
-	}{
-		{l: "Time ", p: &s.runTime, c: cell.ColorGreen},
-		{l: "CFail", p: &s.cfails, c: cell.ColorRed},
-		{l: "T/Out", p: &s.timeouts, c: cell.ColorMagenta},
-		{l: "Flags", p: &s.flags, c: cell.ColorYellow},
-	} {
-		if *pp.p, err = sparkline.New(sparkline.Color(pp.c), sparkline.Label(pp.l)); err != nil {
-			return nil, err
-		}
-	}
-	return &s, err
-}
-
-func (s *sparkset) sparkLines() []*sparkline.SparkLine {
-	return []*sparkline.SparkLine{s.runTime, s.cfails, s.timeouts, s.flags}
-}
-
-func (s *sparkset) gridRows() []grid.Element {
-	sls := s.sparkLines()
-	els := make([]grid.Element, len(sls))
-	for i, sl := range sls {
-		els[i] = grid.RowHeightFixed(2, grid.Widget(sl))
-	}
-	return els
 }
 
 // NewObserver constructs an Observer, initialising its various widgets.
@@ -195,8 +150,8 @@ func (o *Observer) OnCollation(c *collate.Collation) {
 
 func (o *Observer) sparkCollation(c *collate.Collation) error {
 	ferr := o.sparks.flags.Add([]int{len(c.Flagged)})
-	terr := o.sparks.timeouts.Add([]int{len(c.Timeouts)})
-	cerr := o.sparks.cfails.Add([]int{len(c.CompileFailures)})
+	terr := o.sparks.timeouts.Add([]int{len(c.Run.Timeouts)})
+	cerr := o.sparks.cfails.Add([]int{len(c.Compile.Failures)})
 	return iohelp.FirstError(ferr, terr, cerr)
 }
 
@@ -257,7 +212,7 @@ func runSuffixAndColour(s subject.Status) (string, cell.Color) {
 	switch s {
 	case subject.StatusFlagged:
 		return " [FLAGGED]", colorFlagged
-	case subject.StatusTimeout:
+	case subject.StatusRunTimeout:
 		return " [TIMEOUT]", colorTimeout
 	case subject.StatusCompileFail:
 		return " [FAILED]", colorFailed
