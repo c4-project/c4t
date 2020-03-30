@@ -7,13 +7,12 @@ package dash
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/corpus/collate"
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/widgets/text"
 )
@@ -33,43 +32,35 @@ func NewResultLog() (*ResultLog, error) {
 	return &r, err
 }
 
-// Log logs a collation for the machine with ID mid on iteration iter, starting at start.
-func (r *ResultLog) Log(mid id.ID, iter uint64, start time.Time, c *collate.Collation) error {
-	if err := r.logHeader(mid, iter, start, c); err != nil {
-		return err
-	}
-
-	sc := c.ByStatus()
-	for i := subject.FirstBadStatus; i < subject.NumStatus; i++ {
-		if err := r.logBucket(i.String(), sc[i]); err != nil {
-			return err
-		}
-	}
-	return nil
+// Log logs a sourced collation sc.
+func (r *ResultLog) Log(sc collate.Sourced) error {
+	return observer.Log(r, sc)
 }
 
-func (r *ResultLog) logBucket(name string, bucket corpus.Corpus) error {
-	if len(bucket) == 0 {
-		return nil
-	}
-	header := fmt.Sprintf("  [%s]\n", name)
-	if err := r.log.Write(header, text.WriteCellOpts(cell.FgColor(colorFailed))); err != nil {
-		return err
-	}
-	for _, n := range bucket.Names() {
-		if err := r.log.Write(fmt.Sprintf("  - %s\n", n)); err != nil {
-			return err
-		}
-	}
-	return nil
+// LogHeader logs the header of a sourced collation sc.
+func (r *ResultLog) LogHeader(sc collate.Sourced) error {
+	return r.log.Write(sc.String()+"\n", text.WriteCellOpts(cell.FgColor(summaryColor(sc))))
 }
 
-func (r *ResultLog) logHeader(mid id.ID, iter uint64, start time.Time, c *collate.Collation) error {
-	sc := collate.Sourced{
-		MachineID: mid,
-		Iter:      iter,
-		Start:     start,
-		Collation: c,
+// summaryColor retrieves a colour to use for the log header of sc, according to a 'traffic lights' system.
+func summaryColor(sc collate.Sourced) cell.Color {
+	switch {
+	case sc.Collation.HasFailures():
+		return colorFailed
+	case sc.Collation.HasFlagged():
+		return colorFlagged
+	default:
+		return colorRun
 	}
-	return r.log.Write(sc.String())
+}
+
+// LogHeader logs the header of a collation bucket with status st.
+func (r *ResultLog) LogBucketHeader(st subject.Status) error {
+	header := fmt.Sprintf("  [%s]\n", st)
+	return r.log.Write(header, text.WriteCellOpts(cell.FgColor(colorFailed)))
+}
+
+// LogHeader logs an entry for a subject with name sname.
+func (r *ResultLog) LogBucketEntry(sname string) error {
+	return r.log.Write(fmt.Sprintf("  - %s\n", sname))
 }

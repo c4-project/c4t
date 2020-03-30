@@ -12,6 +12,9 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
+
+	"github.com/mitchellh/go-homedir"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
 
@@ -53,31 +56,70 @@ func run(args []string, errw io.Writer) error {
 }
 
 func runWithArgs(cfile *string, qs *config.QuantitySet, a act.Runner, mfilter string, files []string) error {
-	c, err := config.Load(*cfile)
-	if err != nil {
-		return err
-	}
-	dc, err := makeDirectorConfig(c, qs, a, mfilter)
+	c, err := loadAndAmendConfig(cfile, qs, mfilter)
 	if err != nil {
 		return err
 	}
 
-	d, err := director.New(dc, files)
+	logw, err := createResultLogFile(c)
 	if err != nil {
 		return err
 	}
-	return d.Direct(context.Background())
+
+	d, err := makeDirector(c, a, logw, files)
+	if err != nil {
+		_ = logw.Close()
+		return err
+	}
+
+	if derr := d.Direct(context.Background()); derr != nil {
+		_ = logw.Close()
+		return derr
+	}
+
+	return logw.Close()
 }
 
-func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner, mfilter string) (*director.Config, error) {
-	c.Quantities.Override(*qs)
+func createResultLogFile(c *config.Config) (*os.File, error) {
+	logpath, err := homedir.Expand(filepath.Join(c.OutDir, "results.log"))
+	if err != nil {
+		return nil, fmt.Errorf("expanding result log file path: %w", err)
+	}
+	logw, err := os.Create(logpath)
+	if err != nil {
+		return nil, fmt.Errorf("opening result log file: %w", err)
+	}
+	return logw, nil
+}
 
+func loadAndAmendConfig(cfile *string, qs *config.QuantitySet, mfilter string) (*config.Config, error) {
+	c, err := config.Load(*cfile)
+	if err != nil {
+		return nil, err
+	}
+	c.Quantities.Override(*qs)
 	if mfilter != "" {
 		if err := applyMachineFilter(mfilter, c); err != nil {
 			return nil, err
 		}
 	}
+	return c, nil
+}
 
+func makeDirector(c *config.Config, a act.Runner, logw io.Writer, files []string) (*director.Director, error) {
+	dc, err := makeDirectorConfig(c, a, logw)
+	if err != nil {
+		return nil, err
+	}
+
+	d, err := director.New(dc, files)
+	if err != nil {
+		return nil, err
+	}
+	return d, nil
+}
+
+func makeDirectorConfig(c *config.Config, a act.Runner, logw io.Writer) (*director.Config, error) {
 	e := makeEnv(&a, c)
 
 	mids, err := c.MachineIDs()
@@ -85,7 +127,7 @@ func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner, 
 		return nil, err
 	}
 
-	o, lw, err := makeObservers(mids)
+	o, lw, err := makeObservers(mids, logw)
 	if err != nil {
 		return nil, err
 	}
@@ -99,14 +141,13 @@ func makeDirectorConfig(c *config.Config, qs *config.QuantitySet, a act.Runner, 
 	return dc, nil
 }
 
-func makeObservers(mids []id.ID) ([]observer.Observer, io.Writer, error) {
+func makeObservers(mids []id.ID, logw io.Writer) ([]observer.Observer, io.Writer, error) {
 	do, err := dash.New(mids)
 	if err != nil {
 		return nil, nil, err
 	}
-	return []observer.Observer{
-		do,
-	}, do, err
+	lo := observer.NewLogger(logw)
+	return []observer.Observer{do, lo}, do, err
 }
 
 func applyMachineFilter(mfilter string, c *config.Config) error {

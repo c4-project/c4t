@@ -156,7 +156,13 @@ func (o *Observer) sparkCollation(c *collate.Collation) error {
 }
 
 func (o *Observer) logCollation(c *collate.Collation) error {
-	return o.rlog.Log(o.mid, o.nruns, o.lastTime, c)
+	sc := collate.Sourced{
+		MachineID: o.mid,
+		Iter:      o.nruns,
+		Start:     o.lastTime,
+		Collation: c,
+	}
+	return o.rlog.Log(sc)
 }
 
 // OnBuildStart sets up an observer for a test phase with manifest m.

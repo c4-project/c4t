@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// collate handles analysing a Corpus and filing its subjects into categorised sub-corpi
+// Package collate handles analysing a Corpus and filing its subjects into categorised sub-corpi.
 package collate
 
 import (
@@ -51,18 +51,6 @@ func (c *Collation) String() string {
 	}
 
 	return sb.String()
-}
-
-// ByStatus gets the corpi that make up this collation, mapped to each subject status.
-func (c *Collation) ByStatus() map[subject.Status]corpus.Corpus {
-	return map[subject.Status]corpus.Corpus{
-		subject.StatusOk:             c.Successes,
-		subject.StatusFlagged:        c.Flagged,
-		subject.StatusCompileFail:    c.Compile.Failures,
-		subject.StatusCompileTimeout: c.Compile.Timeouts,
-		subject.StatusRunFail:        c.Run.Failures,
-		subject.StatusRunTimeout:     c.Run.Timeouts,
-	}
 }
 
 // Collate collates a corpus c using up to nworkers workers.
