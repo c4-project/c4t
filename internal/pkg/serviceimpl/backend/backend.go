@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend/herdtools"
+	"github.com/MattWindsor91/act-tester/internal/pkg/serviceimpl/backend/herdtools"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/job"
 

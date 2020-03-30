@@ -11,9 +11,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/backend"
+	"github.com/MattWindsor91/act-tester/internal/pkg/serviceimpl/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/compiler"
+	"github.com/MattWindsor91/act-tester/internal/pkg/serviceimpl/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/mach"
 

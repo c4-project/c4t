@@ -147,11 +147,7 @@ func (s *Save) tarFileToWriter(rpath, wpath string, tarw *tar.Writer) error {
 
 	hdr, err := tarFileHeader(rpath, wpath)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			s.Logger.Println("file missing when archiving error:", rpath)
-			return nil
-		}
-		return err
+		return s.rescueNotExistError(err, rpath)
 	}
 	if err := tarw.WriteHeader(hdr); err != nil {
 		return fmt.Errorf("writing header: %w", err)
@@ -166,6 +162,14 @@ func (s *Save) tarFileToWriter(rpath, wpath string, tarw *tar.Writer) error {
 		return fmt.Errorf("archiving %s: %w", rpath, err)
 	}
 	return cerr
+}
+
+func (s *Save) rescueNotExistError(err error, rpath string) error {
+	if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	s.Logger.Println("file missing when archiving error:", rpath)
+	return nil
 }
 
 func tarFileHeader(rpath, wpath string) (*tar.Header, error) {

@@ -8,7 +8,7 @@ package litmus_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/litmus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/tools/litmus"
 )
 
 // ExamplePathset_MainCFile is a testable example for MainCFile.

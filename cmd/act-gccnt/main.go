@@ -32,8 +32,11 @@ func main() {
 }
 
 const (
-	flagOutput = "o"
-	flagDryRun = "nt-dryrun"
+	flagOutput       = "o"
+	flagBin          = "nt-bin"
+	flagDryRun       = "nt-dryrun"
+	flagDivergeOnOpt = "nt-diverge-opt"
+	flagErrorOnOpt   = "nt-error-opt"
 )
 
 func flags() []c.Flag {
@@ -45,9 +48,24 @@ func flags() []c.Flag {
 			TakesFile: true,
 			Value:     "a.out",
 		},
+		&c.StringFlag{
+			Name:  flagBin,
+			Usage: "the 'real' compiler `command` to run",
+			Value: "gcc",
+		},
 		&c.BoolFlag{
 			Name:  flagDryRun,
 			Usage: "print the outcome of running gccn't instead of doing it",
+		},
+		&c.StringSliceFlag{
+			Name:    flagErrorOnOpt,
+			Aliases: nil,
+			Usage:   "O-levels (minus the '-O') on which gccn't should exit with an error",
+		},
+		&c.StringSliceFlag{
+			Name:    flagDivergeOnOpt,
+			Aliases: nil,
+			Usage:   "O-levels (minus the '-O') on which gccn't should diverge",
 		},
 	}
 	return append(fs, oflags()...)
@@ -73,14 +91,16 @@ func run(ctx *c.Context) error {
 	}
 
 	g := gccnt.Gccnt{
-		Bin:      "gcc",
-		In:       ctx.Args().Slice(),
-		Out:      ctx.Path(flagOutput),
-		OptLevel: olevel,
+		Bin:         "gcc",
+		In:          ctx.Args().Slice(),
+		Out:         ctx.Path(flagOutput),
+		OptLevel:    olevel,
+		DivergeOpts: ctx.StringSlice(flagDivergeOnOpt),
+		ErrorOpts:   ctx.StringSlice(flagErrorOnOpt),
 	}
 
 	if ctx.Bool(flagDryRun) {
-		return g.DryRun(os.Stderr)
+		return g.DryRun(ctx.Context, os.Stderr)
 	}
 	return g.Run(ctx.Context, os.Stdout, os.Stderr)
 }

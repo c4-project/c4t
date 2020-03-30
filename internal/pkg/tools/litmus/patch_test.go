@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/litmus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/tools/litmus"
 )
 
 const mainFileExample = `// File example

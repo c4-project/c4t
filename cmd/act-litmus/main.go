@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/act"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/litmus"
+	"github.com/MattWindsor91/act-tester/internal/pkg/tools/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
 )

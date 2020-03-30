@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/pkg/model/service"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/resolve/compiler"
+	"github.com/MattWindsor91/act-tester/internal/pkg/serviceimpl/compiler"
 )
 
 // ExampleGCCArgs is a runnable example for GCCArgs.

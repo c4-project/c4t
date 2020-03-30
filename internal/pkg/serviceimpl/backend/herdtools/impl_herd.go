@@ -37,7 +37,7 @@ func (h Herd) ParseStateLine(_ TestType, fields []string) (*StateLine, error) {
 }
 
 // Args deduces the appropriate arguments for running Herd on job j, with the merged run information r.
-func (h Herd) Args(j job.Harness, r service.RunInfo) ([]string, error) {
+func (h Herd) Args(_ job.Harness, _ service.RunInfo) ([]string, error) {
 	// TODO(@MattWindsor91): once we extend this to deal with non-harness jobs, add functionality here.
 	return nil, fmt.Errorf("%w: harness making", ErrNotSupported)
 }
