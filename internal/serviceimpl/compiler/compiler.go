@@ -39,7 +39,7 @@ var (
 
 // Compiler contains the various interfaces that a compiler can implement.
 type Compiler interface {
-	optlevel.Resolver
+	mdl.Resolver
 	compiler.SingleRunner
 }
 
@@ -50,7 +50,7 @@ type Resolver struct {
 }
 
 // Get tries to look up the compiler specified by nc in this resolver.
-func (r *Resolver) Get(c *mdl.Compiler) (Compiler, error) {
+func (r *Resolver) Get(c *mdl.Config) (Compiler, error) {
 	if c == nil {
 		return nil, ErrNil
 	}
@@ -62,9 +62,27 @@ func (r *Resolver) Get(c *mdl.Compiler) (Compiler, error) {
 	return cp, nil
 }
 
+// DefaultLevels gets the default optimisation levels for the compiler described by c.
+func (r *Resolver) DefaultLevels(c *mdl.Config) (map[string]struct{}, error) {
+	cp, err := r.Get(c)
+	if err != nil {
+		return nil, err
+	}
+	return cp.DefaultLevels(c)
+}
+
+// Levels gets information about all available optimisation levels for the compiler described by c.
+func (r *Resolver) Levels(c *mdl.Config) (map[string]optlevel.Level, error) {
+	cp, err := r.Get(c)
+	if err != nil {
+		return nil, err
+	}
+	return cp.Levels(c)
+}
+
 // RunCompiler runs the compiler specified by nc on job j, using this resolver to map the style to a concrete compiler.
 func (r *Resolver) RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) error {
-	cp, err := r.Get(j.Compiler)
+	cp, err := r.Get(&j.Compiler.Config)
 	if err != nil {
 		return err
 	}

@@ -15,8 +15,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
 
-// ExampleGCCArgs is a runnable example for GCCArgs.
-func ExampleGCCArgs() {
+// ExampleArgs is a runnable example for Args.
+func ExampleArgs() {
 	args := gcc.Args(service.RunInfo{
 		Cmd:  "gcc7",
 		Args: []string{"-funroll-loops"},

@@ -21,18 +21,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// Source contains all of the various sources for a Planner's information.
-type Source struct {
-	// BProbe is the backend prober.
-	BProbe BackendFinder
-
-	// CProbe is the compiler prober.
-	CProbe CompilerLister
-
-	// SProbe is the subject prober.
-	SProbe SubjectProber
-}
-
 // Planner holds all configuration for the test planner.
 type Planner struct {
 	// Source contains all of the various sources for a Planner's information.

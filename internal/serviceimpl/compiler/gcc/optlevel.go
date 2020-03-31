@@ -5,7 +5,10 @@
 
 package gcc
 
-import "github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+import (
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+)
 
 var (
 	// OptLevels contains the optimisation levels known to exist on GCC, Clang, AppleClang etc.
@@ -75,14 +78,14 @@ var (
 )
 
 // DefaultLevels gets the default level set for GCC.
-func (g GCC) DefaultLevels() map[string]struct{} {
+func (g GCC) DefaultLevels(_ *compiler.Config) (map[string]struct{}, error) {
 	sel := optlevel.Selection{
 		Enabled:  OptLevelNames,
 		Disabled: OptLevelDisabledNames,
 	}
-	return sel.Override(nil)
+	return sel.Override(nil), nil
 }
 
-func (_ GCC) Levels() map[string]optlevel.Level {
-	return OptLevels
+func (_ GCC) Levels(_ *compiler.Config) (map[string]optlevel.Level, error) {
+	return OptLevels, nil
 }

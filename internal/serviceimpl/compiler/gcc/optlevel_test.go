@@ -8,6 +8,8 @@ package gcc_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
 	"github.com/stretchr/testify/assert"
 )
@@ -31,14 +33,17 @@ func TestOptLevelNames_consistency(t *testing.T) {
 // TestGCC_Levels tests that Levels returns the expected level set.
 func TestGCC_Levels(t *testing.T) {
 	t.Parallel()
-	assert.Equal(t, gcc.OptLevels, gcc.GCC{}.Levels())
+	ls, err := gcc.GCC{}.Levels(nil)
+	assert.NoError(t, err)
+	assert.Equal(t, gcc.OptLevels, ls)
 }
 
 // TestGCC_DefaultLevels tests that DefaultLevels returns a level set broadly consistent with expectations.
 func TestGCC_DefaultLevels(t *testing.T) {
 	t.Parallel()
 
-	dl := gcc.GCC{}.DefaultLevels()
+	dl, err := gcc.GCC{}.DefaultLevels(nil)
+	require.NoError(t, err)
 
 	t.Run("disabled", func(t *testing.T) {
 		t.Parallel()
