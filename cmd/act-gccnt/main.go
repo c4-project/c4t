@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
+
 	"github.com/MattWindsor91/act-tester/internal/tool/gccnt"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
@@ -71,11 +73,9 @@ func flags() []c.Flag {
 	return append(fs, oflags()...)
 }
 
-var oflagNames = []string{"0", "1", "2", "3", "fast", "s", "g"}
-
 func oflags() []c.Flag {
-	flags := make([]c.Flag, len(oflagNames))
-	for i, o := range oflagNames {
+	flags := make([]c.Flag, len(gcc.OptLevelNames))
+	for i, o := range gcc.OptLevelNames {
 		flags[i] = &c.BoolFlag{
 			Name:  "O" + o,
 			Usage: fmt.Sprintf("optimisation level '%s'", o),
@@ -109,7 +109,7 @@ func geto(ctx *c.Context) (string, error) {
 	set := false
 	o := "0"
 
-	for _, possible := range oflagNames {
+	for _, possible := range gcc.OptLevelNames {
 		if ctx.Bool("O" + possible) {
 			o = possible
 			if set {

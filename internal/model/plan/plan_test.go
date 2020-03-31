@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -22,11 +22,11 @@ import (
 
 // ExamplePlan_CompilerIDs is a runnable example for CompilerIDs.
 func ExamplePlan_CompilerIDs() {
-	p := plan.Plan{Compilers: map[string]service.Compiler{
-		"gcc.ppc":   {Arch: id.ArchPPC},
-		"clang.ppc": {Arch: id.ArchPPC},
-		"gcc":       {Arch: id.ArchArm},
-		"clang":     {Arch: id.ArchArm},
+	p := plan.Plan{Compilers: map[string]compiler.Compiler{
+		"gcc.ppc":   {Config: compiler.Config{Arch: id.ArchPPC}},
+		"clang.ppc": {Config: compiler.Config{Arch: id.ArchPPC}},
+		"gcc":       {Config: compiler.Config{Arch: id.ArchArm}},
+		"clang":     {Config: compiler.Config{Arch: id.ArchArm}},
 	}}
 	cids, _ := p.CompilerIDs()
 	for _, c := range cids {
@@ -49,18 +49,18 @@ func TestMachinePlan_Arches(t *testing.T) {
 		want []id.ID
 	}{
 		"no arches": {plan.Plan{}, []id.ID{}},
-		"one compiler": {plan.Plan{Compilers: map[string]service.Compiler{
-			"gcc": {Arch: id.ArchX8664},
+		"one compiler": {plan.Plan{Compilers: map[string]compiler.Compiler{
+			"gcc": {Config: compiler.Config{Arch: id.ArchX8664}},
 		}}, []id.ID{id.ArchX8664}},
-		"same arch": {plan.Plan{Compilers: map[string]service.Compiler{
-			"gcc":   {Arch: id.ArchArm},
-			"clang": {Arch: id.ArchArm},
+		"same arch": {plan.Plan{Compilers: map[string]compiler.Compiler{
+			"gcc":   {Config: compiler.Config{Arch: id.ArchArm}},
+			"clang": {Config: compiler.Config{Arch: id.ArchArm}},
 		}}, []id.ID{id.ArchArm}},
-		"two arches": {plan.Plan{Compilers: map[string]service.Compiler{
-			"gcc-ppc":   {Arch: id.ArchPPC},
-			"clang-ppc": {Arch: id.ArchPPC},
-			"gcc":       {Arch: id.ArchArm},
-			"clang":     {Arch: id.ArchArm},
+		"two arches": {plan.Plan{Compilers: map[string]compiler.Compiler{
+			"gcc-ppc":   {Config: compiler.Config{Arch: id.ArchPPC}},
+			"clang-ppc": {Config: compiler.Config{Arch: id.ArchPPC}},
+			"gcc":       {Config: compiler.Config{Arch: id.ArchArm}},
+			"clang":     {Config: compiler.Config{Arch: id.ArchArm}},
 		}}, []id.ID{id.ArchArm, id.ArchPPC}},
 	}
 

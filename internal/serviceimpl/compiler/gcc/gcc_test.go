@@ -3,21 +3,21 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package compiler_test
+package gcc_test
 
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
+
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
-
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 )
 
 // ExampleGCCArgs is a runnable example for GCCArgs.
 func ExampleGCCArgs() {
-	args := compiler.GCCArgs(service.RunInfo{
+	args := gcc.GCCArgs(service.RunInfo{
 		Cmd:  "gcc7",
 		Args: []string{"-funroll-loops"},
 	}, job.Compile{

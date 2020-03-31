@@ -11,6 +11,8 @@ import (
 	"io"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -36,7 +38,7 @@ type Plan struct {
 
 	// Compilers represents the compilers to be targeted by this plan.
 	// Each compiler's key is a stringified form of its machine CompilerID.
-	Compilers map[string]service.Compiler `toml:"compilers"`
+	Compilers map[string]compiler.Compiler `toml:"compilers"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
 	Corpus corpus.Corpus `toml:"corpus"`

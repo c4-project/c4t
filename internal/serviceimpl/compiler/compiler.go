@@ -12,6 +12,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
+
+	mdl "github.com/MattWindsor91/act-tester/internal/model/compiler"
+
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -27,7 +31,7 @@ var (
 
 	// CResolve is a pre-populated compiler resolver.
 	CResolve = Resolver{Compilers: map[string]compiler.SingleRunner{
-		"gcc": GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}}},
+		"gcc": gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}}},
 	}}
 )
 
@@ -38,7 +42,7 @@ type Resolver struct {
 }
 
 // Get tries to look up the compiler specified by nc in this resolver.
-func (r *Resolver) Get(c *service.Compiler) (compiler.SingleRunner, error) {
+func (r *Resolver) Get(c *mdl.Compiler) (compiler.SingleRunner, error) {
 	if c == nil {
 		return nil, ErrNil
 	}

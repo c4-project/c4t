@@ -5,12 +5,14 @@
 
 package job
 
-import "github.com/MattWindsor91/act-tester/internal/model/service"
+import (
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+)
 
 // Compile represents a request to compile a list of files to an executable given a particular compiler.
 type Compile struct {
 	// Compiler describes the compiler to use for the compilation.
-	Compiler *service.Compiler
+	Compiler *compiler.Compiler
 
 	// In is the list of files to be sent to the compiler.
 	In []string

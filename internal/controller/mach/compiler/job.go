@@ -12,9 +12,9 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -33,7 +33,7 @@ type Job struct {
 	MachineID id.ID
 
 	// Compiler points to the compiler to run.
-	Compiler *service.NamedCompiler
+	Compiler *compiler.Named
 
 	// Pathset is the pathset to use for this compiler run.
 	Pathset SubjectPather

@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -76,7 +77,7 @@ func (c *Config) MachineIDs() ([]id.ID, error) {
 }
 
 // ListCompilers implements the compiler listing operation using a config.
-func (c *Config) ListCompilers(_ context.Context, mid id.ID) (map[string]service.Compiler, error) {
+func (c *Config) ListCompilers(_ context.Context, mid id.ID) (map[string]compiler.Config, error) {
 	mstr := mid.String()
 	m, ok := c.Machines[mstr]
 	if !ok {

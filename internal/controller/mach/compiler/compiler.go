@@ -12,7 +12,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -90,7 +90,10 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 	}
 
 	for ids, cc := range c.plan.Compilers {
-		nc := nameCompiler(ids, cc)
+		nc, err := cc.AddNameString(ids)
+		if err != nil {
+			return nil, err
+		}
 		cr := c.makeJob(nc, b.SendCh)
 		eg.Go(func() error {
 			return cr.Compile(ectx)
@@ -124,7 +127,7 @@ func (c *Compiler) prepareDirs() error {
 // makeJob makes a job for the named compiler nc, outputting results to resCh.
 // It also takes in a read-only copy, rc, of the corpus; this is because the result handling thread will be modifying
 // the corpus proper.
-func (c *Compiler) makeJob(nc *service.NamedCompiler, resCh chan<- builder.Request) *Job {
+func (c *Compiler) makeJob(nc *compiler.Named, resCh chan<- builder.Request) *Job {
 	return &Job{
 		MachineID: c.mid,
 		Compiler:  nc,
@@ -132,14 +135,6 @@ func (c *Compiler) makeJob(nc *service.NamedCompiler, resCh chan<- builder.Reque
 		Pathset:   c.conf.Paths,
 		Runner:    c.conf.Driver,
 		ResCh:     resCh,
-	}
-}
-
-// nameCompiler sticks the name ids onto the compiler cc.
-func nameCompiler(ids string, cc service.Compiler) *service.NamedCompiler {
-	return &service.NamedCompiler{
-		ID:       id.FromString(ids),
-		Compiler: cc,
 	}
 }
 
