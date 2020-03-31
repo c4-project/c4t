@@ -30,19 +30,24 @@ var (
 	ErrUnknownStyle = errors.New("unknown compiler style")
 
 	// CResolve is a pre-populated compiler resolver.
-	CResolve = Resolver{Compilers: map[string]compiler.SingleRunner{
+	CResolve = Resolver{Compilers: map[string]Compiler{
 		"gcc": gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}}},
 	}}
 )
 
+// Compiler contains the various interfaces that a compiler can implement.
+type Compiler interface {
+	compiler.SingleRunner
+}
+
 // Resolver maps compiler styles to compilers.
 type Resolver struct {
 	// Compilers is the raw map from style strings to compiler runners.
-	Compilers map[string]compiler.SingleRunner
+	Compilers map[string]Compiler
 }
 
 // Get tries to look up the compiler specified by nc in this resolver.
-func (r *Resolver) Get(c *mdl.Compiler) (compiler.SingleRunner, error) {
+func (r *Resolver) Get(c *mdl.Compiler) (Compiler, error) {
 	if c == nil {
 		return nil, ErrNil
 	}
