@@ -17,7 +17,7 @@ import (
 
 // ExampleGCCArgs is a runnable example for GCCArgs.
 func ExampleGCCArgs() {
-	args := gcc.GCCArgs(service.RunInfo{
+	args := gcc.Args(service.RunInfo{
 		Cmd:  "gcc7",
 		Args: []string{"-funroll-loops"},
 	}, job.Compile{

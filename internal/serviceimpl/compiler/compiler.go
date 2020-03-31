@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
 
 	mdl "github.com/MattWindsor91/act-tester/internal/model/compiler"
@@ -37,6 +39,7 @@ var (
 
 // Compiler contains the various interfaces that a compiler can implement.
 type Compiler interface {
+	optlevel.Resolver
 	compiler.SingleRunner
 }
 

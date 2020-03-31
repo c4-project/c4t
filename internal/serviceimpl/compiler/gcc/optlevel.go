@@ -73,3 +73,16 @@ var (
 	// OptLevelDisabledNames contains optimisation levels that are disabled by default, as they aren't portable.
 	OptLevelDisabledNames = []string{"g", "z"}
 )
+
+// DefaultLevels gets the default level set for GCC.
+func (g GCC) DefaultLevels() map[string]struct{} {
+	sel := optlevel.Selection{
+		Enabled:  OptLevelNames,
+		Disabled: OptLevelDisabledNames,
+	}
+	return sel.Override(nil)
+}
+
+func (_ GCC) Levels() map[string]optlevel.Level {
+	return OptLevels
+}

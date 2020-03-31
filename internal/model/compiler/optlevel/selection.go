@@ -11,12 +11,9 @@ type Selection struct {
 	Enabled []string `toml:"enabled,omitempty"`
 	// Disabled overrides the default selection to remove optimisation levels.
 	Disabled []string `toml:"disabled,omitempty"`
-
-	// Level contains any specifically resolved
-	Level *Named
 }
 
-// Override inserts enables from this selection into defaults, then removes disables.
+// Select inserts enables from this selection into defaults, then removes disables.
 // Disables take priority over enables.
 // The resulting map is a copy; this function doesn't mutate defaults.
 func (s Selection) Override(defaults map[string]struct{}) map[string]struct{} {

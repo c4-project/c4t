@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -105,7 +107,7 @@ func TestMapGlob_errors(t *testing.T) {
 		"not-a-map": {
 			in:   5,
 			glob: id.FromString("a.*"),
-			out:  id.ErrNotMap,
+			out:  stringhelp.ErrNotMap,
 		},
 		"key-not-an-id": {
 			in: map[string]int{
@@ -150,7 +152,7 @@ func TestMapKeys_errors(t *testing.T) {
 		},
 		"not-a-map": {
 			in:  5,
-			out: id.ErrNotMap,
+			out: stringhelp.ErrNotMap,
 		},
 		"not-an-id": {
 			in: map[string]int{

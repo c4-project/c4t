@@ -21,21 +21,20 @@ type GCC struct {
 	DefaultRun service.RunInfo
 }
 
-// RunCompiler compiles j according to run using a GCC-friendly invocation.
-
+// RunCompiler compiles j using a GCC-friendly invocation.
 func (g GCC) RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) error {
 	orun := g.DefaultRun
 	if j.Compiler.Run != nil {
 		orun.Override(*j.Compiler.Run)
 	}
-	args := GCCArgs(orun, j)
+	args := Args(orun, j)
 	cmd := exec.CommandContext(ctx, orun.Cmd, args...)
 	cmd.Stderr = errw
 	return cmd.Run()
 }
 
-// GCCArgs computes the arguments to pass to GCC for running job j with run info run.
-func GCCArgs(run service.RunInfo, j job.Compile) []string {
+// Args computes the arguments to pass to GCC for running job j with run info run.
+func Args(run service.RunInfo, j job.Compile) []string {
 	args := run.Args
 	args = append(args, "-o", j.Out)
 	args = append(args, j.In...)
