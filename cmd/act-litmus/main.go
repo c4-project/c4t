@@ -12,11 +12,11 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/act"
+	"github.com/MattWindsor91/act-tester/internal/act"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/tools/litmus"
+	"github.com/MattWindsor91/act-tester/internal/tool/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
+	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 
 func main() {
 	if err := run(os.Args, os.Stderr); err != nil {
-		ux.LogTopError(err)
+		view.LogTopError(err)
 	}
 }
 
@@ -54,7 +54,7 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 	fs.BoolVar(&cfg.Verbose, "v", false, usageVerbose)
 	fs.StringVar(&cfg.CArch, "carch", "", usageCArch)
 	fs.StringVar(&cfg.Pathset.DirOut, "o", "", usageOutDir)
-	ux.ActRunnerFlags(fs, &a)
+	view.ActRunnerFlags(fs, &a)
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return nil, err

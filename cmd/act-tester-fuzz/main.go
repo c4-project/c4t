@@ -12,9 +12,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/act"
-	"github.com/MattWindsor91/act-tester/internal/pkg/fuzzer"
-	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
+	"github.com/MattWindsor91/act-tester/internal/act"
+	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
 // defaultOutDir is the default directory used for the results of the lifter.
@@ -22,7 +22,7 @@ const defaultOutDir = "fuzz_results"
 
 func main() {
 	err := run(os.Args, os.Stdout, os.Stderr)
-	ux.LogTopError(err)
+	view.LogTopError(err)
 }
 
 func run(args []string, outw, errw io.Writer) error {
@@ -31,9 +31,9 @@ func run(args []string, outw, errw io.Writer) error {
 
 	var dir, pf string
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	ux.ActRunnerFlags(fs, &a)
-	ux.OutDirFlag(fs, &dir, defaultOutDir)
-	ux.PlanFileFlag(fs, &pf)
+	view.ActRunnerFlags(fs, &a)
+	view.OutDirFlag(fs, &dir, defaultOutDir)
+	view.PlanFileFlag(fs, &pf)
 
 	qs := setupQuantityFlags(fs)
 
@@ -43,17 +43,17 @@ func run(args []string, outw, errw io.Writer) error {
 
 	cfg := fuzzer.Config{
 		Driver:     &a,
-		Observers:  ux.Observers(l),
+		Observers:  view.Observers(l),
 		Logger:     l,
 		Paths:      fuzzer.NewPathset(dir),
 		Quantities: *qs,
 	}
-	return ux.RunOnPlanFile(context.Background(), &cfg, pf, outw)
+	return view.RunOnPlanFile(context.Background(), &cfg, pf, outw)
 }
 
 func setupQuantityFlags(fs *flag.FlagSet) *fuzzer.QuantitySet {
 	var q fuzzer.QuantitySet
-	ux.CorpusSizeFlag(fs, &q.CorpusSize)
-	ux.SubjectCycleFlag(fs, &q.SubjectCycles)
+	view.CorpusSizeFlag(fs, &q.CorpusSize)
+	view.SubjectCycleFlag(fs, &q.SubjectCycles)
 	return &q
 }

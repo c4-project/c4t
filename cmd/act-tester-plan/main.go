@@ -12,34 +12,34 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/config"
+	"github.com/MattWindsor91/act-tester/internal/config"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/act"
-	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
+	"github.com/MattWindsor91/act-tester/internal/act"
+	"github.com/MattWindsor91/act-tester/internal/view"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
+	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 )
 
 const usageMach = "ID of machine to use for this test plan"
 
 func main() {
 	err := run(os.Args, os.Stdout, os.Stderr)
-	ux.LogTopError(err)
+	view.LogTopError(err)
 }
 
 func run(args []string, outw, errw io.Writer) error {
 	a := act.Runner{Stderr: errw}
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	pmach := fs.String(ux.FlagMachine, "", usageMach)
-	ux.ActRunnerFlags(fs, &a)
+	pmach := fs.String(view.FlagMachine, "", usageMach)
+	view.ActRunnerFlags(fs, &a)
 
-	cfile := ux.ConfFileFlag(fs)
+	cfile := view.ConfFileFlag(fs)
 
 	var cs int
-	ux.CorpusSizeFlag(fs, &cs)
+	view.CorpusSizeFlag(fs, &cs)
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
@@ -77,7 +77,7 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, midstr string, cs i
 			SProbe: &a,
 		},
 		Logger:    l,
-		Observers: ux.Observers(l),
+		Observers: view.Observers(l),
 		MachineID: mid,
 	}
 	return &plan, nil

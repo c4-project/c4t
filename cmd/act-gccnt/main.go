@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/tools/gccnt"
+	"github.com/MattWindsor91/act-tester/internal/tool/gccnt"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
+	"github.com/MattWindsor91/act-tester/internal/view"
 
 	// This name is because every single time I try to use v2 named as 'cli', my IDE decides to replace it with v1.
 	// Yes, I know, I shouldn't work around IDE issues by obfuscating my code, but I'm at my wit's end.
@@ -28,7 +28,7 @@ func main() {
 		HideHelpCommand:        true,
 		UseShortOptionHandling: true,
 	}
-	ux.LogTopError(app.Run(os.Args))
+	view.LogTopError(app.Run(os.Args))
 }
 
 const (

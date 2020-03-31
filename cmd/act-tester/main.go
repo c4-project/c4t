@@ -16,26 +16,26 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/director/observer"
+	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/serviceimpl/backend"
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/ux/dash"
+	"github.com/MattWindsor91/act-tester/internal/view/dash"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/act"
-	"github.com/MattWindsor91/act-tester/internal/pkg/planner"
+	"github.com/MattWindsor91/act-tester/internal/act"
+	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/config"
+	"github.com/MattWindsor91/act-tester/internal/config"
 
-	"github.com/MattWindsor91/act-tester/internal/pkg/director"
-	"github.com/MattWindsor91/act-tester/internal/pkg/ux"
+	"github.com/MattWindsor91/act-tester/internal/director"
+	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
 func main() {
 	err := run(os.Args, os.Stderr)
-	ux.LogTopError(err)
+	view.LogTopError(err)
 }
 
 func run(args []string, errw io.Writer) error {
@@ -43,10 +43,10 @@ func run(args []string, errw io.Writer) error {
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 
-	ux.ActRunnerFlags(fs, &a)
-	cfile := ux.ConfFileFlag(fs)
+	view.ActRunnerFlags(fs, &a)
+	cfile := view.ConfFileFlag(fs)
 	qs := setupQuantityOverrides(fs)
-	mfilter := fs.String(ux.FlagMachine, "", "A `glob` to use to filter incoming machines by ID.")
+	mfilter := fs.String(view.FlagMachine, "", "A `glob` to use to filter incoming machines by ID.")
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
@@ -176,7 +176,7 @@ func makeEnv(a *act.Runner, c *config.Config) director.Env {
 func setupQuantityOverrides(fs *flag.FlagSet) *config.QuantitySet {
 	var q config.QuantitySet
 	// TODO(@MattWindsor91): disambiguate the corpus size argument
-	ux.CorpusSizeFlag(fs, &q.Fuzz.CorpusSize)
-	ux.SubjectCycleFlag(fs, &q.Fuzz.SubjectCycles)
+	view.CorpusSizeFlag(fs, &q.Fuzz.CorpusSize)
+	view.SubjectCycleFlag(fs, &q.Fuzz.SubjectCycles)
 	return &q
 }
