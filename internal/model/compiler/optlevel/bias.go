@@ -42,6 +42,16 @@ var (
 	}
 )
 
+// BiasOfString tries to get the bias corresponding to s.
+func BiasOfString(s string) (Bias, error) {
+	for i := BiasUnknown; i < NumBias; i++ {
+		if strings.EqualFold(biasStrings[i], s) {
+			return i, nil
+		}
+	}
+	return BiasUnknown, fmt.Errorf("%w: %s", ErrBadBias, s)
+}
+
 // String converts this bias into a human-readable string.
 func (b Bias) String() string {
 	ts, err := b.tryString()
@@ -69,12 +79,7 @@ func (b Bias) tryString() (string, error) {
 
 // UnmarshalText tries to unmarshal text into a Bias.
 func (b *Bias) UnmarshalText(text []byte) error {
-	ts := string(text)
-	for i := BiasUnknown; i < NumBias; i++ {
-		if strings.EqualFold(biasStrings[i], ts) {
-			*b = i
-			return nil
-		}
-	}
-	return fmt.Errorf("%w: %s", ErrBadBias, ts)
+	var err error
+	*b, err = BiasOfString(string(text))
+	return err
 }
