@@ -1,0 +1,82 @@
+# This is an example 'tester.toml'.
+# Copy it to '~/.config/act/tester.toml' (or '~/Library/Application Support/tester.toml' on macOS) and edit it to taste.
+
+# This is where the tester will save both 'scratch' files (its current run artefacts)
+# and 'saved' files (tarballs of failed runs).
+out_dir = "~/Documents/git/act/test_out"
+
+# The 'quantities' tables set various quantities on act-tester .
+# More quantities will be added as the tester matures.
+[quantities.fuzz]
+    # If provided, this tells the tester to sample at most this many files AFTER fuzzing.
+	corpus_size = 10
+
+# The 'backend' table tells the tester how to run the external stress-testing 'backend'.
+# At time of writing, this'll generally need to be copied verbatim.
+[backend]
+	id = "litmus"
+	style = "litmus"
+	[backend.run]
+	    # The `act-litmus` tool, provided in `act-tester`, wraps litmus and sidesteps several of its oddities.
+		cmd = "act-litmus"
+
+# We now define the machines that will be run in the test.
+[machines.localhost]
+    # Eventually, the number of cores given here will set a hard cap on the number of threads that litmus tests can
+    # have to be run by the tester.
+    # This isn't quite set-up yet, so you'll need to set the cap in the fuzzer's 'act.conf' instead.
+	cores = 4
+
+    # Here is a compiler definition for 'gcc-9', a GCC-style compiler targeting x86-64.
+	[machines.localhost.compilers.gcc]
+		style = "gcc"
+		arch = "x86.64"
+		[machines.localhost.compilers.gcc.run]
+			cmd = "gcc-9"
+
+    # We can use gccn't to exercise the tester's handling of failure and divergence.
+    # gccn't is a tool that pretends to be gcc, but, on certain configured optimisation levels, will error out or
+    # diverge.
+	[machines.localhost.compilers.gccnt]
+		style = "gcc"
+		arch = "x86.64"
+		[machines.localhost.compilers.gccnt.run]
+			cmd = "act-gccnt"
+			# We can append arguments to those that act-tester supplies here.
+			# act-tester automatically supplies arguments for pthreads and GNU11 C.
+			args = ["-nt-bin", "gcc-9", "-nt-error-opt", "2", "-nt-diverge-opt", "3"]
+
+	[machines.localhost.compilers.clang]
+		style = "gcc"
+		arch = "x86.64"
+		[machines.localhost.compilers.clang.run]
+			cmd = "clang"
+
+# Here is an example of a remote machine called 'foo'.
+[machines.foo]
+	cores = 160
+
+    # To SSH into a remote machine, give its host, your username, and a directory on that machine to which it can copy
+    # scratch data.
+    # act-tester assumes that there is an SSH agent running that it can use to authenticate; it doesn't (yet) support
+    # key files.
+	[machines.foo.ssh]
+		host = "foo.bar.baz"
+		user = "you"
+		copy_dir = "/home/mwind/act2"
+
+    # We can define compilers just as above.
+	[machines.foo.compilers.gcc]
+		style = "gcc"
+		# Here is an example of a different architecture.
+		# These architecture IDs translate to Litmus architectures as follows:
+		#
+		# x86: X86
+		# x86.64: X86_64
+		# ppc: PPC
+		# arm: ARM
+		#
+		# At time of writing, anything after the first dot is ignored, but this may change.
+		arch = "ppc.64"
+			[machines.foo.compilers.gcc.run]
+			cmd = "gcc"

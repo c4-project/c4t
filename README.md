@@ -1,26 +1,37 @@
 # `act-tester`
 
-`act-tester` is a work-in progress rewrite of the top-level testing framework
-in the [ACT](https://github.com/MattWindsor91/act) project.  The idea is that the new tester:
-
-- is in Go, not Python (and so is a little faster, more maintainable, and easier to deploy);
-- has machine-level parallelism (either within a test cycle or at the top-level;
-- takes control of more parts of the test process, such as fuzzing and optimiser levels;
-- handles test failures more gracefully.
+`act-tester` is the top-level testing framework
+for the [ACT](https://github.com/MattWindsor91/act) project.
 
 ## Components
 
-We envision that `act-tester` will have the following components:
+`act-tester` has the following components:
 
-- [x] `act-tester-plan`, which creates an initial test plan over some Litmus tests and compilers;
-- [ ] `act-tester-split`, which converts a test plan over multiple machines to multiple test plans over one machine;
-- [x] `act-tester-fuzz`, which runs `act-fuzz` over a test plan to create a more useful plan;
-- [x] `act-tester-lift`, which runs a harness maker over a test plan to _lift_ subjects compilable harnesses;
-- [ ] `act-tester-cp`, which copies a test plan to one of its remote machines;
-- [ ] `act-tester-run`, which runs _local_ compilers over Litmus harnesses to produce results;
-- [ ] `act-tester`, which combines the above into a looping test campaign.
+- `act-tester-plan`, which creates an initial test plan over some Litmus tests and compilers for a single machine;
+- `act-tester-fuzz`, which runs `act-fuzz` over a test plan to create a more useful plan;
+- `act-tester-lift`, which runs a harness maker over a test plan to _lift_ subjects compilable harnesses;
+- `act-tester-mach`, which runs _local_ compilers over Litmus harnesses to produce results;
+- `act-tester`, which combines the above into a looping test campaign over multiple machines.
 
-The aim is for each component to be available as an individually testable program, but for most test work to use `act-tester`.
+It also contains the following utilities:
+
+- `act-gccnt`, a wrapper around `gcc` that adds support for (controlled) misbehaviour, useful for testing testers'
+  resilience to compiler crashes;
+- `act-litmus`, a wrapper around `litmus7` that incorporates various workarounds useful for act-tester.
+
+## Use
+
+Note that `act-tester` is still pretty rough around the edges - please feel free to file issues about its user
+experience and documentation.
+
+- Install using the usual `go` tools: for example,
+ `go get github.com/MattWindsor91/act-tester/cmd/...`.  All commands are in the `cmd` directory.
+- Make sure that at least `act-tester-mach` is installed on any remote machine you wish to use for testing.
+- Create a `tester.toml` file (see `tester-example.toml`).
+  Note that this is _different_ from the `act.conf` used by ACT (and, in fact, supersedes it in several areas),
+  but you'll need both.
+- For now, the easiest thing to do is to `cd` into an ACT working directory, make an `act.conf` in there, and run
+  a command such as `act-tester examples/c_litmus/memalloy/*.litmus`.
 
 ## Licence
 
