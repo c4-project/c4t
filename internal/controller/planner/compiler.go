@@ -99,7 +99,7 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compile
 			return nil, fmt.Errorf("%s not a valid ID: %w", n, err)
 		}
 		if cmps[n], err = c.planCompiler(cfg); err != nil {
-			return nil, fmt.Errorf("planning compiler %s: %w", n, err)
+			return nil, fmt.Errorf("planning compiler %s/%s: %w", c.MachineID, n, err)
 		}
 
 		OnCompilerPlan(*cmps[n].AddName(nid), c.Observers...)

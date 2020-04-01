@@ -57,7 +57,7 @@ func (r *Resolver) Get(c *mdl.Config) (Compiler, error) {
 	sstr := c.Style.String()
 	cp, ok := r.Compilers[sstr]
 	if !ok {
-		return nil, fmt.Errorf("%w: %s", ErrUnknownStyle, sstr)
+		return nil, fmt.Errorf("%w: %q", ErrUnknownStyle, sstr)
 	}
 	return cp, nil
 }
