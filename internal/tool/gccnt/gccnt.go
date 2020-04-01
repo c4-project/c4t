@@ -39,6 +39,12 @@ type Gccnt struct {
 
 	// DivergeOpts contains the optimisation levels at which gccn't will diverge.
 	DivergeOpts []string
+
+	// Std specifies the standard to pass to gcc.
+	Std string
+
+	// Pthread specifies whether to pass -pthread to gcc.
+	Pthread bool
 }
 
 // runner is the interface of low-level drivers that gccn't can use.
@@ -94,6 +100,12 @@ func (g *Gccnt) args() []string {
 	args := []string{
 		"-o", g.Out,
 		"-O" + g.OptLevel,
+	}
+	if g.Std != "" {
+		args = append(args, "-std="+g.Std)
+	}
+	if g.Pthread {
+		args = append(args, "-pthread")
 	}
 	return append(args, g.In...)
 }

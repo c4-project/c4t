@@ -39,6 +39,8 @@ const (
 	flagDryRun       = "nt-dryrun"
 	flagDivergeOnOpt = "nt-diverge-opt"
 	flagErrorOnOpt   = "nt-error-opt"
+	flagPthread      = "pthread"
+	flagStd          = "std"
 )
 
 func flags() []c.Flag {
@@ -69,6 +71,14 @@ func flags() []c.Flag {
 			Aliases: nil,
 			Usage:   "O-levels (minus the '-O') on which gccn't should diverge",
 		},
+		&c.StringFlag{
+			Name:  flagStd,
+			Usage: "Standard to pass through to gcc",
+		},
+		&c.BoolFlag{
+			Name:  flagPthread,
+			Usage: "passes through pthread to gcc",
+		},
 	}
 	return append(fs, oflags()...)
 }
@@ -91,12 +101,14 @@ func run(ctx *c.Context) error {
 	}
 
 	g := gccnt.Gccnt{
-		Bin:         "gcc",
+		Bin:         ctx.String(flagBin),
 		In:          ctx.Args().Slice(),
 		Out:         ctx.Path(flagOutput),
 		OptLevel:    olevel,
 		DivergeOpts: ctx.StringSlice(flagDivergeOnOpt),
 		ErrorOpts:   ctx.StringSlice(flagErrorOnOpt),
+		Std:         ctx.String(flagStd),
+		Pthread:     ctx.Bool(flagPthread),
 	}
 
 	if ctx.Bool(flagDryRun) {
