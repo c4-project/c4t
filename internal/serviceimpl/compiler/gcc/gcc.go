@@ -36,6 +36,9 @@ func (g GCC) RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) err
 // Args computes the arguments to pass to GCC for running job j with run info run.
 func Args(run service.RunInfo, j job.Compile) []string {
 	args := run.Args
+	if j.Compiler != nil && j.Compiler.SelectedOpt != nil {
+		args = append(args, "-O"+j.Compiler.SelectedOpt.Name)
+	}
 	args = append(args, "-o", j.Out)
 	args = append(args, j.In...)
 	return args

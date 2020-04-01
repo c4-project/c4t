@@ -19,8 +19,8 @@ var (
 	ErrNoSuchLevel = errors.New("no such optimisation level")
 )
 
-// Resolver is the interface of types that support optimisation level lookup.
-type Resolver interface {
+// Inspector is the interface of types that support optimisation level lookup.
+type Inspector interface {
 	// DefaultLevels retrieves a set of optimisation levels that are enabled by default for compiler c.
 	DefaultLevels(c *Config) (map[string]struct{}, error)
 	// Levels retrieves a set of potential optimisation levels for compiler c.
@@ -28,17 +28,17 @@ type Resolver interface {
 	Levels(c *Config) (map[string]optlevel.Level, error)
 }
 
-// SelectLevels selects from r the optimisation levels permitted by the configuration c.
-func SelectLevels(r Resolver, c *Config) (map[string]optlevel.Level, error) {
+// SelectLevels selects from in the optimisation levels permitted by the configuration c.
+func SelectLevels(in Inspector, c *Config) (map[string]optlevel.Level, error) {
 	if c == nil {
 		return nil, ErrConfigNil
 	}
 
-	all, err := r.Levels(c)
+	all, err := in.Levels(c)
 	if err != nil {
 		return nil, err
 	}
-	dls, err := r.DefaultLevels(c)
+	dls, err := in.DefaultLevels(c)
 	if err != nil {
 		return nil, err
 	}

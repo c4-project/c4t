@@ -28,7 +28,7 @@ func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, fs []string) (
 	c := CorpusPlanner{
 		Files:     fs,
 		Prober:    p.Source.SProbe,
-		Observers: p.Observers,
+		Observers: p.Observers.Corpus,
 		Rng:       rng,
 		Size:      p.CorpusSize,
 	}

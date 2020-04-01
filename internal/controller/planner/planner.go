@@ -12,8 +12,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
@@ -32,8 +30,8 @@ type Planner struct {
 	// Logger is the logger used by the planner.
 	Logger *log.Logger
 
-	// Observers watch the plan's corpus being built.
-	Observers []builder.Observer
+	// Observers contains the set of observers used to get feedback on the planning action as it completes.
+	Observers ObserverSet
 
 	// MachineID is the identifier of the target machine for the plan.
 	MachineID id.ID
@@ -76,7 +74,7 @@ func (p *Planner) Plan(ctx context.Context, fs []string) (*plan.Plan, error) {
 	}
 
 	p.Logger.Println("Planning compilers...")
-	if pn.Compilers, err = p.planCompilers(ctx); err != nil {
+	if pn.Compilers, err = p.planCompilers(ctx, rng); err != nil {
 		return nil, err
 	}
 

@@ -7,19 +7,16 @@ package mach
 
 import (
 	"context"
-	"encoding/json"
 	"io"
-	"io/ioutil"
 	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-	"github.com/MattWindsor91/act-tester/internal/view"
-
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/runner"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
 
 // Config configures the machine-dependent stage.
@@ -30,8 +27,6 @@ type Config struct {
 	RDriver runner.ObsParser
 	// Stdout is the Writer to which standard out from the machine-dependent stage should go.
 	Stdout io.Writer
-	// Stderr is the Writer to which standard error from the machine-dependent stage should go.
-	Stderr io.Writer
 	// OutDir is the path to the output directory.
 	OutDir string
 	// SkipCompiler tells the machine-runner to skip compilation.
@@ -42,8 +37,12 @@ type Config struct {
 	Timeout int
 	// NWorkers is the number of running workers to run in parallel.
 	NWorkers int
-	// JsonStatus switches the machine-runner from human-readable status output to JSON status output.
-	JsonStatus bool
+	// Logger is the logger to use for the machine-dependent stage.
+	Logger *log.Logger
+	// Observers is the set of observers to attach on the machine-dependent stage.
+	Observers []builder.Observer
+	// Json is, if present, a pointer to the JSON forwarding observer.
+	Json *forward.Observer
 }
 
 func (c *Config) Check() error {
@@ -61,12 +60,11 @@ func (c *Config) makeCompilerConfig() *compiler.Config {
 		return nil
 	}
 
-	l, obs := c.makeLoggerAndObserver("compiler: ")
 	return &compiler.Config{
 		Driver:    c.CDriver,
-		Logger:    l,
+		Logger:    c.Logger,
 		Paths:     compiler.NewPathset(c.OutDir),
-		Observers: obs,
+		Observers: c.Observers,
 	}
 }
 
@@ -75,30 +73,14 @@ func (c *Config) makeRunnerConfig() *runner.Config {
 		return nil
 	}
 
-	l, obs := c.makeLoggerAndObserver("runner: ")
 	return &runner.Config{
-		Logger:    l,
+		Logger:    c.Logger,
 		Parser:    c.RDriver,
 		Paths:     runner.NewPathset(c.OutDir),
-		Observers: obs,
+		Observers: c.Observers,
 		Timeout:   c.Timeout,
 		NWorkers:  c.NWorkers,
 	}
-}
-
-func (c *Config) makeLoggerAndObserver(prefix string) (*log.Logger, []builder.Observer) {
-	errw := c.Stderr
-	if errw == nil {
-		errw = ioutil.Discard
-	}
-
-	if c.JsonStatus {
-		return nil, []builder.Observer{&forward.Observer{Encoder: json.NewEncoder(errw)}}
-	}
-
-	l := log.New(errw, prefix, log.LstdFlags)
-	// TODO(@MattWindsor91): decouple this?
-	return l, view.Observers(l)
 }
 
 // Run creates a new machine-dependent phase runner from this config, then runs it on p using ctx.

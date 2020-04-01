@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// mockResolver mocks Resolver.
+// mockResolver mocks Inspector.
 type mockResolver struct {
 	mock.Mock
 }

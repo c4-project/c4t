@@ -163,7 +163,7 @@ func (i *Instance) pass(ctx context.Context, iter uint64, sc *StageConfig) error
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	obs := observer.LowerToBuilder(i.Observers)
 
-	p, err := i.makePlanner(obs)
+	p, err := i.makePlanner(observer.LowerToPlanner(i.Observers))
 	if err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
@@ -199,11 +199,11 @@ func (i *Instance) makeSave() *Save {
 	}
 }
 
-func (i *Instance) makePlanner(obs []builder.Observer) (*planner.Planner, error) {
+func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error) {
 	p := planner.Planner{
 		Source:    i.Env.Planner,
 		Logger:    i.Logger,
-		Observers: obs,
+		Observers: planner.NewObserverSet(obs...),
 		MachineID: i.ID,
 	}
 	return &p, nil

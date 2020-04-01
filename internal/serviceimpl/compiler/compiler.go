@@ -39,11 +39,11 @@ var (
 
 // Compiler contains the various interfaces that a compiler can implement.
 type Compiler interface {
-	mdl.Resolver
+	mdl.Inspector
 	compiler.SingleRunner
 }
 
-// Resolver maps compiler styles to compilers.
+// Inspector maps compiler styles to compilers.
 type Resolver struct {
 	// Compilers is the raw map from style strings to compiler runners.
 	Compilers map[string]Compiler

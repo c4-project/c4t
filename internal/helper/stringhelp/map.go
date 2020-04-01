@@ -31,3 +31,16 @@ func SafeMapKeys(m interface{}) ([]reflect.Value, error) {
 	}
 	return v.MapKeys(), nil
 }
+
+// MapKeys gets the keys of a string map m as a slice.
+func MapKeys(m interface{}) ([]string, error) {
+	ks, err := SafeMapKeys(m)
+	if err != nil {
+		return nil, err
+	}
+	kss := make([]string, len(ks))
+	for i, k := range ks {
+		kss[i] = k.String()
+	}
+	return kss, nil
+}

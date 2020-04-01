@@ -14,6 +14,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
+
 	"github.com/mitchellh/go-homedir"
 
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
@@ -166,9 +168,10 @@ func makeEnv(a *act.Runner, c *config.Config) director.Env {
 		Fuzzer: a,
 		Lifter: &backend.BResolve,
 		Planner: planner.Source{
-			BProbe: c,
-			CProbe: c,
-			SProbe: a,
+			BProbe:     c,
+			CLister:    c,
+			CInspector: &compiler.CResolve,
+			SProbe:     a,
 		},
 	}
 }

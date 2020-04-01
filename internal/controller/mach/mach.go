@@ -9,7 +9,6 @@ package mach
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -47,9 +46,7 @@ func New(c *Config, p *plan.Plan) (*Mach, error) {
 		compiler: c.makeCompilerConfig(),
 		runner:   c.makeRunnerConfig(),
 		plan:     p,
-	}
-	if c.JsonStatus {
-		m.json = &forward.Observer{Encoder: json.NewEncoder(c.Stderr)}
+		json:     c.Json,
 	}
 
 	return &m, nil

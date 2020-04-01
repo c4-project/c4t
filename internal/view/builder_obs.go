@@ -8,6 +8,8 @@ package view
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/planner"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -60,8 +62,16 @@ func (l *LogObserver) OnBuildRequest(r builder.Request) {
 // OnBuildFinish does nothing.
 func (l *LogObserver) OnBuildFinish() {}
 
-// Observers builds a list of observers suitable for single-shot act-tester binaries.
-func Observers(l *log.Logger) []builder.Observer {
+// PlannerObservers builds a list of observers suitable for single-shot act-tester planner binaries.
+func PlannerObservers(l *log.Logger) []planner.Observer {
+	return []planner.Observer{
+		NewPbObserver(),
+		(*LogObserver)(l),
+	}
+}
+
+// BuilderObservers builds a list of observers suitable for single-shot act-tester corpus-builder binaries.
+func BuilderObservers(l *log.Logger) []builder.Observer {
 	return []builder.Observer{
 		NewPbObserver(),
 		(*LogObserver)(l),

@@ -10,6 +10,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/planner"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
 
 	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
@@ -39,8 +41,8 @@ type Instance interface {
 	// OnCollation lets the observer know that the run results have been received and collated into c.
 	OnCollation(c *collate.Collation)
 
-	// Instance observers can observe corpus building operations.
-	builder.Observer
+	// Instance observers can observe planner operations.
+	planner.Observer
 
 	// Instance observers can observe file copies.
 	remote.CopyObserver
@@ -58,6 +60,15 @@ func OnCollation(c *collate.Collation, obs ...Instance) {
 	for _, o := range obs {
 		o.OnCollation(c)
 	}
+}
+
+// LowerToPlanner lowers a slice of instance observers to a slice of planner observers.
+func LowerToPlanner(obs []Instance) []planner.Observer {
+	cos := make([]planner.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
 }
 
 // LowerToBuilder lowers a slice of instance observers to a slice of builder observers.

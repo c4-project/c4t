@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
@@ -72,13 +74,18 @@ func makePlanner(cfile string, errw io.Writer, a act.Runner, midstr string, cs i
 	plan := planner.Planner{
 		CorpusSize: cs,
 		Source: planner.Source{
-			BProbe: c,
-			CProbe: c,
-			SProbe: &a,
+			BProbe:     c,
+			CLister:    c,
+			CInspector: &compiler.CResolve,
+			SProbe:     &a,
 		},
 		Logger:    l,
-		Observers: view.Observers(l),
+		Observers: observers(l),
 		MachineID: mid,
 	}
 	return &plan, nil
+}
+
+func observers(l *log.Logger) planner.ObserverSet {
+	return planner.NewObserverSet(view.PlannerObservers(l)...)
 }

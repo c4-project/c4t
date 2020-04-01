@@ -42,7 +42,7 @@ func run(args []string, outw, errw io.Writer) error {
 	cfg := lifter.Config{
 		Maker:     &backend.BResolve,
 		Logger:    l,
-		Observers: view.Observers(l),
+		Observers: view.BuilderObservers(l),
 		Paths:     lifter.NewPathset(od),
 		Stderr:    errw,
 	}
