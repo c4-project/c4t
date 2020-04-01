@@ -180,12 +180,11 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 		return nil, fmt.Errorf("when making machine-exec config: %w", err)
 	}
 	sc := StageConfig{
-		InFiles: i.InFiles,
-		Plan:    p,
-		Fuzz:    f,
-		Lift:    l,
-		Mach:    m,
-		Save:    i.makeSave(),
+		Plan: p,
+		Fuzz: f,
+		Lift: l,
+		Mach: m,
+		Save: i.makeSave(),
 	}
 	return &sc, nil
 }
@@ -200,13 +199,13 @@ func (i *Instance) makeSave() *Save {
 }
 
 func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error) {
-	p := planner.Planner{
+	// TODO(@MattWindsor91): move planner config outside of instance
+	c := planner.Config{
 		Source:    i.Env.Planner,
 		Logger:    i.Logger,
 		Observers: planner.NewObserverSet(obs...),
-		MachineID: i.ID,
 	}
-	return &p, nil
+	return planner.New(c, i.ID, i.MachConfig.Machine, i.InFiles)
 }
 
 func (i *Instance) makeFuzzerConfig(obs []builder.Observer) (*fuzzer.Config, error) {

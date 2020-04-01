@@ -6,11 +6,12 @@
 package main
 
 import (
-	"context"
-	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
+
+	c "github.com/urfave/cli/v2"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 
@@ -24,35 +25,64 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 )
 
-const usageMach = "ID of machine to use for this test plan"
+const (
+	flagCorpusSize  = "corpus-size"
+	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
+		"if non-positive, the planner will use all viable provided corpus files"
+	usageMach = "ID of machine to use for this test plan"
+)
 
 func main() {
-	err := run(os.Args, os.Stdout, os.Stderr)
-	view.LogTopError(err)
+	app := c.App{
+		Name:                   "act-tester-plan",
+		Usage:                  "runs the planning phase of an ACT test standalone",
+		Flags:                  flags(),
+		HideHelpCommand:        true,
+		UseShortOptionHandling: true,
+		Action: func(ctx *c.Context) error {
+			return run(ctx, os.Stdout, os.Stderr)
+		},
+	}
+	view.LogTopError(app.Run(os.Args))
 }
 
-func run(args []string, outw, errw io.Writer) error {
-	a := act.Runner{Stderr: errw}
-
-	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	pmach := fs.String(view.FlagMachine, "", usageMach)
-	view.ActRunnerFlags(fs, &a)
-
-	cfile := view.ConfFileFlag(fs)
-
-	var cs int
-	view.CorpusSizeFlag(fs, &cs)
-
-	if err := fs.Parse(args[1:]); err != nil {
-		return err
+func flags() []c.Flag {
+	ownFlags := []c.Flag{
+		view.ConfFileCliFlag(),
+		&c.StringFlag{
+			Name:  view.FlagMachine,
+			Usage: usageMach,
+		},
+		&c.IntFlag{
+			Name:    flagCorpusSize,
+			Aliases: []string{view.FlagNum},
+			Usage:   usageCorpusSize,
+		},
 	}
+	return append(ownFlags, view.ActRunnerCliFlags()...)
+}
 
-	plan, err := makePlanner(*cfile, errw, a, *pmach, cs)
+func run(ctx *c.Context, outw, errw io.Writer) error {
+	a := view.ActRunnerFromCli(ctx, errw)
+
+	cfg, err := view.ConfFileFromCli(ctx)
 	if err != nil {
 		return err
 	}
 
-	p, err := plan.Plan(context.Background(), fs.Args())
+	pc, err := makePlanConfig(cfg, errw, a, ctx.Int(flagCorpusSize))
+	if err != nil {
+		return err
+	}
+
+	midstr := ctx.String(view.FlagMachine)
+	mid, mach, err := getMachine(cfg, midstr)
+	if err != nil {
+		return err
+	}
+
+	fs := ctx.Args().Slice()
+	p, err := pc.Plan(ctx.Context, mid, mach.Machine, fs)
 	if err != nil {
 		return err
 	}
@@ -60,30 +90,33 @@ func run(args []string, outw, errw io.Writer) error {
 	return p.Dump(outw)
 }
 
-func makePlanner(cfile string, errw io.Writer, a act.Runner, midstr string, cs int) (*planner.Planner, error) {
-	c, err := config.Load(cfile)
-	if err != nil {
-		return nil, err
-	}
+func getMachine(cfg *config.Config, midstr string) (id.ID, config.Machine, error) {
 	mid, err := id.TryFromString(midstr)
 	if err != nil {
-		return nil, err
+		return id.ID{}, config.Machine{}, err
 	}
 
+	mach, ok := cfg.Machines[midstr]
+	if !ok {
+		return id.ID{}, config.Machine{}, fmt.Errorf("no such machine: %s", midstr)
+	}
+	return mid, mach, nil
+}
+
+func makePlanConfig(c *config.Config, errw io.Writer, a *act.Runner, cs int) (*planner.Config, error) {
 	l := log.New(errw, "", 0)
-	plan := planner.Planner{
+	cfg := planner.Config{
 		CorpusSize: cs,
 		Source: planner.Source{
 			BProbe:     c,
 			CLister:    c,
 			CInspector: &compiler.CResolve,
-			SProbe:     &a,
+			SProbe:     a,
 		},
 		Logger:    l,
 		Observers: observers(l),
-		MachineID: mid,
 	}
-	return &plan, nil
+	return &cfg, nil
 }
 
 func observers(l *log.Logger) planner.ObserverSet {

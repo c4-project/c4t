@@ -9,6 +9,7 @@ package planner
 import (
 	"context"
 	"log"
+	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -21,67 +22,59 @@ import (
 
 // Planner holds all configuration for the test planner.
 type Planner struct {
-	// Source contains all of the various sources for a Planner's information.
-	Source Source
-
-	// Filter is the compiler filter to use to select compilers to test.
-	Filter string
-
-	// Logger is the logger used by the planner.
-	Logger *log.Logger
-
-	// Observers contains the set of observers used to get feedback on the planning action as it completes.
-	Observers ObserverSet
-
-	// MachineID is the identifier of the target machine for the plan.
-	MachineID id.ID
-
-	// CorpusSize is the requested size of the test corpus.
-	// If zero, no corpus sampling is done, but the planner will still error if the final corpus size is 0.
-	// If nonzero, the corpus will be sampled if larger than the size, and an error occurs if the final size is below
-	// that requested.
-	CorpusSize int
+	conf Config
+	fs   []string
+	l    *log.Logger
+	mid  id.ID
+	plan plan.Plan
+	rng  *rand.Rand
 }
 
-// plan runs the test planner p on input file paths fs.
-func (p *Planner) Plan(ctx context.Context, fs []string) (*plan.Plan, error) {
+func New(c Config, mid id.ID, mach plan.Machine, fs []string) (*Planner, error) {
+	if err := c.Check(); err != nil {
+		return nil, err
+	}
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(fs) == 0 {
 		return nil, corpus.ErrNone
 	}
 
-	// TODO(@MattWindsor91): separate Planner from MachConfig to avoid this
-	p.Logger = iohelp.EnsureLog(p.Logger)
-
-	hd := plan.NewHeader()
-	// TODO(@MattWindsor91): allow manual seed override
-	rng := hd.Rand()
-
-	pn := plan.Plan{
-		Header:    *hd,
-		Machine:   plan.Machine{},
-		Backend:   nil,
-		Compilers: nil,
-		Corpus:    nil,
+	p := Planner{
+		conf: c,
+		fs:   fs,
+		l:    iohelp.EnsureLog(c.Logger),
+		mid:  mid,
+		plan: plan.Plan{
+			Machine: mach,
+		},
 	}
+	return &p, nil
+}
+
+// Plan runs the test planner p.
+func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
+	hd := plan.NewHeader()
+	p.plan.Header = *hd
+
+	// TODO(@MattWindsor91): allow manual seed override
+	p.rng = hd.Rand()
 
 	var err error
 
-	// TODO(@MattWindsor91): probe machine
-	p.Logger.Println("Planning backend...")
-	if pn.Backend, err = p.planBackend(ctx); err != nil {
+	p.l.Println("Planning backend...")
+	if err = p.planBackend(ctx); err != nil {
 		return nil, err
 	}
 
-	p.Logger.Println("Planning compilers...")
-	if pn.Compilers, err = p.planCompilers(ctx, rng); err != nil {
+	p.l.Println("Planning compilers...")
+	if err = p.planCompilers(ctx); err != nil {
 		return nil, err
 	}
 
-	p.Logger.Println("Planning corpus...")
-	if pn.Corpus, err = p.planCorpus(ctx, rng, fs); err != nil {
+	p.l.Println("Planning corpus...")
+	if err = p.planCorpus(ctx); err != nil {
 		return nil, err
 	}
 
-	return &pn, nil
+	return &p.plan, nil
 }

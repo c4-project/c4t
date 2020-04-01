@@ -37,14 +37,16 @@ type CompilerPlanner struct {
 	Rng *rand.Rand
 }
 
-func (p *Planner) planCompilers(ctx context.Context, rng *rand.Rand) (map[string]compiler.Compiler, error) {
+func (p *Planner) planCompilers(ctx context.Context) error {
 	c := CompilerPlanner{
-		Lister:    p.Source.CLister,
-		Inspector: p.Source.CInspector,
-		MachineID: p.MachineID,
-		Rng:       rng,
+		Lister:    p.conf.Source.CLister,
+		Inspector: p.conf.Source.CInspector,
+		MachineID: p.mid,
+		Rng:       p.rng,
 	}
-	return c.Plan(ctx)
+	var err error
+	p.plan.Compilers, err = c.Plan(ctx)
+	return err
 }
 
 func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compiler, error) {

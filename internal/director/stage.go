@@ -12,8 +12,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/director/mach"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
@@ -22,8 +20,6 @@ import (
 
 // StageConfig groups together the stage configuration for of a director instance.
 type StageConfig struct {
-	// InFiles contains the input files for the instance.
-	InFiles []string
 	// Plan contains configuration for the instance's plan stage.
 	Plan *planner.Planner
 	// Fuzz contains configuration for the instance's fuzz stage.
@@ -40,9 +36,6 @@ var ErrStageConfigMissing = errors.New("stage config missing")
 
 // Check makes sure the StageConfig has all configuration elements present.
 func (c *StageConfig) Check() error {
-	if len(c.InFiles) == 0 {
-		return fmt.Errorf("%w: no input files", corpus.ErrNone)
-	}
 	if c.Plan == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stagePlan)
 	}
@@ -82,7 +75,7 @@ var Stages = []stage{
 	{
 		Name: stagePlan,
 		Run: func(c *StageConfig, ctx context.Context, _ *plan.Plan) (*plan.Plan, error) {
-			return c.Plan.Plan(ctx, c.InFiles)
+			return c.Plan.Plan(ctx)
 		},
 	},
 	{

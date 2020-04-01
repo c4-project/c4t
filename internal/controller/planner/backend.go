@@ -20,7 +20,9 @@ type BackendFinder interface {
 	FindBackend(ctx context.Context, style id.ID, machines ...id.ID) (*service.Backend, error)
 }
 
-func (p *Planner) planBackend(ctx context.Context) (*service.Backend, error) {
+func (p *Planner) planBackend(ctx context.Context) error {
 	// TODO(@MattWindsor91): fix this pointer awfulness.
-	return p.Source.BProbe.FindBackend(ctx, id.FromString("litmus"), p.MachineID)
+	var err error
+	p.plan.Backend, err = p.conf.Source.BProbe.FindBackend(ctx, id.FromString("litmus"), p.mid)
+	return err
 }

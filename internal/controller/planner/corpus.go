@@ -24,15 +24,17 @@ type SubjectProber interface {
 	ProbeSubject(ctx context.Context, litmus string) (subject.Named, error)
 }
 
-func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, fs []string) (corpus.Corpus, error) {
+func (p *Planner) planCorpus(ctx context.Context) error {
 	c := CorpusPlanner{
-		Files:     fs,
-		Prober:    p.Source.SProbe,
-		Observers: p.Observers.Corpus,
-		Rng:       rng,
-		Size:      p.CorpusSize,
+		Files:     p.fs,
+		Prober:    p.conf.Source.SProbe,
+		Observers: p.conf.Observers.Corpus,
+		Rng:       p.rng,
+		Size:      p.conf.CorpusSize,
 	}
-	return c.Plan(ctx)
+	var err error
+	p.plan.Corpus, err = c.Plan(ctx)
+	return err
 }
 
 // CorpusPlanner contains the state required to plan the corpus part of an initial plan file.
