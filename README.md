@@ -2,6 +2,8 @@
 
 `act-tester` is the top-level testing framework
 for the [ACT](https://github.com/MattWindsor91/act) project.
+Unlike most of `ACT`, which is made using OCaml, `act-tester` is written in Go
+for ease of portability and deployability.
 
 ## Components
 
@@ -23,6 +25,10 @@ It also contains the following utilities:
 
 Note that `act-tester` is still pretty rough around the edges - please feel free to file issues about its user
 experience and documentation.
+
+Also note that `act-tester` depends on the `act-c`, `act-fuzz`, etc. tools from the main OCaml
+[ACT](https://github.com/MattWindsor91/act) project being in `PATH` (for example, from
+`make install` on that project).
 
 - Install using the usual `go` tools: for example,
  `go get github.com/MattWindsor91/act-tester/cmd/...`.  All commands are in the `cmd` directory.
