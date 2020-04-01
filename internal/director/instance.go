@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/run"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
@@ -146,7 +148,12 @@ func (i *Instance) pass(ctx context.Context, iter uint64, sc *StageConfig) error
 		err error
 	)
 
-	observer.OnIteration(iter, time.Now(), i.Observers...)
+	r := run.Run{
+		MachineID: i.ID,
+		Iter:      iter,
+		Start:     time.Now(),
+	}
+	observer.OnIteration(r, i.Observers...)
 
 	for _, s := range Stages {
 		if p, err = s.Run(sc, ctx, p); err != nil {

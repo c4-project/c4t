@@ -5,6 +5,8 @@
 
 package service
 
+import "strings"
+
 // RunInfo gives hints as to how to run a service.
 type RunInfo struct {
 	// Cmd overrides the command for the service.
@@ -12,6 +14,16 @@ type RunInfo struct {
 
 	// Args specifies (extra) arguments to supply to the service.
 	Args []string `toml:"args,omitempty"`
+}
+
+// Invocation is Cmd appended to Args.
+func (r *RunInfo) Invocation() []string {
+	return append([]string{r.Cmd}, r.Args...)
+}
+
+// String is defined as the space-joined form of Invocation.
+func (r *RunInfo) String() string {
+	return strings.Join(r.Invocation(), " ")
 }
 
 // Override overlays this run information with that in new.

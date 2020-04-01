@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/run"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -17,9 +19,11 @@ import (
 // ExampleSourced_String is a runnable example for String.
 func ExampleSourced_String() {
 	sc := collate.Sourced{
-		MachineID: id.FromString("foo.bar.baz"),
-		Iter:      42,
-		Start:     time.Date(1997, time.May, 1, 10, 0, 0, 0, time.FixedZone("BST", 60*60)),
+		Run: run.Run{
+			MachineID: id.FromString("foo.bar.baz"),
+			Iter:      42,
+			Start:     time.Date(1997, time.May, 1, 10, 0, 0, 0, time.FixedZone("BST", 60*60)),
+		},
 		Collation: nil,
 	}
 

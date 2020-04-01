@@ -8,7 +8,8 @@ package observer
 
 import (
 	"context"
-	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 
@@ -36,7 +37,7 @@ type Instance interface {
 	// OnIteration lets the observer know that the machine loop has started anew.
 	// iter is, modulo eventual overflow, the current iteration number;
 	// time is the time at which the iteration started.
-	OnIteration(iter uint64, time time.Time)
+	OnIteration(run run.Run)
 
 	// OnCollation lets the observer know that the run results have been received and collated into c.
 	OnCollation(c *collate.Collation)
@@ -49,9 +50,9 @@ type Instance interface {
 }
 
 // OnIteration sends OnIteration to every instance observer in obs.
-func OnIteration(iter uint64, time time.Time, obs ...Instance) {
+func OnIteration(r run.Run, obs ...Instance) {
 	for _, o := range obs {
-		o.OnIteration(iter, time)
+		o.OnIteration(r)
 	}
 }
 

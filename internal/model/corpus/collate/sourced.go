@@ -6,22 +6,13 @@
 package collate
 
 import (
-	"fmt"
-	"time"
-
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/run"
 )
 
-// Sourced contains a corpus collation and various bits of information about whence it came.
+// Sourced contains a corpus collation and its parent run.
 type Sourced struct {
-	// MachineID is the ID of the machine whose collation is being reported.
-	MachineID id.ID
-
-	// Iter is the iteration number of the run to which this collation is associated.
-	Iter uint64
-
-	// Start is the start time of the run to which this collation is associated.
-	Start time.Time
+	// Run contains information about the run that produced this collation.
+	Run run.Run
 
 	// Collation is the collation proper.
 	Collation *Collation
@@ -33,11 +24,5 @@ func (s *Sourced) String() string {
 	if s.Collation != nil {
 		cstr = s.Collation.String()
 	}
-	return fmt.Sprintf(
-		"[%s #%d (%s)] %s",
-		s.MachineID.String(),
-		s.Iter,
-		s.Start.Format(time.Stamp),
-		cstr,
-	)
+	return s.Run.String() + " " + cstr
 }

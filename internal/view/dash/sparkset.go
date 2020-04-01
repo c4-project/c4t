@@ -6,6 +6,8 @@
 package dash
 
 import (
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"
@@ -52,4 +54,11 @@ func (s *sparkset) gridRows() []grid.Element {
 		els[i] = grid.RowHeightFixed(2, grid.Widget(sl))
 	}
 	return els
+}
+
+func (s *sparkset) sparkCollation(c *collate.Collation) error {
+	ferr := s.flags.Add([]int{len(c.Flagged)})
+	terr := s.timeouts.Add([]int{len(c.Run.Timeouts)})
+	cerr := s.cfails.Add([]int{len(c.Compile.Failures)})
+	return iohelp.FirstError(ferr, terr, cerr)
 }

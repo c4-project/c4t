@@ -105,7 +105,7 @@ func New(mids []id.ID) (*Dash, error) {
 		container.SplitVertical(
 			container.Left(logs),
 			container.Right(g...),
-			container.SplitPercent(30),
+			container.SplitPercent(25),
 		),
 	)
 	if err != nil {

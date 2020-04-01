@@ -15,6 +15,7 @@ import (
 
 // Planner builds a list of observers suitable for single-shot act-tester planner binaries.
 func Planner(l *log.Logger) []planner.Observer {
+	// The ordering is important here: we want log messages to appear _before_ progress bars.
 	return []planner.Observer{
 		NewBar(),
 		(*Logger)(l),
@@ -23,6 +24,7 @@ func Planner(l *log.Logger) []planner.Observer {
 
 // Builder builds a list of observers suitable for single-shot act-tester corpus-builder binaries.
 func Builder(l *log.Logger) []builder.Observer {
+	// See above.
 	return []builder.Observer{
 		NewBar(),
 		(*Logger)(l),

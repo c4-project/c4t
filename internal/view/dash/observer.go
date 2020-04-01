@@ -6,9 +6,10 @@
 package dash
 
 import (
-	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
@@ -24,9 +25,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/mum4k/termdash/cell"
-	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/text"
 )
 
@@ -47,15 +46,18 @@ type Observer struct {
 
 	rlog *ResultLog
 
-	runCount   *segmentdisplay.SegmentDisplay
-	runStart   *text.Text
-	sparks     *sparkset
-	buildLog   *text.Text
-	buildGauge *gauge.Gauge
-	lastTime   time.Time
+	runCount *segmentdisplay.SegmentDisplay
+	runStart *text.Text
+	sparks   *sparkset
 
-	nruns        uint64
-	nreqs, ndone int
+	action *actionObserver
+
+	lastTime time.Time
+
+	// compilers contains a readout of the currently planned compilers for this instance.
+	compilers *text.Text
+
+	nruns uint64
 }
 
 // NewObserver constructs an Observer, initialising its various widgets.
@@ -79,25 +81,32 @@ func NewObserver(mid id.ID, rlog *ResultLog) (*Observer, error) {
 		return nil, err
 	}
 
-	if d.buildGauge, err = gauge.New(); err != nil {
+	if d.action, err = NewCorpusObserver(); err != nil {
 		return nil, err
 	}
 
-	if d.buildLog, err = text.New(text.RollContent()); err != nil {
+	if d.compilers, err = text.New(); err != nil {
 		return nil, err
 	}
 
 	return &d, nil
 }
 
+const (
+	percRun     = 25
+	percStats   = 25
+	percActions = 100 - percRun - percStats
+)
+
 // AddToGrid adds this observer to a grid builder gb.
 func (o *Observer) AddToGrid(gb *grid.Builder, midstr string, pc int) {
 	gb.Add(grid.RowHeightPercWithOpts(pc,
 		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(midstr)},
-		grid.ColWidthPerc(15,
-			grid.RowHeightFixed(1, grid.Widget(o.runCount, container.Border(linestyle.Light), container.BorderTitle("Run#"))),
+		grid.ColWidthPerc(percRun,
+			grid.RowHeightFixed(10, grid.Widget(o.runCount, container.Border(linestyle.Light), container.BorderTitle("Run#"))),
+			grid.RowHeightFixed(1, grid.Widget(o.compilers, container.Border(linestyle.Light), container.BorderTitle("Compilers"))),
 		),
-		grid.ColWidthPerc(25,
+		grid.ColWidthPerc(percStats,
 			grid.RowHeightFixed(3, grid.Widget(o.runStart, container.Border(linestyle.Light), container.BorderTitle("Start"))),
 			grid.RowHeightFixedWithOpts(10,
 				[]container.Option{container.Border(linestyle.Light), container.BorderTitle("Sparklines")},
@@ -108,29 +117,27 @@ func (o *Observer) AddToGrid(gb *grid.Builder, midstr string, pc int) {
 }
 
 func (o *Observer) currentRunColumn() grid.Element {
-	return grid.ColWidthPercWithOpts(60,
+	return grid.ColWidthPercWithOpts(percActions,
 		[]container.Option{
 			container.Border(linestyle.Light),
 			container.BorderTitle("Current Run"),
 		},
-		grid.RowHeightFixed(1, grid.Widget(o.buildGauge)),
-		grid.RowHeightFixed(1, grid.Widget(o.buildLog)),
+		o.action.gridRows()...,
 	)
 }
 
 // OnIteration logs that a new iteration has begun.
-func (o *Observer) OnIteration(iter uint64, t time.Time) {
-	o.nruns = iter
-	ch := segmentdisplay.NewChunk(strconv.FormatUint(iter, 10))
+func (o *Observer) OnIteration(r run.Run) {
+	o.nruns = r.Iter
+	ch := segmentdisplay.NewChunk(strconv.FormatUint(o.nruns, 10))
 	_ = o.runCount.Write(
 		[]*segmentdisplay.TextChunk{ch},
 	)
 
-	_ = o.runStart.Write(t.Format(time.Stamp), text.WriteReplace())
+	_ = o.runStart.Write(r.Start.Format(time.Stamp), text.WriteReplace())
 
-	o.addDurationToSparkline(t)
-
-	o.buildLog.Reset()
+	o.addDurationToSparkline(r.Start)
+	o.action.reset()
 }
 
 func (o *Observer) addDurationToSparkline(t time.Time) {
@@ -143,146 +150,54 @@ func (o *Observer) addDurationToSparkline(t time.Time) {
 
 // OnCollation observes a collation by adding failure/timeout/flag rates to the sparklines.
 func (o *Observer) OnCollation(c *collate.Collation) {
-	serr := o.sparkCollation(c)
+	serr := o.sparks.sparkCollation(c)
 	lerr := o.logCollation(c)
 	o.logError(iohelp.FirstError(serr, lerr))
 }
 
-func (o *Observer) sparkCollation(c *collate.Collation) error {
-	ferr := o.sparks.flags.Add([]int{len(c.Flagged)})
-	terr := o.sparks.timeouts.Add([]int{len(c.Run.Timeouts)})
-	cerr := o.sparks.cfails.Add([]int{len(c.Compile.Failures)})
-	return iohelp.FirstError(ferr, terr, cerr)
-}
-
 func (o *Observer) logCollation(c *collate.Collation) error {
 	sc := collate.Sourced{
-		MachineID: o.mid,
-		Iter:      o.nruns,
-		Start:     o.lastTime,
+		Run: run.Run{
+			MachineID: o.mid,
+			Iter:      o.nruns,
+			Start:     o.lastTime,
+		},
 		Collation: c,
 	}
 	return o.rlog.Log(sc)
 }
 
-// OnBuildStart sets up an observer for a test phase with manifest m.
+// OnBuildStart forwards a build start observation.
 func (o *Observer) OnBuildStart(m builder.Manifest) {
-	o.onTaskStart(m.Name, m.NReqs)
+	o.action.OnBuildStart(m)
 }
 
-// OnBuildRequest acknowledges a corpus-builder request.
+// OnBuildRequest forwards a build request observation.
 func (o *Observer) OnBuildRequest(r builder.Request) {
-	switch {
-	case r.Add != nil:
-		o.onAdd(r.Name)
-	case r.Compile != nil:
-		o.onCompile(r.Name, r.Compile)
-	case r.Harness != nil:
-		o.onHarness(r.Name, r.Harness)
-	case r.Run != nil:
-		o.onRun(r.Name, r.Run)
-	}
+	o.action.OnBuildRequest(r)
 }
 
-// onAdd acknowledges the addition of a subject to a corpus being built.
-func (o *Observer) onAdd(sname string) {
-	o.logAndStepGauge("ADD", sname, colorAdd)
-}
-
-// onCompile acknowledges the addition of a compilation to a corpus being built.
-func (o *Observer) onCompile(sname string, b *builder.Compile) {
-	c := colorCompile
-	desc := idQualSubjectDesc(sname, b.CompilerID)
-
-	if !b.Result.Success {
-		c = colorFailed
-		desc += " [FAILED]"
-	}
-
-	o.logAndStepGauge("COMPILE", desc, c)
-}
-
-// onHarness acknowledges the addition of a harness to a corpus being built.
-func (o *Observer) onHarness(sname string, b *builder.Harness) {
-	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colorHarness)
-}
-
-// onRun acknowledges the addition of a run to a corpus being built.
-func (o *Observer) onRun(sname string, b *builder.Run) {
-	desc := idQualSubjectDesc(sname, b.CompilerID)
-	suff, c := runSuffixAndColour(b.Result.Status)
-	o.logAndStepGauge("RUN", desc+suff, c)
-}
-
-func runSuffixAndColour(s subject.Status) (string, cell.Color) {
-	switch s {
-	case subject.StatusFlagged:
-		return " [FLAGGED]", colorFlagged
-	case subject.StatusRunTimeout:
-		return " [TIMEOUT]", colorTimeout
-	case subject.StatusCompileFail:
-		return " [FAILED]", colorFailed
-	default:
-		return "", colorRun
-	}
-}
-
-// OnBuildFinish acknowledges the end of a run.
+// OnBuildFinish forwards a build finish observation.
 func (o *Observer) OnBuildFinish() {
-	_ = o.buildLog.Write("-- DONE --\n")
+	o.action.OnBuildFinish()
 }
 
+// OnCopyStart forwards a copy start observation.
 func (o *Observer) OnCopyStart(nfiles int) {
-	o.onTaskStart("COPYING FILES", nfiles)
+	o.action.OnCopyStart(nfiles)
 }
 
+// OnCopy forwards a copy observation.
 func (o *Observer) OnCopy(dst, src string) {
-	desc := fmt.Sprintf("%s -> %s", src, dst)
-	o.logAndStepGauge("COPY", desc, colorCopy)
+	o.action.OnCopy(dst, src)
 }
 
+// OnCopyFinish forwards a copy finish observation.
 func (o *Observer) OnCopyFinish() {
-	// TODO(@MattWindsor91): abstract this properly
-	o.OnBuildFinish()
-}
-
-func (o *Observer) onTaskStart(name string, n int) {
-	_ = o.buildLog.Write(fmt.Sprintf("-- %s --\n", name))
-
-	o.nreqs = n
-	o.ndone = 0
-	_ = o.buildGauge.Absolute(o.ndone, o.nreqs)
-}
-
-func idQualSubjectDesc(sname string, id id.ID) string {
-	return fmt.Sprintf("%s (@%s)", sname, id)
-}
-
-// logAndStepGauge logs a request with name rq and summary desc, then repopulates the gauge.
-// It uses c as the colour for both.
-func (o *Observer) logAndStepGauge(rq, desc string, c cell.Color) {
-	lerr := o.log(rq, desc, c)
-	serr := o.stepGauge(c)
-	o.logError(iohelp.FirstError(lerr, serr))
-}
-
-// log logs an observed builder request with name rq and summary desc to the per-machine log.
-// It colours the log with c.
-func (o *Observer) log(rq, desc string, c cell.Color) error {
-	ferr := o.buildLog.Write(rq, text.WriteCellOpts(cell.FgColor(c)))
-	lerr := o.buildLog.Write(" " + desc + "\n")
-	return iohelp.FirstError(ferr, lerr)
-}
-
-// stepGauge increments the gauge and sets its colour to c.
-func (o *Observer) stepGauge(c cell.Color) error {
-	o.ndone++
-	return o.buildGauge.Absolute(o.ndone, o.nreqs, gauge.Color(c))
+	o.action.OnCopyFinish()
 }
 
 func (o *Observer) logError(err error) {
-	if err == nil {
-		return
-	}
-	_ = o.buildLog.Write(err.Error(), text.WriteCellOpts(cell.FgColor(cell.ColorRed)))
+	// For want of better location.
+	o.action.logError(err)
 }

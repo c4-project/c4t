@@ -9,7 +9,10 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/run"
+
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -19,7 +22,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// BasicLogger is an interface for things that can use the LogCollation func.
+// BasicLogger is an interface for things that can use the Log func.
 type BasicLogger interface {
 	// LogHeader should log the String() of the argument collation.
 	LogHeader(collate.Sourced) error
@@ -54,7 +57,7 @@ func (w Writer) LogBucketEntry(sname string) error {
 	return err
 }
 
-// log logs s to b.
+// Log logs s to b.
 func Log(b BasicLogger, s collate.Sourced) error {
 	if err := b.LogHeader(s); err != nil {
 		return err
@@ -91,90 +94,140 @@ func logBucket(b BasicLogger, s subject.Status, bucket corpus.Corpus) error {
 type Logger struct {
 	// out is the writer to use for logging collations.
 	out io.Writer
-	// ch is used to send SourcedCollations for logging.
-	ch chan collate.Sourced
+	// collCh is used to send sourced collations for logging.
+	collCh chan collate.Sourced
+	// compCh is used to send sourced collations for logging.
+	compCh chan compilerSet
 }
 
 // NewLogger constructs a new LogObserver writing into w, ranging over machine IDs ids.
 func NewLogger(w io.Writer) *Logger {
-	return &Logger{out: w, ch: make(chan collate.Sourced)}
+	return &Logger{out: w, collCh: make(chan collate.Sourced), compCh: make(chan compilerSet)}
 }
 
 // Run runs the log observer.
 func (j *Logger) Run(ctx context.Context, _ func()) error {
 	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case sc := <-j.ch:
-			if err := j.log(sc); err != nil {
-				return err
-			}
+		if err := j.runStep(ctx); err != nil {
+			return err
 		}
 	}
 }
 
-// Instance creates an instance logger for machine mid.
-func (j *Logger) Instance(mid id.ID) (Instance, error) {
-	return &InstanceLogger{id: mid, ch: j.ch}, nil
+func (j *Logger) runStep(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case sc := <-j.collCh:
+		return j.logCollation(sc)
+	case cc := <-j.compCh:
+		return j.logCompilers(cc)
+	}
 }
 
-// log logs s to this Logger's file.
-func (j *Logger) log(s collate.Sourced) error {
+// Instance creates an instance logger.
+func (j *Logger) Instance(id.ID) (Instance, error) {
+	return &InstanceLogger{collCh: j.collCh, compCh: j.compCh}, nil
+}
+
+// logCollation logs s to this Logger's file.
+func (j *Logger) logCollation(s collate.Sourced) error {
 	return Log(Writer{j.out}, s)
+}
+
+// logCompilers logs compilers to this Logger's file.
+func (j *Logger) logCompilers(cs compilerSet) error {
+	// TODO(@MattWindsor91): abstract this?
+	if _, err := fmt.Fprintf(j.out, "%s compilers %d:\n", cs.run, len(cs.compilers)); err != nil {
+		return err
+	}
+	for _, c := range cs.compilers {
+		if _, err := fmt.Fprintf(j.out, "- %s: %s\n", c.ID, c.Compiler); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // InstanceLogger holds state for logging a particular instance.
 type InstanceLogger struct {
 	// done is a channel closed when the instance can no longer log.
 	done <-chan struct{}
-	// ch is the channel used to send sourced collations for logging.
-	ch chan<- collate.Sourced
-	// id is the machine ID.
-	id id.ID
-	// iter is the number of the current iteration.
-	iter uint64
-	// start is the start time of the current iteration.
-	start time.Time
+	// compCh is the channel used to send compiler sets for logging.
+	compCh chan<- compilerSet
+	// collCh is the channel used to send sourced collations for logging.
+	collCh chan<- collate.Sourced
+	// run contains information about the current iteration.
+	run run.Run
+	// compilers stores the current, if any, compiler set.
+	compilers []compiler.Named
+	// icompiler stores the index of the compiler being received.
+	icompiler int
 }
 
-// OnIteration notes that the instance's iteration has changed.
-func (i *InstanceLogger) OnIteration(iter uint64, start time.Time) {
-	i.iter = iter
-	i.start = start
+type compilerSet struct {
+	run       run.Run
+	compilers []compiler.Named
 }
 
-// OnCollation logs a collation to this logger.
-func (i *InstanceLogger) OnCollation(c *collate.Collation) {
+func (l *InstanceLogger) OnCompilerPlanStart(ncompilers int) {
+	l.compilers = make([]compiler.Named, ncompilers)
+	l.icompiler = 0
+}
+
+func (l *InstanceLogger) OnCompilerPlan(c compiler.Named) {
+	l.compilers[l.icompiler] = c
+	l.icompiler++
+}
+
+func (l *InstanceLogger) OnCompilerPlanFinish() {
 	select {
-	case <-i.done:
-	case i.ch <- i.addSource(c):
+	case <-l.done:
+	case l.compCh <- l.makeCompilerSet():
 	}
 }
 
-func (i *InstanceLogger) addSource(c *collate.Collation) collate.Sourced {
+func (l *InstanceLogger) makeCompilerSet() compilerSet {
+	return compilerSet{
+		run:       l.run,
+		compilers: l.compilers,
+	}
+}
+
+// OnIteration notes that the instance's iteration has changed.
+func (l *InstanceLogger) OnIteration(r run.Run) {
+	l.run = r
+}
+
+// OnCollation logs a collation to this logger.
+func (l *InstanceLogger) OnCollation(c *collate.Collation) {
+	select {
+	case <-l.done:
+	case l.collCh <- l.addSource(c):
+	}
+}
+
+func (l *InstanceLogger) addSource(c *collate.Collation) collate.Sourced {
 	return collate.Sourced{
-		MachineID: i.id,
-		Iter:      i.iter,
-		Start:     i.start,
+		Run:       l.run,
 		Collation: c,
 	}
 }
 
 // OnBuildStart does nothing.
-func (i *InstanceLogger) OnBuildStart(builder.Manifest) {}
+func (l *InstanceLogger) OnBuildStart(builder.Manifest) {}
 
 // OnBuildRequest does nothing.
-func (i *InstanceLogger) OnBuildRequest(builder.Request) {}
+func (l *InstanceLogger) OnBuildRequest(builder.Request) {}
 
 // OnBuildFinish does nothing.
-func (i *InstanceLogger) OnBuildFinish() {}
+func (l *InstanceLogger) OnBuildFinish() {}
 
 // OnCopyStart does nothing.
-func (i *InstanceLogger) OnCopyStart(int) {}
+func (l *InstanceLogger) OnCopyStart(int) {}
 
 // OnCopy does nothing.
-func (i *InstanceLogger) OnCopy(string, string) {}
+func (l *InstanceLogger) OnCopy(string, string) {}
 
 // OnCopyFinish does nothing.
-func (i *InstanceLogger) OnCopyFinish() {}
+func (l *InstanceLogger) OnCopyFinish() {}

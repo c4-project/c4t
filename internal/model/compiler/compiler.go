@@ -7,6 +7,8 @@
 package compiler
 
 import (
+	"fmt"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -33,4 +35,17 @@ type Compiler struct {
 	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty"`
 
 	Config
+}
+
+// String outputs a human-readable but machine-separable summary of this compiler.
+func (c Compiler) String() string {
+	var run, opt string
+	if c.Run != nil {
+		run = fmt.Sprintf(" (%s)", c.Run)
+	}
+	if c.SelectedOpt != nil {
+		opt = fmt.Sprintf(" opt %q", c.SelectedOpt.Name)
+	}
+
+	return fmt.Sprintf("%s@%s%s%s", c.Style, c.Arch, run, opt)
 }

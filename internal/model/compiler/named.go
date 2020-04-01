@@ -18,12 +18,12 @@ type Named struct {
 }
 
 // AddName names this Compiler with ID name, lifting it to a Named.
-func (c *Compiler) AddName(name id.ID) *Named {
-	return &Named{ID: name, Compiler: *c}
+func (c Compiler) AddName(name id.ID) *Named {
+	return &Named{ID: name, Compiler: c}
 }
 
 // AddNameString tries to resolve name into an ID then name this Compiler with it.
-func (c *Compiler) AddNameString(name string) (*Named, error) {
+func (c Compiler) AddNameString(name string) (*Named, error) {
 	nid, err := id.TryFromString(name)
 	if err != nil {
 		return nil, err

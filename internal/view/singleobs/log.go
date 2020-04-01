@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
@@ -30,3 +32,14 @@ func (l *Logger) OnBuildRequest(r builder.Request) {
 
 // OnBuildFinish does nothing.
 func (l *Logger) OnBuildFinish() {}
+
+// OnCompilerPlanStart briefly logs a compiler start.
+func (l *Logger) OnCompilerPlanStart(ncompilers int) {
+	(*log.Logger)(l).Printf("planning %d compiler(s)...\n", ncompilers)
+}
+
+// OnCompilerPlan does nothing.
+func (l *Logger) OnCompilerPlan(_ compiler.Named) {}
+
+// OnCompilerPlanFinish does nothing.
+func (l *Logger) OnCompilerPlanFinish() {}
