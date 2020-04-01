@@ -21,9 +21,9 @@ func TestRun_TomlDecode(t *testing.T) {
 	t.Parallel()
 	cases := map[string]struct {
 		toml string
-		want subject.Run
+		want subject.RunResult
 	}{
-		"empty": {toml: "", want: subject.Run{}},
+		"empty": {toml: "", want: subject.RunResult{}},
 		"unsat": {
 			toml: `
 time = 2015-10-21T07:28:00-08:00
@@ -39,10 +39,12 @@ status = "flagged"
 [[obs.states]]
   "0:r0" = "1"
   x = "1"`,
-			want: subject.Run{
-				Time:     time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
-				Duration: 8675309,
-				Status:   subject.StatusFlagged,
+			want: subject.RunResult{
+				Result: subject.Result{
+					Time:     time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
+					Duration: 8675309,
+					Status:   subject.StatusFlagged,
+				},
 				Obs: &obs.Obs{
 					Flags: obs.Unsat,
 					CounterExamples: []obs.State{
@@ -60,7 +62,7 @@ status = "flagged"
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			var got subject.Run
+			var got subject.RunResult
 			if _, err := toml.Decode(c.toml, &got); err != nil {
 				t.Fatal("unexpected decode error:", err)
 			}

@@ -8,11 +8,13 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
+
+	c "github.com/urfave/cli/v2"
 
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 
@@ -25,50 +27,89 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
-const defaultOutDir = "mach_results"
+const (
+	defaultOutDir = "mach_results"
+
+	flagSkipCompiler = "skip-compiler"
+	flagSkipRunner   = "skip-runner"
+)
 
 func main() {
-	if err := run(os.Args, os.Stdout, os.Stderr); err != nil {
-		// TODO(@MattWindsor91): make this work properly with JSON output.
-		view.LogTopError(err)
+	app := c.App{
+		Name:                   "act-tester-plan",
+		Usage:                  "runs the planning phase of an ACT test standalone",
+		Flags:                  flags(),
+		HideHelpCommand:        true,
+		UseShortOptionHandling: true,
+		Action: func(ctx *c.Context) error {
+			return run(ctx, os.Stdout, os.Stderr)
+		},
+	}
+	view.LogTopError(app.Run(os.Args))
+}
+
+func flags() []c.Flag {
+	return []c.Flag{
+		&c.BoolFlag{
+			Name:    view.FlagUseJSONLong,
+			Aliases: []string{view.FlagUseJSON},
+			Usage:   "emit progress reports in JSON form on stderr",
+		},
+		&c.BoolFlag{
+			Name:  flagSkipCompiler,
+			Usage: "if given, skip the compiler",
+		},
+		&c.BoolFlag{
+			Name:  flagSkipRunner,
+			Usage: "if given, skip the runner",
+		},
+		&c.DurationFlag{
+			Name:    view.FlagCompilerTimeoutLong,
+			Aliases: []string{view.FlagCompilerTimeout},
+			Value:   1 * time.Minute,
+			Usage:   "a `timeout` to apply to each compilation",
+		},
+		&c.DurationFlag{
+			Name:    view.FlagRunTimeoutLong,
+			Aliases: []string{view.FlagRunTimeout},
+			Value:   1 * time.Minute,
+			Usage:   "a `timeout` to apply to each run",
+		},
+		&c.IntFlag{
+			Name:    view.FlagWorkerCountLong,
+			Aliases: []string{view.FlagWorkerCount},
+			Value:   1,
+			Usage:   "number of `workers` to run in parallel",
+		},
+		view.OutDirCliFlag(defaultOutDir),
+		view.PlanFileCliFlag(),
 	}
 }
 
-func run(args []string, outw, errw io.Writer) error {
-	var pfile string
-	a := act.Runner{Stderr: errw}
-
-	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	js := fs.Bool("J", false, "emit progress reports in JSON form on stderr")
-
-	c := makeConfigFlags(fs)
-	c.Stdout = outw
-	c.RDriver = &backend.BResolve
-	c.CDriver = &compiler.CResolve
-
-	view.ActRunnerFlags(fs, &a)
-	view.PlanFileFlag(fs, &pfile)
-	if err := fs.Parse(args[1:]); err != nil {
-		return err
-	}
-
-	setLoggersAndObserver(c, errw, *js)
-
-	return view.RunOnPlanFile(context.Background(), c, pfile, outw)
+func run(ctx *c.Context, outw, errw io.Writer) error {
+	cfg := makeConfig(ctx, outw, errw)
+	pfile := view.PlanFileFromCli(ctx)
+	return view.RunOnPlanFile(context.Background(), cfg, pfile, outw)
 }
 
-func makeConfigFlags(fs *flag.FlagSet) *mach.Config {
-	var c mach.Config
-	fs.BoolVar(&c.SkipCompiler, "c", false, "if given, skip the compiler")
-	fs.BoolVar(&c.SkipRunner, "r", false, "if given, skip the runner")
-	fs.IntVar(&c.Timeout, "t", 1, "a timeout, in `minutes`, to apply to each run")
-	fs.IntVar(&c.NWorkers, "j", 1, "number of `workers` to run in parallel")
-	view.OutDirFlag(fs, &c.OutDir, defaultOutDir)
-	return &c
+func makeConfig(ctx *c.Context, outw, errw io.Writer) *mach.Config {
+	cfg := mach.Config{
+		CDriver:      &compiler.CResolve,
+		RDriver:      &backend.BResolve,
+		Stdout:       outw,
+		OutDir:       view.OutDirFromCli(ctx),
+		SkipCompiler: ctx.Bool(flagSkipCompiler),
+		SkipRunner:   ctx.Bool(flagSkipRunner),
+		CTimeout:     ctx.Duration(view.FlagCompilerTimeoutLong),
+		RTimeout:     ctx.Duration(view.FlagRunTimeoutLong),
+		NWorkers:     ctx.Int(view.FlagWorkerCountLong),
+	}
+
+	setLoggerAndObservers(&cfg, errw, ctx.Bool(view.FlagUseJSONLong))
+	return &cfg
 }
 
 func ensureStderr(errw io.Writer) io.Writer {
@@ -78,7 +119,7 @@ func ensureStderr(errw io.Writer) io.Writer {
 	return errw
 }
 
-func setLoggersAndObserver(c *mach.Config, errw io.Writer, jsonStatus bool) {
+func setLoggerAndObservers(c *mach.Config, errw io.Writer, jsonStatus bool) {
 	errw = ensureStderr(errw)
 
 	if jsonStatus {

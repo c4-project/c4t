@@ -84,7 +84,7 @@ func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 
 	r.l.Printf("running across %d worker(s)", r.conf.NWorkers)
 	if 0 < r.conf.Timeout {
-		r.l.Printf("timeout at %d minute(s)", r.conf.Timeout)
+		r.l.Printf("timeout at %s", r.conf.Timeout)
 	}
 
 	err := r.plan.Corpus.Par(ctx, r.conf.NWorkers,

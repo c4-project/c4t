@@ -39,7 +39,7 @@ type Subject struct {
 	// Runs contains information about this subject's runs so far.
 	// It maps from the string form of each compiler's ID.
 	// If nil, this subject hasn't had any runs.
-	Runs map[string]Run `toml:"runs, omitempty"`
+	Runs map[string]RunResult `toml:"runs, omitempty"`
 }
 
 // BestLitmus tries to get the 'best' litmus test path for further development.
@@ -120,18 +120,18 @@ func (s *Subject) ensureHarnessMap() {
 }
 
 // RunOf gets the run for the compiler with id cid.
-func (s *Subject) RunOf(cid id.ID) (Run, error) {
+func (s *Subject) RunOf(cid id.ID) (RunResult, error) {
 	key := cid.String()
 	h, ok := s.Runs[key]
 	if !ok {
-		return Run{}, fmt.Errorf("%w: compiler=%q", ErrMissingRun, key)
+		return RunResult{}, fmt.Errorf("%w: compiler=%q", ErrMissingRun, key)
 	}
 	return h, nil
 }
 
 // AddRun sets the run information for cid to r in this subject.
 // It fails if there already _is_ a run for cid.
-func (s *Subject) AddRun(cid id.ID, r Run) error {
+func (s *Subject) AddRun(cid id.ID, r RunResult) error {
 	s.ensureRunMap()
 	key := cid.String()
 	if _, ok := s.Runs[key]; ok {
@@ -144,6 +144,6 @@ func (s *Subject) AddRun(cid id.ID, r Run) error {
 // ensureHarnessMap makes sure this subject has a harness map.
 func (s *Subject) ensureRunMap() {
 	if s.Runs == nil {
-		s.Runs = make(map[string]Run)
+		s.Runs = make(map[string]RunResult)
 	}
 }

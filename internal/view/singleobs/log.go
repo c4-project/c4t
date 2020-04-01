@@ -23,10 +23,10 @@ func (l *Logger) OnBuildStart(builder.Manifest) {}
 // OnBuildRequest logs failed compile and run results.
 func (l *Logger) OnBuildRequest(r builder.Request) {
 	switch {
-	case r.Compile != nil && !r.Compile.Result.Success:
-		(*log.Logger)(l).Printf("subject %q on compiler %q: compilation failed", r.Name, r.Compile.CompilerID.String())
+	case r.Compile != nil && r.Compile.Result.Status != subject.StatusOk:
+		(*log.Logger)(l).Printf("subject %q on compiler %q: %s", r.Name, r.Compile.CompilerID.String(), r.Compile.Result.Status)
 	case r.Run != nil && r.Run.Result.Status != subject.StatusOk:
-		(*log.Logger)(l).Printf("subject %q on compiler %q: %s", r.Name, r.Run.CompilerID.String(), r.Run.Result.Status.String())
+		(*log.Logger)(l).Printf("subject %q on compiler %q: %s", r.Name, r.Run.CompilerID.String(), r.Run.Result.Status)
 	}
 }
 

@@ -52,7 +52,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		"foo",
 		id.CStyleGCC,
 		subject.CompileResult{
-			Success: true,
+			Result: subject.Result{Status: subject.StatusOk},
 			Files: subject.CompileFileset{
 				Bin: "foo/bin",
 				Log: "foo/log",
@@ -61,8 +61,8 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	run := builder.RunRequest(
 		"foo",
 		id.CStyleGCC,
-		subject.Run{
-			Status: subject.StatusFlagged,
+		subject.RunResult{
+			Result: subject.Result{Status: subject.StatusFlagged},
 		})
 
 	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {

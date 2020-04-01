@@ -9,6 +9,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 
@@ -33,8 +34,10 @@ type Config struct {
 	SkipCompiler bool
 	// SkipRunner tells the machine-runner to skip running.
 	SkipRunner bool
-	// Timeout is a timeout, in minutes, to apply to each run.
-	Timeout int
+	// CTimeout is a timeout to apply to each compilation.
+	CTimeout time.Duration
+	// RTimeout is a timeout to apply to each run.
+	RTimeout time.Duration
 	// NWorkers is the number of running workers to run in parallel.
 	NWorkers int
 	// Logger is the logger to use for the machine-dependent stage.
@@ -65,6 +68,7 @@ func (c *Config) makeCompilerConfig() *compiler.Config {
 		Logger:    c.Logger,
 		Paths:     compiler.NewPathset(c.OutDir),
 		Observers: c.Observers,
+		Timeout:   c.CTimeout,
 	}
 }
 
@@ -78,7 +82,7 @@ func (c *Config) makeRunnerConfig() *runner.Config {
 		Parser:    c.RDriver,
 		Paths:     runner.NewPathset(c.OutDir),
 		Observers: c.Observers,
-		Timeout:   c.Timeout,
+		Timeout:   c.RTimeout,
 		NWorkers:  c.NWorkers,
 	}
 }

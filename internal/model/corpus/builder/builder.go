@@ -147,7 +147,7 @@ func (b *Builder) addHarness(name string, arch id.ID, h subject.Harness) error {
 	})
 }
 
-func (b *Builder) addRun(name string, cid id.ID, r subject.Run) error {
+func (b *Builder) addRun(name string, cid id.ID, r subject.RunResult) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddRun(cid, r)
 	})

@@ -9,6 +9,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
@@ -28,11 +29,11 @@ type ObsParser interface {
 	ParseObs(ctx context.Context, b *service.Backend, r io.Reader, o *obs.Obs) error
 }
 
-// MachConfig represents the configuration needed to run a Runner.
+// Config represents the configuration needed to run a Runner.
 type Config struct {
-	// Timeout is the timeout for each run, in minutes.
+	// Timeout is the timeout for each run.
 	// Non-positive values disable the timeout.
-	Timeout int
+	Timeout time.Duration
 
 	// NWorkers is the number of parallel run workers that should be spawned.
 	// Anything less than or equal to 1 will sequentialise the run.

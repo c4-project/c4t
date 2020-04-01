@@ -119,14 +119,14 @@ func TestNormaliser_Subject(t *testing.T) {
 			in: subject.Subject{
 				Compiles: map[string]subject.CompileResult{
 					"clang": {
-						Success: true,
+						Result: subject.Result{Status: subject.StatusOk},
 						Files: subject.CompileFileset{
 							Bin: path.Join("foobaz", "clang", "a.out"),
 							Log: path.Join("foobaz", "clang", "errors"),
 						},
 					},
 					"gcc": {
-						Success: true,
+						Result: subject.Result{Status: subject.StatusOk},
 						Files: subject.CompileFileset{
 							Bin: path.Join("foobaz", "gcc", "a.out"),
 							Log: path.Join("foobaz", "gcc", "errors"),
@@ -137,14 +137,14 @@ func TestNormaliser_Subject(t *testing.T) {
 			out: subject.Subject{
 				Compiles: map[string]subject.CompileResult{
 					"clang": {
-						Success: true,
+						Result: subject.Result{Status: subject.StatusOk},
 						Files: subject.CompileFileset{
 							Bin: path.Join(transfer.DirCompiles, "clang", transfer.FileBin),
 							Log: path.Join(transfer.DirCompiles, "clang", transfer.FileCompileLog),
 						},
 					},
 					"gcc": {
-						Success: true,
+						Result: subject.Result{Status: subject.StatusOk},
 						Files: subject.CompileFileset{
 							Bin: path.Join(transfer.DirCompiles, "gcc", transfer.FileBin),
 							Log: path.Join(transfer.DirCompiles, "gcc", transfer.FileCompileLog),
@@ -200,7 +200,7 @@ func ExampleNormaliser_MappingsOfKind() {
 		},
 		Compiles: map[string]subject.CompileResult{
 			"clang": {
-				Success: true,
+				Result: subject.Result{Status: subject.StatusOk},
 				Files: subject.CompileFileset{
 					Bin: path.Join("foobaz", "clang", "a.out"),
 					Log: path.Join("foobaz", "clang", "errors"),

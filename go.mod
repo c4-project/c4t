@@ -10,6 +10,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gdamore/tcell v1.3.0 // indirect
+	github.com/kr/fs v0.1.0
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect

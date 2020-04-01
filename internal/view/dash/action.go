@@ -78,15 +78,18 @@ func (o *actionObserver) onAdd(sname string) {
 
 // onCompile acknowledges the addition of a compilation to a action being built.
 func (o *actionObserver) onCompile(sname string, b *builder.Compile) {
-	c := colorCompile
-	desc := idQualSubjectDesc(sname, b.CompilerID)
+	o.onMachOp(sname, "COMPILE", b.CompilerID, b.Result.Result, colorCompile)
+}
 
-	if !b.Result.Success {
-		c = colorFailed
-		desc += " [FAILED]"
-	}
+// onRun acknowledges the addition of a run to a action being built.
+func (o *actionObserver) onRun(sname string, b *builder.Run) {
+	o.onMachOp(sname, "RUN", b.CompilerID, b.Result.Result, colorRun)
+}
 
-	o.logAndStepGauge("COMPILE", desc, c)
+func (o *actionObserver) onMachOp(sname, opname string, cid id.ID, r subject.Result, defaultc cell.Color) {
+	descStub := idQualSubjectDesc(sname, cid)
+	desc := fmt.Sprintf("%s%s %s", descStub, suffixOfStatus(r.Status), r.Duration)
+	o.logAndStepGauge(opname, desc, colourOfStatus(r.Status, defaultc))
 }
 
 // onHarness acknowledges the addition of a harness to a action being built.
@@ -94,23 +97,27 @@ func (o *actionObserver) onHarness(sname string, b *builder.Harness) {
 	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colorHarness)
 }
 
-// onRun acknowledges the addition of a run to a action being built.
-func (o *actionObserver) onRun(sname string, b *builder.Run) {
-	desc := idQualSubjectDesc(sname, b.CompilerID)
-	suff, c := runSuffixAndColour(b.Result.Status)
-	o.logAndStepGauge("RUN", desc+suff, c)
+func suffixOfStatus(s subject.Status) string {
+	if s == subject.StatusOk {
+		return ""
+	}
+	return fmt.Sprintf(" [%s]", s)
 }
 
-func runSuffixAndColour(s subject.Status) (string, cell.Color) {
+func colourOfStatus(s subject.Status, defaultc cell.Color) cell.Color {
 	switch s {
 	case subject.StatusFlagged:
-		return " [FLAGGED]", colorFlagged
+		return colorFlagged
+	case subject.StatusCompileTimeout:
+		fallthrough
 	case subject.StatusRunTimeout:
-		return " [TIMEOUT]", colorTimeout
+		return colorTimeout
 	case subject.StatusCompileFail:
-		return " [FAILED]", colorFailed
+		fallthrough
+	case subject.StatusRunFail:
+		return colorFailed
 	default:
-		return "", colorRun
+		return defaultc
 	}
 }
 

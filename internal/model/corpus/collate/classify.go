@@ -15,31 +15,28 @@ func classify(named subject.Named) flag {
 }
 
 func classifyCompiles(cs map[string]subject.CompileResult) flag {
-	for _, c := range cs {
-		if !c.Success {
-			return flagCompileFail
-		}
-	}
-	return flagOk
-}
-
-func classifyRuns(rs map[string]subject.Run) flag {
 	f := flagOk
-	for _, r := range rs {
-		f |= classifyRunStatus(r.Status)
+	for _, c := range cs {
+		f |= classifyStatus(c.Status)
 	}
 	return f
 }
 
-func classifyRunStatus(s subject.Status) flag {
+func classifyRuns(rs map[string]subject.RunResult) flag {
+	f := flagOk
+	for _, r := range rs {
+		f |= classifyStatus(r.Status)
+	}
+	return f
+}
+
+func classifyStatus(s subject.Status) flag {
 	switch s {
 	case subject.StatusFlagged:
 		return flagFlagged
 	case subject.StatusCompileTimeout:
-		// This (will be) probably redundant, as we classify the compile too.
 		return flagCompileTimeout
 	case subject.StatusCompileFail:
-		// This is probably redundant, as we classify the compile too.
 		return flagCompileFail
 	case subject.StatusRunTimeout:
 		return flagRunTimeout

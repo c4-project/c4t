@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/view"
+
 	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 	"golang.org/x/sync/errgroup"
@@ -88,8 +90,8 @@ const binName = "act-tester-mach"
 // runArgs produces the arguments for an invocation of binName, given directory dir.
 func runArgs(dir string) []string {
 	return []string{
-		"-J",      // use JSON
-		"-d", dir, // output to the given directory
+		"-" + view.FlagUseJSON,
+		"-" + view.FlagOutDir, dir,
 	}
 }
 

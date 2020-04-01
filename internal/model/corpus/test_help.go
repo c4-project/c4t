@@ -37,17 +37,17 @@ func MockFailedCompile(name string) subject.Subject {
 		},
 		Compiles: map[string]subject.CompileResult{
 			"gcc": {
-				Success: false,
-				Files:   subject.CompileFileset{},
+				Result: subject.Result{Status: subject.StatusCompileFail},
+				Files:  subject.CompileFileset{},
 			},
 			"clang": MockSuccessfulCompile("clang", name),
 		},
-		Runs: map[string]subject.Run{
+		Runs: map[string]subject.RunResult{
 			"gcc": {
-				Status: subject.StatusOk,
+				Result: subject.Result{Status: subject.StatusCompileFail},
 			},
 			"clang": {
-				Status: subject.StatusCompileFail,
+				Result: subject.Result{Status: subject.StatusOk},
 			},
 		},
 	}
@@ -65,9 +65,9 @@ func MockFlaggedRun(name string) subject.Subject {
 			"gcc": MockSuccessfulCompile("gcc", name),
 			"icc": MockSuccessfulCompile("icc", name),
 		},
-		Runs: map[string]subject.Run{
-			"gcc": {Status: subject.StatusFlagged},
-			"icc": {Status: subject.StatusFlagged},
+		Runs: map[string]subject.RunResult{
+			"gcc": {Result: subject.Result{Status: subject.StatusFlagged}},
+			"icc": {Result: subject.Result{Status: subject.StatusFlagged}},
 		},
 	}
 }
@@ -84,8 +84,8 @@ func MockTimeoutRun(name string) subject.Subject {
 		Compiles: map[string]subject.CompileResult{
 			"msvc": MockSuccessfulCompile("msvc", name),
 		},
-		Runs: map[string]subject.Run{
-			"msvc": {Status: subject.StatusRunTimeout},
+		Runs: map[string]subject.RunResult{
+			"msvc": {Result: subject.Result{Status: subject.StatusRunTimeout}},
 		},
 	}
 }
@@ -93,7 +93,9 @@ func MockTimeoutRun(name string) subject.Subject {
 // MockSuccessfulCompile generates a mock CompileResult for a successful compile of subject sname with compiler cstr.
 func MockSuccessfulCompile(cstr string, sname string) subject.CompileResult {
 	return subject.CompileResult{
-		Success: true,
+		Result: subject.Result{
+			Status: subject.StatusOk,
+		},
 		Files: subject.CompileFileset{
 			Bin: path.Join(cstr, sname, "a.out"),
 			Log: path.Join(cstr, sname, "log.txt"),

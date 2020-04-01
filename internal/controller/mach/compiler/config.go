@@ -9,6 +9,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 
@@ -42,6 +43,10 @@ type SubjectPather interface {
 
 // Config represents the configuration that goes into a batch compiler run.
 type Config struct {
+	// Timeout is the timeout for each compile.
+	// Non-positive values disable the timeout.
+	Timeout time.Duration
+
 	// Driver is what the compiler should use to run single compiler jobs.
 	Driver SingleRunner
 

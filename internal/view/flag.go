@@ -18,20 +18,35 @@ import (
 )
 
 const (
+	// FlagRunTimeout is a short flag for run timeout.
+	FlagRunTimeout  = "T"
+	flagActConfFile = "A"
+	flagConfFile    = "C"
+	// FlagUseJSON is a short flag for enabling JSON output where available.
+	FlagUseJSON = "J"
+	// FlagOutDir is a short flag for specifying an output directory.
+	FlagOutDir = "d"
 	// FlagInputFile is a standard flag for arguments that suggest an alternative to stdin for commands that read files.
 	FlagInputFile = "i"
-
+	// FlagWorkerCount is a standard flag for arguments that set a worker count.
+	FlagWorkerCount   = "j"
+	flagSubjectCycles = "k"
 	// FlagMachine is a standard flag for machine selection arguments.
 	FlagMachine = "m"
-
 	// FlagNum is a standard flag for 'number of' arguments.
 	FlagNum = "n"
+	// FlagCompilerTimeout is a short flag for compiler timeout.
+	FlagCompilerTimeout = "t"
+	flagActDuneExec     = "x"
 
-	flagActConfFile   = "A"
-	flagConfFile      = "C"
-	flagOutDir        = "d"
-	flagSubjectCycles = "k"
-	flagActDuneExec   = "x"
+	// FlagCompilerTimeoutLong is a long flag for compiler timeout.
+	FlagCompilerTimeoutLong = "compiler-timeout"
+	// FlagRunTimeoutLong is a long flag for run timeout.
+	FlagRunTimeoutLong = "run-timeout"
+	// FlagUseJSONLong is a long flag for JSON emission.
+	FlagUseJSONLong = "emit-json"
+	// FlagWorkerCountLong is a long flag for arguments that set a worker count.
+	FlagWorkerCountLong = "num-workers"
 
 	usageConfFile    = "The `file` from which to load the tester configuration."
 	usageActConfFile = "read ACT config from this `file`"
@@ -55,7 +70,21 @@ func SubjectCycleFlag(fs *flag.FlagSet, out *int) {
 
 // OutDirFlag sets up an 'output directory' flag on fs.
 func OutDirFlag(fs *flag.FlagSet, out *string, defaultdir string) {
-	fs.StringVar(out, flagOutDir, defaultdir, usageOutDir)
+	fs.StringVar(out, FlagOutDir, defaultdir, usageOutDir)
+}
+
+// OutDirCliFlag sets up an 'output directory' cli flag.
+func OutDirCliFlag(defaultdir string) c.Flag {
+	return &c.PathFlag{
+		Name:  FlagOutDir,
+		Value: defaultdir,
+		Usage: usageOutDir,
+	}
+}
+
+// OutDirFromCli gets the output directory set up by OutDirCliFlag.
+func OutDirFromCli(ctx *c.Context) string {
+	return ctx.Path(FlagOutDir)
 }
 
 // ActRunnerFlags sets up a standard set of arguments on fs feeding into the ActRunner a.
@@ -111,4 +140,18 @@ func ConfFileFlag(fs *flag.FlagSet) *string {
 // PlanFileFlag sets up a standard argument on fs for loading a plan file into f.
 func PlanFileFlag(fs *flag.FlagSet, f *string) {
 	fs.StringVar(f, FlagInputFile, "", usagePlanFile)
+}
+
+// PlanFileCliFlag sets up a standard cli flag for loading a plan file into f.
+func PlanFileCliFlag() c.Flag {
+	return &c.PathFlag{
+		Name:      FlagInputFile,
+		TakesFile: true,
+		Usage:     usagePlanFile,
+	}
+}
+
+// PlanFileFromCli retrieves a plan file using the file flag set up by PlanFileCliFlag.
+func PlanFileFromCli(ctx *c.Context) string {
+	return ctx.Path(FlagInputFile)
 }

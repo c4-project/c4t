@@ -11,6 +11,7 @@ import "github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 type QuantitySet struct {
 	// Fuzz is the quantity set for the fuzz stage.
 	Fuzz fuzzer.QuantitySet `toml:"fuzz"`
+	// TODO(@MattWindsor91): allow timeout overriding here
 }
 
 // Override substitutes any quantities in new that are non-zero for those in this set.

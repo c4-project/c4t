@@ -89,6 +89,10 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 		return nil, berr
 	}
 
+	if 0 < c.conf.Timeout {
+		c.l.Printf("timeout at %s", c.conf.Timeout)
+	}
+
 	for ids, cc := range c.plan.Compilers {
 		nc, err := cc.AddNameString(ids)
 		if err != nil {
@@ -132,8 +136,7 @@ func (c *Compiler) makeJob(nc *compiler.Named, resCh chan<- builder.Request) *Jo
 		MachineID: c.mid,
 		Compiler:  nc,
 		Corpus:    c.plan.Corpus,
-		Pathset:   c.conf.Paths,
-		Runner:    c.conf.Driver,
+		Conf:      &c.conf,
 		ResCh:     resCh,
 	}
 }

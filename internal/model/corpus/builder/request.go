@@ -84,10 +84,10 @@ type Run struct {
 	CompilerID id.ID
 
 	// Run is the run result.
-	Result subject.Run
+	Result subject.RunResult
 }
 
 // RunRequest constructs an add-run request for the subject with name sname, compiler ID cid, and result r.
-func RunRequest(sname string, cid id.ID, r subject.Run) Request {
+func RunRequest(sname string, cid id.ID, r subject.RunResult) Request {
 	return Request{Name: sname, Run: &Run{CompilerID: cid, Result: r}}
 }

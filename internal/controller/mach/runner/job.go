@@ -57,25 +57,35 @@ func (j *Job) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResul
 	return j.makeBuilderReq(cid, run).SendTo(ctx, j.ResCh)
 }
 
-func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.Run, error) {
-	if !c.Success {
-		return subject.Run{Status: subject.StatusCompileFail}, nil
+func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.RunResult, error) {
+	if c.Status != subject.StatusOk {
+		return subject.RunResult{Result: subject.Result{Status: c.Status}}, nil
 	}
 
 	bin := c.Files.Bin
 	if bin == "" {
-		return subject.Run{Status: subject.StatusUnknown}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.Subject.Name, cid.String())
+		return subject.RunResult{
+			Result: subject.Result{Status: subject.StatusUnknown},
+		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.Subject.Name, cid.String())
 	}
 
+	start := time.Now()
 	o, runErr := j.runAndParseBin(ctx, cid, bin)
 	status, err := subject.StatusOfObs(o, runErr)
 
-	return subject.Run{Status: status, Obs: o}, err
+	rr := subject.RunResult{
+		Result: subject.Result{
+			Time:     start,
+			Duration: time.Since(start),
+			Status:   status,
+		},
+		Obs: o,
+	}
+	return rr, err
 }
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
 func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.Obs, error) {
-	// TODO(@MattWindsor91): make the timeout configurable
 	tctx, cancel := j.timeout(ctx)
 	defer cancel()
 
@@ -99,7 +109,7 @@ func (j *Job) timeout(ctx context.Context) (context.Context, context.CancelFunc)
 	if j.Conf.Timeout <= 0 {
 		return ctx, func() {}
 	}
-	return context.WithTimeout(ctx, time.Duration(j.Conf.Timeout)*time.Minute)
+	return context.WithTimeout(ctx, j.Conf.Timeout)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and
@@ -122,7 +132,7 @@ func mostRelevantError(r, p, c error) error {
 	}
 }
 
-func (j *Job) makeBuilderReq(cid id.ID, run subject.Run) builder.Request {
+func (j *Job) makeBuilderReq(cid id.ID, run subject.RunResult) builder.Request {
 	return builder.RunRequest(j.Subject.Name, cid, run)
 }
 

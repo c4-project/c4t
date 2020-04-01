@@ -109,7 +109,7 @@ func (c *Collation) build(ctx context.Context, ch <-chan collationRequest, count
 
 func (c *Collation) file(rq collationRequest) {
 	for s, c := range c.ByStatus() {
-		if rq.flags.matches(classifyRunStatus(s)) {
+		if rq.flags.matches(classifyStatus(s)) {
 			c[rq.sub.Name] = rq.sub.Subject
 		}
 	}

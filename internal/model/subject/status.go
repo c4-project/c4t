@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os/exec"
 	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
@@ -56,14 +57,32 @@ var (
 	}
 )
 
-// StatusOfError tries to see if err represents a non-fatal issue such as a timeout.
+// StatusOfCompileError tries to see if err represents a non-fatal issue such as a timeout or process error.
 // If so, it converts that error to a status and returns it alongside nil.
 // Otherwise, it propagates the error forwards.
-func StatusOfError(err error) (Status, error) {
-	if errors.Is(err, context.DeadlineExceeded) {
-		return StatusRunTimeout, nil
+func StatusOfCompileError(err error) (Status, error) {
+	return statusOfError(err, StatusCompileTimeout, StatusCompileFail)
+}
+
+// StatusOfRunError tries to see if err represents a non-fatal issue such as a timeout or process error.
+// If so, it converts that error to a status and returns it alongside nil.
+// Otherwise, it propagates the error forwards.
+func StatusOfRunError(err error) (Status, error) {
+	return statusOfError(err, StatusRunTimeout, StatusRunFail)
+}
+
+func statusOfError(err error, timeout, fail Status) (Status, error) {
+	var ee *exec.ExitError
+	switch {
+	case err == nil:
+		return StatusOk, nil
+	case errors.Is(err, context.DeadlineExceeded):
+		return timeout, nil
+	case errors.As(err, &ee):
+		return fail, nil
+	default:
+		return StatusUnknown, err
 	}
-	return StatusUnknown, err
 }
 
 // StatusOfString tries to resolve s to a status code.
@@ -101,7 +120,7 @@ func (s *Status) UnmarshalText(text []byte) error {
 // StatusOfObs returns any error passed to it that it deems too fatal to represent in the status code.
 func StatusOfObs(o *obs.Obs, runErr error) (Status, error) {
 	if runErr != nil {
-		return StatusOfError(runErr)
+		return StatusOfRunError(runErr)
 	}
 
 	// TODO(@MattWindsor91): allow interestingness criteria

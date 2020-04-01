@@ -38,18 +38,18 @@ func ExampleSubject_BestLitmus() {
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
 	s := subject.Subject{Compiles: map[string]subject.CompileResult{
-		"gcc":   {Success: true, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
-		"clang": {Success: false, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
+		"gcc":   {Result: subject.Result{Status: subject.StatusOk}, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
+		"clang": {Result: subject.Result{Status: subject.StatusCompileFail}, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
 	gr, _ := s.CompileResult(id.FromString("gcc"))
 	cr, _ := s.CompileResult(id.FromString("clang"))
 
-	fmt.Println("gcc:", gr.Success, gr.Files.Bin, gr.Files.Log)
-	fmt.Println("clang:", cr.Success, cr.Files.Bin, cr.Files.Log)
+	fmt.Println("gcc:", gr.Status, gr.Files.Bin, gr.Files.Log)
+	fmt.Println("clang:", cr.Status, cr.Files.Bin, cr.Files.Log)
 
 	// Output:
-	// gcc: true a.out gcc.log
-	// clang: false a.out clang.log
+	// gcc: ok a.out gcc.log
+	// clang: compile/fail a.out clang.log
 }
 
 // ExampleSubject_Harness is a testable example for Harness.
@@ -76,9 +76,9 @@ func ExampleSubject_Harness() {
 
 // ExampleSubject_RunOf is a testable example for RunOf.
 func ExampleSubject_RunOf() {
-	s := subject.Subject{Runs: map[string]subject.Run{
-		"gcc":   {Status: subject.StatusOk},
-		"clang": {Status: subject.StatusRunTimeout},
+	s := subject.Subject{Runs: map[string]subject.RunResult{
+		"gcc":   {Result: subject.Result{Status: subject.StatusOk}},
+		"clang": {Result: subject.Result{Status: subject.StatusRunTimeout}},
 	}}
 	gr, _ := s.RunOf(id.FromString("gcc"))
 	cr, _ := s.RunOf(id.FromString("clang"))
@@ -103,7 +103,7 @@ func TestSubject_CompileResult_Missing(t *testing.T) {
 func TestSubject_AddCompileResult(t *testing.T) {
 	var s subject.Subject
 	c := subject.CompileResult{
-		Success: true,
+		Result: subject.Result{Status: subject.StatusOk},
 		Files: subject.CompileFileset{
 			Bin: "a.out",
 			Log: "gcc.log",
@@ -181,7 +181,7 @@ func TestSubject_RunOf_Missing(t *testing.T) {
 // TestSubject_AddRun checks that AddRun is working properly.
 func TestSubject_AddRun(t *testing.T) {
 	var s subject.Subject
-	c := subject.Run{Status: subject.StatusRunTimeout}
+	c := subject.RunResult{Result: subject.Result{Status: subject.StatusRunTimeout}}
 
 	mcomp := id.FromString("gcc")
 
@@ -200,7 +200,7 @@ func TestSubject_AddRun(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		err := s.AddRun(mcomp, subject.Run{})
+		err := s.AddRun(mcomp, subject.RunResult{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRun, "adding compile twice")
 	})
 }
