@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
+
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
@@ -42,7 +44,7 @@ func run(args []string, outw, errw io.Writer) error {
 	cfg := lifter.Config{
 		Maker:     &backend.BResolve,
 		Logger:    l,
-		Observers: view.BuilderObservers(l),
+		Observers: singleobs.Builder(l),
 		Paths:     lifter.NewPathset(od),
 		Stderr:    errw,
 	}

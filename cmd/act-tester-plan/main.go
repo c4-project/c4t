@@ -11,6 +11,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
+
 	c "github.com/urfave/cli/v2"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
@@ -120,5 +122,5 @@ func makePlanConfig(c *config.Config, errw io.Writer, a *act.Runner, cs int) (*p
 }
 
 func observers(l *log.Logger) planner.ObserverSet {
-	return planner.NewObserverSet(view.PlannerObservers(l)...)
+	return planner.NewObserverSet(singleobs.Planner(l)...)
 }

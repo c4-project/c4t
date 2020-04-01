@@ -14,6 +14,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -86,7 +88,7 @@ func setLoggersAndObserver(c *mach.Config, errw io.Writer, jsonStatus bool) {
 	}
 
 	c.Logger = log.New(errw, "[mach] ", log.LstdFlags)
-	c.Observers = view.BuilderObservers(c.Logger)
+	c.Observers = singleobs.Builder(c.Logger)
 }
 
 func makeJsonObserver(errw io.Writer) []builder.Observer {

@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
+
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/view"
@@ -43,7 +45,7 @@ func run(args []string, outw, errw io.Writer) error {
 
 	cfg := fuzzer.Config{
 		Driver:     &a,
-		Observers:  view.BuilderObservers(l),
+		Observers:  singleobs.Builder(l),
 		Logger:     l,
 		Paths:      fuzzer.NewPathset(dir),
 		Quantities: *qs,
