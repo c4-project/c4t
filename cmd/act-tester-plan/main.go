@@ -30,6 +30,7 @@ import (
 )
 
 const (
+	envSeed         = "ACT_SEED"
 	flagSeed        = "seed"
 	flagSeedShort   = "s"
 	usageSeed       = "`seed` to use for any randomised components of this test plan; -1 uses run time as seed"
@@ -59,6 +60,7 @@ func flags() []c.Flag {
 		&c.Int64Flag{
 			Name:    flagSeed,
 			Aliases: []string{flagSeedShort},
+			EnvVars: []string{envSeed},
 			Usage:   usageSeed,
 			Value:   plan.UseDateSeed,
 		},

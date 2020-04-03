@@ -13,6 +13,9 @@ fi
 trace="$1"
 original="$2"
 
+# Try to remove some entropy from the bisection process
+export ACT_SEED=0
+
 # TODO(@MattWindsor91): this is working around a failure in the litmusifying process when a litmus file has a name
 # of the form foo.bar.baz (the output C file becomes foo.c).
 OUTPUT_DIR="$(mktemp -d)" || exit 2
