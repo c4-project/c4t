@@ -120,7 +120,7 @@ func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand) (*plan.P
 
 	f.l.Println("updating plan")
 	f.plan.Corpus = scs
-	f.plan.Header = *plan.NewHeader()
+	f.plan.Header = *plan.NewHeader(plan.UseDateSeed)
 	return &f.plan, nil
 }
 

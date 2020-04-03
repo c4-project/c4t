@@ -11,6 +11,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 
 	c "github.com/urfave/cli/v2"
@@ -28,9 +30,12 @@ import (
 )
 
 const (
+	flagSeed        = "seed"
+	flagSeedShort   = "s"
+	usageSeed       = "`seed` to use for any randomised components of this test plan; -1 uses run time as seed"
 	flagCorpusSize  = "corpus-size"
 	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
-		"if non-positive, the planner will use all viable provided corpus files"
+		"if positive, the planner will use all viable provided corpus files"
 	usageMach = "ID of machine to use for this test plan"
 )
 
@@ -51,6 +56,12 @@ func main() {
 func flags() []c.Flag {
 	ownFlags := []c.Flag{
 		view.ConfFileCliFlag(),
+		&c.Int64Flag{
+			Name:    flagSeed,
+			Aliases: []string{flagSeedShort},
+			Usage:   usageSeed,
+			Value:   plan.UseDateSeed,
+		},
 		&c.StringFlag{
 			Name:  view.FlagMachine,
 			Usage: usageMach,
@@ -84,7 +95,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	}
 
 	fs := ctx.Args().Slice()
-	p, err := pc.Plan(ctx.Context, mid, mach.Machine, fs)
+	p, err := pc.Plan(ctx.Context, mid, mach.Machine, fs, ctx.Int64(flagSeed))
 	if err != nil {
 		return err
 	}

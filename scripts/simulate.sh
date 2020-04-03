@@ -11,6 +11,6 @@ set -euo pipefail
 OUTPUT_DIR="$(mktemp -d)" || exit 2
 trap 'rm -rf ${OUTPUT_DIR}' EXIT
 
-act-tester-plan -m localhost "$@" |
+act-tester-plan -m localhost -seed 0 "$@" |
 act-tester-lift -d "${OUTPUT_DIR}/lift" |
 act-tester-mach -d "${OUTPUT_DIR}/compile"

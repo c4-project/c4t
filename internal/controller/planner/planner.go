@@ -28,9 +28,12 @@ type Planner struct {
 	mid  id.ID
 	plan plan.Plan
 	rng  *rand.Rand
+	seed int64
 }
 
-func New(c Config, mid id.ID, mach plan.Machine, fs []string) (*Planner, error) {
+// New constructs a new planner with the given config, machine information, files, and seed override.
+// If seed is UseDateSeed, it will be ignored and a date-specific seed generated at runtime.
+func New(c Config, mid id.ID, mach plan.Machine, fs []string, seed int64) (*Planner, error) {
 	if err := c.Check(); err != nil {
 		return nil, err
 	}
@@ -47,17 +50,20 @@ func New(c Config, mid id.ID, mach plan.Machine, fs []string) (*Planner, error) 
 		plan: plan.Plan{
 			Machine: mach,
 		},
+		seed: seed,
 	}
+
 	return &p, nil
 }
 
 // Plan runs the test planner p.
 func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
-	hd := plan.NewHeader()
+	hd := plan.NewHeader(p.seed)
 	p.plan.Header = *hd
 
-	// TODO(@MattWindsor91): allow manual seed override
-	p.rng = hd.Rand()
+	if p.rng == nil {
+		p.rng = hd.Rand()
+	}
 
 	var err error
 
