@@ -14,8 +14,6 @@ set -euo pipefail
 rm -rf tester_test || true
 mkdir tester_test
 
-go install github.com/MattWindsor91/act-tester/cmd/...
-
 act-tester-plan -m localhost examples/c_litmus/memalloy/*.litmus |
 	tee tester_test/plan.toml |
 act-tester-fuzz -d tester_test/fuzz -n 10 |
