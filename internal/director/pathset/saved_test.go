@@ -19,8 +19,8 @@ import (
 func ExampleNewSaved() {
 	p := pathset.NewSaved("saved")
 
-	for s, d := range p.Dirs {
-		fmt.Printf("%s: %s\n", s, d)
+	for s := subject.FirstBadStatus; s < subject.NumStatus; s++ {
+		fmt.Printf("%s: %s\n", s, p.Dirs[s])
 	}
 
 	// Unordered output:
@@ -29,6 +29,17 @@ func ExampleNewSaved() {
 	// compile/timeout: saved/compile_timeout
 	// run/fail: saved/run_fail
 	// run/timeout: saved/run_timeout
+}
+
+// ExampleSaved_PlanFile is a runnable example for PlanFile.
+func ExampleSaved_PlanFile() {
+	p := pathset.NewSaved("saved")
+	t := time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60))
+	stf, _ := p.PlanFile(subject.StatusCompileFail, t)
+	fmt.Println(filepath.ToSlash(stf))
+
+	// Output:
+	// saved/compile_fail/2015/10/21/072800/plan.toml
 }
 
 // ExampleSaved_SubjectTarFile is a runnable example for SubjectTarFile.

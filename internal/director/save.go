@@ -14,8 +14,9 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"time"
+
+	"github.com/1set/gut/yos"
 
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
@@ -64,35 +65,70 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	observer.OnCollation(coll, s.Observers...)
 
 	for st, c := range coll.ByStatus() {
-		if st < subject.FirstBadStatus {
+		if st < subject.FirstBadStatus || len(c) == 0 {
 			continue
 		}
-
-		if err := s.tarSubjects(st, c, p.Header.Creation); err != nil {
+		if err := s.saveBucket(st, c, p, p.Header.Creation); err != nil {
 			return nil, err
 		}
 	}
 	return p, nil
 }
 
+func (s *Save) saveBucket(st subject.Status, c corpus.Corpus, p *plan.Plan, creation time.Time) error {
+	if err := s.prepareDir(st, creation); err != nil {
+		return err
+	}
+	if err := s.writePlan(st, p, creation); err != nil {
+		return err
+	}
+	return s.tarSubjects(st, c, creation)
+}
+
+func (s *Save) prepareDir(st subject.Status, creation time.Time) error {
+	dir, err := s.Paths.SubjectDir(st, creation)
+	if err != nil {
+		return err
+	}
+	return yos.MakeDir(dir)
+}
+
+func (s *Save) writePlan(st subject.Status, p *plan.Plan, creation time.Time) error {
+	path, err := s.Paths.PlanFile(st, creation)
+	if err != nil {
+		return err
+	}
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	err = p.Dump(f)
+	cerr := f.Close()
+	return iohelp.FirstError(err, cerr)
+}
+
 func (s *Save) tarSubjects(st subject.Status, corp corpus.Corpus, creation time.Time) error {
 	for name, sub := range corp {
-		tarpath, err := s.Paths.SubjectTarFile(name, st, creation)
-		if err != nil {
+		if err := s.tarSubject(st, name, sub, creation); err != nil {
 			return err
-		}
-		if err := os.MkdirAll(filepath.Dir(tarpath), 0744); err != nil {
-			return nil
-		}
-		s.Logger.Printf("archiving %s (to %q)", name, tarpath)
-		if err := s.tarSubject(sub, tarpath); err != nil {
-			return fmt.Errorf("tarring subject %s: %w", name, err)
 		}
 	}
 	return nil
 }
 
-func (s *Save) tarSubject(sub subject.Subject, tarpath string) error {
+func (s *Save) tarSubject(st subject.Status, name string, sub subject.Subject, creation time.Time) error {
+	tarpath, err := s.Paths.SubjectTarFile(name, st, creation)
+	if err != nil {
+		return err
+	}
+	s.Logger.Printf("archiving %s (to %q)", name, tarpath)
+	if err := s.tarSubjectToPath(sub, tarpath); err != nil {
+		return fmt.Errorf("tarring subject %s: %w", name, err)
+	}
+	return nil
+}
+
+func (s *Save) tarSubjectToPath(sub subject.Subject, tarpath string) error {
 	tarfile, err := os.Create(tarpath)
 	if err != nil {
 		return fmt.Errorf("create %s: %w", tarpath, err)

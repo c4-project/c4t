@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	planBasename       = "plan.toml"
 	segFlagged         = "flagged"
 	segCompileFailures = "compile_fail"
 	segCompileTimeouts = "compile_timeout"
@@ -26,13 +27,13 @@ const (
 // Saved contains the pre-computed paths for saving 'interesting' run results.
 type Saved struct {
 	// Dirs maps 'interesting' statuses to directories.
-	Dirs map[subject.Status]string
+	Dirs [subject.NumStatus]string
 }
 
 // NewSaved creates a save pathset rooted at root.
 func NewSaved(root string) *Saved {
 	return &Saved{
-		Dirs: map[subject.Status]string{
+		Dirs: [subject.NumStatus]string{
 			subject.StatusFlagged:        filepath.Join(root, segFlagged),
 			subject.StatusCompileFail:    filepath.Join(root, segCompileFailures),
 			subject.StatusCompileTimeout: filepath.Join(root, segCompileTimeouts),
@@ -44,34 +45,39 @@ func NewSaved(root string) *Saved {
 
 // DirList gets the list of directories in the save pathset, ordered by subject number.
 func (s *Saved) DirList() []string {
-	b := subject.FirstBadStatus
-	dirs := make([]string, subject.NumStatus-b)
-	for i := b; i < subject.NumStatus; i++ {
-		dirs[i-b] = s.Dirs[i]
-	}
-	return dirs
+	return s.Dirs[subject.FirstBadStatus:]
 }
 
-// CompileFailureTarFile gets the path to which a tarball for compile-failed subject sname,
-// from the test at time iterTime and with final status st, should be saved.
-func (s *Saved) SubjectTarFile(sname string, st subject.Status, iterTime time.Time) (string, error) {
-	dir, ok := s.Dirs[st]
-	if !ok {
+// SubjectDir tries to get the directory for saved subjects for status st and iteration time iterTime.
+func (s *Saved) SubjectDir(st subject.Status, iterTime time.Time) (string, error) {
+	if st < subject.FirstBadStatus || subject.NumStatus <= st {
 		return "", fmt.Errorf("%w: not an 'interesting' status", subject.ErrBadStatus)
 	}
-	return tarFile(dir, sname, iterTime), nil
-}
-
-// tarFile decides what to call the tarball of the subject with name sname, from the test at time iterTime,
-// relative to root root.
-func tarFile(root, sname string, iterTime time.Time) string {
-	file := sname + tarSuffix
 	return filepath.Join(
-		root,
+		s.Dirs[st],
 		strconv.Itoa(iterTime.Year()),
 		strconv.Itoa(int(iterTime.Month())),
 		strconv.Itoa(iterTime.Day()),
 		iterTime.Format("150405"),
-		file,
-	)
+	), nil
+}
+
+// PlanFile gets the path to which a final plan file for the test at time iterTime, failing with final status st,
+// should be saved.
+func (s *Saved) PlanFile(st subject.Status, iterTime time.Time) (string, error) {
+	return s.subjectFile(planBasename, st, iterTime)
+}
+
+// SubjectTarFile gets the path to which a tarball for compile-failed subject sname,
+// from the test at time iterTime and with final status st, should be saved.
+func (s *Saved) SubjectTarFile(sname string, st subject.Status, iterTime time.Time) (string, error) {
+	return s.subjectFile(sname+tarSuffix, st, iterTime)
+}
+
+func (s *Saved) subjectFile(fname string, st subject.Status, iterTime time.Time) (string, error) {
+	root, err := s.SubjectDir(st, iterTime)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(root, fname), nil
 }
