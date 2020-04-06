@@ -73,28 +73,28 @@ func (o *actionObserver) OnBuildRequest(r builder.Request) {
 
 // onAdd acknowledges the addition of a subject to a action being built.
 func (o *actionObserver) onAdd(sname string) {
-	o.logAndStepGauge("ADD", sname, colorAdd)
+	o.logAndStepGauge("ADD", sname, colourAdd)
 }
 
 // onCompile acknowledges the addition of a compilation to a action being built.
 func (o *actionObserver) onCompile(sname string, b *builder.Compile) {
-	o.onMachOp(sname, "COMPILE", b.CompilerID, b.Result.Result, colorCompile)
+	o.onMachOp(sname, "COMPILE", b.CompilerID, b.Result.Result)
 }
 
 // onRun acknowledges the addition of a run to a action being built.
 func (o *actionObserver) onRun(sname string, b *builder.Run) {
-	o.onMachOp(sname, "RUN", b.CompilerID, b.Result.Result, colorRun)
+	o.onMachOp(sname, "RUN", b.CompilerID, b.Result.Result)
 }
 
-func (o *actionObserver) onMachOp(sname, opname string, cid id.ID, r subject.Result, defaultc cell.Color) {
+func (o *actionObserver) onMachOp(sname, opname string, cid id.ID, r subject.Result) {
 	descStub := idQualSubjectDesc(sname, cid)
 	desc := fmt.Sprintf("%s%s %s", descStub, suffixOfStatus(r.Status), r.Duration)
-	o.logAndStepGauge(opname, desc, colourOfStatus(r.Status, defaultc))
+	o.logAndStepGauge(opname, desc, statusColours[r.Status])
 }
 
 // onHarness acknowledges the addition of a harness to a action being built.
 func (o *actionObserver) onHarness(sname string, b *builder.Harness) {
-	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colorHarness)
+	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colourHarness)
 }
 
 func suffixOfStatus(s subject.Status) string {
@@ -102,23 +102,6 @@ func suffixOfStatus(s subject.Status) string {
 		return ""
 	}
 	return fmt.Sprintf(" [%s]", s)
-}
-
-func colourOfStatus(s subject.Status, defaultc cell.Color) cell.Color {
-	switch s {
-	case subject.StatusFlagged:
-		return colorFlagged
-	case subject.StatusCompileTimeout:
-		fallthrough
-	case subject.StatusRunTimeout:
-		return colorTimeout
-	case subject.StatusCompileFail:
-		fallthrough
-	case subject.StatusRunFail:
-		return colorFailed
-	default:
-		return defaultc
-	}
 }
 
 // OnBuildFinish acknowledges the end of a run.
@@ -134,7 +117,7 @@ func (o *actionObserver) OnCopyStart(nfiles int) {
 // OnCopy acknowledges one step of a file copy.
 func (o *actionObserver) OnCopy(dst, src string) {
 	desc := fmt.Sprintf("%s -> %s", src, dst)
-	o.logAndStepGauge("COPY", desc, colorCopy)
+	o.logAndStepGauge("COPY", desc, colourCopy)
 }
 
 // OnCopyFinish acknowledges the end of a file copy.

@@ -6,19 +6,19 @@
 package dash
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
-	"github.com/mum4k/termdash/cell"
+	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"
 )
 
 // sparks contains the sparklines for a machine.
 type sparkset struct {
-	runTime  *sparkline.SparkLine
-	cfails   *sparkline.SparkLine
-	timeouts *sparkline.SparkLine
-	flags    *sparkline.SparkLine
+	// runLine is a sparkline tracking run time.
+	runLine *sparkline.SparkLine
+	// statusLines contains one sparkline for each status.
+	// (This _includes_ StatusUnknown to simplify calculations later, but we don't display it as a line.)
+	statusLines [subject.NumStatus]*sparkline.SparkLine
 }
 
 func newSparkset() (*sparkset, error) {
@@ -26,17 +26,17 @@ func newSparkset() (*sparkset, error) {
 		s   sparkset
 		err error
 	)
-	for _, pp := range []struct {
-		p **sparkline.SparkLine
-		c cell.Color
-		l string
-	}{
-		{l: "Time ", p: &s.runTime, c: cell.ColorGreen},
-		{l: "CFail", p: &s.cfails, c: cell.ColorRed},
-		{l: "T/Out", p: &s.timeouts, c: cell.ColorMagenta},
-		{l: "Flags", p: &s.flags, c: cell.ColorYellow},
-	} {
-		if *pp.p, err = sparkline.New(sparkline.Color(pp.c), sparkline.Label(pp.l)); err != nil {
+
+	if s.runLine, err = sparkline.New(
+		sparkline.Color(colourOk), sparkline.Label("Run time"),
+	); err != nil {
+		return nil, err
+	}
+
+	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+		if s.statusLines[i], err = sparkline.New(
+			sparkline.Color(statusColours[i]), sparkline.Label(i.String()),
+		); err != nil {
 			return nil, err
 		}
 	}
@@ -44,7 +44,7 @@ func newSparkset() (*sparkset, error) {
 }
 
 func (s *sparkset) sparkLines() []*sparkline.SparkLine {
-	return []*sparkline.SparkLine{s.runTime, s.cfails, s.timeouts, s.flags}
+	return append(s.statusLines[subject.StatusOk:], s.runLine)
 }
 
 func (s *sparkset) gridRows() []grid.Element {
@@ -57,8 +57,11 @@ func (s *sparkset) gridRows() []grid.Element {
 }
 
 func (s *sparkset) sparkCollation(c *collate.Collation) error {
-	ferr := s.flags.Add([]int{len(c.Flagged)})
-	terr := s.timeouts.Add([]int{len(c.Run.Timeouts)})
-	cerr := s.cfails.Add([]int{len(c.Compile.Failures)})
-	return iohelp.FirstError(ferr, terr, cerr)
+	st := c.ByStatus()
+	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+		if err := s.statusLines[i].Add([]int{len(st[i])}); err != nil {
+			return err
+		}
+	}
+	return nil
 }

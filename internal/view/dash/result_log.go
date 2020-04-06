@@ -42,22 +42,10 @@ func (r *ResultLog) LogHeader(sc collate.Sourced) error {
 	return r.log.Write(sc.String()+"\n", text.WriteCellOpts(cell.FgColor(summaryColor(sc))))
 }
 
-// summaryColor retrieves a colour to use for the log header of sc, according to a 'traffic lights' system.
-func summaryColor(sc collate.Sourced) cell.Color {
-	switch {
-	case sc.Collation.HasFailures():
-		return colorFailed
-	case sc.Collation.HasFlagged():
-		return colorFlagged
-	default:
-		return colorRun
-	}
-}
-
 // LogHeader logs the header of a collation bucket with status st.
 func (r *ResultLog) LogBucketHeader(st subject.Status) error {
 	header := fmt.Sprintf("  [%s]\n", st)
-	return r.log.Write(header, text.WriteCellOpts(cell.FgColor(colorFailed)))
+	return r.log.Write(header, text.WriteCellOpts(cell.FgColor(statusColours[st])))
 }
 
 // LogHeader logs an entry for a subject with name sname.

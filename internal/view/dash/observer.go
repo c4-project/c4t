@@ -25,19 +25,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
-	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/widgets/text"
-)
-
-const (
-	colorAdd     = cell.ColorBlue
-	colorCompile = cell.ColorMagenta
-	colorCopy    = cell.ColorWhite
-	colorFailed  = cell.ColorRed
-	colorFlagged = cell.ColorYellow
-	colorHarness = cell.ColorCyan
-	colorRun     = cell.ColorGreen
-	colorTimeout = colorFailed
 )
 
 // Observer is a BuilderObserver that attaches into a Dash.
@@ -143,7 +131,7 @@ func (o *Observer) OnIteration(r run.Run) {
 func (o *Observer) addDurationToSparkline(t time.Time) {
 	if !o.lastTime.IsZero() {
 		dur := t.Sub(o.lastTime)
-		_ = o.sparks.runTime.Add([]int{int(dur.Seconds())})
+		_ = o.sparks.runLine.Add([]int{int(dur.Seconds())})
 	}
 	o.lastTime = t
 }

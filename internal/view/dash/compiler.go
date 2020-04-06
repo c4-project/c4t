@@ -9,15 +9,8 @@ import (
 	"fmt"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/widgets/text"
-)
-
-const (
-	colorOptNone   = cell.ColorBlue
-	colorOptNormal = cell.ColorMagenta
-	colorOptBreak  = cell.ColorRed
 )
 
 // OnCompilerPlanSet prepares for receiving compiler plans by clearing out any existing compilers shown on the dash.
@@ -38,16 +31,4 @@ func (o *Observer) OnCompilerPlan(c compiler.Named) {
 
 // OnCompilerPlanFinish does nothing.
 func (o *Observer) OnCompilerPlanFinish() {
-}
-
-// optColour divines a colour to signify the optimisation level described by o.
-func optColour(o *optlevel.Named) cell.Color {
-	switch {
-	case o == nil || !o.Optimises:
-		return colorOptNone
-	case o.BreaksStandards:
-		return colorOptBreak
-	default:
-		return colorOptNormal
-	}
 }
