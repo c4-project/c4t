@@ -6,16 +6,11 @@
 package dash
 
 import (
-	"strconv"
-	"time"
-
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
-
-	"github.com/mum4k/termdash/widgets/segmentdisplay"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
@@ -32,15 +27,13 @@ import (
 type Observer struct {
 	mid id.ID
 
-	rlog *ResultLog
+	run   *runCounter
+	rlog  *ResultLog
+	tally *tally
 
-	runCount *segmentdisplay.SegmentDisplay
-	runStart *text.Text
-	sparks   *sparkset
+	sparks *sparkset
 
 	action *actionObserver
-
-	lastTime time.Time
 
 	// compilers contains a readout of the currently planned compilers for this instance.
 	compilers *text.Text
@@ -57,11 +50,11 @@ func NewObserver(mid id.ID, rlog *ResultLog) (*Observer, error) {
 		rlog: rlog,
 	}
 
-	if d.runCount, err = segmentdisplay.New(); err != nil {
+	if d.tally, err = newTally(); err != nil {
 		return nil, err
 	}
 
-	if d.runStart, err = text.New(text.DisableScrolling()); err != nil {
+	if d.run, err = newRunCounter(); err != nil {
 		return nil, err
 	}
 
@@ -73,7 +66,7 @@ func NewObserver(mid id.ID, rlog *ResultLog) (*Observer, error) {
 		return nil, err
 	}
 
-	if d.compilers, err = text.New(); err != nil {
+	if d.compilers, err = text.New(text.WrapAtWords()); err != nil {
 		return nil, err
 	}
 
@@ -91,14 +84,25 @@ func (o *Observer) AddToGrid(gb *grid.Builder, midstr string, pc int) {
 	gb.Add(grid.RowHeightPercWithOpts(pc,
 		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(midstr)},
 		grid.ColWidthPerc(percRun,
-			grid.RowHeightFixed(10, grid.Widget(o.runCount, container.Border(linestyle.Light), container.BorderTitle("Run#"))),
-			grid.RowHeightFixed(1, grid.Widget(o.compilers, container.Border(linestyle.Light), container.BorderTitle("Compilers"))),
+			grid.RowHeightPercWithOpts(
+				40,
+				[]container.Option{
+					container.Border(linestyle.Light),
+					container.BorderTitle("Run"),
+				},
+				o.run.grid()...,
+			),
+			grid.RowHeightPerc(60, grid.Widget(o.compilers, container.Border(linestyle.Light), container.BorderTitle("Compilers"))),
 		),
 		grid.ColWidthPerc(percStats,
-			grid.RowHeightFixed(3, grid.Widget(o.runStart, container.Border(linestyle.Light), container.BorderTitle("Start"))),
-			grid.RowHeightFixedWithOpts(10,
+			grid.RowHeightPercWithOpts(
+				40,
+				[]container.Option{container.Border(linestyle.Light), container.BorderTitle("Statistics")},
+				o.tally.grid()...,
+			),
+			grid.RowHeightPercWithOpts(60,
 				[]container.Option{container.Border(linestyle.Light), container.BorderTitle("Sparklines")},
-				o.sparks.gridRows()...),
+				o.sparks.grid()...),
 		),
 		o.currentRunColumn(),
 	))
@@ -117,39 +121,21 @@ func (o *Observer) currentRunColumn() grid.Element {
 // OnIteration logs that a new iteration has begun.
 func (o *Observer) OnIteration(r run.Run) {
 	o.nruns = r.Iter
-	ch := segmentdisplay.NewChunk(strconv.FormatUint(o.nruns, 10))
-	_ = o.runCount.Write(
-		[]*segmentdisplay.TextChunk{ch},
-	)
-
-	_ = o.runStart.Write(r.Start.Format(time.Stamp), text.WriteReplace())
-
-	o.addDurationToSparkline(r.Start)
+	_ = o.run.onIteration(r)
 	o.action.reset()
-}
-
-func (o *Observer) addDurationToSparkline(t time.Time) {
-	if !o.lastTime.IsZero() {
-		dur := t.Sub(o.lastTime)
-		_ = o.sparks.runLine.Add([]int{int(dur.Seconds())})
-	}
-	o.lastTime = t
 }
 
 // OnCollation observes a collation by adding failure/timeout/flag rates to the sparklines.
 func (o *Observer) OnCollation(c *collate.Collation) {
+	terr := o.tally.tallyCollation(c)
 	serr := o.sparks.sparkCollation(c)
 	lerr := o.logCollation(c)
-	o.logError(iohelp.FirstError(serr, lerr))
+	o.logError(iohelp.FirstError(terr, serr, lerr))
 }
 
 func (o *Observer) logCollation(c *collate.Collation) error {
 	sc := collate.Sourced{
-		Run: run.Run{
-			MachineID: o.mid,
-			Iter:      o.nruns,
-			Start:     o.lastTime,
-		},
+		Run:       o.run.last,
 		Collation: c,
 	}
 	return o.rlog.Log(sc)

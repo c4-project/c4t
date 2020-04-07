@@ -12,7 +12,7 @@ import (
 	"github.com/mum4k/termdash/widgets/sparkline"
 )
 
-// sparks contains the sparklines for a machine.
+// sparkset contains the sparklines for a machine.
 type sparkset struct {
 	// runLine is a sparkline tracking run time.
 	runLine *sparkline.SparkLine
@@ -47,7 +47,7 @@ func (s *sparkset) sparkLines() []*sparkline.SparkLine {
 	return append(s.statusLines[subject.StatusOk:], s.runLine)
 }
 
-func (s *sparkset) gridRows() []grid.Element {
+func (s *sparkset) grid() []grid.Element {
 	sls := s.sparkLines()
 	els := make([]grid.Element, len(sls))
 	for i, sl := range sls {

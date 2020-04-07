@@ -7,6 +7,15 @@ package collate
 
 import "github.com/MattWindsor91/act-tester/internal/model/subject"
 
+var statusFlags = [subject.NumStatus]flag{
+	subject.StatusOk:             flagOk,
+	subject.StatusFlagged:        flagFlagged,
+	subject.StatusCompileTimeout: flagCompileTimeout,
+	subject.StatusCompileFail:    flagCompileFail,
+	subject.StatusRunTimeout:     flagRunTimeout,
+	subject.StatusRunFail:        flagRunFailure,
+}
+
 func classify(named subject.Named) flag {
 	var f flag
 	f |= classifyCompiles(named.Compiles)
@@ -17,7 +26,7 @@ func classify(named subject.Named) flag {
 func classifyCompiles(cs map[string]subject.CompileResult) flag {
 	f := flagOk
 	for _, c := range cs {
-		f |= classifyStatus(c.Status)
+		f |= statusFlags[c.Status]
 	}
 	return f
 }
@@ -25,24 +34,7 @@ func classifyCompiles(cs map[string]subject.CompileResult) flag {
 func classifyRuns(rs map[string]subject.RunResult) flag {
 	f := flagOk
 	for _, r := range rs {
-		f |= classifyStatus(r.Status)
+		f |= statusFlags[r.Status]
 	}
 	return f
-}
-
-func classifyStatus(s subject.Status) flag {
-	switch s {
-	case subject.StatusFlagged:
-		return flagFlagged
-	case subject.StatusCompileTimeout:
-		return flagCompileTimeout
-	case subject.StatusCompileFail:
-		return flagCompileFail
-	case subject.StatusRunTimeout:
-		return flagRunTimeout
-	case subject.StatusRunFail:
-		return flagRunFailure
-	default:
-		return flagOk
-	}
 }
