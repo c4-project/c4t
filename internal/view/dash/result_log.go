@@ -55,6 +55,11 @@ func (r *ResultLog) maybeOverflow() error {
 	if r.nheaders < resultLogOverflow {
 		return nil
 	}
+	r.nheaders = 0
+	return r.overflow()
+}
+
+func (r *ResultLog) overflow() error {
 	txt := fmt.Sprintf("[log overflowed at %s; see log file]\n", time.Now().Format(time.Stamp))
 	return r.log.Write(txt, text.WriteReplace(), text.WriteCellOpts(cell.FgColor(cell.ColorMagenta)))
 }
