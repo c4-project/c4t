@@ -47,9 +47,9 @@ func TestBuilder_Run_Adds(t *testing.T) {
 		},
 	}
 
-	b, err := builder.NewBuilder(c)
+	b, err := builder.New(c)
 	if err != nil {
-		t.Fatal("unexpected NewBuilder error:", err)
+		t.Fatal("unexpected New error:", err)
 	}
 
 	var got corpus.Corpus

@@ -8,6 +8,7 @@ package planner
 
 import (
 	"context"
+	"errors"
 	"log"
 	"math/rand"
 
@@ -31,10 +32,13 @@ type Planner struct {
 	seed int64
 }
 
+// ErrConfigNil occurs when we pass a nil config when creating a planner.
+var ErrConfigNil = errors.New("config nil")
+
 // New constructs a new planner with the given config, machine information, files, and seed override.
 // If seed is UseDateSeed, it will be ignored and a date-specific seed generated at runtime.
-func New(c Config, mid id.ID, mach plan.Machine, fs []string, seed int64) (*Planner, error) {
-	if err := c.Check(); err != nil {
+func New(c *Config, mid id.ID, mach plan.Machine, fs []string, seed int64) (*Planner, error) {
+	if err := checkConfig(c); err != nil {
 		return nil, err
 	}
 	// Early out to prevent us from doing any planning if we received no files.
@@ -43,7 +47,7 @@ func New(c Config, mid id.ID, mach plan.Machine, fs []string, seed int64) (*Plan
 	}
 
 	p := Planner{
-		conf: c,
+		conf: *c,
 		fs:   fs,
 		l:    iohelp.EnsureLog(c.Logger),
 		mid:  mid,
@@ -54,6 +58,13 @@ func New(c Config, mid id.ID, mach plan.Machine, fs []string, seed int64) (*Plan
 	}
 
 	return &p, nil
+}
+
+func checkConfig(c *Config) error {
+	if c == nil {
+		return ErrConfigNil
+	}
+	return c.Check()
 }
 
 // Plan runs the test planner p.

@@ -30,6 +30,9 @@ import (
 )
 
 var (
+	// ErrConfigNil occurs when we try to construct a lifter without config.
+	ErrConfigNil = errors.New("config nil")
+
 	// ErrMakerNil occurs when a lifter runs without a HarnessMaker set.
 	ErrMakerNil = errors.New("harness maker nil")
 
@@ -59,11 +62,8 @@ type Lifter struct {
 
 // New constructs a new Lifter given config c and plan p.
 func New(c *Config, p *plan.Plan) (*Lifter, error) {
-	if c.Paths == nil {
-		return nil, iohelp.ErrPathsetNil
-	}
-	if c.Maker == nil {
-		return nil, ErrMakerNil
+	if err := checkConfig(c); err != nil {
+		return nil, err
 	}
 	if p == nil {
 		return nil, plan.ErrNil
@@ -80,6 +80,13 @@ func New(c *Config, p *plan.Plan) (*Lifter, error) {
 	return &l, nil
 }
 
+func checkConfig(c *Config) error {
+	if c == nil {
+		return ErrConfigNil
+	}
+	return c.Check()
+}
+
 // Run runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
 func (l *Lifter) Run(ctx context.Context) (*plan.Plan, error) {
 	l.l.Println("preparing directories")
@@ -94,7 +101,7 @@ func (l *Lifter) Run(ctx context.Context) (*plan.Plan, error) {
 func (l *Lifter) lift(ctx context.Context) error {
 	l.l.Println("now lifting")
 
-	b, err := builder.NewBuilder(builder.Config{
+	b, err := builder.New(builder.Config{
 		Init:      l.plan.Corpus,
 		Observers: l.conf.Observers,
 		Manifest: builder.Manifest{

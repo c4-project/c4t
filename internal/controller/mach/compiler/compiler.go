@@ -57,14 +57,17 @@ func New(c *Config, p *plan.Plan) (*Compiler, error) {
 	if p == nil {
 		return nil, plan.ErrNil
 	}
-	if c == nil {
-		return nil, ErrConfigNil
-	}
-	if err := c.Check(); err != nil {
+	if err := checkConfig(c); err != nil {
 		return nil, err
 	}
-
 	return &Compiler{plan: *p, conf: *c, l: iohelp.EnsureLog(c.Logger)}, nil
+}
+
+func checkConfig(c *Config) error {
+	if c == nil {
+		return ErrConfigNil
+	}
+	return c.Check()
 }
 
 // Run runs the batch compiler with context ctx.
@@ -76,17 +79,9 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 
 	eg, ectx := errgroup.WithContext(ctx)
 
-	bc := builder.Config{
-		Init:      c.plan.Corpus,
-		Observers: c.conf.Observers,
-		Manifest: builder.Manifest{
-			Name:  "compile",
-			NReqs: c.count(),
-		},
-	}
-	b, berr := builder.NewBuilder(bc)
-	if berr != nil {
-		return nil, berr
+	b, err := c.makeBuilder()
+	if err != nil {
+		return nil, err
 	}
 
 	if 0 < c.conf.Timeout {
@@ -117,6 +112,18 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 	}
 	c.plan.Corpus = newc
 	return &c.plan, nil
+}
+
+func (c *Compiler) makeBuilder() (*builder.Builder, error) {
+	bc := builder.Config{
+		Init:      c.plan.Corpus,
+		Observers: c.conf.Observers,
+		Manifest: builder.Manifest{
+			Name:  "compile",
+			NReqs: c.count(),
+		},
+	}
+	return builder.New(bc)
 }
 
 func (c *Compiler) prepareDirs() error {

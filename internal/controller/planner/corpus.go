@@ -93,7 +93,7 @@ func (p *CorpusPlanner) makeBuilder() (*builder.Builder, error) {
 			NReqs: len(p.Files),
 		},
 	}
-	return builder.NewBuilder(bc)
+	return builder.New(bc)
 }
 
 func (p *CorpusPlanner) probeInner(ctx context.Context, ch chan<- builder.Request) error {

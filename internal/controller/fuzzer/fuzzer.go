@@ -66,16 +66,7 @@ func checkConfig(c *Config) error {
 	if c == nil {
 		return ErrConfigNil
 	}
-	if c.Driver == nil {
-		return ErrDriverNil
-	}
-	if c.Paths == nil {
-		return iohelp.ErrPathsetNil
-	}
-	if c.Quantities.SubjectCycles <= 0 {
-		return fmt.Errorf("%w: non-positive subject cycle amount", corpus.ErrSmall)
-	}
-	return nil
+	return c.Check()
 }
 
 func (f *Fuzzer) checkCount() error {

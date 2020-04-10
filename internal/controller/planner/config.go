@@ -36,7 +36,7 @@ type Config struct {
 }
 
 // Plan constructs a Planner using this config, then runs it using ctx on the file set fs and machine mach.
-func (c Config) Plan(ctx context.Context, mid id.ID, mach plan.Machine, fs []string, seed int64) (*plan.Plan, error) {
+func (c *Config) Plan(ctx context.Context, mid id.ID, mach plan.Machine, fs []string, seed int64) (*plan.Plan, error) {
 	p, err := New(c, mid, mach, fs, seed)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (c Config) Plan(ctx context.Context, mid id.ID, mach plan.Machine, fs []str
 }
 
 // Check performs in-flight checks on this config before its use.
-func (c Config) Check() error {
+func (c *Config) Check() error {
 	// TODO(@MattWindsor91)
 	return nil
 }

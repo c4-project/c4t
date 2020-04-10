@@ -47,9 +47,9 @@ type Builder struct {
 	SendCh chan<- Request
 }
 
-// NewBuilder constructs a Builder according to cfg.
+// New constructs a Builder according to cfg.
 // It fails if the number of target requests is negative.
-func NewBuilder(cfg Config) (*Builder, error) {
+func New(cfg Config) (*Builder, error) {
 	if cfg.NReqs <= 0 {
 		return nil, fmt.Errorf("%w: %d", ErrBadTarget, cfg.NReqs)
 	}
@@ -171,7 +171,7 @@ func (b *Builder) rmwSubject(name string, f func(*subject.Subject) error) error 
 // It uses the responses from f in a Builder, and returns the resulting corpus.
 // Note that src may be different from cfg.Init; this is useful when building a new corpus from scratch.
 func ParBuild(ctx context.Context, src corpus.Corpus, cfg Config, f func(context.Context, subject.Named, chan<- Request) error) (corpus.Corpus, error) {
-	b, err := NewBuilder(cfg)
+	b, err := New(cfg)
 	if err != nil {
 		return nil, err
 	}

@@ -7,8 +7,12 @@ package fuzzer
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"reflect"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -66,6 +70,20 @@ func (q *QuantitySet) Override(new QuantitySet) {
 			qv.Field(i).SetInt(k)
 		}
 	}
+}
+
+// Check makes sure various parts of this config are present.
+func (c *Config) Check() error {
+	if c.Driver == nil {
+		return ErrDriverNil
+	}
+	if c.Paths == nil {
+		return iohelp.ErrPathsetNil
+	}
+	if c.Quantities.SubjectCycles <= 0 {
+		return fmt.Errorf("%w: non-positive subject cycle amount", corpus.ErrSmall)
+	}
+	return nil
 }
 
 // Run runs a fuzzer configured by this config.

@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
@@ -32,6 +34,17 @@ type Config struct {
 
 	// Stderr is the writer to which standard error (eg from the harness maker) should be sent.
 	Stderr io.Writer
+}
+
+// Check checks that various required parts of this config are present.
+func (c *Config) Check() error {
+	if c.Paths == nil {
+		return iohelp.ErrPathsetNil
+	}
+	if c.Maker == nil {
+		return ErrMakerNil
+	}
+	return nil
 }
 
 // Run is shorthand for constructing a Lifter using c, then running it with p.

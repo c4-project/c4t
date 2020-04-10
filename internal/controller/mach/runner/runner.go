@@ -77,7 +77,7 @@ func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 			NReqs: r.count(),
 		},
 	}
-	b, berr := builder.NewBuilder(bcfg)
+	b, berr := builder.New(bcfg)
 	if berr != nil {
 		return nil, berr
 	}
