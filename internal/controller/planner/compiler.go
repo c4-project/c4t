@@ -75,7 +75,7 @@ func (p *Planner) planCompilers(ctx context.Context) error {
 		Lister:    p.conf.Source.CLister,
 		Inspector: p.conf.Source.CInspector,
 		Observers: p.conf.Observers.Compiler,
-		MachineID: p.mid,
+		MachineID: p.plan.Machine.ID,
 		Rng:       p.rng,
 	}
 	var err error

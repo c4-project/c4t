@@ -12,8 +12,6 @@ import (
 	"log"
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
@@ -26,7 +24,6 @@ type Planner struct {
 	conf Config
 	fs   []string
 	l    *log.Logger
-	mid  id.ID
 	plan plan.Plan
 	rng  *rand.Rand
 	seed int64
@@ -37,7 +34,7 @@ var ErrConfigNil = errors.New("config nil")
 
 // New constructs a new planner with the given config, machine information, files, and seed override.
 // If seed is UseDateSeed, it will be ignored and a date-specific seed generated at runtime.
-func New(c *Config, mid id.ID, mach plan.Machine, fs []string, seed int64) (*Planner, error) {
+func New(c *Config, mach plan.NamedMachine, fs []string, seed int64) (*Planner, error) {
 	if err := checkConfig(c); err != nil {
 		return nil, err
 	}
@@ -50,7 +47,6 @@ func New(c *Config, mid id.ID, mach plan.Machine, fs []string, seed int64) (*Pla
 		conf: *c,
 		fs:   fs,
 		l:    iohelp.EnsureLog(c.Logger),
-		mid:  mid,
 		plan: plan.Plan{
 			Machine: mach,
 		},

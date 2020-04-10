@@ -91,13 +91,13 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	}
 
 	midstr := ctx.String(view.FlagMachine)
-	mid, mach, err := getMachine(cfg, midstr)
+	mach, err := getMachine(cfg, midstr)
 	if err != nil {
 		return err
 	}
 
 	fs := ctx.Args().Slice()
-	p, err := pc.Plan(ctx.Context, mid, mach.Machine, fs, ctx.Int64(flagSeed))
+	p, err := pc.Plan(ctx.Context, mach, fs, ctx.Int64(flagSeed))
 	if err != nil {
 		return err
 	}
@@ -105,17 +105,21 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	return p.Dump(outw)
 }
 
-func getMachine(cfg *config.Config, midstr string) (id.ID, config.Machine, error) {
+func getMachine(cfg *config.Config, midstr string) (plan.NamedMachine, error) {
 	mid, err := id.TryFromString(midstr)
 	if err != nil {
-		return id.ID{}, config.Machine{}, err
+		return plan.NamedMachine{}, err
 	}
 
 	mach, ok := cfg.Machines[midstr]
 	if !ok {
-		return id.ID{}, config.Machine{}, fmt.Errorf("no such machine: %s", midstr)
+		return plan.NamedMachine{}, fmt.Errorf("no such machine: %s", midstr)
 	}
-	return mid, mach, nil
+	m := plan.NamedMachine{
+		ID:      mid,
+		Machine: mach.Machine,
+	}
+	return m, nil
 }
 
 func makePlanConfig(c *config.Config, errw io.Writer, a *act.Runner, cs int) (*planner.Config, error) {

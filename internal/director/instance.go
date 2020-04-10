@@ -212,7 +212,15 @@ func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error)
 		Logger:    i.Logger,
 		Observers: planner.NewObserverSet(obs...),
 	}
-	return planner.New(&c, i.ID, i.MachConfig.Machine, i.InFiles, plan.UseDateSeed)
+	return planner.New(&c, i.machineForPlan(), i.InFiles, plan.UseDateSeed)
+}
+
+// machineForPlan massages this instance's machine config into a form with which the planner is comfortable.
+func (i *Instance) machineForPlan() plan.NamedMachine {
+	return plan.NamedMachine{
+		ID:      i.ID,
+		Machine: i.MachConfig.Machine,
+	}
 }
 
 func (i *Instance) makeFuzzerConfig(obs []builder.Observer) (*fuzzer.Config, error) {

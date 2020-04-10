@@ -31,7 +31,7 @@ type Plan struct {
 	Header Header `toml:"header"`
 
 	// Machine represents the machine targeted by this plan.
-	Machine Machine `toml:"machine"`
+	Machine NamedMachine `toml:"machine"`
 
 	// Backend represents the backend targeted by this plan.
 	Backend *service.Backend `toml:"backend, omitempty"`

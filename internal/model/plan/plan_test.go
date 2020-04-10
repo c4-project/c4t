@@ -8,8 +8,9 @@ package plan_test
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
@@ -69,9 +70,7 @@ func TestMachinePlan_Arches(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			got := c.plan.Arches()
-			if !reflect.DeepEqual(got, c.want) {
-				t.Errorf("%s: Arches=%v; want %v", name, got, c.want)
-			}
+			assert.Equalf(t, c.want, got, "%s: Arches=%v; want %v", name, got, c.want)
 		})
 	}
 }
@@ -93,7 +92,7 @@ func TestPlan_Dump_roundTrip(t *testing.T) {
 	}
 
 	// TODO(@MattWindsor91): more comparisons?
-	if !p.Header.Creation.Equal(p2.Header.Creation) {
-		t.Errorf("date not equal after round-trip: send=%v, recv=%v", p.Header.Creation, p2.Header.Creation)
-	}
+	assert.Truef(t,
+		p.Header.Creation.Equal(p2.Header.Creation),
+		"date not equal after round-trip: send=%v, recv=%v", p.Header.Creation, p2.Header.Creation)
 }
