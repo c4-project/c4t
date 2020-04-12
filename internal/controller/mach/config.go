@@ -9,7 +9,6 @@ import (
 	"context"
 	"io"
 	"log"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 
@@ -34,12 +33,8 @@ type Config struct {
 	SkipCompiler bool
 	// SkipRunner tells the machine-runner to skip running.
 	SkipRunner bool
-	// CTimeout is a timeout to apply to each compilation.
-	CTimeout time.Duration
-	// RTimeout is a timeout to apply to each run.
-	RTimeout time.Duration
-	// NWorkers is the number of running workers to run in parallel.
-	NWorkers int
+	// Quantities contains various tunable quantities for the machine-dependent stage.
+	Quantities QuantitySet
 	// Logger is the logger to use for the machine-dependent stage.
 	Logger *log.Logger
 	// Observers is the set of observers to attach on the machine-dependent stage.
@@ -64,11 +59,11 @@ func (c *Config) makeCompilerConfig() *compiler.Config {
 	}
 
 	return &compiler.Config{
-		Driver:    c.CDriver,
-		Logger:    c.Logger,
-		Paths:     compiler.NewPathset(c.OutDir),
-		Observers: c.Observers,
-		Timeout:   c.CTimeout,
+		Driver:     c.CDriver,
+		Logger:     c.Logger,
+		Paths:      compiler.NewPathset(c.OutDir),
+		Observers:  c.Observers,
+		Quantities: c.Quantities.Compiler,
 	}
 }
 
@@ -78,12 +73,11 @@ func (c *Config) makeRunnerConfig() *runner.Config {
 	}
 
 	return &runner.Config{
-		Logger:    c.Logger,
-		Parser:    c.RDriver,
-		Paths:     runner.NewPathset(c.OutDir),
-		Observers: c.Observers,
-		Timeout:   c.RTimeout,
-		NWorkers:  c.NWorkers,
+		Logger:     c.Logger,
+		Parser:     c.RDriver,
+		Paths:      runner.NewPathset(c.OutDir),
+		Observers:  c.Observers,
+		Quantities: c.Quantities.Runner,
 	}
 }
 

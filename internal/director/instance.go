@@ -25,7 +25,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
 
-	"github.com/MattWindsor91/act-tester/internal/director/mach"
+	"github.com/MattWindsor91/act-tester/internal/controller/rmach"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 
@@ -168,31 +168,25 @@ func (i *Instance) pass(ctx context.Context, iter uint64, sc *StageConfig) error
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
-	obs := observer.LowerToBuilder(i.Observers)
+	bobs := observer.LowerToBuilder(i.Observers)
+	cobs := observer.LowerToCopy(i.Observers)
 
-	p, err := i.makePlanner(observer.LowerToPlanner(i.Observers))
-	if err != nil {
+	var (
+		err error
+		sc  StageConfig
+	)
+
+	if sc.Plan, err = i.makePlanner(observer.LowerToPlanner(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
-	f, err := i.makeFuzzerConfig(obs)
-	if err != nil {
+	if sc.Fuzz, err = i.makeFuzzerConfig(bobs); err != nil {
 		return nil, fmt.Errorf("when making fuzzer config: %w", err)
 	}
-	l, err := i.makeLifterConfig(obs)
-	if err != nil {
+	if sc.Lift, err = i.makeLifterConfig(bobs); err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	m, err := mach.New(i.Observers, i.ScratchPaths.DirRun, i.SSHConfig, i.MachConfig.SSH)
-	if err != nil {
-		return nil, fmt.Errorf("when making machine-exec config: %w", err)
-	}
-	sc := StageConfig{
-		Plan: p,
-		Fuzz: f,
-		Lift: l,
-		Mach: m,
-		Save: i.makeSave(),
-	}
+	sc.Mach = i.makeRMachConfig(cobs, bobs)
+	sc.Save = i.makeSave()
 	return &sc, nil
 }
 
@@ -243,7 +237,7 @@ func (i *Instance) makeFuzzerConfig(obs []builder.Observer) (*fuzzer.Config, err
 func (i *Instance) makeLifterConfig(obs []builder.Observer) (*lifter.Config, error) {
 	hm := i.Env.Lifter
 	if hm == nil {
-		return nil, errors.New("no single fuzzer provided")
+		return nil, errors.New("no single lifter provided")
 	}
 
 	lc := lifter.Config{
@@ -254,6 +248,14 @@ func (i *Instance) makeLifterConfig(obs []builder.Observer) (*lifter.Config, err
 	}
 
 	return &lc, nil
+}
+
+func (i *Instance) makeRMachConfig(cobs []remote.CopyObserver, bobs []builder.Observer) *rmach.Config {
+	return &rmach.Config{
+		DirLocal:  i.ScratchPaths.DirRun,
+		Observers: rmach.ObserverSet{Copy: cobs, Corpus: bobs},
+		SSH:       i.SSHConfig,
+	}
 }
 
 // dump dumps a plan p to its expected plan file given the stage name name.

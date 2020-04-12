@@ -9,6 +9,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/rmach"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
@@ -26,6 +28,15 @@ func Planner(l *log.Logger) []planner.Observer {
 func Builder(l *log.Logger) []builder.Observer {
 	// See above.
 	return []builder.Observer{
+		NewBar(),
+		(*Logger)(l),
+	}
+}
+
+// RMach builds a list of observers suitable for single-shot act-tester remote-mach binaries.
+func RMach(l *log.Logger) []rmach.Observer {
+	// The ordering is important here: we want log messages to appear _before_ progress bars.
+	return []rmach.Observer{
 		NewBar(),
 		(*Logger)(l),
 	}

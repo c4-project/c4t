@@ -77,7 +77,7 @@ func (j *Job) runCompiler(ctx context.Context, sp subject.CompileFileset, h subj
 		return subject.CompileResult{}, err
 	}
 
-	tctx, cancel := j.timeout(ctx)
+	tctx, cancel := j.Conf.Quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
 	start := time.Now()
@@ -118,14 +118,6 @@ func (j *Job) makeCompileResult(sp subject.CompileFileset, start time.Time, err 
 // If the context ctx has been cancelled, it will fail and instead terminate the job.
 func (j *Job) sendResult(ctx context.Context, name string, r subject.CompileResult) error {
 	return builder.CompileRequest(name, j.Compiler.ID, r).SendTo(ctx, j.ResCh)
-}
-
-func (j *Job) timeout(ctx context.Context) (context.Context, context.CancelFunc) {
-	// TODO(@MattWindsor91): dedupe with runner equivalent
-	if j.Conf.Timeout <= 0 {
-		return ctx, func() {}
-	}
-	return context.WithTimeout(ctx, j.Conf.Timeout)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and

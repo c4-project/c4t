@@ -86,7 +86,7 @@ func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.Compile
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
 func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.Obs, error) {
-	tctx, cancel := j.timeout(ctx)
+	tctx, cancel := j.Conf.Quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
 	cmd := exec.CommandContext(tctx, bin)
@@ -103,13 +103,6 @@ func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.O
 	werr := cmd.Wait()
 
 	return &o, mostRelevantError(werr, perr, tctx.Err())
-}
-
-func (j *Job) timeout(ctx context.Context) (context.Context, context.CancelFunc) {
-	if j.Conf.Timeout <= 0 {
-		return ctx, func() {}
-	}
-	return context.WithTimeout(ctx, j.Conf.Timeout)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and

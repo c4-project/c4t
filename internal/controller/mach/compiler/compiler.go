@@ -84,9 +84,7 @@ func (c *Compiler) Run(ctx context.Context) (*plan.Plan, error) {
 		return nil, err
 	}
 
-	if 0 < c.conf.Timeout {
-		c.l.Printf("timeout at %s", c.conf.Timeout)
-	}
+	c.conf.Quantities.Log(c.l)
 
 	for ids, cc := range c.plan.Compilers {
 		nc, err := cc.AddNameString(ids)

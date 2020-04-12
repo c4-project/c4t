@@ -6,8 +6,14 @@
 package fuzzer_test
 
 import (
-	"reflect"
+	"fmt"
+	"strconv"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 )
@@ -26,13 +32,35 @@ func TestParseSubjectCycle_roundTrip(t *testing.T) {
 	for name, c := range cases {
 		want := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := fuzzer.ParseSubjectCycle(want.String())
-			if err != nil {
-				t.Fatal("unexpected error in ParseSubjectCycle:", err)
-			}
-			if !reflect.DeepEqual(got, want) {
-				t.Fatalf("ParseSubjectCycle roundtrip diverge: got=%q, want=%q", got, want)
-			}
+
+			require.NoError(t, err, "unexpected error in ParseSubjectCycle")
+			assert.Equalf(t, want, got, "ParseSubjectCycle roundtrip diverge: got=%q, want=%q", got, want)
+		})
+	}
+}
+
+func TestParseSubjectCycle_errors(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		in  string
+		err error
+	}{
+		"empty":    {in: "", err: fuzzer.ErrNotSubjectCycleName},
+		"no-under": {in: "foobar", err: fuzzer.ErrNotSubjectCycleName},
+		"no-num":   {in: "foo_bar", err: strconv.ErrSyntax},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			_, err := fuzzer.ParseSubjectCycle(c.in)
+			testhelp.ExpectErrorIs(t, err, c.err, fmt.Sprintf("parsing bad subject-cycle %q", c.in))
 		})
 	}
 }

@@ -5,13 +5,19 @@
 
 package plan
 
-import "github.com/MattWindsor91/act-tester/internal/model/id"
+import (
+	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+)
 
 // Machine represents the information about a machine that is relevant to the tester.
 type Machine struct {
 	// Cores is the number of known cores on the machine.
 	// If zero, there is no known core count.
 	Cores int `toml:"cores,omitzero"`
+
+	// SSH contains, if present, information about how to dial into a remote machine through SSH.
+	SSH *remote.MachineConfig `toml:"ssh,omitempty"`
 }
 
 // NamedMachine wraps a plan machine with its ID.

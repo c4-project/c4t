@@ -9,10 +9,15 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
+	"github.com/MattWindsor91/act-tester/internal/controller/mach/runner"
+	"github.com/MattWindsor91/act-tester/internal/controller/mach/timeout"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	c "github.com/urfave/cli/v2"
 
@@ -21,9 +26,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
-
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
+	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
 
@@ -39,8 +43,8 @@ const (
 
 func main() {
 	app := c.App{
-		Name:                   "act-tester-plan",
-		Usage:                  "runs the planning phase of an ACT test standalone",
+		Name:                   "act-tester-mach",
+		Usage:                  "runs the machine-dependent phase of an ACT test",
 		Flags:                  flags(),
 		HideHelpCommand:        true,
 		UseShortOptionHandling: true,
@@ -97,30 +101,33 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 
 func makeConfig(ctx *c.Context, outw, errw io.Writer) *mach.Config {
 	cfg := mach.Config{
-		CDriver:      &compiler.CResolve,
-		RDriver:      &backend.BResolve,
+		CDriver:      &cimpl.CResolve,
+		RDriver:      &bimpl.BResolve,
 		Stdout:       outw,
 		OutDir:       view.OutDirFromCli(ctx),
 		SkipCompiler: ctx.Bool(flagSkipCompiler),
 		SkipRunner:   ctx.Bool(flagSkipRunner),
-		CTimeout:     ctx.Duration(view.FlagCompilerTimeoutLong),
-		RTimeout:     ctx.Duration(view.FlagRunTimeoutLong),
-		NWorkers:     ctx.Int(view.FlagWorkerCountLong),
+		Quantities:   makeQuantitySet(ctx),
 	}
 
 	setLoggerAndObservers(&cfg, errw, ctx.Bool(view.FlagUseJSONLong))
 	return &cfg
 }
 
-func ensureStderr(errw io.Writer) io.Writer {
-	if errw == nil {
-		return ioutil.Discard
+func makeQuantitySet(ctx *c.Context) mach.QuantitySet {
+	return mach.QuantitySet{
+		Compiler: compiler.QuantitySet{
+			Timeout: timeout.Timeout(ctx.Duration(view.FlagCompilerTimeoutLong)),
+		},
+		Runner: runner.QuantitySet{
+			Timeout:  timeout.Timeout(ctx.Duration(view.FlagRunTimeoutLong)),
+			NWorkers: ctx.Int(view.FlagWorkerCountLong),
+		},
 	}
-	return errw
 }
 
 func setLoggerAndObservers(c *mach.Config, errw io.Writer, jsonStatus bool) {
-	errw = ensureStderr(errw)
+	errw = iohelp.EnsureWriter(errw)
 
 	if jsonStatus {
 		c.Logger = nil

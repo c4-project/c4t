@@ -9,7 +9,15 @@ By default, it accepts a lifted, potentially-fuzzed plan and:
 
 ## Usage
 
-`act-tester-mach [-c] [-r] -i PLAN`
+`act-tester-mach [FLAGS] -i PLAN`
 
-- `-c` disables the compiling phase.
-- `-r` disables the running phase.
+### Flags
+
+- `-compiler-timeout DURATION` sets the compiler timeout.
+- `-run-timeout DURATION` sets the run timeout.
+- `-num-workers N` sets the number of parallel run workers.
+
+- `-emit-json` causes the machine runner to emit progress information in JSON,
+  in the format expected by `act-tester-rmach` and `act-tester`.
+- `-skip-compiler` disables the compiling phase.
+- `-skip-runner` disables the running phase.

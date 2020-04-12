@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package mach
+package rmach
 
 import (
 	"context"
@@ -41,15 +41,15 @@ func NewSSHRunner(r *remote.MachineRunner, o []remote.CopyObserver, recvRoot str
 }
 
 func (r *SSHRunner) Start(ctx context.Context) (*Pipeset, error) {
-	// TODO(@MattWindsor91): handle context
-	var err error
+	var (
+		err error
+		ps  *Pipeset
+	)
 
-	r.session, err = r.runner.NewSession()
-	if err != nil {
+	if r.session, err = r.runner.NewSession(); err != nil {
 		return nil, err
 	}
 
-	var ps *Pipeset
 	if ps, err = r.openPipes(); err != nil {
 		return nil, fmt.Errorf("while opening pipes: %w", err)
 	}

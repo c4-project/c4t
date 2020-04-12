@@ -43,6 +43,12 @@ func TestNew_errors(t *testing.T) {
 		"ok": {
 			err: nil,
 		},
+		"nil-config": {
+			cdelta: func(c *lifter.Config) *lifter.Config {
+				return nil
+			},
+			err: lifter.ErrConfigNil,
+		},
 		"nil-maker": {
 			cdelta: func(c *lifter.Config) *lifter.Config {
 				c.Maker = nil

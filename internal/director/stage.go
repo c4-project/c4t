@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/director/mach"
+	"github.com/MattWindsor91/act-tester/internal/controller/rmach"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
@@ -27,7 +27,7 @@ type StageConfig struct {
 	// Lift contains configuration for the instance's lift stage.
 	Lift *lifter.Config
 	// Mach contains configuration for the instance's machine-specific stage.
-	Mach *mach.Mach
+	Mach *rmach.Config
 	// Save contains configuration for the instance's error saving stage.
 	Save *Save
 }

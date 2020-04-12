@@ -9,7 +9,6 @@ import (
 	"context"
 	"io"
 	"log"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
@@ -31,14 +30,6 @@ type ObsParser interface {
 
 // Config represents the configuration needed to run a Runner.
 type Config struct {
-	// Timeout is the timeout for each run.
-	// Non-positive values disable the timeout.
-	Timeout time.Duration
-
-	// NWorkers is the number of parallel run workers that should be spawned.
-	// Anything less than or equal to 1 will sequentialise the run.
-	NWorkers int
-
 	// Logger is the logger that should be used for this Runner.
 	// If nil, logging will be suppressed.
 	Logger *log.Logger
@@ -51,6 +42,9 @@ type Config struct {
 
 	// Paths contains the pathset used for this runner's outputs.
 	Paths *Pathset
+
+	// Quantities contains quantity configuration for this runner.
+	Quantities QuantitySet
 }
 
 // Check checks various error conditions on the config.

@@ -43,3 +43,14 @@ func (l *Logger) OnCompilerPlan(_ compiler.Named) {}
 
 // OnCompilerPlanFinish does nothing.
 func (l *Logger) OnCompilerPlanFinish() {}
+
+// OnCompilerPlanStart briefly logs a file-copy start.
+func (l *Logger) OnCopyStart(nfiles int) {
+	(*log.Logger)(l).Printf("copying %d files...\n", nfiles)
+}
+
+// OnCopy does nothing.
+func (l *Logger) OnCopy(_, _ string) {}
+
+// OnCopyFinish does nothing.
+func (l *Logger) OnCopyFinish() {}

@@ -82,12 +82,9 @@ func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 		return nil, berr
 	}
 
-	r.l.Printf("running across %d worker(s)", r.conf.NWorkers)
-	if 0 < r.conf.Timeout {
-		r.l.Printf("timeout at %s", r.conf.Timeout)
-	}
+	r.conf.Quantities.Log(r.l)
 
-	err := r.plan.Corpus.Par(ctx, r.conf.NWorkers,
+	err := r.plan.Corpus.Par(ctx, r.conf.Quantities.NWorkers,
 		func(ctx context.Context, named subject.Named) error {
 			return r.makeJob(b, named).Run(ctx)
 		},

@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package mach
+package rmach
 
 import (
 	"context"
@@ -38,10 +38,9 @@ type Runner interface {
 	Recv(ctx context.Context, origp, runp *plan.Plan) (*plan.Plan, error)
 }
 
-// Run runs the machine binary on p.
-// It presumes that p has already been amended
-func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	rp, err := m.runner.Send(ctx, p)
+// Run runs the machine binary.
+func (m *RMach) Run(ctx context.Context) (*plan.Plan, error) {
+	rp, err := m.runner.Send(ctx, m.plan)
 	if err != nil {
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
@@ -51,8 +50,26 @@ func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, fmt.Errorf("while starting command: %w", err)
 	}
 
-	eg, ectx := errgroup.WithContext(ctx)
+	np, err := m.runPipework(ctx, rp, ps)
+	werr := m.runner.Wait()
+
+	if err != nil {
+		return nil, err
+	}
+	if werr != nil {
+		return nil, werr
+	}
+
+	return m.runner.Recv(ctx, m.plan, np)
+}
+
+// runPipework runs the various parallel processes that read to and write from the machine binary via ps.
+// These include: sending the remote plan rp to stdin; receiving the updated plan from stdout; and replaying
+// observations from stderr.
+func (m *RMach) runPipework(ctx context.Context, rp *plan.Plan, ps *Pipeset) (*plan.Plan, error) {
 	var p2 plan.Plan
+
+	eg, ectx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
 		return sendPlan(rp, ps.Stdin)
 	})
@@ -63,25 +80,20 @@ func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil
 	})
 	eg.Go(func() error {
-		r := forward.Replayer{
-			Decoder:   json.NewDecoder(ps.Stderr),
-			Observers: m.observers,
-		}
-		return r.Run(ectx)
+		return m.runReplayer(ectx, ps.Stderr)
 	})
 
 	// Waiting _should_ close the pipes.
-	err = eg.Wait()
-	werr := m.runner.Wait()
+	return &p2, eg.Wait()
+}
 
-	if err != nil {
-		return nil, err
+// runReplayer constructs and runs an observation replayer on top of r.
+func (m *RMach) runReplayer(ctx context.Context, r io.Reader) error {
+	rp := forward.Replayer{
+		Decoder:   json.NewDecoder(r),
+		Observers: m.conf.Observers.Corpus,
 	}
-	if werr != nil {
-		return nil, werr
-	}
-
-	return m.runner.Recv(ctx, p, &p2)
+	return rp.Run(ctx)
 }
 
 // binName is the name of the machine-runner binary.

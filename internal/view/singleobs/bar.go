@@ -52,6 +52,21 @@ func (p *Bar) OnCompilerPlanFinish() {
 	p.finish()
 }
 
+// OnCopyStart observes the start of a file copy using a progress bar.
+func (p *Bar) OnCopyStart(nfiles int) {
+	p.start(nfiles)
+}
+
+// OnCopy observes a step of a file copy using a progress bar.
+func (p *Bar) OnCopy(_, _ string) {
+	p.step()
+}
+
+// OnCopyFinish observes the end of a file copy using a progress bar.
+func (p *Bar) OnCopyFinish() {
+	p.finish()
+}
+
 func (p *Bar) start(n int) {
 	p.bar = pb.StartNew(n)
 }
