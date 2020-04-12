@@ -13,7 +13,4 @@ var (
 
 	// ErrDirEmpty occurs when the local directory filepath is empty.
 	ErrDirEmpty = errors.New("local dir is empty string")
-
-	// ErrSSHNil occurs when the SSH config part of a rmach config is nil.
-	ErrSSHNil = errors.New("ssh config nil")
 )

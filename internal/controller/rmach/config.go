@@ -22,7 +22,8 @@ type Config struct {
 	// Observers is the set of observers listening for file copying and remote corpus manipulations.
 	Observers ObserverSet
 
-	/// SSH tells the remote-machine invoker how to use SSH on the host machine.
+	// SSH tells the remote-machine invoker how to use SSH on the host machine.
+	// It may be nil, signifying a lack of specific configuration.
 	SSH *remote.Config
 }
 
@@ -31,9 +32,7 @@ func (c *Config) Check() error {
 	if ystring.IsBlank(c.DirLocal) {
 		return ErrDirEmpty
 	}
-	if c.SSH == nil {
-		return ErrSSHNil
-	}
+	// .SSH may be nil.
 	return nil
 }
 
