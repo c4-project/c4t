@@ -12,6 +12,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/act"
 
 	"github.com/MattWindsor91/act-tester/internal/tool/litmus"
@@ -54,7 +56,7 @@ func parseArgs(args []string, errw io.Writer) (*litmus.Litmus, error) {
 	fs.BoolVar(&cfg.Verbose, "v", false, usageVerbose)
 	fs.StringVar(&cfg.CArch, "carch", "", usageCArch)
 	fs.StringVar(&cfg.Pathset.DirOut, "o", "", usageOutDir)
-	view.ActRunnerFlags(fs, &a)
+	stdflag.ActRunnerFlags(fs, &a)
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return nil, err

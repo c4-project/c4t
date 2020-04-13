@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
@@ -33,9 +35,9 @@ func run(args []string, outw, errw io.Writer) error {
 
 	var dir, pf string
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	view.ActRunnerFlags(fs, &a)
-	view.OutDirFlag(fs, &dir, defaultOutDir)
-	view.PlanFileFlag(fs, &pf)
+	stdflag.ActRunnerFlags(fs, &a)
+	stdflag.OutDirFlag(fs, &dir, defaultOutDir)
+	stdflag.PlanFileFlag(fs, &pf)
 
 	qs := setupQuantityFlags(fs)
 
@@ -55,7 +57,7 @@ func run(args []string, outw, errw io.Writer) error {
 
 func setupQuantityFlags(fs *flag.FlagSet) *fuzzer.QuantitySet {
 	var q fuzzer.QuantitySet
-	view.CorpusSizeFlag(fs, &q.CorpusSize)
-	view.SubjectCycleFlag(fs, &q.SubjectCycles)
+	stdflag.CorpusSizeFlag(fs, &q.CorpusSize)
+	stdflag.SubjectCycleFlag(fs, &q.SubjectCycles)
 	return &q
 }

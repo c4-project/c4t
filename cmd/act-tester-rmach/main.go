@@ -11,6 +11,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
@@ -21,10 +23,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
-)
-
-const (
-	defaultOutDir = "rmach_results"
 )
 
 func main() {
@@ -42,32 +40,34 @@ func main() {
 }
 
 func flags() []c.Flag {
-	return []c.Flag{
-		// TODO(@MattWindsor91): forward some flags from rmach to mach
-		view.ConfFileCliFlag(),
-		view.OutDirCliFlag(defaultOutDir),
-		view.PlanFileCliFlag(),
+	ownFlags := []c.Flag{
+		stdflag.ConfFileCliFlag(),
 	}
+	return append(ownFlags, stdflag.MachCliFlags()...)
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
-	cfg, err := view.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfFileFromCli(ctx)
 	if err != nil {
 		return err
 	}
 
 	errw = iohelp.EnsureWriter(errw)
 	rcfg := makeConfig(ctx, cfg, errw)
-	pfile := view.PlanFileFromCli(ctx)
+	pfile := stdflag.PlanFileFromCli(ctx)
 	return view.RunOnPlanFile(context.Background(), rcfg, pfile, outw)
 }
 
 func makeConfig(ctx *c.Context, cfg *config.Config, errw io.Writer) *rmach.Config {
 	l := log.New(errw, "[rmach] ", log.LstdFlags)
 	obs := rmach.NewObserverSet(singleobs.RMach(l)...)
+	mcfg := stdflag.MachConfigFromCli(ctx)
 	return &rmach.Config{
-		DirLocal:  view.OutDirFromCli(ctx),
+		DirLocal:  stdflag.OutDirFromCli(ctx),
 		Observers: obs,
 		SSH:       cfg.SSH,
+		Invoker: stdflag.MachInvoker{
+			Config: &mcfg,
+		},
 	}
 }

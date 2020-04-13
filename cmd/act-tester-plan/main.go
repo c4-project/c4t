@@ -11,6 +11,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
@@ -56,7 +58,7 @@ func main() {
 
 func flags() []c.Flag {
 	ownFlags := []c.Flag{
-		view.ConfFileCliFlag(),
+		stdflag.ConfFileCliFlag(),
 		&c.Int64Flag{
 			Name:    flagSeed,
 			Aliases: []string{flagSeedShort},
@@ -65,22 +67,22 @@ func flags() []c.Flag {
 			Value:   plan.UseDateSeed,
 		},
 		&c.StringFlag{
-			Name:  view.FlagMachine,
+			Name:  stdflag.FlagMachine,
 			Usage: usageMach,
 		},
 		&c.IntFlag{
 			Name:    flagCorpusSize,
-			Aliases: []string{view.FlagNum},
+			Aliases: []string{stdflag.FlagNum},
 			Usage:   usageCorpusSize,
 		},
 	}
-	return append(ownFlags, view.ActRunnerCliFlags()...)
+	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
-	a := view.ActRunnerFromCli(ctx, errw)
+	a := stdflag.ActRunnerFromCli(ctx, errw)
 
-	cfg, err := view.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfFileFromCli(ctx)
 	if err != nil {
 		return err
 	}
@@ -90,7 +92,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 		return err
 	}
 
-	midstr := ctx.String(view.FlagMachine)
+	midstr := ctx.String(stdflag.FlagMachine)
 	mach, err := getMachine(cfg, midstr)
 	if err != nil {
 		return err

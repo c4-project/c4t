@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
 
 	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
@@ -27,7 +27,7 @@ type Runner interface {
 	Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
 
 	// Start starts the machine binary, returning a set of pipe readers and writers to use for communication with it.
-	Start(ctx context.Context) (*Pipeset, error)
+	Start(ctx context.Context, mi InvocationGetter) (*remote.Pipeset, error)
 
 	// Wait blocks waiting for the command to finish (or the context passed into Start to cancel).
 	Wait() error
@@ -45,7 +45,7 @@ func (m *RMach) Run(ctx context.Context) (*plan.Plan, error) {
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
 
-	ps, err := m.runner.Start(ctx)
+	ps, err := m.runner.Start(ctx, m.conf.Invoker)
 	if err != nil {
 		return nil, fmt.Errorf("while starting command: %w", err)
 	}
@@ -66,7 +66,7 @@ func (m *RMach) Run(ctx context.Context) (*plan.Plan, error) {
 // runPipework runs the various parallel processes that read to and write from the machine binary via ps.
 // These include: sending the remote plan rp to stdin; receiving the updated plan from stdout; and replaying
 // observations from stderr.
-func (m *RMach) runPipework(ctx context.Context, rp *plan.Plan, ps *Pipeset) (*plan.Plan, error) {
+func (m *RMach) runPipework(ctx context.Context, rp *plan.Plan, ps *remote.Pipeset) (*plan.Plan, error) {
 	var p2 plan.Plan
 
 	eg, ectx := errgroup.WithContext(ctx)
@@ -94,17 +94,6 @@ func (m *RMach) runReplayer(ctx context.Context, r io.Reader) error {
 		Observers: m.conf.Observers.Corpus,
 	}
 	return rp.Run(ctx)
-}
-
-// binName is the name of the machine-runner binary.
-const binName = "act-tester-mach"
-
-// runArgs produces the arguments for an invocation of binName, given directory dir.
-func runArgs(dir string) []string {
-	return []string{
-		"-" + view.FlagUseJSON,
-		"-" + view.FlagOutDir, dir,
-	}
 }
 
 // sendPlan sends p to w, then closes w, reporting any relevant errors.

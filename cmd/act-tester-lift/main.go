@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
@@ -34,8 +36,8 @@ func run(args []string, outw, errw io.Writer) error {
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 	var od string
-	view.OutDirFlag(fs, &od, defaultOutDir)
-	view.PlanFileFlag(fs, &pf)
+	stdflag.OutDirFlag(fs, &od, defaultOutDir)
+	stdflag.PlanFileFlag(fs, &pf)
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return err

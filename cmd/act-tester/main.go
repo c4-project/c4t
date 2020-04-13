@@ -14,6 +14,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 
 	"github.com/mitchellh/go-homedir"
@@ -45,10 +47,10 @@ func run(args []string, errw io.Writer) error {
 
 	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
 
-	view.ActRunnerFlags(fs, &a)
-	cfile := view.ConfFileFlag(fs)
+	stdflag.ActRunnerFlags(fs, &a)
+	cfile := stdflag.ConfFileFlag(fs)
 	qs := setupQuantityOverrides(fs)
-	mfilter := fs.String(view.FlagMachine, "", "A `glob` to use to filter incoming machines by ID.")
+	mfilter := fs.String(stdflag.FlagMachine, "", "A `glob` to use to filter incoming machines by ID.")
 
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
@@ -179,7 +181,7 @@ func makeEnv(a *act.Runner, c *config.Config) director.Env {
 func setupQuantityOverrides(fs *flag.FlagSet) *config.QuantitySet {
 	var q config.QuantitySet
 	// TODO(@MattWindsor91): disambiguate the corpus size argument
-	view.CorpusSizeFlag(fs, &q.Fuzz.CorpusSize)
-	view.SubjectCycleFlag(fs, &q.Fuzz.SubjectCycles)
+	stdflag.CorpusSizeFlag(fs, &q.Fuzz.CorpusSize)
+	stdflag.SubjectCycleFlag(fs, &q.Fuzz.SubjectCycles)
 	return &q
 }

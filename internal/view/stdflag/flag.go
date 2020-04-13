@@ -3,16 +3,12 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package view
+package stdflag
 
 import (
 	"flag"
-	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
-	// It's 2020, and tools _still_ can't understand the use of 'v2' unless you do silly hacks like this.
-	c "github.com/urfave/cli/v2"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
 )
@@ -38,6 +34,9 @@ const (
 	// FlagCompilerTimeout is a short flag for compiler timeout.
 	FlagCompilerTimeout = "t"
 	flagActDuneExec     = "x"
+
+	FlagSkipCompiler = "skip-compiler"
+	FlagSkipRunner   = "skip-runner"
 
 	// FlagCompilerTimeoutLong is a long flag for compiler timeout.
 	FlagCompilerTimeoutLong = "compiler-timeout"
@@ -73,63 +72,10 @@ func OutDirFlag(fs *flag.FlagSet, out *string, defaultdir string) {
 	fs.StringVar(out, FlagOutDir, defaultdir, usageOutDir)
 }
 
-// OutDirCliFlag sets up an 'output directory' cli flag.
-func OutDirCliFlag(defaultdir string) c.Flag {
-	return &c.PathFlag{
-		Name:  FlagOutDir,
-		Value: defaultdir,
-		Usage: usageOutDir,
-	}
-}
-
-// OutDirFromCli gets the output directory set up by OutDirCliFlag.
-func OutDirFromCli(ctx *c.Context) string {
-	return ctx.Path(FlagOutDir)
-}
-
 // ActRunnerFlags sets up a standard set of arguments on fs feeding into the ActRunner a.
 func ActRunnerFlags(fs *flag.FlagSet, a *act.Runner) {
 	fs.StringVar(&a.ConfFile, flagActConfFile, "", usageActConfFile)
 	fs.BoolVar(&a.DuneExec, flagActDuneExec, false, usageDuneExec)
-}
-
-// ActRunnerCliFlags gets the 'cli' flags needed to set up an ACT runner.
-func ActRunnerCliFlags() []c.Flag {
-	return []c.Flag{
-		&c.PathFlag{
-			Name:      flagActConfFile,
-			Usage:     usageActConfFile,
-			TakesFile: true,
-		},
-		&c.BoolFlag{
-			Name:  flagActDuneExec,
-			Usage: usageActConfFile,
-		},
-	}
-}
-
-// ActRunnerFromCli makes an ACT runner using the flags previously set up by ActRunnerCliFlags.
-func ActRunnerFromCli(ctx *c.Context, errw io.Writer) *act.Runner {
-	return &act.Runner{
-		DuneExec: ctx.Bool(flagActDuneExec),
-		ConfFile: ctx.Path(flagActConfFile),
-		Stderr:   errw,
-	}
-}
-
-// ConfFileCliFlag creates a cli flag for the config file.
-func ConfFileCliFlag() c.Flag {
-	return &c.PathFlag{
-		Name:      flagConfFile,
-		Usage:     usageActConfFile,
-		TakesFile: true,
-	}
-}
-
-// ConfFileFromCli sets up a Config using the file flag set up by ConfFileCliFlag.
-func ConfFileFromCli(ctx *c.Context) (*config.Config, error) {
-	cfile := ctx.Path(flagConfFile)
-	return config.Load(cfile)
 }
 
 // ConfFileFlag sets up a standard argument on fs for loading a configuration file into f.
@@ -140,18 +86,4 @@ func ConfFileFlag(fs *flag.FlagSet) *string {
 // PlanFileFlag sets up a standard argument on fs for loading a plan file into f.
 func PlanFileFlag(fs *flag.FlagSet, f *string) {
 	fs.StringVar(f, FlagInputFile, "", usagePlanFile)
-}
-
-// PlanFileCliFlag sets up a standard cli flag for loading a plan file into f.
-func PlanFileCliFlag() c.Flag {
-	return &c.PathFlag{
-		Name:      FlagInputFile,
-		TakesFile: true,
-		Usage:     usagePlanFile,
-	}
-}
-
-// PlanFileFromCli retrieves a plan file using the file flag set up by PlanFileCliFlag.
-func PlanFileFromCli(ctx *c.Context) string {
-	return ctx.Path(FlagInputFile)
 }

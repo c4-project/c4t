@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
@@ -28,9 +30,9 @@ func NewLocalRunner(dir string) *LocalRunner {
 	return &LocalRunner{dir: dir}
 }
 
-// Start starts the machine-runner binary locally using ctx, and returns various
-func (r *LocalRunner) Start(ctx context.Context) (*Pipeset, error) {
-	r.cmd = exec.CommandContext(ctx, binName, runArgs(r.dir)...)
+// Start starts the machine-runner binary locally using ctx, and returns a pipeset for talking to it.
+func (r *LocalRunner) Start(ctx context.Context, i InvocationGetter) (*remote.Pipeset, error) {
+	r.cmd = exec.CommandContext(ctx, i.MachBin(), i.MachArgs(r.dir)...)
 	ps, err := r.openPipes()
 	if err != nil {
 		return nil, fmt.Errorf("opening pipes: %w", err)
@@ -60,21 +62,6 @@ func (r *LocalRunner) Recv(ctx context.Context, _, rp *plan.Plan) (*plan.Plan, e
 }
 
 // openLocalPipes tries to open stdin, stdout, and stderr pipes for c.
-func (r *LocalRunner) openPipes() (*Pipeset, error) {
-	var (
-		ps  Pipeset
-		err error
-	)
-	if ps.Stdin, err = r.cmd.StdinPipe(); err != nil {
-		return nil, fmt.Errorf("while opening stdin pipe: %w", err)
-	}
-	if ps.Stdout, err = r.cmd.StdoutPipe(); err != nil {
-		_ = ps.Close()
-		return nil, fmt.Errorf("while opening stdout pipe: %w", err)
-	}
-	if ps.Stderr, err = r.cmd.StderrPipe(); err != nil {
-		_ = ps.Close()
-		return nil, fmt.Errorf("while opening stderr pipe: %w", err)
-	}
-	return &ps, nil
+func (r *LocalRunner) openPipes() (*remote.Pipeset, error) {
+	return remote.OpenCmdPipes(r.cmd)
 }

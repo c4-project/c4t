@@ -8,7 +8,6 @@ package rmach
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"path"
 	"strings"
 
@@ -40,10 +39,10 @@ func NewSSHRunner(r *remote.MachineRunner, o []remote.CopyObserver, recvRoot str
 	return &SSHRunner{runner: r, observers: o, recvRoot: recvRoot}
 }
 
-func (r *SSHRunner) Start(ctx context.Context) (*Pipeset, error) {
+func (r *SSHRunner) Start(ctx context.Context, i InvocationGetter) (*remote.Pipeset, error) {
 	var (
 		err error
-		ps  *Pipeset
+		ps  *remote.Pipeset
 	)
 
 	if r.session, err = r.runner.NewSession(); err != nil {
@@ -54,7 +53,7 @@ func (r *SSHRunner) Start(ctx context.Context) (*Pipeset, error) {
 		return nil, fmt.Errorf("while opening pipes: %w", err)
 	}
 
-	if err := r.session.Start(r.invocation()); err != nil {
+	if err := r.session.Start(r.invocation(i)); err != nil {
 		_ = ps.Close()
 		return nil, fmt.Errorf("while starting local runner: %w", err)
 	}
@@ -89,33 +88,13 @@ func (r *SSHRunner) Wait() error {
 }
 
 // invocation works out what the SSH command invocation for the tester should be.
-func (r *SSHRunner) invocation() string {
+func (r *SSHRunner) invocation(i InvocationGetter) string {
 	dir := path.Join(r.runner.Config.DirCopy, "mach")
 	qdir := shellescape.Quote(dir)
-	argv := append([]string{binName}, runArgs(qdir)...)
-	return strings.Join(argv, " ")
+	return strings.Join(Invocation(i, qdir), " ")
 }
 
-// openPipes tries to open stdin, stdout, and stderr pipes for c.
-func (r *SSHRunner) openPipes() (*Pipeset, error) {
-	stdin, err := r.session.StdinPipe()
-	if err != nil {
-		return nil, fmt.Errorf("while opening stdin pipe: %w", err)
-	}
-	stdout, err := r.session.StdoutPipe()
-	if err != nil {
-		_ = stdin.Close()
-		return nil, fmt.Errorf("while opening stdout pipe: %w", err)
-	}
-	stderr, err := r.session.StderrPipe()
-	if err != nil {
-		_ = stdin.Close()
-		return nil, fmt.Errorf("while opening stderr pipe: %w", err)
-	}
-	ps := Pipeset{
-		Stdin:  stdin,
-		Stdout: ioutil.NopCloser(stdout),
-		Stderr: ioutil.NopCloser(stderr),
-	}
-	return &ps, nil
+// openPipes tries to open stdin, stdout, and stderr pipes for r.
+func (r *SSHRunner) openPipes() (*remote.Pipeset, error) {
+	return remote.OpenSSHPipes(r.session)
 }

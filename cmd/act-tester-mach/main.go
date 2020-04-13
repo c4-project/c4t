@@ -11,34 +11,22 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
-
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/runner"
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/timeout"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-
-	c "github.com/urfave/cli/v2"
-
-	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 
 	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
+	c "github.com/urfave/cli/v2"
+
 	"github.com/MattWindsor91/act-tester/internal/view"
-)
-
-const (
-	defaultOutDir = "mach_results"
-
-	flagSkipCompiler = "skip-compiler"
-	flagSkipRunner   = "skip-runner"
 )
 
 func main() {
@@ -56,74 +44,24 @@ func main() {
 }
 
 func flags() []c.Flag {
-	return []c.Flag{
-		&c.BoolFlag{
-			Name:    view.FlagUseJSONLong,
-			Aliases: []string{view.FlagUseJSON},
-			Usage:   "emit progress reports in JSON form on stderr",
-		},
-		&c.BoolFlag{
-			Name:  flagSkipCompiler,
-			Usage: "if given, skip the compiler",
-		},
-		&c.BoolFlag{
-			Name:  flagSkipRunner,
-			Usage: "if given, skip the runner",
-		},
-		&c.DurationFlag{
-			Name:    view.FlagCompilerTimeoutLong,
-			Aliases: []string{view.FlagCompilerTimeout},
-			Value:   1 * time.Minute,
-			Usage:   "a `timeout` to apply to each compilation",
-		},
-		&c.DurationFlag{
-			Name:    view.FlagRunTimeoutLong,
-			Aliases: []string{view.FlagRunTimeout},
-			Value:   1 * time.Minute,
-			Usage:   "a `timeout` to apply to each run",
-		},
-		&c.IntFlag{
-			Name:    view.FlagWorkerCountLong,
-			Aliases: []string{view.FlagWorkerCount},
-			Value:   1,
-			Usage:   "number of `workers` to run in parallel",
-		},
-		view.OutDirCliFlag(defaultOutDir),
-		view.PlanFileCliFlag(),
-	}
+	return stdflag.MachCliFlags()
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
 	cfg := makeConfig(ctx, outw, errw)
-	pfile := view.PlanFileFromCli(ctx)
+	pfile := stdflag.PlanFileFromCli(ctx)
 	return view.RunOnPlanFile(context.Background(), cfg, pfile, outw)
 }
 
 func makeConfig(ctx *c.Context, outw, errw io.Writer) *mach.Config {
 	cfg := mach.Config{
-		CDriver:      &cimpl.CResolve,
-		RDriver:      &bimpl.BResolve,
-		Stdout:       outw,
-		OutDir:       view.OutDirFromCli(ctx),
-		SkipCompiler: ctx.Bool(flagSkipCompiler),
-		SkipRunner:   ctx.Bool(flagSkipRunner),
-		Quantities:   makeQuantitySet(ctx),
+		CDriver: &cimpl.CResolve,
+		RDriver: &bimpl.BResolve,
+		Stdout:  outw,
+		User:    stdflag.MachConfigFromCli(ctx),
 	}
-
-	setLoggerAndObservers(&cfg, errw, ctx.Bool(view.FlagUseJSONLong))
+	setLoggerAndObservers(&cfg, errw, ctx.Bool(stdflag.FlagUseJSONLong))
 	return &cfg
-}
-
-func makeQuantitySet(ctx *c.Context) mach.QuantitySet {
-	return mach.QuantitySet{
-		Compiler: compiler.QuantitySet{
-			Timeout: timeout.Timeout(ctx.Duration(view.FlagCompilerTimeoutLong)),
-		},
-		Runner: runner.QuantitySet{
-			Timeout:  timeout.Timeout(ctx.Duration(view.FlagRunTimeoutLong)),
-			NWorkers: ctx.Int(view.FlagWorkerCountLong),
-		},
-	}
 }
 
 func setLoggerAndObservers(c *mach.Config, errw io.Writer, jsonStatus bool) {
