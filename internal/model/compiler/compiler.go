@@ -8,6 +8,9 @@ package compiler
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -25,12 +28,17 @@ type Config struct {
 	// Run contains information on how to run the compiler.
 	Run *service.RunInfo `toml:"run,omitempty"`
 
+	// MArch contains information on the 'march' (compiler architecture tuning) levels to select for the compiler.
+	MArch *optlevel.Selection `toml:"march,optempty"`
+
 	// Opt contains information on the optimisation levels to select for the compiler.
 	Opt *optlevel.Selection `toml:"opt,omitempty"`
 }
 
 // Compiler collects all test-relevant information about a compiler.
 type Compiler struct {
+	// SelectedMArch refers to an architecture tuning level chosen using the compiler's configured march selection.
+	SelectedMArch string `toml:"selected_march,optempty"`
 	// SelectedOpt refers to an optimisation level chosen using the compiler's configured optimisation selection.
 	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty"`
 
@@ -39,13 +47,33 @@ type Compiler struct {
 
 // String outputs a human-readable but machine-separable summary of this compiler.
 func (c Compiler) String() string {
-	var run, opt string
+	s, err := c.stringErr()
+	if err != nil {
+		return fmt.Sprintf("error: %s", err)
+	}
+	return s
+}
+
+func (c Compiler) stringErr() (string, error) {
+	var sb strings.Builder
+	if _, err := fmt.Fprintf(&sb, "%s@%s", c.Style, c.Arch); err != nil {
+		return "", err
+	}
 	if c.Run != nil {
-		run = fmt.Sprintf(" (%s)", c.Run)
+		if _, err := fmt.Fprintf(&sb, " (%s)", c.Run); err != nil {
+			return "", err
+		}
 	}
 	if c.SelectedOpt != nil {
-		opt = fmt.Sprintf(" opt %q", c.SelectedOpt.Name)
+		if _, err := fmt.Fprintf(&sb, " opt %q", c.SelectedOpt.Name); err != nil {
+			return "", err
+		}
+	}
+	if !ystring.IsBlank(c.SelectedMArch) {
+		if _, err := fmt.Fprintf(&sb, " march %q", c.SelectedMArch); err != nil {
+			return "", err
+		}
 	}
 
-	return fmt.Sprintf("%s@%s%s%s", c.Style, c.Arch, run, opt)
+	return sb.String(), nil
 }

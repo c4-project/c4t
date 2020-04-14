@@ -112,3 +112,14 @@ func (i ID) Join(r ID) ID {
 	}
 	return ID{append(i.tags, r.tags...)}
 }
+
+// Uncons splits an ID into a head tag and tail of zero or more further tags.
+// If the ID is empty, ok is false, and hd and tl are unspecified.
+func (i ID) Uncons() (hd string, tl ID, ok bool) {
+	if i.IsEmpty() {
+		return hd, tl, false
+	}
+	hd = i.tags[0]
+	tl = ID{tags: i.tags[1:]}
+	return hd, tl, true
+}

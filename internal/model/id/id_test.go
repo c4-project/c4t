@@ -66,6 +66,23 @@ func ExampleID_Tags() {
 	// baz
 }
 
+// ExampleID_Uncons is a runnable example for Uncons.
+func ExampleID_Uncons() {
+	_, _, ok := id.ID{}.Uncons()
+	fmt.Println("uncons of empty ok?:", ok)
+
+	hd, tl, ok := id.FromString("foo.bar.baz").Uncons()
+	fmt.Println("uncons of foo.bar.baz ok?:", ok)
+	fmt.Println("head of foo.bar.baz:", hd)
+	fmt.Println("tail of foo.bar.baz:", tl)
+
+	// Output:
+	// uncons of empty ok?: false
+	// uncons of foo.bar.baz ok?: true
+	// head of foo.bar.baz: foo
+	// tail of foo.bar.baz: bar.baz
+}
+
 // TestNew_valid tests New using various 'valid' inputs.
 func TestNew_valid(t *testing.T) {
 	t.Parallel()

@@ -5,6 +5,8 @@
 
 package optlevel
 
+import "github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+
 // Selection represents a piece of compiler configuration that specifies which optimisation levels to select.
 type Selection struct {
 	// Enabled overrides the default selection to insert optimisation levels.
@@ -16,16 +18,9 @@ type Selection struct {
 // Select inserts enables from this selection into defaults, then removes disables.
 // Disables take priority over enables.
 // The resulting map is a copy; this function doesn't mutate defaults.
-func (s Selection) Override(defaults map[string]struct{}) map[string]struct{} {
-	nm := make(map[string]struct{}, len(defaults)+len(s.Enabled))
-	for _, o := range s.Enabled {
-		nm[o] = struct{}{}
-	}
-	for o := range defaults {
-		nm[o] = struct{}{}
-	}
-	for _, o := range s.Disabled {
-		delete(nm, o)
-	}
+func (s Selection) Override(defaults stringhelp.Set) stringhelp.Set {
+	nm := defaults.Copy()
+	nm.Add(s.Enabled...)
+	nm.Remove(s.Disabled...)
 	return nm
 }
