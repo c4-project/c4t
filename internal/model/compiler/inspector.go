@@ -9,6 +9,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 )
 
@@ -21,11 +23,16 @@ var (
 
 // Inspector is the interface of types that support optimisation level lookup.
 type Inspector interface {
-	// DefaultLevels retrieves a set of optimisation levels that are enabled by default for compiler c.
-	DefaultLevels(c *Config) (map[string]struct{}, error)
-	// Levels retrieves a set of potential optimisation levels for compiler c.
+	// DefaultOptLevels retrieves a set of optimisation levels that are enabled by default for compiler c.
+	DefaultOptLevels(c *Config) (stringhelp.Set, error)
+	// OptLevels retrieves a set of potential optimisation levels for compiler c.
 	// This map shouldn't be modified, as it may be global.
-	Levels(c *Config) (map[string]optlevel.Level, error)
+	OptLevels(c *Config) (map[string]optlevel.Level, error)
+	// DefaultMOpts retrieves a set of machine optimisation directives that are enabled by default for compiler c.
+	DefaultMOpts(c *Config) (stringhelp.Set, error)
+
+	// We don't request a list of all possible MOpts from compilers, as the list expands so rapidly that any such
+	// list would be hideously out of date.
 }
 
 // SelectLevels selects from in the optimisation levels permitted by the configuration c.
@@ -34,25 +41,38 @@ func SelectLevels(in Inspector, c *Config) (map[string]optlevel.Level, error) {
 		return nil, ErrConfigNil
 	}
 
-	all, err := in.Levels(c)
+	all, err := in.OptLevels(c)
 	if err != nil {
 		return nil, err
 	}
-	dls, err := in.DefaultLevels(c)
+	dls, err := in.DefaultOptLevels(c)
 	if err != nil {
 		return nil, err
 	}
 	return filterLevels(chosenLevels(dls, c.Opt), all)
 }
 
-func chosenLevels(defaults map[string]struct{}, s *optlevel.Selection) map[string]struct{} {
+// SelectMOpts selects from in the machine optimisation profiles (-march, etc.) permitted by the configuration c.
+func SelectMOpts(in Inspector, c *Config) (stringhelp.Set, error) {
+	if c == nil {
+		return nil, ErrConfigNil
+	}
+
+	dls, err := in.DefaultMOpts(c)
+	if err != nil {
+		return nil, err
+	}
+	return chosenLevels(dls, c.MOpt), nil
+}
+
+func chosenLevels(defaults stringhelp.Set, s *optlevel.Selection) stringhelp.Set {
 	if s == nil {
 		return defaults
 	}
 	return s.Override(defaults)
 }
 
-func filterLevels(choices map[string]struct{}, all map[string]optlevel.Level) (map[string]optlevel.Level, error) {
+func filterLevels(choices stringhelp.Set, all map[string]optlevel.Level) (map[string]optlevel.Level, error) {
 	chosen := make(map[string]optlevel.Level, len(choices))
 	for c := range choices {
 		var ok bool

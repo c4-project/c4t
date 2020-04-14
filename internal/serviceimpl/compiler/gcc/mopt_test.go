@@ -15,8 +15,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// TestMOpts tests the mopt calculation for various platforms.
-func TestMOpts(t *testing.T) {
+// TestDefaultMOpts tests the mopt calculation for various platforms.
+func TestDefaultMOpts(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {

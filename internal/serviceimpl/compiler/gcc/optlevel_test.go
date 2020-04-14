@@ -30,19 +30,19 @@ func TestOptLevelNames_consistency(t *testing.T) {
 	})
 }
 
-// TestGCC_Levels tests that Levels returns the expected level set.
+// TestGCC_Levels tests that OptLevels returns the expected level set.
 func TestGCC_Levels(t *testing.T) {
 	t.Parallel()
-	ls, err := gcc.GCC{}.Levels(nil)
+	ls, err := gcc.GCC{}.OptLevels(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, gcc.OptLevels, ls)
 }
 
-// TestGCC_DefaultLevels tests that DefaultLevels returns a level set broadly consistent with expectations.
-func TestGCC_DefaultLevels(t *testing.T) {
+// TestGCC_DefaultOptLevels tests that DefaultOptLevels returns a level set broadly consistent with expectations.
+func TestGCC_DefaultOptLevels(t *testing.T) {
 	t.Parallel()
 
-	dl, err := gcc.GCC{}.DefaultLevels(nil)
+	dl, err := gcc.GCC{}.DefaultOptLevels(nil)
 	require.NoError(t, err)
 
 	t.Run("disabled", func(t *testing.T) {

@@ -9,6 +9,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -67,7 +69,12 @@ func (m *mOptSet) Strings() stringhelp.Set {
 	return nset
 }
 
-// MOpts gets the 'm' invocations (march, mcpu, etc.) to consider for the architecture with ID arch.
+// DefaultMOpts adapts the GCC mopts calculation to the interface needed for a compiler.
+func (g GCC) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
+	return MOpts(c.Arch)
+}
+
+// MOpts gets the default 'm' invocations (march, mcpu, etc.) to consider for compilers with archID arch.
 func MOpts(arch id.ID) (stringhelp.Set, error) {
 	family, variant, ok := arch.Uncons()
 	if !ok {

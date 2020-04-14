@@ -6,7 +6,10 @@
 package compiler_test
 
 import (
+	"errors"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
@@ -21,26 +24,166 @@ type mockResolver struct {
 	mock.Mock
 }
 
-func (m *mockResolver) DefaultLevels(c *compiler.Config) (map[string]struct{}, error) {
+func (m *mockResolver) DefaultOptLevels(c *compiler.Config) (stringhelp.Set, error) {
 	args := m.Called(c)
-	return args.Get(0).(map[string]struct{}), args.Error(1)
+	return args.Get(0).(stringhelp.Set), args.Error(1)
 }
 
-func (m *mockResolver) Levels(c *compiler.Config) (map[string]optlevel.Level, error) {
+func (m *mockResolver) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
+	args := m.Called(c)
+	return args.Get(0).(stringhelp.Set), args.Error(1)
+}
+
+func (m *mockResolver) OptLevels(c *compiler.Config) (map[string]optlevel.Level, error) {
 	args := m.Called(c)
 	return args.Get(0).(map[string]optlevel.Level), args.Error(1)
 }
 
-func makeMockResolver(dls map[string]struct{}, levels map[string]optlevel.Level) *mockResolver {
+func makeMockResolver(dls, dms stringhelp.Set, levels map[string]optlevel.Level, derr, merr, oerr error) *mockResolver {
 	var mr mockResolver
-	mr.On("DefaultLevels", mock.Anything).Return(dls, nil).Once()
-	mr.On("Levels", mock.Anything).Return(levels, nil).Once()
+	mr.On("DefaultOptLevels", mock.Anything).Return(dls, derr).Once()
+	mr.On("DefaultMOpts", mock.Anything).Return(dms, merr).Once()
+	mr.On("OptLevels", mock.Anything).Return(levels, oerr).Once()
 	return &mr
 }
 
+// TestSelectLevels tests SelectLevels on a variety of cases.
 func TestSelectLevels(t *testing.T) {
 	t.Parallel()
 
+	dls, levels := testData()
+	mr := func() *mockResolver { return makeMockResolver(dls, nil, levels, nil, nil, nil) }
+
+	err := errors.New("test error please ignore")
+
+	cases := map[string]struct {
+		conf     *compiler.Config
+		res      func() *mockResolver
+		expected stringhelp.Set
+		err      error
+	}{
+		"defaults-nil": {
+			conf:     &compiler.Config{Opt: nil},
+			res:      mr,
+			expected: dls,
+		},
+		"defaults": {
+			conf:     &compiler.Config{Opt: &optlevel.Selection{}},
+			res:      mr,
+			expected: dls,
+		},
+		"disable-everything": {
+			conf:     &compiler.Config{Opt: &optlevel.Selection{Disabled: []string{"", "size", "speed"}}},
+			res:      mr,
+			expected: nil,
+		},
+		"unknown-enable": {
+			conf: &compiler.Config{Opt: &optlevel.Selection{Enabled: []string{"kappa"}}},
+			res:  mr,
+			err:  compiler.ErrNoSuchLevel,
+		},
+		"no-conf": {
+			conf: nil,
+			res:  mr,
+			err:  compiler.ErrConfigNil,
+		},
+		"d-error": {
+			conf: &compiler.Config{Opt: &optlevel.Selection{}},
+			res:  func() *mockResolver { return makeMockResolver(nil, nil, levels, err, nil, nil) },
+			err:  err,
+		},
+		"o-error": {
+			conf: &compiler.Config{Opt: &optlevel.Selection{}},
+			res:  func() *mockResolver { return makeMockResolver(dls, nil, nil, nil, nil, err) },
+			err:  err,
+		},
+	}
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			ls, err := compiler.SelectLevels(c.res(), c.conf)
+			if !testhelp.ExpectErrorIs(t, err, c.err, "SelectLevels") || err != nil {
+				return
+			}
+
+			for n, l := range ls {
+				assert.Equal(t, levels[n], l, "selected level inconsistent with input")
+				assert.Contains(t, c.expected, n, "selected level not expected", n)
+			}
+			for n := range c.expected {
+				assert.Contains(t, ls, n, "expected level not selected", n)
+			}
+		})
+	}
+}
+
+// TestSelectMOpts tests SelectMOpts on a variety of cases.
+func TestSelectMOpts(t *testing.T) {
+	t.Parallel()
+
+	dms := stringhelp.NewSet("march=native", "march=x86_64", "march=skylake")
+	dmsk := dms.Copy()
+	dmsk.Add("kappa")
+
+	mr := func() *mockResolver { return makeMockResolver(nil, dms, nil, nil, nil, nil) }
+
+	err := errors.New("test error please ignore")
+
+	cases := map[string]struct {
+		conf     *compiler.Config
+		res      func() *mockResolver
+		expected stringhelp.Set
+		err      error
+	}{
+		"defaults-nil": {
+			conf:     &compiler.Config{MOpt: nil},
+			res:      mr,
+			expected: dms,
+		},
+		"defaults": {
+			conf:     &compiler.Config{MOpt: &optlevel.Selection{}},
+			res:      mr,
+			expected: dms,
+		},
+		"disable-everything": {
+			conf:     &compiler.Config{MOpt: &optlevel.Selection{Disabled: dms.Slice()}},
+			res:      mr,
+			expected: nil,
+		},
+		"enable-new": {
+			conf:     &compiler.Config{MOpt: &optlevel.Selection{Enabled: []string{"kappa"}}},
+			res:      mr,
+			expected: dmsk,
+		},
+		"no-conf": {
+			conf: nil,
+			res:  mr,
+			err:  compiler.ErrConfigNil,
+		},
+		"error": {
+			conf: &compiler.Config{MOpt: &optlevel.Selection{}},
+			res:  func() *mockResolver { return makeMockResolver(nil, nil, nil, nil, err, nil) },
+			err:  err,
+		},
+	}
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			ls, err := compiler.SelectMOpts(c.res(), c.conf)
+			if !testhelp.ExpectErrorIs(t, err, c.err, "SelectMOpts") || err != nil {
+				return
+			}
+
+			assert.ElementsMatch(t, c.expected.Slice(), ls.Slice(), "selected ops not expected")
+		})
+	}
+}
+
+func testData() (stringhelp.Set, map[string]optlevel.Level) {
 	dls := map[string]struct{}{"": {}, "size": {}, "speed": {}}
 	levels := map[string]optlevel.Level{
 		"": {
@@ -64,47 +207,5 @@ func TestSelectLevels(t *testing.T) {
 			BreaksStandards: true,
 		},
 	}
-
-	cases := map[string]struct {
-		sel      *optlevel.Selection
-		expected map[string]struct{}
-		err      error
-	}{
-		"defaults-nil": {
-			sel:      nil,
-			expected: dls,
-		},
-		"defaults": {
-			sel:      &optlevel.Selection{},
-			expected: dls,
-		},
-		"disable-everything": {
-			sel:      &optlevel.Selection{Disabled: []string{"", "size", "speed"}},
-			expected: nil,
-		},
-		"unknown-enable": {
-			sel: &optlevel.Selection{Enabled: []string{"kappa"}},
-			err: compiler.ErrNoSuchLevel,
-		},
-	}
-	for name, c := range cases {
-		c := c
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			r := makeMockResolver(dls, levels)
-			ls, err := compiler.SelectLevels(r, &compiler.Config{Opt: c.sel})
-			if !testhelp.ExpectErrorIs(t, err, c.err, "SelectLevels") || err != nil {
-				return
-			}
-
-			for n, l := range ls {
-				assert.Equal(t, levels[n], l, "selected level inconsistent with input")
-				assert.Contains(t, c.expected, n, "selected level not expected", n)
-			}
-			for n := range c.expected {
-				assert.Contains(t, ls, n, "expected level not selected", n)
-			}
-		})
-	}
+	return dls, levels
 }

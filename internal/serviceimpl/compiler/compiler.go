@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
@@ -62,22 +64,31 @@ func (r *Resolver) Get(c *mdl.Config) (Compiler, error) {
 	return cp, nil
 }
 
-// DefaultLevels gets the default optimisation levels for the compiler described by c.
-func (r *Resolver) DefaultLevels(c *mdl.Config) (map[string]struct{}, error) {
+// DefaultOptLevels gets the default optimisation levels for the compiler described by c.
+func (r *Resolver) DefaultOptLevels(c *mdl.Config) (stringhelp.Set, error) {
 	cp, err := r.Get(c)
 	if err != nil {
 		return nil, err
 	}
-	return cp.DefaultLevels(c)
+	return cp.DefaultOptLevels(c)
 }
 
-// Levels gets information about all available optimisation levels for the compiler described by c.
-func (r *Resolver) Levels(c *mdl.Config) (map[string]optlevel.Level, error) {
+// OptLevels gets information about all available optimisation levels for the compiler described by c.
+func (r *Resolver) OptLevels(c *mdl.Config) (map[string]optlevel.Level, error) {
 	cp, err := r.Get(c)
 	if err != nil {
 		return nil, err
 	}
-	return cp.Levels(c)
+	return cp.OptLevels(c)
+}
+
+// OptLevels gets the default machine-specific optimisation profiles for the compiler described by c.
+func (r *Resolver) DefaultMOpts(c *mdl.Config) (stringhelp.Set, error) {
+	cp, err := r.Get(c)
+	if err != nil {
+		return nil, err
+	}
+	return cp.DefaultMOpts(c)
 }
 
 // RunCompiler runs the compiler specified by nc on job j, using this resolver to map the style to a concrete compiler.

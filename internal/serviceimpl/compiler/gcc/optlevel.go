@@ -6,6 +6,7 @@
 package gcc
 
 import (
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 )
@@ -77,8 +78,8 @@ var (
 	OptLevelDisabledNames = []string{"g", "z"}
 )
 
-// DefaultLevels gets the default level set for GCC.
-func (g GCC) DefaultLevels(_ *compiler.Config) (map[string]struct{}, error) {
+// DefaultOptLevels gets the default level set for GCC.
+func (g GCC) DefaultOptLevels(_ *compiler.Config) (stringhelp.Set, error) {
 	sel := optlevel.Selection{
 		Enabled:  OptLevelNames,
 		Disabled: OptLevelDisabledNames,
@@ -86,6 +87,6 @@ func (g GCC) DefaultLevels(_ *compiler.Config) (map[string]struct{}, error) {
 	return sel.Override(nil), nil
 }
 
-func (_ GCC) Levels(_ *compiler.Config) (map[string]optlevel.Level, error) {
+func (_ GCC) OptLevels(_ *compiler.Config) (map[string]optlevel.Level, error) {
 	return OptLevels, nil
 }
