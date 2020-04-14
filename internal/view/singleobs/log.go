@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/1set/gut/ystring"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -39,7 +41,15 @@ func (l *Logger) OnCompilerPlanStart(ncompilers int) {
 }
 
 // OnCompilerPlan does nothing.
-func (l *Logger) OnCompilerPlan(_ compiler.Named) {}
+func (l *Logger) OnCompilerPlan(nc compiler.Named) {
+	(*log.Logger)(l).Printf("compiler %s:\n", nc.ID)
+	if nc.SelectedOpt != nil {
+		(*log.Logger)(l).Printf(" - opt: %q:\n", nc.SelectedOpt.Name)
+	}
+	if !ystring.IsBlank(nc.SelectedMOpt) {
+		(*log.Logger)(l).Printf(" - m/opt: %q:\n", nc.SelectedMOpt)
+	}
+}
 
 // OnCompilerPlanFinish does nothing.
 func (l *Logger) OnCompilerPlanFinish() {}

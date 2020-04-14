@@ -112,9 +112,14 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compile
 
 func (c *CompilerPlanner) planCompiler(cfg compiler.Config) (compiler.Compiler, error) {
 	opt, err := c.planCompilerOpt(cfg)
+	if err != nil {
+		return compiler.Compiler{}, nil
+	}
+	mopt, err := c.planCompilerMOpt(cfg)
 	comp := compiler.Compiler{
-		SelectedOpt: opt,
-		Config:      cfg,
+		SelectedOpt:  opt,
+		SelectedMOpt: mopt,
+		Config:       cfg,
 	}
 	return comp, err
 }
@@ -129,6 +134,14 @@ func (c *CompilerPlanner) planCompilerOpt(cfg compiler.Config) (*optlevel.Named,
 		return nil, err
 	}
 	return c.chooseOpt(opts, names), err
+}
+
+func (c *CompilerPlanner) planCompilerMOpt(cfg compiler.Config) (string, error) {
+	mopts, err := compiler.SelectMOpts(c.Inspector, &cfg)
+	if err != nil {
+		return "", err
+	}
+	return c.chooseMOpt(mopts), err
 }
 
 func (c *CompilerPlanner) chooseOpt(opts map[string]optlevel.Level, names []string) *optlevel.Named {
@@ -146,4 +159,17 @@ func (c *CompilerPlanner) chooseOpt(opts map[string]optlevel.Level, names []stri
 	name := names[i]
 	return &optlevel.Named{Name: name, Level: opts[name]}
 
+}
+
+func (c *CompilerPlanner) chooseMOpt(opts stringhelp.Set) string {
+	// Don't bother trying to select an mopt if there aren't any
+	// TODO(@MattWindsor91): should this be an error?
+	nopts := len(opts)
+	if nopts == 0 {
+		return ""
+	}
+	// 'don't choose an mopt' - the empty string, may or may not be a valid choice, so we don't factor it in here.
+	optsl := opts.Slice()
+	i := c.Rng.Intn(nopts)
+	return optsl[i]
 }

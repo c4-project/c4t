@@ -37,8 +37,8 @@ type Config struct {
 
 // Compiler collects all test-relevant information about a compiler.
 type Compiler struct {
-	// SelectedMArch refers to an architecture tuning level chosen using the compiler's configured march selection.
-	SelectedMArch string `toml:"selected_march,optempty"`
+	// SelectedMOpt refers to an architecture tuning level chosen using the compiler's configured march selection.
+	SelectedMOpt string `toml:"selected_march,optempty"`
 	// SelectedOpt refers to an optimisation level chosen using the compiler's configured optimisation selection.
 	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty"`
 
@@ -69,8 +69,8 @@ func (c Compiler) stringErr() (string, error) {
 			return "", err
 		}
 	}
-	if !ystring.IsBlank(c.SelectedMArch) {
-		if _, err := fmt.Fprintf(&sb, " march %q", c.SelectedMArch); err != nil {
+	if !ystring.IsBlank(c.SelectedMOpt) {
+		if _, err := fmt.Fprintf(&sb, " march %q", c.SelectedMOpt); err != nil {
 			return "", err
 		}
 	}
