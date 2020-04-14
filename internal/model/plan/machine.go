@@ -7,7 +7,7 @@ package plan
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 )
 
 // Machine represents the information about a machine that is relevant to the tester.

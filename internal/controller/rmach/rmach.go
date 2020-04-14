@@ -8,7 +8,7 @@ package rmach
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 )
 
 // RMach runs the machine-runner, through SSH if needed.

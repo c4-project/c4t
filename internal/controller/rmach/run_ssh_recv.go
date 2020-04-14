@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/model/normalise"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
-	"github.com/MattWindsor91/act-tester/internal/transfer"
 )
 
 // Recv copies bits of remp into locp, including run information and any compiler failures.
@@ -28,7 +28,7 @@ func (r *SSHRunner) Recv(ctx context.Context, locp, remp *plan.Plan) (*plan.Plan
 }
 
 func (r *SSHRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp corpus.Corpus) error {
-	norm := transfer.NewNormaliser(path.Join(r.recvRoot, ls.Name))
+	norm := normalise.NewNormaliser(path.Join(r.recvRoot, ls.Name))
 	rs, ok := rcorp[ls.Name]
 	if !ok {
 		return fmt.Errorf("subject not in remote corpus: %s", ls.Name)
@@ -39,7 +39,7 @@ func (r *SSHRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp co
 	}
 	ls.Runs = ns.Runs
 	ls.Compiles = ns.Compiles
-	return r.recvMapping(ctx, norm.MappingsOfKind(transfer.NKCompile))
+	return r.recvMapping(ctx, norm.MappingsOfKind(normalise.NKCompile))
 }
 
 func (r *SSHRunner) recvMapping(ctx context.Context, ms map[string]string) error {

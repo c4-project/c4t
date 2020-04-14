@@ -7,7 +7,7 @@ package rmach
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 )
 
 // Observer is the union of the various interfaces of observers used by rmach.

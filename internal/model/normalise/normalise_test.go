@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package transfer_test
+package normalise_test
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/act-tester/internal/transfer"
+	"github.com/MattWindsor91/act-tester/internal/model/normalise"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
@@ -26,20 +26,20 @@ func TestNormaliser_Subject(t *testing.T) {
 	cases := map[string]struct {
 		in   subject.Subject
 		out  subject.Subject
-		maps map[string]transfer.Normalisation
+		maps map[string]normalise.Normalisation
 	}{
 		"empty": {
 			in:   subject.Subject{},
 			out:  subject.Subject{},
-			maps: map[string]transfer.Normalisation{},
+			maps: map[string]normalise.Normalisation{},
 		},
 		"litmus": {
 			in:  subject.Subject{Litmus: path.Join("foo", "bar", "baz.litmus")},
-			out: subject.Subject{Litmus: transfer.FileOrigLitmus},
-			maps: map[string]transfer.Normalisation{
-				transfer.FileOrigLitmus: {
+			out: subject.Subject{Litmus: normalise.FileOrigLitmus},
+			maps: map[string]normalise.Normalisation{
+				normalise.FileOrigLitmus: {
 					Original: path.Join("foo", "bar", "baz.litmus"),
-					Kind:     transfer.NKOrigLitmus,
+					Kind:     normalise.NKOrigLitmus,
 				},
 			},
 		},
@@ -55,19 +55,19 @@ func TestNormaliser_Subject(t *testing.T) {
 			out: subject.Subject{
 				Fuzz: &subject.Fuzz{
 					Files: subject.FuzzFileset{
-						Litmus: transfer.FileFuzzLitmus,
-						Trace:  transfer.FileFuzzTrace,
+						Litmus: normalise.FileFuzzLitmus,
+						Trace:  normalise.FileFuzzTrace,
 					},
 				},
 			},
-			maps: map[string]transfer.Normalisation{
-				transfer.FileFuzzLitmus: {
+			maps: map[string]normalise.Normalisation{
+				normalise.FileFuzzLitmus: {
 					Original: path.Join("barbaz", "baz.1.litmus"),
-					Kind:     transfer.NKFuzz,
+					Kind:     normalise.NKFuzz,
 				},
-				transfer.FileFuzzTrace: {
+				normalise.FileFuzzTrace: {
 					Original: path.Join("barbaz", "baz.1.trace"),
-					Kind:     transfer.NKFuzz,
+					Kind:     normalise.NKFuzz,
 				},
 			},
 		},
@@ -87,31 +87,31 @@ func TestNormaliser_Subject(t *testing.T) {
 			out: subject.Subject{
 				Harnesses: map[string]subject.Harness{
 					"arm": {
-						Dir:   path.Join(transfer.DirHarnesses, "arm"),
+						Dir:   path.Join(normalise.DirHarnesses, "arm"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 					"x86": {
-						Dir:   path.Join(transfer.DirHarnesses, "x86"),
+						Dir:   path.Join(normalise.DirHarnesses, "x86"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 				},
 			},
-			maps: map[string]transfer.Normalisation{
-				path.Join(transfer.DirHarnesses, "arm", "inky.c"): {
+			maps: map[string]normalise.Normalisation{
+				path.Join(normalise.DirHarnesses, "arm", "inky.c"): {
 					Original: path.Join("burble", "armv8", "inky.c"),
-					Kind:     transfer.NKHarness,
+					Kind:     normalise.NKHarness,
 				},
-				path.Join(transfer.DirHarnesses, "arm", "pinky.c"): {
+				path.Join(normalise.DirHarnesses, "arm", "pinky.c"): {
 					Original: path.Join("burble", "armv8", "pinky.c"),
-					Kind:     transfer.NKHarness,
+					Kind:     normalise.NKHarness,
 				},
-				path.Join(transfer.DirHarnesses, "x86", "inky.c"): {
+				path.Join(normalise.DirHarnesses, "x86", "inky.c"): {
 					Original: path.Join("burble", "i386", "inky.c"),
-					Kind:     transfer.NKHarness,
+					Kind:     normalise.NKHarness,
 				},
-				path.Join(transfer.DirHarnesses, "x86", "pinky.c"): {
+				path.Join(normalise.DirHarnesses, "x86", "pinky.c"): {
 					Original: path.Join("burble", "i386", "pinky.c"),
-					Kind:     transfer.NKHarness,
+					Kind:     normalise.NKHarness,
 				},
 			},
 		},
@@ -139,35 +139,35 @@ func TestNormaliser_Subject(t *testing.T) {
 					"clang": {
 						Result: subject.Result{Status: subject.StatusOk},
 						Files: subject.CompileFileset{
-							Bin: path.Join(transfer.DirCompiles, "clang", transfer.FileBin),
-							Log: path.Join(transfer.DirCompiles, "clang", transfer.FileCompileLog),
+							Bin: path.Join(normalise.DirCompiles, "clang", normalise.FileBin),
+							Log: path.Join(normalise.DirCompiles, "clang", normalise.FileCompileLog),
 						},
 					},
 					"gcc": {
 						Result: subject.Result{Status: subject.StatusOk},
 						Files: subject.CompileFileset{
-							Bin: path.Join(transfer.DirCompiles, "gcc", transfer.FileBin),
-							Log: path.Join(transfer.DirCompiles, "gcc", transfer.FileCompileLog),
+							Bin: path.Join(normalise.DirCompiles, "gcc", normalise.FileBin),
+							Log: path.Join(normalise.DirCompiles, "gcc", normalise.FileCompileLog),
 						},
 					},
 				},
 			},
-			maps: map[string]transfer.Normalisation{
-				path.Join(transfer.DirCompiles, "clang", transfer.FileBin): {
+			maps: map[string]normalise.Normalisation{
+				path.Join(normalise.DirCompiles, "clang", normalise.FileBin): {
 					Original: path.Join("foobaz", "clang", "a.out"),
-					Kind:     transfer.NKCompile,
+					Kind:     normalise.NKCompile,
 				},
-				path.Join(transfer.DirCompiles, "gcc", transfer.FileBin): {
+				path.Join(normalise.DirCompiles, "gcc", normalise.FileBin): {
 					Original: path.Join("foobaz", "gcc", "a.out"),
-					Kind:     transfer.NKCompile,
+					Kind:     normalise.NKCompile,
 				},
-				path.Join(transfer.DirCompiles, "clang", transfer.FileCompileLog): {
+				path.Join(normalise.DirCompiles, "clang", normalise.FileCompileLog): {
 					Original: path.Join("foobaz", "clang", "errors"),
-					Kind:     transfer.NKCompile,
+					Kind:     normalise.NKCompile,
 				},
-				path.Join(transfer.DirCompiles, "gcc", transfer.FileCompileLog): {
+				path.Join(normalise.DirCompiles, "gcc", normalise.FileCompileLog): {
 					Original: path.Join("foobaz", "gcc", "errors"),
-					Kind:     transfer.NKCompile,
+					Kind:     normalise.NKCompile,
 				},
 			},
 		},
@@ -177,7 +177,7 @@ func TestNormaliser_Subject(t *testing.T) {
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			n := transfer.NewNormaliser("")
+			n := normalise.NewNormaliser("")
 			s, err := n.Subject(c.in)
 			if assert.NoError(t, err) {
 				assert.Equal(t, c.out, *s)
@@ -189,7 +189,7 @@ func TestNormaliser_Subject(t *testing.T) {
 
 // ExampleNormaliser_MappingsOfKind is a runnable example for MappingsOfKind.
 func ExampleNormaliser_MappingsOfKind() {
-	n := transfer.NewNormaliser("root")
+	n := normalise.NewNormaliser("root")
 	s := subject.Subject{
 		Litmus: path.Join("foo", "bar", "baz.litmus"),
 		Fuzz: &subject.Fuzz{
@@ -219,7 +219,7 @@ func ExampleNormaliser_MappingsOfKind() {
 		},
 	}
 	_, _ = n.Subject(s)
-	for k, v := range n.MappingsOfKind(transfer.NKHarness) {
+	for k, v := range n.MappingsOfKind(normalise.NKHarness) {
 		fmt.Println(k, "<-", v)
 	}
 

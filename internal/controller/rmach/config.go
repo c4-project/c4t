@@ -11,7 +11,7 @@ import (
 	"github.com/1set/gut/ystring"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 )
 
 // InvocationGetter is the interface of types that tell the remote-machine invoker how to invoke the local-machine binary.

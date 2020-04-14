@@ -13,7 +13,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/stretchr/testify/assert"
 

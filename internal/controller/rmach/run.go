@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"

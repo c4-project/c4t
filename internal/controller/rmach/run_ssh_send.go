@@ -8,15 +8,15 @@ package rmach
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/transfer/remote"
+	"github.com/MattWindsor91/act-tester/internal/remote"
 
+	"github.com/MattWindsor91/act-tester/internal/model/normalise"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
-	"github.com/MattWindsor91/act-tester/internal/transfer"
 )
 
 // Send translates p to the remote host, using SFTP to copy over its harness files.
 func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	n := transfer.NewNormaliser(r.runner.Config.DirCopy)
+	n := normalise.NewNormaliser(r.runner.Config.DirCopy)
 	rp := *p
 	var err error
 	if rp.Corpus, err = n.Corpus(rp.Corpus); err != nil {
@@ -24,7 +24,7 @@ func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) 
 	}
 
 	// We only send the harnesses, to avoid wasting SFTP bandwidth.
-	return &rp, r.sendMapping(ctx, n.MappingsOfKind(transfer.NKHarness))
+	return &rp, r.sendMapping(ctx, n.MappingsOfKind(normalise.NKHarness))
 }
 
 func (r *SSHRunner) sendMapping(ctx context.Context, ms map[string]string) error {

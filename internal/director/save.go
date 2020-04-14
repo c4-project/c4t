@@ -20,7 +20,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/transfer"
+	"github.com/MattWindsor91/act-tester/internal/model/normalise"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -166,8 +166,8 @@ func (s *Save) tarSubjectToWriter(sub subject.Subject, tarw *tar.Writer) error {
 	return nil
 }
 
-func filesToTar(s subject.Subject) (map[string]transfer.Normalisation, error) {
-	n := transfer.NewNormaliser("")
+func filesToTar(s subject.Subject) (map[string]normalise.Normalisation, error) {
+	n := normalise.NewNormaliser("")
 	if _, err := n.Subject(s); err != nil {
 		return nil, err
 	}
