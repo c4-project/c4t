@@ -9,8 +9,11 @@ package gccnt
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"sort"
+
+	"github.com/1set/gut/ystring"
 )
 
 var (
@@ -40,11 +43,17 @@ type Gccnt struct {
 	// DivergeOpts contains the optimisation levels at which gccn't will diverge.
 	DivergeOpts []string
 
-	// Std specifies the standard to pass to gcc.
-	Std string
+	// March specifies whether to pass -march to gcc, and, if so, what value.
+	March string
+
+	// Mcpu specifies whether to pass -mcpu to gcc, and, if so, what value.
+	Mcpu string
 
 	// Pthread specifies whether to pass -pthread to gcc.
 	Pthread bool
+
+	// Std specifies the standard to pass to gcc.
+	Std string
 }
 
 // runner is the interface of low-level drivers that gccn't can use.
@@ -101,13 +110,21 @@ func (g *Gccnt) args() []string {
 		"-o", g.Out,
 		"-O" + g.OptLevel,
 	}
-	if g.Std != "" {
-		args = append(args, "-std="+g.Std)
-	}
+	args = addStringArg("std", g.Std, args)
+	args = addStringArg("march", g.March, args)
+	args = addStringArg("mcpu", g.Mcpu, args)
+
 	if g.Pthread {
 		args = append(args, "-pthread")
 	}
 	return append(args, g.In...)
+}
+
+func addStringArg(k, v string, args []string) []string {
+	if ystring.IsBlank(v) {
+		return args
+	}
+	return append(args, fmt.Sprintf("-%s=%s", k, v))
 }
 
 // shouldDiverge checks whether gccn't should diverge.

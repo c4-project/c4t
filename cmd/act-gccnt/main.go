@@ -41,6 +41,8 @@ const (
 	flagErrorOnOpt   = "nt-error-opt"
 	flagPthread      = "pthread"
 	flagStd          = "std"
+	flagMarch        = "march"
+	flagMcpu         = "mcpu"
 )
 
 func flags() []c.Flag {
@@ -64,16 +66,24 @@ func flags() []c.Flag {
 		&c.StringSliceFlag{
 			Name:    flagErrorOnOpt,
 			Aliases: nil,
-			Usage:   "O-levels (minus the '-O') on which gccn't should exit with an error",
+			Usage:   "o-levels (minus the '-O') on which gccn't should exit with an error",
 		},
 		&c.StringSliceFlag{
 			Name:    flagDivergeOnOpt,
 			Aliases: nil,
-			Usage:   "O-levels (minus the '-O') on which gccn't should diverge",
+			Usage:   "o-levels (minus the '-O') on which gccn't should diverge",
 		},
 		&c.StringFlag{
 			Name:  flagStd,
-			Usage: "Standard to pass through to gcc",
+			Usage: "standard to pass through to gcc",
+		},
+		&c.StringFlag{
+			Name:  flagMarch,
+			Usage: "architecture optimisation to pass through to gcc",
+		},
+		&c.StringFlag{
+			Name:  flagMcpu,
+			Usage: "cpu optimisation to pass through to gcc",
 		},
 		&c.BoolFlag{
 			Name:  flagPthread,
@@ -107,8 +117,10 @@ func run(ctx *c.Context) error {
 		OptLevel:    olevel,
 		DivergeOpts: ctx.StringSlice(flagDivergeOnOpt),
 		ErrorOpts:   ctx.StringSlice(flagErrorOnOpt),
-		Std:         ctx.String(flagStd),
+		March:       ctx.String(flagMarch),
+		Mcpu:        ctx.String(flagMcpu),
 		Pthread:     ctx.Bool(flagPthread),
+		Std:         ctx.String(flagStd),
 	}
 
 	if ctx.Bool(flagDryRun) {
