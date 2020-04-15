@@ -23,7 +23,8 @@ func TestDefaultMOpts(t *testing.T) {
 		in  id.ID
 		out []string
 	}{
-		"skylake":      {in: id.ArchX86Skylake, out: []string{"", "arch=native", "arch=x86-64", "arch=skylake"}},
+		"skylake":      {in: id.ArchX86Skylake, out: []string{"", "arch=native", "arch=x86-64", "arch=broadwell", "arch=skylake"}},
+		"broadwell":    {in: id.ArchX86Broadwell, out: []string{"", "arch=native", "arch=x86-64", "arch=broadwell"}},
 		"arm7":         {in: id.ArchArm7, out: []string{"arch=armv7-a"}},
 		"arm8":         {in: id.ArchArm8, out: []string{"arch=armv8-a", "arch=armv7-a"}},
 		"armcortexa72": {in: id.ArchArmCortexA72, out: []string{"cpu=cortex-a72", "arch=armv8-a", "arch=armv7-a"}},

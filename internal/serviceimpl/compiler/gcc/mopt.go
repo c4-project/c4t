@@ -189,6 +189,10 @@ func x8664MOpts(svar id.ID) (*mOptSet, error) {
 	switch svar.String() {
 	case id.ArchSubVariantX86Skylake:
 		set.AddArch("skylake")
+		// TODO(@MattWindsor91): is this fallthrough safe?
+		fallthrough
+	case id.ArchSubVariantX86Broadwell:
+		set.AddArch("broadwell")
 		fallthrough
 	case "":
 		// TODO(@MattWindsor91): other subvariants?

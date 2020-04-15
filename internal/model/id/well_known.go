@@ -36,6 +36,8 @@ const (
 	// ArchVariantX8664 is the tag representing the 64-bit x86 variant.
 	ArchVariantX8664 = "64"
 
+	// ArchSubVariantX86Broadwell is the tag representing the Intel Broadwell x86-64 subvariant.
+	ArchSubVariantX86Broadwell = "broadwell"
 	// ArchSubVariantX86Skylake is the tag representing the Intel Skylake x86-64 subvariant.
 	// This variant is, for example, that used in 2016 MacBook Pros.
 	ArchSubVariantX86Skylake = "skylake"
@@ -46,6 +48,8 @@ var (
 	ArchX86 = ID{[]string{ArchFamilyX86}}
 	// ArchX8664 is the ACT architecture ID for x86-64.
 	ArchX8664 = ID{[]string{ArchFamilyX86, ArchVariantX8664}}
+	// ArchX86Broadwell is the ACT architecture ID for x86-64 Broadwell.
+	ArchX86Broadwell = ID{[]string{ArchFamilyX86, ArchVariantX8664, ArchSubVariantX86Broadwell}}
 	// ArchX86Skylake is the ACT architecture ID for x86-64 Skylake.
 	ArchX86Skylake = ID{[]string{ArchFamilyX86, ArchVariantX8664, ArchSubVariantX86Skylake}}
 
