@@ -21,3 +21,10 @@ type QuantitySet struct {
 func (q *QuantitySet) Log(l *log.Logger) {
 	q.Timeout.Log(l)
 }
+
+// Override substitutes any non-zero quantities in new for those in this quantity set, in-place.
+func (q *QuantitySet) Override(new QuantitySet) {
+	if new.Timeout.IsActive() {
+		q.Timeout = new.Timeout
+	}
+}

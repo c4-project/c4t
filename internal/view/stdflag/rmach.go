@@ -103,13 +103,15 @@ func MachCliFlags() []c.Flag {
 	)
 }
 
-// MachConfigFromCli creates a machine configuration using the flags in ctx.
-func MachConfigFromCli(ctx *c.Context) mach.UserConfig {
+// MachConfigFromCli creates a machine configuration using the flags in ctx and the default quantities in defq.
+func MachConfigFromCli(ctx *c.Context, defq mach.QuantitySet) mach.UserConfig {
+	defq.Override(makeQuantitySet(ctx))
+
 	return mach.UserConfig{
 		OutDir:       OutDirFromCli(ctx),
 		SkipCompiler: ctx.Bool(FlagSkipCompiler),
 		SkipRunner:   ctx.Bool(FlagSkipRunner),
-		Quantities:   makeQuantitySet(ctx),
+		Quantities:   defq,
 	}
 }
 

@@ -9,7 +9,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"reflect"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/confhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
@@ -60,16 +61,7 @@ type QuantitySet struct {
 
 // Override substitutes any quantities in new that are non-zero for those in this set.
 func (q *QuantitySet) Override(new QuantitySet) {
-	qv := reflect.ValueOf(q).Elem()
-	nv := reflect.ValueOf(new)
-
-	nf := nv.NumField()
-	for i := 0; i < nf; i++ {
-		k := nv.Field(i).Int()
-		if k != 0 {
-			qv.Field(i).SetInt(k)
-		}
-	}
+	confhelp.GenericOverride(q, new)
 }
 
 // Check makes sure various parts of this config are present.

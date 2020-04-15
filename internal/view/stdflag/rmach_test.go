@@ -54,7 +54,7 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 			a := testApp(
 				func(ctx *c.Context) error {
 					t.Helper()
-					out := stdflag.MachConfigFromCli(ctx)
+					out := stdflag.MachConfigFromCli(ctx, mach.QuantitySet{})
 					assert.Equal(t, in, out, "user config didn't match")
 
 					return nil

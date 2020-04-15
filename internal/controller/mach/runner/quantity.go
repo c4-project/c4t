@@ -29,3 +29,13 @@ func (q *QuantitySet) Log(l *log.Logger) {
 	l.Println("running across", iohelp.PluralQuantity(q.NWorkers, "worker", "", "s"))
 	q.Timeout.Log(l)
 }
+
+// Override substitutes any non-zero quantities in new for those in this quantity set, in-place.
+func (q *QuantitySet) Override(new QuantitySet) {
+	if new.Timeout.IsActive() {
+		q.Timeout = new.Timeout
+	}
+	if new.NWorkers != 0 {
+		q.NWorkers = new.NWorkers
+	}
+}

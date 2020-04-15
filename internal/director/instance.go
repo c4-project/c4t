@@ -13,6 +13,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/mach"
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -255,6 +258,13 @@ func (i *Instance) makeRMachConfig(cobs []remote.CopyObserver, bobs []builder.Ob
 		DirLocal:  i.ScratchPaths.DirRun,
 		Observers: rmach.ObserverSet{Copy: cobs, Corpus: bobs},
 		SSH:       i.SSHConfig,
+		Invoker: stdflag.MachInvoker{
+			// TODO(@MattWindsor91): this is a bit messy.
+			Config: &mach.UserConfig{
+				OutDir:     i.ScratchPaths.DirRun,
+				Quantities: i.Quantities.Mach,
+			},
+		},
 	}
 }
 

@@ -61,7 +61,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 func makeConfig(ctx *c.Context, cfg *config.Config, errw io.Writer) *rmach.Config {
 	l := log.New(errw, "[rmach] ", log.LstdFlags)
 	obs := rmach.NewObserverSet(singleobs.RMach(l)...)
-	mcfg := stdflag.MachConfigFromCli(ctx)
+	mcfg := stdflag.MachConfigFromCli(ctx, cfg.Quantities.Mach)
 	return &rmach.Config{
 		DirLocal:  stdflag.OutDirFromCli(ctx),
 		Observers: obs,

@@ -58,7 +58,7 @@ func makeConfig(ctx *c.Context, outw, errw io.Writer) *mach.Config {
 		CDriver: &cimpl.CResolve,
 		RDriver: &bimpl.BResolve,
 		Stdout:  outw,
-		User:    stdflag.MachConfigFromCli(ctx),
+		User:    stdflag.MachConfigFromCli(ctx, mach.QuantitySet{}),
 	}
 	setLoggerAndObservers(&cfg, errw, ctx.Bool(stdflag.FlagUseJSONLong))
 	return &cfg
