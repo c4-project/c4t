@@ -33,7 +33,19 @@ func TestGccnt_DryRun(t *testing.T) {
 			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", Pthread: true},
 			out: "invocation: gcc -o a.out -O -pthread hello.c",
 		},
-		"passthrough-opts": {
+		"passthrough-oflag": {
+			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", OptLevel: "3"},
+			out: "invocation: gcc -o a.out -O3 hello.c",
+		},
+		"passthrough-march": {
+			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", March: "nehalem"},
+			out: "invocation: gcc -o a.out -O -march=nehalem hello.c",
+		},
+		"passthrough-mcpu": {
+			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", Mcpu: "power9"},
+			out: "invocation: gcc -o a.out -O -mcpu=power9 hello.c",
+		},
+		"passthrough-addopts": {
 			in: Gccnt{
 				Bin:         "gcc",
 				In:          []string{"hello.c"},

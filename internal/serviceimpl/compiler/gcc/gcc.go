@@ -26,17 +26,17 @@ type GCC struct {
 
 // RunCompiler compiles j using a GCC-friendly invocation.
 func (g GCC) RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) error {
-	orun := g.DefaultRun
-	if j.Compiler.Run != nil {
-		orun.Override(*j.Compiler.Run)
+	run := g.DefaultRun
+	if nr := j.CompilerRun(); nr != nil {
+		run.Override(*nr)
 	}
-	args := Args(orun, j)
-	cmd := exec.CommandContext(ctx, orun.Cmd, args...)
+	cmd := exec.CommandContext(ctx, run.Cmd, Args(run, j)...)
 	cmd.Stderr = errw
 	return cmd.Run()
 }
 
 // Args computes the arguments to pass to GCC for running job j with run info run.
+// It does not take j's run info into consideration, and assumes this has already been done.
 func Args(run service.RunInfo, j job.Compile) []string {
 	args := run.Args
 	args = AddStringArg(args, "O", j.SelectedOptName())
