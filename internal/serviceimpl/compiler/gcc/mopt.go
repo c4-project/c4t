@@ -192,7 +192,7 @@ func x8664MOpts(svar id.ID) (*mOptSet, error) {
 		fallthrough
 	case "":
 		// TODO(@MattWindsor91): other subvariants?
-		set.AddArch("x86_64", "native")
+		set.AddArch("x86-64", "native")
 	default:
 		return nil, fmt.Errorf("%w: unknown subvariant: %s", ErrUnsupportedVariant, svar)
 	}
