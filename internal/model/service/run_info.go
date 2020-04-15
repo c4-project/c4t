@@ -16,6 +16,11 @@ type RunInfo struct {
 	Args []string `toml:"args,omitempty"`
 }
 
+// NewRunInfo programmatically creates a RunInfo using command cmd and arguments args.
+func NewRunInfo(cmd string, args ...string) *RunInfo {
+	return &RunInfo{Cmd: cmd, Args: args}
+}
+
 // Invocation is Cmd appended to Args.
 func (r *RunInfo) Invocation() []string {
 	return append([]string{r.Cmd}, r.Args...)

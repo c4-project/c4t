@@ -7,6 +7,7 @@ package job
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
 
 // Compile represents a request to compile a list of files to an executable given a particular compiler.
@@ -18,6 +19,14 @@ type Compile struct {
 	In []string
 	// Out is the file to be received from the compiler.
 	Out string
+}
+
+// CompilerRun gets the job's compiler run information if present; else, nil.
+func (j *Compile) CompilerRun() *service.RunInfo {
+	if j.Compiler == nil {
+		return nil
+	}
+	return j.Compiler.Run
 }
 
 // SelectedOptName gets the name of this job's compiler's selected optimisation level, if present; else, "".

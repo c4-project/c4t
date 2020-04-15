@@ -123,3 +123,17 @@ func (i ID) Uncons() (hd string, tl ID, ok bool) {
 	tl = ID{tags: i.tags[1:]}
 	return hd, tl, true
 }
+
+// Triple splits this ID into three parts: a family tag, a variant tag, and a subvariant identifier.
+func (i ID) Triple() (f, v string, s ID) {
+	ri := i
+	ok := false
+
+	if f, ri, ok = ri.Uncons(); !ok {
+		return f, v, s
+	}
+	if v, s, ok = ri.Uncons(); !ok {
+		return f, v, s
+	}
+	return f, v, s
+}

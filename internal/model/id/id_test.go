@@ -83,6 +83,27 @@ func ExampleID_Uncons() {
 	// tail of foo.bar.baz: bar.baz
 }
 
+// ExampleID_Triple is a runnable example for Triple.
+func ExampleID_Triple() {
+	f, v, s := id.ID{}.Triple()
+	fmt.Printf("empty ID: f=%q v=%q s=%q\n", f, v, s)
+
+	f, v, s = id.FromString("x86").Triple()
+	fmt.Printf("family ID: f=%q v=%q s=%q\n", f, v, s)
+
+	f, v, s = id.FromString("x86.64").Triple()
+	fmt.Printf("variant ID: f=%q v=%q s=%q\n", f, v, s)
+
+	f, v, s = id.FromString("x86.64.coffeelake").Triple()
+	fmt.Printf("subvariant ID: f=%q v=%q s=%q\n", f, v, s)
+
+	// Output:
+	// empty ID: f="" v="" s=""
+	// family ID: f="x86" v="" s=""
+	// variant ID: f="x86" v="64" s=""
+	// subvariant ID: f="x86" v="64" s="coffeelake"
+}
+
 // TestNew_valid tests New using various 'valid' inputs.
 func TestNew_valid(t *testing.T) {
 	t.Parallel()
