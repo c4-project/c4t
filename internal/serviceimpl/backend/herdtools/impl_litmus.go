@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/1set/gut/ystring"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -113,16 +115,19 @@ func parseTagSigilLine(sigil rune, onEmph, onNorm obs.Tag) (obs.Tag, error) {
 	}
 }
 
-// archMap maps specific ACT architectures to Litmus7 arch names.
-var archMap = map[string]string{
-	"x86.64": "X86_64",
-}
-
-// familyMap maps ACT architecture families to Litmus7 arch names.
-var familyMap = map[string]string{
-	id.ArchFamilyArm: "ARM", // 32-bit
-	id.ArchFamilyPPC: "PPC",
-	id.ArchFamilyX86: "X86", // 32-bit
+// archMap maps ACT architecture family/variant pairs to Litmus7 arch names.
+// Each empty string mapping in a variant position is the 'default', or 'generic' architecture.
+var archMap = map[string]map[string]string{
+	id.ArchFamilyArm: {
+		"": "ARM", // 32bit
+	},
+	id.ArchFamilyPPC: {
+		"": "PPC",
+	},
+	id.ArchFamilyX86: {
+		"":                  "X86", // 32-bit
+		id.ArchVariantX8664: "X86_64",
+	},
 }
 
 var (
@@ -133,24 +138,22 @@ var (
 )
 
 func lookupArch(arch id.ID) (string, error) {
-	if arch.IsEmpty() {
+	f, v, _ := arch.Triple()
+	if ystring.IsBlank(f) {
 		return "", ErrEmptyArch
 	}
 
-	larch, ok := archMap[arch.String()]
+	amap, ok := archMap[f]
 	if !ok {
-		return lookupArchFamily(arch.Tags()[0])
+		mk, _ := id.MapKeys(archMap)
+		return "", fmt.Errorf("%w: %s (valid: %q)", ErrBadArch, f, mk)
 	}
-	return larch, nil
-}
-
-func lookupArchFamily(fam string) (string, error) {
-	larch, ok := familyMap[fam]
+	spec, ok := amap[v]
 	if !ok {
-		mk, _ := id.MapKeys(familyMap)
-		return "", fmt.Errorf("%w: %s (valid: %q)", ErrBadArch, larch, mk)
+		// Return the default if the variant doesn't have a specific match.
+		return amap[""], nil
 	}
-	return larch, nil
+	return spec, nil
 }
 
 // Args deduces the appropriate arguments for running Litmus on job j, with the merged run information r.
