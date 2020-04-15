@@ -9,11 +9,10 @@ package gccnt
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"sort"
 
-	"github.com/1set/gut/ystring"
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
 )
 
 var (
@@ -110,21 +109,14 @@ func (g *Gccnt) args() []string {
 		"-o", g.Out,
 		"-O" + g.OptLevel,
 	}
-	args = addStringArg("std", g.Std, args)
-	args = addStringArg("march", g.March, args)
-	args = addStringArg("mcpu", g.Mcpu, args)
+	args = gcc.AddStringArg(args, "std=", g.Std)
+	args = gcc.AddStringArg(args, "march=", g.March)
+	args = gcc.AddStringArg(args, "mcpu=", g.Mcpu)
 
 	if g.Pthread {
 		args = append(args, "-pthread")
 	}
 	return append(args, g.In...)
-}
-
-func addStringArg(k, v string, args []string) []string {
-	if ystring.IsBlank(v) {
-		return args
-	}
-	return append(args, fmt.Sprintf("-%s=%s", k, v))
 }
 
 // shouldDiverge checks whether gccn't should diverge.

@@ -19,3 +19,19 @@ type Compile struct {
 	// Out is the file to be received from the compiler.
 	Out string
 }
+
+// SelectedOptName gets the name of this job's compiler's selected optimisation level, if present; else, "".
+func (j *Compile) SelectedOptName() string {
+	if j.Compiler == nil || j.Compiler.SelectedOpt == nil {
+		return ""
+	}
+	return j.Compiler.SelectedOpt.Name
+}
+
+// SelectedMOptName gets the name of this job's compiler's selected machine optimisation profile, if present; else, "".
+func (j *Compile) SelectedMOptName() string {
+	if j.Compiler == nil {
+		return ""
+	}
+	return j.Compiler.SelectedMOpt
+}

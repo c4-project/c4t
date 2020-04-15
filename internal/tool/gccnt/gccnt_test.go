@@ -29,6 +29,10 @@ func TestGccnt_DryRun(t *testing.T) {
 			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out"},
 			out: "invocation: gcc -o a.out -O hello.c",
 		},
+		"passthrough-pthread": {
+			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", Pthread: true},
+			out: "invocation: gcc -o a.out -O -pthread hello.c",
+		},
 		"passthrough-opts": {
 			in: Gccnt{
 				Bin:         "gcc",
