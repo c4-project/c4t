@@ -28,8 +28,8 @@ type Config struct {
 	// Run contains information on how to run the compiler.
 	Run *service.RunInfo `toml:"run,omitempty"`
 
-	// MOpt contains information on the 'march' (compiler architecture tuning) levels to select for the compiler.
-	MOpt *optlevel.Selection `toml:"march,optempty"`
+	// MOpt contains information on the 'mopt' (compiler architecture tuning) levels to select for the compiler.
+	MOpt *optlevel.Selection `toml:"mopt,optempty"`
 
 	// Opt contains information on the optimisation levels to select for the compiler.
 	Opt *optlevel.Selection `toml:"opt,omitempty"`
