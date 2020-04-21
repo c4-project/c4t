@@ -11,7 +11,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"time"
@@ -192,12 +191,10 @@ func (s *Save) tarFileToWriter(rpath, wpath string, tarw *tar.Writer) error {
 	if err != nil {
 		return fmt.Errorf("opening %s: %w", rpath, err)
 	}
-	_, err = io.Copy(tarw, f)
-	cerr := f.Close()
-	if err != nil {
+	if _, err = iohelp.CopyCloseSrc(tarw, f); err != nil {
 		return fmt.Errorf("archiving %s: %w", rpath, err)
 	}
-	return cerr
+	return nil
 }
 
 func (s *Save) rescueNotExistError(err error, rpath string) error {

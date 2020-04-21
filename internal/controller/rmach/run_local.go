@@ -37,8 +37,7 @@ func (r *LocalRunner) Start(ctx context.Context, i InvocationGetter) (*remote.Pi
 	if err != nil {
 		return nil, fmt.Errorf("opening pipes: %w", err)
 	}
-	err = r.cmd.Start()
-	if err != nil {
+	if err = r.cmd.Start(); err != nil {
 		_ = ps.Close()
 		return nil, fmt.Errorf("starting command: %w", err)
 	}

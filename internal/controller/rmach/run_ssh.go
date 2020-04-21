@@ -7,6 +7,7 @@ package rmach
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -84,7 +85,14 @@ func makeSSHWaiter(eg *errgroup.Group, r *SSHRunner, ctx context.Context) {
 
 // Wait waits for either the SSH session to finish, or the context supplied to Start to close.
 func (r *SSHRunner) Wait() error {
-	return r.eg.Wait()
+	err := r.eg.Wait()
+
+	// These errors signify that the SSH waiter gave up on the SSH context, in which case it might not have yet closed.
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		_ = r.session.Close()
+	}
+
+	return err
 }
 
 // invocation works out what the SSH command invocation for the tester should be.
