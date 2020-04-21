@@ -115,6 +115,11 @@ func (s *Status) UnmarshalText(text []byte) error {
 	return err
 }
 
+// IsOk is true if, and only if, this status is StatusOk.
+func (s Status) IsOk() bool {
+	return s == StatusOk
+}
+
 // StatusOfObs determines the status of an observation o given various items of context.
 // The error runErr should contain any error that occurred when running the binary giving the observation.
 // StatusOfObs returns any error passed to it that it deems too fatal to represent in the status code.
