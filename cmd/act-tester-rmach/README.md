@@ -4,7 +4,7 @@
 
 ## Usage
 
-`act-tester-mach [-c] [-r] -i PLAN`
+`act-tester-rmach [-c] [-r] -i PLAN`
 
 - `-c` disables the compiling phase.
 - `-r` disables the running phase.

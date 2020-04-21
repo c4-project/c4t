@@ -8,11 +8,11 @@ package main
 import (
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/app/plan"
+	"github.com/MattWindsor91/act-tester/internal/app/mkdoc"
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
 func main() {
-	app := plan.App(os.Stdout, os.Stderr)
+	app := mkdoc.App(os.Stdout, os.Stderr)
 	view.LogTopError(app.Run(os.Args))
 }
