@@ -54,10 +54,10 @@ type Compiler struct {
 // It can fail if various safety checks fail on the config,
 // or if there is no obvious machine that the compiler can target.
 func New(c *Config, p *plan.Plan) (*Compiler, error) {
-	if p == nil {
-		return nil, plan.ErrNil
-	}
 	if err := checkConfig(c); err != nil {
+		return nil, err
+	}
+	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
 	return &Compiler{plan: *p, conf: *c, l: iohelp.EnsureLog(c.Logger)}, nil
@@ -68,6 +68,13 @@ func checkConfig(c *Config) error {
 		return ErrConfigNil
 	}
 	return c.Check()
+}
+
+func checkPlan(p *plan.Plan) error {
+	if p == nil {
+		return plan.ErrNil
+	}
+	return p.Check()
 }
 
 // Run runs the batch compiler with context ctx.

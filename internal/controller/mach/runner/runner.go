@@ -12,8 +12,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
@@ -61,10 +59,7 @@ func New(c *Config, p *plan.Plan) (*Runner, error) {
 }
 
 func (r *Runner) check() error {
-	if len(r.plan.Corpus) == 0 {
-		return corpus.ErrNone
-	}
-	return nil
+	return r.plan.Check()
 }
 
 // Run runs the runner.

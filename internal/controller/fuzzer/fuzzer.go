@@ -52,8 +52,8 @@ func New(c *Config, p *plan.Plan) (*Fuzzer, error) {
 	if err := checkConfig(c); err != nil {
 		return nil, err
 	}
-	if p == nil {
-		return nil, plan.ErrNil
+	if err := checkPlan(p); err != nil {
+		return nil, err
 	}
 
 	f := Fuzzer{plan: *p, l: iohelp.EnsureLog(c.Logger), conf: *c}
@@ -67,6 +67,13 @@ func checkConfig(c *Config) error {
 		return ErrConfigNil
 	}
 	return c.Check()
+}
+
+func checkPlan(p *plan.Plan) error {
+	if p == nil {
+		return plan.ErrNil
+	}
+	return p.Check()
 }
 
 func (f *Fuzzer) checkCount() error {

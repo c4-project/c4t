@@ -33,15 +33,13 @@ type Mach struct {
 }
 
 func New(c *Config, p *plan.Plan) (*Mach, error) {
-	if c == nil {
-		return nil, errors.New("config nil")
-	}
-	if err := c.Check(); err != nil {
+	if err := checkConfig(c); err != nil {
 		return nil, err
 	}
-	if p == nil {
-		return nil, plan.ErrNil
+	if err := checkPlan(p); err != nil {
+		return nil, err
 	}
+
 	m := Mach{
 		compiler: c.makeCompilerConfig(),
 		runner:   c.makeRunnerConfig(),
@@ -50,6 +48,20 @@ func New(c *Config, p *plan.Plan) (*Mach, error) {
 	}
 
 	return &m, nil
+}
+
+func checkConfig(c *Config) error {
+	if c == nil {
+		return errors.New("config nil")
+	}
+	return c.Check()
+}
+
+func checkPlan(p *plan.Plan) error {
+	if p == nil {
+		return plan.ErrNil
+	}
+	return p.Check()
 }
 
 // trap checks to see if this mach is in JSON mode; if it is, it swallows the error and sends it as a JSON message.

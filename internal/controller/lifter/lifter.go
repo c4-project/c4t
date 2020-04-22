@@ -65,11 +65,8 @@ func New(c *Config, p *plan.Plan) (*Lifter, error) {
 	if err := checkConfig(c); err != nil {
 		return nil, err
 	}
-	if p == nil {
-		return nil, plan.ErrNil
-	}
-	if p.Backend == nil {
-		return nil, ErrNoBackend
+	if err := checkPlan(p); err != nil {
+		return nil, err
 	}
 
 	l := Lifter{
@@ -85,6 +82,16 @@ func checkConfig(c *Config) error {
 		return ErrConfigNil
 	}
 	return c.Check()
+}
+
+func checkPlan(p *plan.Plan) error {
+	if p == nil {
+		return plan.ErrNil
+	}
+	if p.Backend == nil {
+		return ErrNoBackend
+	}
+	return p.Check()
 }
 
 // Run runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.

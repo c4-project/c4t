@@ -44,6 +44,18 @@ type Plan struct {
 	Corpus corpus.Corpus `toml:"corpus"`
 }
 
+// Check checks various basic properties on a plan.
+func (p *Plan) Check() error {
+	if err := p.Header.CheckVersion(); err != nil {
+		return err
+	}
+	if len(p.Corpus) == 0 {
+		return corpus.ErrNone
+	}
+	// TODO(@MattWindsor91): make sure compilers exist
+	return nil
+}
+
 // Dump dumps plan p to w.
 func (p *Plan) Dump(w io.Writer) error {
 	enc := toml.NewEncoder(w)

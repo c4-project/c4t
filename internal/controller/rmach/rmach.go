@@ -32,10 +32,10 @@ func New(c *Config, p *plan.Plan) (*RMach, error) {
 }
 
 func check(c *Config, p *plan.Plan) error {
-	if p == nil {
-		return plan.ErrNil
+	if err := checkConfig(c); err != nil {
+		return nil
 	}
-	return checkConfig(c)
+	return checkPlan(p)
 }
 
 func checkConfig(c *Config) error {
@@ -43,6 +43,13 @@ func checkConfig(c *Config) error {
 		return ErrConfigNil
 	}
 	return c.Check()
+}
+
+func checkPlan(p *plan.Plan) error {
+	if p == nil {
+		return plan.ErrNil
+	}
+	return p.Check()
 }
 
 func newRunner(o []remote.CopyObserver, dir string, c *remote.Config, ssh *remote.MachineConfig) (Runner, error) {

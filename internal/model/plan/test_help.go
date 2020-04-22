@@ -21,6 +21,7 @@ func Mock() *Plan {
 		Header: Header{
 			Creation: time.Date(2011, time.November, 11, 11, 11, 11, 0, time.FixedZone("PST", -8*60*60)),
 			Seed:     8675309,
+			Version:  CurrentVer,
 		},
 		Machine: NamedMachine{
 			ID: id.FromString("localhost"),

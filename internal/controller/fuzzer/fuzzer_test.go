@@ -39,6 +39,7 @@ func makeConfig() (*fuzzer.Config, *fuzzer.MockPathset) {
 // makePlan makes a 'valid' plan.
 func makePlan() *plan.Plan {
 	return &plan.Plan{
+		Header: plan.Header{Version: plan.CurrentVer},
 		Corpus: map[string]subject.Subject{
 			"foo": {
 				Threads: 1,

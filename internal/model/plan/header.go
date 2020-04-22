@@ -6,12 +6,26 @@
 package plan
 
 import (
+	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 )
 
-// UseDateSeed is a value for the header constructor's seed parameter that ensures its RNG will be seeded by run date.
-const UseDateSeed int64 = -1
+const (
+	// UseDateSeed is a value for the header constructor's seed parameter that ensures its RNG will be seeded by run date.
+	UseDateSeed int64 = -1
+
+	// CurrentVer is the current plan version.
+	// It changes when the interface between various bits of the tester (generally manifested within the plan version)
+	// changes.
+	CurrentVer uint32 = 20200422
+)
+
+var (
+	// ErrVersionMismatch occurs when the version of a plan loaded into part of a tester doesn't equal CurrentVer.
+	ErrVersionMismatch = errors.New("bad plan version")
+)
 
 // Header is a grouping of plan metadata.
 type Header struct {
@@ -20,6 +34,9 @@ type Header struct {
 
 	// Seed is a pseudo-randomly generated integer that should be used to drive randomiser input.
 	Seed int64 `toml:"seed"`
+
+	// Version is a version identifier of the form YYYYMMDD, used to check whether the plan format has changed.
+	Version uint32 `toml:"version"`
 }
 
 // NewHeader produces a new header with a seed and creation time initialised from the current time.
@@ -29,7 +46,15 @@ func NewHeader(seed int64) *Header {
 	if seed == UseDateSeed {
 		seed = now.UnixNano()
 	}
-	return &Header{Creation: now, Seed: seed}
+	return &Header{Creation: now, Seed: seed, Version: CurrentVer}
+}
+
+// CheckVersion checks to see if this header's plan version is compatible with this tool's version.
+func (h Header) CheckVersion() error {
+	if h.Version != CurrentVer {
+		return fmt.Errorf("%w: plan version: %d; tool version: %d", ErrVersionMismatch, h.Version, CurrentVer)
+	}
+	return nil
 }
 
 // Rand creates a random number generator using this Header's seed.
