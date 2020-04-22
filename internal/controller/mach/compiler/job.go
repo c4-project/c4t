@@ -9,8 +9,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"time"
+
+	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
@@ -72,7 +75,7 @@ func (j *Job) compileSubject(ctx context.Context, s *subject.Named) error {
 }
 
 func (j *Job) runCompiler(ctx context.Context, sp subject.CompileFileset, h subject.Harness) (subject.CompileResult, error) {
-	logf, err := os.Create(sp.Log)
+	logf, err := j.openLogFile(sp.Log)
 	if err != nil {
 		return subject.CompileResult{}, err
 	}
@@ -88,6 +91,13 @@ func (j *Job) runCompiler(ctx context.Context, sp subject.CompileFileset, h subj
 
 	// We could close the log file here, but we want fatal compiler errors to take priority over log file close errors.
 	return j.makeCompileResult(sp, start, mostRelevantError(rerr, lerr, tctx.Err()))
+}
+
+func (j *Job) openLogFile(l string) (io.WriteCloser, error) {
+	if ystring.IsBlank(l) {
+		return iohelp.DiscardCloser(), nil
+	}
+	return os.Create(l)
 }
 
 func (j *Job) compileJob(h subject.Harness, sp subject.CompileFileset) job.Compile {

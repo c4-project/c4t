@@ -38,7 +38,7 @@ type Config struct {
 // Compiler collects all test-relevant information about a compiler.
 type Compiler struct {
 	// SelectedMOpt refers to an architecture tuning level chosen using the compiler's configured march selection.
-	SelectedMOpt string `toml:"selected_march,optempty"`
+	SelectedMOpt string `toml:"selected_mopt,optempty"`
 	// SelectedOpt refers to an optimisation level chosen using the compiler's configured optimisation selection.
 	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty"`
 

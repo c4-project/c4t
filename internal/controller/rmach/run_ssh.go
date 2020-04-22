@@ -7,7 +7,6 @@ package rmach
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -87,10 +86,9 @@ func makeSSHWaiter(eg *errgroup.Group, r *SSHRunner, ctx context.Context) {
 func (r *SSHRunner) Wait() error {
 	err := r.eg.Wait()
 
-	// These errors signify that the SSH waiter gave up on the SSH context, in which case it might not have yet closed.
-	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-		_ = r.session.Close()
-	}
+	// I'm unsure as to whether a session close errors if the session has been waited on;
+	// hence why this error is currently unhandled.
+	_ = r.session.Close()
 
 	return err
 }
