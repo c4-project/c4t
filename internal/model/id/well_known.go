@@ -66,7 +66,12 @@ var (
 	ArchPPC = ID{[]string{ArchFamilyPPC}}
 	// ArchPPC64LE is the ACT architecture ID for PowerPC64LE.
 	ArchPPC64LE = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE}}
-
+	// ArchPPCPOWER7 is the ACT architecture ID for POWER7.
+	ArchPPCPOWER7 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER7}}
+	// ArchPPCPOWER8 is the ACT architecture ID for POWER8.
+	ArchPPCPOWER8 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER8}}
+	// ArchPPCPOWER9 is the ACT architecture ID for POWER9.
+	ArchPPCPOWER9 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER9}}
 	/*
 		KnownArches = []ID{
 			ArchX86, ArchX8664, ArchX86Skylake,

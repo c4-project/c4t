@@ -125,7 +125,7 @@ func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 		nErrors uint
 	)
 	for {
-		if err := i.pass(ctx, iter, sc); err != nil {
+		if err := i.iterate(ctx, iter, sc); err != nil {
 			// This serves to stop the tester if we get stuck in a rapid failure loop on a particular machine.
 			// TODO(@MattWindsor91): ideally this should be timing the gap between errors, so that we stop if there
 			// are too many errors happening too quickly.
@@ -144,8 +144,8 @@ func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 	}
 }
 
-// pass performs one iteration of the main testing loop (number iter) for one machine.
-func (i *Instance) pass(ctx context.Context, iter uint64, sc *StageConfig) error {
+// iterate performs one iteration of the main testing loop (number iter) for one machine.
+func (i *Instance) iterate(ctx context.Context, iter uint64, sc *StageConfig) error {
 	var (
 		p   *plan.Plan
 		err error

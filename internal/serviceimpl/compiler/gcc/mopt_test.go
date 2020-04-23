@@ -29,6 +29,9 @@ func TestDefaultMOpts(t *testing.T) {
 		"arm8":         {in: id.ArchArm8, out: []string{"arch=armv8-a", "arch=armv7-a"}},
 		"armcortexa72": {in: id.ArchArmCortexA72, out: []string{"cpu=cortex-a72", "arch=armv8-a", "arch=armv7-a"}},
 		"ppc64le":      {in: id.ArchPPC64LE, out: []string{"", "cpu=native", "cpu=powerpc64le"}},
+		"power9":       {in: id.ArchPPCPOWER9, out: []string{"", "cpu=native", "cpu=powerpc64le", "cpu=power7", "cpu=power8", "cpu=power9"}},
+		"power8":       {in: id.ArchPPCPOWER8, out: []string{"", "cpu=native", "cpu=powerpc64le", "cpu=power7", "cpu=power8"}},
+		"power7":       {in: id.ArchPPCPOWER7, out: []string{"", "cpu=native", "cpu=powerpc64le", "cpu=power7"}},
 	}
 
 	for name, c := range cases {
