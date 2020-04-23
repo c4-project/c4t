@@ -14,8 +14,6 @@ import (
 
 // sparkset contains the sparklines for a machine.
 type sparkset struct {
-	// runLine is a sparkline tracking run time.
-	runLine *sparkline.SparkLine
 	// statusLines contains one sparkline for each status.
 	// (This _includes_ StatusUnknown to simplify calculations later, but we don't display it as a line.)
 	statusLines [subject.NumStatus]*sparkline.SparkLine
@@ -26,12 +24,6 @@ func newSparkset() (*sparkset, error) {
 		s   sparkset
 		err error
 	)
-
-	if s.runLine, err = sparkline.New(
-		sparkline.Color(colourOk), sparkline.Label("Run time"),
-	); err != nil {
-		return nil, err
-	}
 
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
 		if s.statusLines[i], err = sparkline.New(
@@ -44,7 +36,7 @@ func newSparkset() (*sparkset, error) {
 }
 
 func (s *sparkset) sparkLines() []*sparkline.SparkLine {
-	return append(s.statusLines[subject.StatusOk:], s.runLine)
+	return s.statusLines[subject.StatusOk:]
 }
 
 func (s *sparkset) grid() []grid.Element {
