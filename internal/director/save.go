@@ -6,8 +6,6 @@
 package director
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
@@ -132,33 +130,20 @@ func (s *Save) tarSubjectToPath(sub subject.Subject, tarpath string) error {
 	if err != nil {
 		return fmt.Errorf("create %s: %w", tarpath, err)
 	}
-	gzw := gzip.NewWriter(tarfile)
-	tarw := tar.NewWriter(gzw)
-
-	werr := s.tarSubjectToWriter(sub, tarw)
-	terr := tarw.Close()
-	gerr := gzw.Close()
-
-	if werr != nil {
-		return werr
-	}
-	if terr != nil {
-		return fmt.Errorf("closing tar: %w", terr)
-	}
-	if gerr != nil {
-		return fmt.Errorf("closing gzip: %w", gerr)
-	}
-	return nil
+	tgz := NewTGZWriter(tarfile)
+	werr := s.tarSubjectToWriter(sub, tgz)
+	cerr := tgz.Close()
+	return iohelp.FirstError(werr, cerr)
 }
 
-func (s *Save) tarSubjectToWriter(sub subject.Subject, tarw *tar.Writer) error {
+func (s *Save) tarSubjectToWriter(sub subject.Subject, tgz *TGZWriter) error {
 	fs, err := filesToTar(sub)
 	if err != nil {
 		return err
 	}
 	for wpath, norm := range fs {
 		rpath := norm.Original
-		if err := s.tarFileToWriter(rpath, wpath, tarw); err != nil {
+		if err := s.rescueNotExistError(tgz.TarFile(rpath, wpath), rpath); err != nil {
 			return fmt.Errorf("archiving %q: %w", rpath, err)
 		}
 	}
@@ -173,47 +158,10 @@ func filesToTar(s subject.Subject) (map[string]normalise.Normalisation, error) {
 	return n.Mappings, nil
 }
 
-// tarFileToWriter tars the file at rpath to wpath within the tar archive represented by tarw.
-// If rpath is empty, no tarring occurs.
-func (s *Save) tarFileToWriter(rpath, wpath string, tarw *tar.Writer) error {
-	if rpath == "" {
-		return nil
-	}
-
-	hdr, err := tarFileHeader(rpath, wpath)
-	if err != nil {
-		return s.rescueNotExistError(err, rpath)
-	}
-	if err := tarw.WriteHeader(hdr); err != nil {
-		return fmt.Errorf("writing header: %w", err)
-	}
-	f, err := os.Open(rpath)
-	if err != nil {
-		return fmt.Errorf("opening %s: %w", rpath, err)
-	}
-	if _, err = iohelp.CopyCloseSrc(tarw, f); err != nil {
-		return fmt.Errorf("archiving %s: %w", rpath, err)
-	}
-	return nil
-}
-
 func (s *Save) rescueNotExistError(err error, rpath string) error {
 	if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
 	s.Logger.Println("file missing when archiving error:", rpath)
 	return nil
-}
-
-func tarFileHeader(rpath, wpath string) (*tar.Header, error) {
-	info, err := os.Stat(rpath)
-	if err != nil {
-		return nil, fmt.Errorf("can't stat %s: %w", rpath, err)
-	}
-	hdr, err := tar.FileInfoHeader(info, "")
-	if err != nil {
-		return nil, fmt.Errorf("can't get header for %s: %w", rpath, err)
-	}
-	hdr.Name = wpath
-	return hdr, nil
 }
