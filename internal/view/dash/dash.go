@@ -9,6 +9,7 @@ package dash
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/mum4k/termdash/linestyle"
 
@@ -31,6 +32,7 @@ import (
 type Dash struct {
 	container *container.Container
 	term      terminalapi.Terminal
+	startTime *text.Text
 	log       *text.Text
 	resultLog *ResultLog
 
@@ -77,6 +79,14 @@ func New(mids []id.ID) (*Dash, error) {
 		return nil, err
 	}
 
+	s, err := text.New(text.DisableScrolling())
+	if err != nil {
+		return nil, err
+	}
+	if err := s.Write(time.Now().Format(time.Stamp)); err != nil {
+		return nil, err
+	}
+
 	x, err := text.New(text.RollContent(), text.WrapAtWords())
 	if err != nil {
 		return nil, err
@@ -94,7 +104,16 @@ func New(mids []id.ID) (*Dash, error) {
 
 	logs := container.SplitHorizontal(
 		container.Top(
-			container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(x),
+			container.SplitHorizontal(
+				container.Top(
+					container.Border(linestyle.Double), container.BorderTitle("Run Start"),
+					container.PlaceWidget(s),
+				),
+				container.Bottom(
+					container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(x),
+				),
+				container.SplitFixed(3),
+			),
 		),
 		container.Bottom(
 			container.Border(linestyle.Double), container.BorderTitle("Results Log"), container.PlaceWidget(rl.log),
@@ -117,6 +136,7 @@ func New(mids []id.ID) (*Dash, error) {
 		term:      t,
 		log:       x,
 		resultLog: rl,
+		startTime: s,
 		machines:  obs,
 	}
 	return &d, nil
