@@ -74,53 +74,38 @@ func countNewlines(sp string) uint {
 
 // New constructs a dashboard for the given machine IDs.
 func New(mids []id.ID) (*Dash, error) {
-	t, err := tcell.New()
-	if err != nil {
-		return nil, err
-	}
-
-	s, err := text.New(text.DisableScrolling())
-	if err != nil {
-		return nil, err
-	}
-	if err := s.Write(time.Now().Format(time.Stamp)); err != nil {
-		return nil, err
-	}
-
-	x, err := text.New(text.RollContent(), text.WrapAtWords())
-	if err != nil {
-		return nil, err
-	}
-
-	rl, err := NewResultLog()
-	if err != nil {
-		return nil, err
-	}
-
-	obs, g, err := makeMachineGrid(mids, rl)
-	if err != nil {
-		return nil, err
-	}
-
-	logs := container.SplitHorizontal(
-		container.Top(
-			container.SplitHorizontal(
-				container.Top(
-					container.Border(linestyle.Double), container.BorderTitle("Run Start"),
-					container.PlaceWidget(s),
-				),
-				container.Bottom(
-					container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(x),
-				),
-				container.SplitFixed(3),
-			),
-		),
-		container.Bottom(
-			container.Border(linestyle.Double), container.BorderTitle("Results Log"), container.PlaceWidget(rl.log),
-		),
+	var (
+		d   Dash
+		err error
 	)
 
-	c, err := container.New(t,
+	if d.term, err = tcell.New(); err != nil {
+		return nil, err
+	}
+
+	if d.startTime, err = text.New(text.DisableScrolling()); err != nil {
+		return nil, err
+	}
+	if err := d.startTime.Write(time.Now().Format(time.Stamp)); err != nil {
+		return nil, err
+	}
+
+	if d.log, err = text.New(text.RollContent(), text.WrapAtWords()); err != nil {
+		return nil, err
+	}
+
+	if d.resultLog, err = NewResultLog(); err != nil {
+		return nil, err
+	}
+
+	var g []container.Option
+	if d.machines, g, err = makeMachineGrid(mids, d.resultLog); err != nil {
+		return nil, err
+	}
+
+	logs := makeLogPane(d)
+
+	c, err := container.New(d.term,
 		container.SplitVertical(
 			container.Left(logs),
 			container.Right(g...),
@@ -131,15 +116,28 @@ func New(mids []id.ID) (*Dash, error) {
 		return nil, err
 	}
 
-	d := Dash{
-		container: c,
-		term:      t,
-		log:       x,
-		resultLog: rl,
-		startTime: s,
-		machines:  obs,
-	}
+	d.container = c
 	return &d, nil
+}
+
+func makeLogPane(d Dash) container.Option {
+	return container.SplitHorizontal(
+		container.Top(
+			container.SplitHorizontal(
+				container.Top(
+					container.Border(linestyle.Double), container.BorderTitle("Run Start"),
+					container.PlaceWidget(d.startTime),
+				),
+				container.Bottom(
+					container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(d.log),
+				),
+				container.SplitFixed(3),
+			),
+		),
+		container.Bottom(
+			container.Border(linestyle.Double), container.BorderTitle("Results Log"), container.PlaceWidget(d.resultLog.log),
+		),
+	)
 }
 
 func makeMachineGrid(mids []id.ID, rl *ResultLog) (map[string]*Observer, []container.Option, error) {
