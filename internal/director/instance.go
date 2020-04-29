@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
@@ -270,14 +269,5 @@ func (i *Instance) makeRMachConfig(cobs []remote.CopyObserver, bobs []builder.Ob
 
 // dump dumps a plan p to its expected plan file given the stage name name.
 func (i *Instance) dump(name string, p *plan.Plan) error {
-	fname := i.ScratchPaths.PlanForStage(name)
-	f, err := os.Create(fname)
-	if err != nil {
-		return fmt.Errorf("while opening plan file for %s: %w", name, err)
-	}
-	if err := p.Dump(f); err != nil {
-		_ = f.Close()
-		return fmt.Errorf("while writing plan file for %s: %w", name, err)
-	}
-	return f.Close()
+	return p.DumpFile(i.ScratchPaths.PlanForStage(name))
 }

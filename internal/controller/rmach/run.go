@@ -51,6 +51,7 @@ func (m *RMach) Run(ctx context.Context) (*plan.Plan, error) {
 	}
 
 	np, err := m.runPipework(ctx, rp, ps)
+	// Waiting _should_ close the pipes.
 	werr := m.runner.Wait()
 
 	if err != nil {
@@ -83,7 +84,6 @@ func (m *RMach) runPipework(ctx context.Context, rp *plan.Plan, ps *remote.Pipes
 		return m.runReplayer(ectx, ps.Stderr)
 	})
 
-	// Waiting _should_ close the pipes.
 	return &p2, eg.Wait()
 }
 

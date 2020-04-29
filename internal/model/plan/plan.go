@@ -8,8 +8,12 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"io"
+	"os"
 	"sort"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
@@ -61,6 +65,17 @@ func (p *Plan) Dump(w io.Writer) error {
 	enc := toml.NewEncoder(w)
 	enc.Indent = "  "
 	return enc.Encode(p)
+}
+
+// DumpFile dumps plan p to the file named by path.
+func (p *Plan) DumpFile(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("creating plan file: %w", err)
+	}
+	err = p.Dump(f)
+	cerr := f.Close()
+	return iohelp.FirstError(err, cerr)
 }
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.

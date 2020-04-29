@@ -95,13 +95,7 @@ func (s *Save) writePlan(st subject.Status, p *plan.Plan, creation time.Time) er
 	if err != nil {
 		return err
 	}
-	f, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	err = p.Dump(f)
-	cerr := f.Close()
-	return iohelp.FirstError(err, cerr)
+	return p.DumpFile(path)
 }
 
 func (s *Save) tarSubjects(st subject.Status, corp corpus.Corpus, creation time.Time) error {
