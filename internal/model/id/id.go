@@ -124,6 +124,18 @@ func (i ID) Uncons() (hd string, tl ID, ok bool) {
 	return hd, tl, true
 }
 
+// Unsnoc splits an ID into a tail tag and head of zero or more preceding tags.
+// If the ID is empty, ok is false, and hd and tl are unspecified.
+func (i ID) Unsnoc() (hd ID, tl string, ok bool) {
+	if i.IsEmpty() {
+		return hd, tl, false
+	}
+	end := len(i.tags) - 1
+	hd = ID{tags: i.tags[:end]}
+	tl = i.tags[end]
+	return hd, tl, true
+}
+
 // Triple splits this ID into three parts: a family tag, a variant tag, and a subvariant identifier.
 func (i ID) Triple() (f, v string, s ID) {
 	ri := i

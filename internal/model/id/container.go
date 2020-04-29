@@ -63,6 +63,26 @@ func MapGlob(m interface{}, glob ID) (interface{}, error) {
 	return nm.Interface(), nil
 }
 
+// LookupPrefix looks up id in map m by starting from the id itself, and progressively taking a smaller and smaller
+// prefix until the id runs out or m has a value.
+// If a lookup succeeded, LookupPrefix returns the matched key as key, the value as val, and true as ok;
+// else, it returns false, and the other two values are undefined.
+func LookupPrefix(m interface{}, id ID) (key ID, val interface{}, ok bool) {
+	mv, _, err := stringhelp.CheckMap(m)
+	if err != nil {
+		return ID{}, nil, false
+	}
+
+	key = id
+	for ok = true; ok; key, _, ok = key.Unsnoc() {
+		vv := mv.MapIndex(reflect.ValueOf(key.String()))
+		if vv.Kind() != reflect.Invalid {
+			return key, vv.Interface(), true
+		}
+	}
+	return ID{}, nil, ok
+}
+
 func tryFromValue(v reflect.Value) (ID, error) {
 	return TryFromString(v.String())
 }

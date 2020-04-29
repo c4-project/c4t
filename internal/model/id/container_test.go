@@ -86,6 +86,27 @@ func ExampleMapGlob() {
 	// foo.bar.baz 2
 }
 
+func ExampleLookupPrefix() {
+	c := map[string]int{
+		"foo":     1,
+		"bar":     2,
+		"bar.baz": 3,
+	}
+
+	k1, v1, _ := id.LookupPrefix(c, id.FromString("bar.baz"))
+	k2, v2, _ := id.LookupPrefix(c, id.FromString("bar.foobaz"))
+	k3, v3, _ := id.LookupPrefix(c, id.FromString("foo.bar.baz"))
+
+	fmt.Printf("matched bar.baz to %s (%d)\n", k1, v1)
+	fmt.Printf("matched bar.foobaz to %s (%d)\n", k2, v2)
+	fmt.Printf("matched foo.bar.baz to %s (%d)\n", k3, v3)
+
+	// Output:
+	// matched bar.baz to bar.baz (3)
+	// matched bar.foobaz to bar (2)
+	// matched foo.bar.baz to foo (1)
+}
+
 // TestMapGlob_errors tests MapKeys's error handling.
 func TestMapGlob_errors(t *testing.T) {
 	t.Parallel()

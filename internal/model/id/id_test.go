@@ -83,6 +83,23 @@ func ExampleID_Uncons() {
 	// tail of foo.bar.baz: bar.baz
 }
 
+// ExampleID_Unsnoc is a runnable example for Unsnoc.
+func ExampleID_Unsnoc() {
+	_, _, ok := id.ID{}.Unsnoc()
+	fmt.Println("unsnoc of empty ok?:", ok)
+
+	hd, tl, ok := id.FromString("foo.bar.baz").Unsnoc()
+	fmt.Println("unsnoc of foo.bar.baz ok?:", ok)
+	fmt.Println("head of foo.bar.baz:", hd)
+	fmt.Println("tail of foo.bar.baz:", tl)
+
+	// Output:
+	// unsnoc of empty ok?: false
+	// unsnoc of foo.bar.baz ok?: true
+	// head of foo.bar.baz: foo.bar
+	// tail of foo.bar.baz: baz
+}
+
 // ExampleID_Triple is a runnable example for Triple.
 func ExampleID_Triple() {
 	f, v, s := id.ID{}.Triple()
