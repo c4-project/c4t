@@ -8,6 +8,8 @@ package stdflag
 import (
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/config"
 	// It's 2020, and tools _still_ can't understand the use of 'v2' unless you do silly hacks like this.
@@ -67,7 +69,7 @@ func OutDirFromCli(ctx *c.Context) string {
 	return ctx.Path(FlagOutDir)
 }
 
-// PlanFileCliFlag sets up a standard cli flag for loading a plan file into f.
+// PlanFileCliFlag sets up a standard cli flag for loading a plan file.
 func PlanFileCliFlag() c.Flag {
 	return &c.PathFlag{
 		Name:      FlagInputFile,
@@ -79,4 +81,34 @@ func PlanFileCliFlag() c.Flag {
 // PlanFileFromCli retrieves a plan file using the file flag set up by PlanFileCliFlag.
 func PlanFileFromCli(ctx *c.Context) string {
 	return ctx.Path(FlagInputFile)
+}
+
+// CorpusSizeCliFlag sets up a 'target corpus size' flag.
+func CorpusSizeCliFlag() c.Flag {
+	return &c.IntFlag{Name: FlagNum, Value: 0, Usage: usageCorpusSize}
+}
+
+// CorpusSizeFromCli retrieves a plan file using the file flag set up by CorpusSizeCliFlag.
+func CorpusSizeFromCli(ctx *c.Context) int {
+	return ctx.Int(FlagNum)
+}
+
+// SubjectCyclesCliFlag sets up a 'number of cycles' flag.
+func SubjectCyclesCliFlag() c.Flag {
+	return &c.IntFlag{Name: flagSubjectCycles, Value: fuzzer.DefaultSubjectCycles, Usage: usageSubjectCycles}
+}
+
+// SubjectCyclesFromCli retrieves a plan file using the file flag set up by SubjectCyclesCliFlag.
+func SubjectCyclesFromCli(ctx *c.Context) int {
+	return ctx.Int(flagSubjectCycles)
+}
+
+// CPUProfileCliFlag sets up a 'cpu profile dumper' flag.
+func CPUProfileCliFlag() c.Flag {
+	return &c.PathFlag{Name: FlagCPUProfile, Value: "", Usage: usageCPUProfile}
+}
+
+// CPUProfileFromCli retrieves the 'cpu profile dumper' set up by CPUProfileCliFlag.
+func CPUProfileFromCli(ctx *c.Context) string {
+	return ctx.Path(FlagCPUProfile)
 }

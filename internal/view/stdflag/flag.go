@@ -35,6 +35,9 @@ const (
 	FlagCompilerTimeout = "t"
 	flagActDuneExec     = "x"
 
+	// FlagCPUProfile is a standard flag for specifying a CPU profile output.
+	FlagCPUProfile = "cpuprofile"
+
 	FlagSkipCompiler = "skip-compiler"
 	FlagSkipRunner   = "skip-runner"
 
@@ -47,7 +50,6 @@ const (
 	// FlagWorkerCountLong is a long flag for arguments that set a worker count.
 	FlagWorkerCountLong = "num-workers"
 
-	usageConfFile    = "The `file` from which to load the tester configuration."
 	usageActConfFile = "read ACT config from this `file`"
 	usageCorpusSize  = "`number` of corpus files to select for this test plan;\n" +
 		"if non-positive, the planner will use all viable provided corpus files"
@@ -55,6 +57,7 @@ const (
 	usageOutDir        = "`directory` to which outputs will be written"
 	usagePlanFile      = "read from this plan `file` instead of stdin"
 	usageSubjectCycles = "number of `cycles` to run for each subject in the corpus"
+	usageCPUProfile    = "`file` into which we should dump pprof information"
 )
 
 // CorpusSizeFlag sets up a 'target corpus size' flag on fs.
@@ -76,11 +79,6 @@ func OutDirFlag(fs *flag.FlagSet, out *string, defaultdir string) {
 func ActRunnerFlags(fs *flag.FlagSet, a *act.Runner) {
 	fs.StringVar(&a.ConfFile, flagActConfFile, "", usageActConfFile)
 	fs.BoolVar(&a.DuneExec, flagActDuneExec, false, usageDuneExec)
-}
-
-// ConfFileFlag sets up a standard argument on fs for loading a configuration file into f.
-func ConfFileFlag(fs *flag.FlagSet) *string {
-	return fs.String(flagConfFile, "", usageConfFile)
 }
 
 // PlanFileFlag sets up a standard argument on fs for loading a plan file into f.

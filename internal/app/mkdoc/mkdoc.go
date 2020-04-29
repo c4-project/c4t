@@ -19,6 +19,7 @@ import (
 	c "github.com/urfave/cli/v2"
 )
 
+// App creates the act-tester-mkdoc app.
 func App(outw, errw io.Writer) *c.App {
 	return &c.App{
 		Name:  "act-tester-mkdoc",
