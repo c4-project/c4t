@@ -19,6 +19,9 @@ import (
 
 // Config collects the part of a compiler's specification that comes from the act-tester configuration.
 type Config struct {
+	// Disabled specifies whether this compiler has been disabled.
+	Disabled bool `toml:"disabled,omitempty"`
+
 	// Style is the declared style of the compile.
 	Style id.ID `toml:"style"`
 

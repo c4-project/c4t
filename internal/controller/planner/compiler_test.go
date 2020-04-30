@@ -45,6 +45,11 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 			Style: id.CStyleGCC,
 			Arch:  id.ArchArmCortexA72,
 		},
+		"gccnt": {
+			Disabled: true,
+			Style:    id.CStyleGCC,
+			Arch:     id.ArchArmCortexA72,
+		},
 		"clang": {
 			Style: id.CStyleGCC,
 			Arch:  id.ArchArm8,
@@ -91,12 +96,12 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 
 	ml.On("ListCompilers", ctx, mid).Return(cfgs, nil).Once()
 
-	mo.On("OnCompilerPlanStart", len(cfgs)).Return().Once()
+	mo.On("OnCompilerPlanStart", ncfgs-1).Return().Once()
 	mo.On("OnCompilerPlanFinish").Return().Once()
 
-	mi.On("DefaultMOpts", mock.Anything).Return(dms, nil).Times(ncfgs)
-	mi.On("DefaultOptLevels", mock.Anything).Return(dls, nil).Times(ncfgs)
-	mi.On("OptLevels", mock.Anything).Return(ols, nil).Times(ncfgs)
+	mi.On("DefaultMOpts", mock.Anything).Return(dms, nil).Times(ncfgs - 1)
+	mi.On("DefaultOptLevels", mock.Anything).Return(dls, nil).Times(ncfgs - 1)
+	mi.On("OptLevels", mock.Anything).Return(ols, nil).Times(ncfgs - 1)
 
 	keys, _ := stringhelp.MapKeys(cfgs)
 	sort.Strings(keys)
@@ -104,8 +109,8 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	mo.On("OnCompilerPlan", mock.MatchedBy(func(c compiler.Named) bool {
 		cs := c.ID.String()
 		i := sort.SearchStrings(keys, cs)
-		return i < ncfgs && keys[i] == cs
-	})).Return().Times(ncfgs)
+		return i < ncfgs && keys[i] == cs && !c.Disabled
+	})).Return().Times(ncfgs - 1)
 
 	cp := planner.CompilerPlanner{
 		Lister:    &ml,
@@ -131,6 +136,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 		if c.SelectedOpt != nil {
 			checkSelection(t, "Opt", n, c.SelectedOpt.Name, dls.Slice(), c.Opt)
 		}
+		assert.Falsef(t, c.Disabled, "picked up disabled compiler %s", n)
 	}
 }
 

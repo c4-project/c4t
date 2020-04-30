@@ -90,24 +90,49 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compile
 		return nil, fmt.Errorf("listing compilers: %w", err)
 	}
 
-	OnCompilerPlanStart(len(cfgs), c.Observers...)
+	nenabled := resolveDisabled(cfgs)
+	OnCompilerPlanStart(nenabled, c.Observers...)
 
 	cmps := make(map[string]compiler.Compiler, len(cfgs))
 	for n, cfg := range cfgs {
-		nid, err := id.TryFromString(n)
+		nc, err := c.maybePlanCompiler(cmps, n, cfg)
 		if err != nil {
-			return nil, fmt.Errorf("%s not a valid ID: %w", n, err)
+			return nil, err
 		}
-		if cmps[n], err = c.planCompiler(cfg); err != nil {
-			return nil, fmt.Errorf("planning compiler %s/%s: %w", c.MachineID, n, err)
+		if nc != nil {
+			OnCompilerPlan(*nc, c.Observers...)
 		}
-
-		OnCompilerPlan(*cmps[n].AddName(nid), c.Observers...)
 	}
 
 	OnCompilerPlanFinish(c.Observers...)
 
 	return cmps, nil
+}
+
+func resolveDisabled(cfgs map[string]compiler.Config) (nenabled int) {
+	// TODO(@MattWindsor91): automatic disabling
+	for _, cfg := range cfgs {
+		if !cfg.Disabled {
+			nenabled++
+		}
+	}
+	return nenabled
+}
+
+func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Compiler, n string, cfg compiler.Config) (*compiler.Named, error) {
+	if cfg.Disabled {
+		return nil, nil
+	}
+
+	nid, err := id.TryFromString(n)
+	if err != nil {
+		return nil, fmt.Errorf("%s not a valid ID: %w", n, err)
+	}
+	if into[n], err = c.planCompiler(cfg); err != nil {
+		return nil, fmt.Errorf("planning compiler %s/%s: %w", c.MachineID, n, err)
+	}
+
+	return into[n].AddName(nid), nil
 }
 
 func (c *CompilerPlanner) planCompiler(cfg compiler.Config) (compiler.Compiler, error) {
