@@ -57,6 +57,8 @@ func liftInitError(err error) error {
 
 // Direct runs the director d.
 func (d *Director) Direct(ctx context.Context) error {
+	d.config.Quantities.Log(d.l)
+
 	d.l.Println("making directories")
 	if err := d.config.Paths.Prepare(); err != nil {
 		return err

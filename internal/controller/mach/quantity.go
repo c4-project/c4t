@@ -6,6 +6,8 @@
 package mach
 
 import (
+	"log"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/runner"
 )
@@ -16,6 +18,14 @@ type QuantitySet struct {
 	Compiler compiler.QuantitySet `toml:"compiler,omitzero"`
 	// Runner is the quantity set for the runner.
 	Runner runner.QuantitySet `toml:"runner,omitzero"`
+}
+
+// Log logs q to l.
+func (q *QuantitySet) Log(l *log.Logger) {
+	l.Println("[Compiler]")
+	q.Compiler.Log(l)
+	l.Println("[Runner]")
+	q.Runner.Log(l)
 }
 
 // Override overrides the quantities in this set with any new quantities supplied in new.

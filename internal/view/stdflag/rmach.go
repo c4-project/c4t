@@ -78,6 +78,7 @@ func MachConfigCliFlags() []c.Flag {
 			Value:   1 * time.Minute,
 			Usage:   "a `timeout` to apply to each run",
 		},
+		// TODO(@MattWindsor91): split into compile worker and run worker
 		&c.IntFlag{
 			Name:    FlagWorkerCountLong,
 			Aliases: []string{FlagWorkerCount},

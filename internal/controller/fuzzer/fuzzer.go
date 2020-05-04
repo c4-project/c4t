@@ -139,7 +139,7 @@ func (f *Fuzzer) fuzzInner(ctx context.Context, rng *rand.Rand) (corpus.Corpus, 
 
 	m := builder.Manifest{Name: "fuzz", NReqs: nfuzzes}
 	bc := builder.Config{Manifest: m, Observers: f.conf.Observers}
-	return builder.ParBuild(ctx, f.plan.Corpus, bc, func(ctx context.Context, s subject.Named, ch chan<- builder.Request) error {
+	return builder.ParBuild(ctx, f.conf.Quantities.NWorkers, f.plan.Corpus, bc, func(ctx context.Context, s subject.Named, ch chan<- builder.Request) error {
 		return f.makeJob(s, seeds[s.Name], ch).Fuzz(ctx)
 	})
 }

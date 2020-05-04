@@ -8,7 +8,7 @@ package runner
 import (
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/helper/confhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/timeout"
 )
@@ -26,7 +26,7 @@ type QuantitySet struct {
 
 // Log logs this quantity set to l.
 func (q *QuantitySet) Log(l *log.Logger) {
-	l.Println("running across", iohelp.PluralQuantity(q.NWorkers, "worker", "", "s"))
+	confhelp.LogWorkers(l, q.NWorkers)
 	q.Timeout.Log(l)
 }
 

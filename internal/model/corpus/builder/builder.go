@@ -170,14 +170,14 @@ func (b *Builder) rmwSubject(name string, f func(*subject.Subject) error) error 
 // ParBuild runs f in a parallelised manner across the subjects in src.
 // It uses the responses from f in a Builder, and returns the resulting corpus.
 // Note that src may be different from cfg.Init; this is useful when building a new corpus from scratch.
-func ParBuild(ctx context.Context, src corpus.Corpus, cfg Config, f func(context.Context, subject.Named, chan<- Request) error) (corpus.Corpus, error) {
+func ParBuild(ctx context.Context, nworkers int, src corpus.Corpus, cfg Config, f func(context.Context, subject.Named, chan<- Request) error) (corpus.Corpus, error) {
 	b, err := New(cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	var c corpus.Corpus
-	perr := src.Par(ctx, 20,
+	perr := src.Par(ctx, nworkers,
 		func(ctx context.Context, named subject.Named) error {
 			return f(ctx, named, b.SendCh)
 		},

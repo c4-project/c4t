@@ -9,22 +9,17 @@ package lifter
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-
-	"golang.org/x/sync/errgroup"
-
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
@@ -108,50 +103,33 @@ func (l *Lifter) Run(ctx context.Context) (*plan.Plan, error) {
 func (l *Lifter) lift(ctx context.Context) error {
 	l.l.Println("now lifting")
 
-	b, err := builder.New(builder.Config{
+	cfg := builder.Config{
 		Init:      l.plan.Corpus,
 		Observers: l.conf.Observers,
 		Manifest: builder.Manifest{
 			Name:  "lift",
 			NReqs: l.count(),
 		},
-	})
-	if err != nil {
-		return fmt.Errorf("when making builder: %w", err)
 	}
+
 	mrng := l.plan.Header.Rand()
 
-	var lerr error
-	l.plan.Corpus, lerr = l.liftInner(ctx, mrng, b)
-	return lerr
-}
-
-func (l *Lifter) liftInner(ctx context.Context, mrng *rand.Rand, b *builder.Builder) (corpus.Corpus, error) {
-	eg, ectx := errgroup.WithContext(ctx)
-	var lc corpus.Corpus
-	// It's very likely this will be a single element array.
-	for _, a := range l.plan.Arches() {
-		j := l.makeJob(a, mrng, b.SendCh)
-		eg.Go(func() error {
-			return j.Lift(ectx)
-		})
-	}
-	eg.Go(func() error {
-		var err error
-		lc, err = b.Run(ectx)
-		return err
+	var err error
+	// TODO(@MattWindsor91): extract this 20 into configuration.
+	l.plan.Corpus, err = builder.ParBuild(ctx, 20, l.plan.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
+		j := l.makeJob(s, mrng, rq)
+		return j.Lift(ctx)
 	})
-	err := eg.Wait()
-	return lc, err
+	return err
 }
 
-func (l *Lifter) makeJob(a id.ID, mrng *rand.Rand, resCh chan<- builder.Request) Job {
+func (l *Lifter) makeJob(s subject.Named, mrng *rand.Rand, resCh chan<- builder.Request) Job {
 	return Job{
-		Arch:    a,
+		Arches:  l.plan.Arches(),
 		Backend: l.plan.Backend,
 		Paths:   l.conf.Paths,
 		Maker:   l.conf.Maker,
-		Corpus:  l.plan.Corpus,
+		Subject: s,
 		Rng:     rand.New(rand.NewSource(mrng.Int63())),
 		ResCh:   resCh,
 		Stderr:  l.conf.Stderr,

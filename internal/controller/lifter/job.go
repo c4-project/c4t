@@ -19,15 +19,13 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Job is the type of per-architecture lifter jobs.
+// Job is the type of per-subject lifter jobs.
 type Job struct {
-	// Arch is the architecture for which this job is responsible.
-	Arch id.ID
+	// Arches is the list of architectures for which this job is responsible.
+	Arches []id.ID
 
 	// Backend is the backend that this job will use.
 	Backend *service.Backend
@@ -41,8 +39,8 @@ type Job struct {
 	// Stderr is the writer to which harness maker stderr should be redirected.
 	Stderr io.Writer
 
-	// Corpus is the existing corpus that we are trying to lift.
-	Corpus corpus.Corpus
+	// Subject is the subject that we are trying to lift.
+	Subject subject.Named
 
 	// Rng is the random number generator to use for fuzz seeds.
 	Rng *rand.Rand
@@ -57,18 +55,20 @@ func (j *Job) Lift(ctx context.Context) error {
 		return err
 	}
 
-	return j.Corpus.Par(ctx, 20, func(ctx context.Context, s subject.Named) error {
-		return j.liftSubject(ctx, &s)
-	})
+	// TODO(@MattWindsor91): this used to be a parallel loop, but was causing file exhaustion.
+	// Ideally, we'd have a means of parallelism that doesn't inadvertently scale up like this.
+	for _, a := range j.Arches {
+		if err := j.liftArch(ctx, a); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // check does some basic checking on the Job before starting to run it.
 func (j *Job) check() error {
 	if j.Backend == nil {
 		return ErrNoBackend
-	}
-	if j.Corpus == nil {
-		return corpus.ErrNone
 	}
 	if j.Maker == nil {
 		return ErrMakerNil
@@ -77,36 +77,36 @@ func (j *Job) check() error {
 	return nil
 }
 
-func (j *Job) liftSubject(ctx context.Context, s *subject.Named) error {
-	dir, derr := j.Paths.Path(j.Arch, s.Name)
+func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
+	dir, derr := j.Paths.Path(arch, j.Subject.Name)
 	if derr != nil {
 		return fmt.Errorf("when getting subject dir: %w", derr)
 	}
 
-	path, perr := s.BestLitmus()
+	path, perr := j.Subject.BestLitmus()
 	if perr != nil {
 		return perr
 	}
 
 	spec := job.Harness{
 		Backend: j.Backend,
-		Arch:    j.Arch,
+		Arch:    arch,
 		InFile:  path,
 		OutDir:  dir,
 	}
 
 	files, err := j.Maker.MakeHarness(ctx, spec, j.Stderr)
 	if err != nil {
-		return fmt.Errorf("when making harness for %s (arch %s): %w", s.Name, j.Arch.String(), err)
+		return fmt.Errorf("when making harness for %s (arch %s): %w", j.Subject.Name, arch, err)
 	}
 
-	return j.makeBuilderReq(s, dir, files).SendTo(ctx, j.ResCh)
+	return j.makeBuilderReq(arch, dir, files).SendTo(ctx, j.ResCh)
 }
 
-func (j *Job) makeBuilderReq(s *subject.Named, dir string, files []string) builder.Request {
+func (j *Job) makeBuilderReq(arch id.ID, dir string, files []string) builder.Request {
 	return builder.HarnessRequest(
-		s.Name,
-		j.Arch,
+		j.Subject.Name,
+		arch,
 		subject.Harness{Dir: dir, Files: files},
 	)
 }
