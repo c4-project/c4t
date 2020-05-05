@@ -38,7 +38,7 @@ atomic-xchg-statements 2`)
 		},
 	}
 
-	got := Statset{AtomicStatements: make(map[string]int)}
+	var got Statset
 	err := got.Parse(r)
 	require.NoError(t, err)
 	assert.Equal(t, got, want)

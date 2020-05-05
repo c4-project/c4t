@@ -42,6 +42,10 @@ type Statset struct {
 // Parse parses a statistics set from r into this statistics set.
 // Each statistic should be in the form "name value\n".
 func (s *Statset) Parse(r io.Reader) error {
+	if s.AtomicStatements == nil {
+		s.AtomicStatements = make(map[string]int)
+	}
+
 	sc := bufio.NewScanner(r)
 	for sc.Scan() {
 		if err := s.parseLine(sc.Text()); err != nil {
