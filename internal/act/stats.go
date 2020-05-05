@@ -34,6 +34,9 @@ type Statset struct {
 
 	// LiteralBools is the number of Boolean literals (true, false, etc).
 	LiteralBools int
+
+	// AtomicStatements is the number of atomic statements, categorised by type.
+	AtomicStatements map[string]int
 }
 
 // Parse parses a statistics set from r into this statistics set.
@@ -63,13 +66,24 @@ func (s *Statset) parseLine(l string) error {
 }
 
 func (s *Statset) setByName(name string, val int) error {
+	frags := strings.Split(name, "-")
+	switch {
+	case len(frags) == 3 && frags[0] == "atomic" && frags[2] == "statements":
+		s.AtomicStatements[frags[1]] = val
+	case len(frags) == 2 && frags[0] == "literal" && frags[1] == "bools":
+		s.LiteralBools = val
+	case len(frags) == 1:
+		return s.setBySimpleName(name, val)
+	}
+	return nil
+}
+
+func (s *Statset) setBySimpleName(name string, val int) error {
 	switch name {
 	case "threads":
 		s.Threads = val
 	case "returns":
 		s.Returns = val
-	case "literal-bools":
-		s.LiteralBools = val
 	default:
 		return fmt.Errorf("%w: unknown stat %s", ErrStatsetParse, name)
 	}

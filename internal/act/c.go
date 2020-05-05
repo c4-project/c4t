@@ -24,6 +24,7 @@ func (a *Runner) ProbeSubject(ctx context.Context, litmus string) (subject.Named
 	}
 
 	var st Statset
+	st.AtomicStatements = make(map[string]int)
 	if err := a.DumpStats(ctx, &st, litmus); err != nil {
 		return subject.Named{}, fmt.Errorf("stats read on %s failed: %w", litmus, err)
 	}
