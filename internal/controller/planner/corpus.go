@@ -9,6 +9,8 @@ import (
 	"context"
 	"math/rand"
 
+	"github.com/1set/gut/yos"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"golang.org/x/sync/errgroup"
@@ -25,14 +27,17 @@ type SubjectProber interface {
 }
 
 func (p *Planner) planCorpus(ctx context.Context) error {
+	files, err := expandFiles(p.fs)
+	if err != nil {
+		return err
+	}
 	c := CorpusPlanner{
-		Files:     p.fs,
+		Files:     files,
 		Prober:    p.conf.Source.SProbe,
 		Observers: p.conf.Observers.Corpus,
 		Rng:       p.rng,
 		Size:      p.conf.CorpusSize,
 	}
-	var err error
 	p.plan.Corpus, err = c.Plan(ctx)
 	return err
 }
@@ -103,6 +108,36 @@ func (p *CorpusPlanner) probeInner(ctx context.Context, ch chan<- builder.Reques
 		}
 	}
 	return nil
+}
+
+func expandFiles(in []string) ([]string, error) {
+	files := make([]string, 0, len(in))
+	var err error
+	for _, f := range in {
+		if files, err = expandFile(f, files); err != nil {
+			return nil, err
+		}
+	}
+	return files, nil
+}
+
+func expandFile(f string, curr []string) ([]string, error) {
+	if yos.ExistDir(f) {
+		return expandDir(f, curr)
+	}
+	// Delegate handling of non-files to the point where we actually open them.
+	return append(curr, f), nil
+}
+
+func expandDir(d string, curr []string) ([]string, error) {
+	ents, err := yos.ListMatch(d, yos.ListIncludeFile, "*.litmus")
+	if err != nil {
+		return nil, err
+	}
+	for _, ent := range ents {
+		curr = append(curr, ent.Path)
+	}
+	return curr, nil
 }
 
 func (p *CorpusPlanner) probeSubject(ctx context.Context, f string, ch chan<- builder.Request) error {
