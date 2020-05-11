@@ -28,6 +28,7 @@ compiler {{ $cname }} ({{ index $compilers $cname }}):
 
 	tmplByStatus = `
 {{- range $status, $corpus := .Analysis.ByStatus -}}
+{{- if not $status.IsOk -}}
 {{- if $corpus -}}
 status {{ $status }}:
 {{ range $sname, $subject := $corpus }}  subject {{ $sname }}:
@@ -38,6 +39,7 @@ status {{ $status }}:
 
 {{- if .Obs -}}{{- template "obs" .Obs -}}{{- end -}}
 
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
