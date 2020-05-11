@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package collate
+package analysis
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
@@ -14,8 +14,8 @@ type Sourced struct {
 	// Run contains information about the run that produced this collation.
 	Run run.Run
 
-	// Collation is the collation proper.
-	Collation *Collation
+	// Analysis is the collation proper.
+	Collation *Analysis
 }
 
 // String formats a log header for this sourced collation.

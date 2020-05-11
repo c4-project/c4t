@@ -6,7 +6,7 @@
 package dash
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"
@@ -48,7 +48,7 @@ func (s *sparkset) grid() []grid.Element {
 	return els
 }
 
-func (s *sparkset) sparkCollation(c *collate.Collation) error {
+func (s *sparkset) sparkCollation(c *analysis.Analysis) error {
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
 		if err := s.statusLines[i].Add([]int{len(c.ByStatus[i])}); err != nil {
 			return err

@@ -10,7 +10,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
@@ -126,15 +126,15 @@ func (o *Observer) OnIteration(r run.Run) {
 }
 
 // OnCollation observes a collation by adding failure/timeout/flag rates to the sparklines.
-func (o *Observer) OnCollation(c *collate.Collation) {
+func (o *Observer) OnCollation(c *analysis.Analysis) {
 	terr := o.tally.tallyCollation(c)
 	serr := o.sparks.sparkCollation(c)
 	lerr := o.logCollation(c)
 	o.logError(iohelp.FirstError(terr, serr, lerr))
 }
 
-func (o *Observer) logCollation(c *collate.Collation) error {
-	sc := collate.Sourced{
+func (o *Observer) logCollation(c *analysis.Analysis) error {
+	sc := analysis.Sourced{
 		Run:       o.run.last,
 		Collation: c,
 	}

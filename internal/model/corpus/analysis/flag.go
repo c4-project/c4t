@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package collate
+package analysis
 
 // flag programmatically represents, as a bitwise flag set, the possible classifications for a subject in a collation.
 type flag int

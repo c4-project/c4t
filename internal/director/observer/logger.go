@@ -17,15 +17,15 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
 // BasicLogger is an interface for things that can use the Log func.
 type BasicLogger interface {
 	// LogHeader should log the String() of the argument collation.
-	LogHeader(collate.Sourced) error
+	LogHeader(analysis.Sourced) error
 
 	// LogBucketHeader should log a header for the collation bucket with the given status.
 	LogBucketHeader(subject.Status) error
@@ -40,7 +40,7 @@ type Writer struct {
 }
 
 // LogHeader logs a collation header to the writer.
-func (w Writer) LogHeader(s collate.Sourced) error {
+func (w Writer) LogHeader(s analysis.Sourced) error {
 	_, err := fmt.Fprintln(w.Writer, &s)
 	return err
 }
@@ -58,14 +58,14 @@ func (w Writer) LogBucketEntry(sname string) error {
 }
 
 // Log logs s to b.
-func Log(b BasicLogger, s collate.Sourced) error {
+func Log(b BasicLogger, s analysis.Sourced) error {
 	if err := b.LogHeader(s); err != nil {
 		return err
 	}
 	return logBuckets(b, s)
 }
 
-func logBuckets(b BasicLogger, s collate.Sourced) error {
+func logBuckets(b BasicLogger, s analysis.Sourced) error {
 	sc := s.Collation.ByStatus
 	for i := subject.FirstBadStatus; i < subject.NumStatus; i++ {
 		if err := logBucket(b, i, sc[i]); err != nil {
@@ -95,14 +95,14 @@ type Logger struct {
 	// out is the writer to use for logging collations.
 	out io.Writer
 	// collCh is used to send sourced collations for logging.
-	collCh chan collate.Sourced
+	collCh chan analysis.Sourced
 	// compCh is used to send sourced collations for logging.
 	compCh chan compilerSet
 }
 
 // NewLogger constructs a new LogObserver writing into w, ranging over machine IDs ids.
 func NewLogger(w io.Writer) *Logger {
-	return &Logger{out: w, collCh: make(chan collate.Sourced), compCh: make(chan compilerSet)}
+	return &Logger{out: w, collCh: make(chan analysis.Sourced), compCh: make(chan compilerSet)}
 }
 
 // Run runs the log observer.
@@ -131,7 +131,7 @@ func (j *Logger) Instance(id.ID) (Instance, error) {
 }
 
 // logCollation logs s to this Logger's file.
-func (j *Logger) logCollation(s collate.Sourced) error {
+func (j *Logger) logCollation(s analysis.Sourced) error {
 	return Log(Writer{j.out}, s)
 }
 
@@ -156,7 +156,7 @@ type InstanceLogger struct {
 	// compCh is the channel used to send compiler sets for logging.
 	compCh chan<- compilerSet
 	// collCh is the channel used to send sourced collations for logging.
-	collCh chan<- collate.Sourced
+	collCh chan<- analysis.Sourced
 	// run contains information about the current iteration.
 	run run.Run
 	// compilers stores the current, if any, compiler set.
@@ -200,15 +200,15 @@ func (l *InstanceLogger) OnIteration(r run.Run) {
 }
 
 // OnCollation logs a collation to this logger.
-func (l *InstanceLogger) OnCollation(c *collate.Collation) {
+func (l *InstanceLogger) OnCollation(c *analysis.Analysis) {
 	select {
 	case <-l.done:
 	case l.collCh <- l.addSource(c):
 	}
 }
 
-func (l *InstanceLogger) addSource(c *collate.Collation) collate.Sourced {
-	return collate.Sourced{
+func (l *InstanceLogger) addSource(c *analysis.Analysis) analysis.Sourced {
+	return analysis.Sourced{
 		Run:       l.run,
 		Collation: c,
 	}

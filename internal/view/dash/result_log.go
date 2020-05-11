@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/widgets/text"
 )
@@ -38,12 +38,12 @@ func NewResultLog() (*ResultLog, error) {
 }
 
 // Log logs a sourced collation sc.
-func (r *ResultLog) Log(sc collate.Sourced) error {
+func (r *ResultLog) Log(sc analysis.Sourced) error {
 	return observer.Log(r, sc)
 }
 
 // LogHeader logs the header of a sourced collation sc.
-func (r *ResultLog) LogHeader(sc collate.Sourced) error {
+func (r *ResultLog) LogHeader(sc analysis.Sourced) error {
 	if err := r.maybeOverflow(); err != nil {
 		return err
 	}

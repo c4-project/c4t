@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package collate_test
+package analysis_test
 
 import (
 	"context"
@@ -15,14 +15,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 )
 
-// TestCollate_empty tests that collating an empty corpus gives an empty collation.
-func TestCollate_empty(t *testing.T) {
+// TestAnalyse_empty tests that collating an empty corpus gives an empty collation.
+func TestAnalyse_empty(t *testing.T) {
 	t.Parallel()
 
-	c, err := collate.Collate(context.Background(), corpus.Corpus{}, 10)
+	c, err := analysis.Analyse(context.Background(), corpus.Corpus{}, 10)
 	if err != nil {
 		t.Fatal("unexpected error collating empty corpus:", err)
 	}
@@ -31,12 +31,12 @@ func TestCollate_empty(t *testing.T) {
 	}
 }
 
-// TestCollate_mock tests that collating an example corpus gives the expected collation.
-func TestCollate_mock(t *testing.T) {
+// TestAnalyse_mock tests that collating an example corpus gives the expected collation.
+func TestAnalyse_mock(t *testing.T) {
 	t.Parallel()
 
 	m := corpus.Mock()
-	crp, err := collate.Collate(context.Background(), m, 10)
+	crp, err := analysis.Analyse(context.Background(), m, 10)
 	if err != nil {
 		t.Fatal("unexpected error collating mock corpus:", err)
 	}

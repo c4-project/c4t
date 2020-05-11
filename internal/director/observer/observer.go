@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
@@ -40,7 +40,7 @@ type Instance interface {
 	OnIteration(run run.Run)
 
 	// OnCollation lets the observer know that the run results have been received and collated into c.
-	OnCollation(c *collate.Collation)
+	OnCollation(c *analysis.Analysis)
 
 	// Instance observers can observe planner operations.
 	planner.Observer
@@ -57,7 +57,7 @@ func OnIteration(r run.Run, obs ...Instance) {
 }
 
 // OnCollation sends OnCollation to every instance observer in obs.
-func OnCollation(c *collate.Collation, obs ...Instance) {
+func OnCollation(c *analysis.Analysis, obs ...Instance) {
 	for _, o := range obs {
 		o.OnCollation(c)
 	}

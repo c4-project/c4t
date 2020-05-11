@@ -3,46 +3,21 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package collate handles analysing a Corpus and filing its subjects into categorised sub-corpi.
-package collate
+// Package analysis handles analysing a Corpus and filing its subjects into categorised sub-corpi.
+package analysis
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Collation represents a grouping of corpus subjects according to various issues.
-type Collation struct {
-	// ByStatus maps each status to the corpus of subjects that fall into it.
-	ByStatus map[subject.Status]corpus.Corpus
-}
-
-// String summarises this collation as a string.
-func (c *Collation) String() string {
-	var sb strings.Builder
-
-	bf := c.ByStatus
-
-	// We range over this to enforce a deterministic order.
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
-		if i != subject.StatusOk {
-			sb.WriteString(", ")
-		}
-		_, _ = fmt.Fprintf(&sb, "%d %s", len(bf[i]), i.String())
-	}
-
-	return sb.String()
-}
-
-// Collate collates a corpus c using up to nworkers workers.
-func Collate(ctx context.Context, c corpus.Corpus, nworkers int) (*Collation, error) {
+// Analyse collates a corpus c using up to nworkers workers.
+func Analyse(ctx context.Context, c corpus.Corpus, nworkers int) (*Analysis, error) {
 	l := len(c)
-	col := Collation{
+	col := Analysis{
 		ByStatus: make(map[subject.Status]corpus.Corpus, subject.NumStatus),
 	}
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
@@ -75,7 +50,7 @@ func classifyAndSend(named subject.Named, ch chan<- collationRequest) {
 	}
 }
 
-func (c *Collation) build(ctx context.Context, ch <-chan collationRequest, count int) error {
+func (c *Analysis) build(ctx context.Context, ch <-chan collationRequest, count int) error {
 	for i := 0; i < count; i++ {
 		select {
 		case <-ctx.Done():
@@ -87,7 +62,7 @@ func (c *Collation) build(ctx context.Context, ch <-chan collationRequest, count
 	return nil
 }
 
-func (c *Collation) file(rq collationRequest) {
+func (c *Analysis) file(rq collationRequest) {
 	for s, c := range c.ByStatus {
 		if rq.flags.matches(statusFlags[s]) {
 			c[rq.sub.Name] = rq.sub.Subject

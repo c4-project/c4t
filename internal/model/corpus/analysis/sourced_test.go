@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package collate_test
+package analysis_test
 
 import (
 	"fmt"
@@ -14,13 +14,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
 // ExampleSourced_String is a runnable example for String.
 func ExampleSourced_String() {
-	sc := collate.Sourced{
+	sc := analysis.Sourced{
 		Run: run.Run{
 			MachineID: id.FromString("foo.bar.baz"),
 			Iter:      42,
@@ -33,7 +33,7 @@ func ExampleSourced_String() {
 	fmt.Println(&sc)
 
 	// With collation:
-	sc.Collation = &collate.Collation{
+	sc.Collation = &analysis.Analysis{
 		ByStatus: map[subject.Status]corpus.Corpus{
 			subject.StatusOk:             corpus.New("a", "b", "c", "ch"),
 			subject.StatusFlagged:        corpus.New("barbaz"),

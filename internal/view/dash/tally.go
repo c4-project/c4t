@@ -8,7 +8,7 @@ package dash
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container/grid"
@@ -43,7 +43,7 @@ func (t *tally) grid() []grid.Element {
 	return els
 }
 
-func (t *tally) tallyCollation(c *collate.Collation) error {
+func (t *tally) tallyCollation(c *analysis.Analysis) error {
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
 		t.nstatus[i] += uint64(len(c.ByStatus[i]))
 		if err := t.updateCollation(i); err != nil {
