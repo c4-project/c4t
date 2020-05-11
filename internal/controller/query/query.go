@@ -13,6 +13,10 @@ import (
 	"io"
 	"text/template"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
@@ -55,7 +59,18 @@ func checkPlan(p *plan.Plan) error {
 }
 
 // Run runs the query, outputting to the configured output writer.
-func (q *Query) Run(_ context.Context) (*plan.Plan, error) {
-	err := q.planTmpl.ExecuteTemplate(q.w, "plan", q.plan)
+func (q *Query) Run(ctx context.Context) (*plan.Plan, error) {
+	// TODO(@MattWindsor91): allow customisation of nworkers here
+	a, err := analysis.Analyse(ctx, q.plan.Corpus, 20)
+	if err != nil {
+		return nil, err
+	}
+
+	err = q.planTmpl.ExecuteTemplate(q.w, "root", Context{Compilers: q.plan.Compilers, Analysis: a})
 	return q.plan, err
+}
+
+type Context struct {
+	Compilers map[string]compiler.Compiler
+	Analysis  *analysis.Analysis
 }

@@ -8,44 +8,61 @@ package query
 import "text/template"
 
 const (
-	tmplStateset = `{{ range . }}  {{ range $k, $v := . }}  {{ $k }} = {{ $v }}{{- end }}
+	tmplStateset = `{{ range . }}      {{ range $k, $v := . }}  {{ $k }} = {{ $v }}{{- end }}
 {{ end -}}`
 
-	tmplObs = `{{- if .CounterExamples }}  valid final states observed:
+	tmplObs = `{{- if .CounterExamples }}      valid final states observed:
 {{ template "states" .Witnesses }}
-  counter-examples observed:
+      counter-examples observed:
 {{ template "states" .CounterExamples }}
   {{- end -}}`
 
-	tmplCorpus = `
+	tmplCompilerCounts = `
 {{- $compilers := .Compilers -}}
-{{- range $sname, $subject := .Corpus -}}
-  {{- range $compiler, $compile := .Runs -}}
+{{- range $cname, $compiler := .Analysis.CompilerCounts -}}
+compiler {{ $cname }} ({{ index $compilers $cname }}):
+{{ range $status, $count := $compiler }}  {{ $status }}: {{ $count }}
+{{ end -}}
+{{- end -}}
+`
 
-{{- if not .Status.IsOk -}}
-{{ $sname }} {{ index $compilers $compiler }}: {{ .Status }}
+	tmplByStatus = `
+{{- range $status, $corpus := .Analysis.ByStatus -}}
+{{- if $corpus -}}
+status {{ $status }}:
+{{ range $sname, $subject := $corpus }}  subject {{ $sname }}:
+{{ range $compiler, $compile := .Runs -}}
+
+{{- if eq $status .Status }}    {{ $compiler }}
 {{ end -}}
 
 {{- if .Obs -}}{{- template "obs" .Obs -}}{{- end -}}
 
-  {{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 `
 
-	tmplPlan = `
-{{- template "corpus" . -}}
+	tmplRoot = `COMPILER BREAKDOWN:
+
+{{ template "compilerCounts" . }}
+SUBJECT REPORT:
+
+{{ template "byStatus" . -}}
 `
 )
 
 func getTemplate() (*template.Template, error) {
-	t, err := template.New("plan").Parse(tmplPlan)
+	t, err := template.New("root").Parse(tmplRoot)
 	if err != nil {
 		return nil, err
 	}
 	for n, ts := range map[string]string{
-		"states": tmplStateset,
-		"corpus": tmplCorpus,
-		"obs":    tmplObs,
+		"states":         tmplStateset,
+		"byStatus":       tmplByStatus,
+		"compilerCounts": tmplCompilerCounts,
+		"obs":            tmplObs,
 	} {
 		t, err = t.New(n).Parse(ts)
 		if err != nil {
