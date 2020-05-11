@@ -103,7 +103,7 @@ func (n *Normaliser) Corpus(c corpus.Corpus) (corpus.Corpus, error) {
 // Subject normalises mappings from subject component files to 'normalised' names.
 func (n *Normaliser) Subject(s subject.Subject) (*subject.Subject, error) {
 	var err error
-	s.Litmus, err = n.replaceAndAdd(s.Litmus, NKOrigLitmus, FileOrigLitmus)
+	s.OrigLitmus, err = n.replaceAndAdd(s.OrigLitmus, NKOrigLitmus, FileOrigLitmus)
 	if s.Fuzz != nil && err == nil {
 		s.Fuzz, err = n.fuzz(*s.Fuzz)
 	}

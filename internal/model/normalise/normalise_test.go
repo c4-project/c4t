@@ -34,8 +34,8 @@ func TestNormaliser_Subject(t *testing.T) {
 			maps: map[string]normalise.Normalisation{},
 		},
 		"litmus": {
-			in:  subject.Subject{Litmus: path.Join("foo", "bar", "baz.litmus")},
-			out: subject.Subject{Litmus: normalise.FileOrigLitmus},
+			in:  subject.Subject{OrigLitmus: path.Join("foo", "bar", "baz.litmus")},
+			out: subject.Subject{OrigLitmus: normalise.FileOrigLitmus},
 			maps: map[string]normalise.Normalisation{
 				normalise.FileOrigLitmus: {
 					Original: path.Join("foo", "bar", "baz.litmus"),
@@ -191,7 +191,7 @@ func TestNormaliser_Subject(t *testing.T) {
 func ExampleNormaliser_MappingsOfKind() {
 	n := normalise.NewNormaliser("root")
 	s := subject.Subject{
-		Litmus: path.Join("foo", "bar", "baz.litmus"),
+		OrigLitmus: path.Join("foo", "bar", "baz.litmus"),
 		Fuzz: &subject.Fuzz{
 			Files: subject.FuzzFileset{
 				Litmus: path.Join("barbaz", "baz.1.litmus"),

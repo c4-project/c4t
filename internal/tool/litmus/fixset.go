@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
+	"github.com/MattWindsor91/act-tester/internal/model"
 )
 
 // Fixset contains the various fix-ups that the litmus tool needs to do before and after the run to Litmus.
@@ -36,7 +36,7 @@ func (f *Fixset) Args() []string {
 }
 
 // PopulateFromStats switches various fixes on according to the statistics in s.
-func (f *Fixset) PopulateFromStats(s *act.Statset) {
+func (f *Fixset) PopulateFromStats(s *model.Statset) {
 	// TODO(@MattWindsor91): this should only be turned on if atomic integers are present.
 	// Even then, it should only appear when we're using `gcc`, but I'm unsure how to enforce that.
 	f.RemoveAtomicCasts = true

@@ -3,11 +3,15 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act
+package act_test
 
 import (
 	"strings"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/act"
+
+	"github.com/MattWindsor91/act-tester/internal/model"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,11 +46,11 @@ mem-orders.statement.memory_order_release 7
 mem-orders.statement.memory_order_acq_rel 0
 mem-orders.statement.memory_order_seq_cst 0`)
 
-	want := Statset{
+	want := model.Statset{
 		Threads:      3,
 		Returns:      0,
 		LiteralBools: 14,
-		AtomicExpressions: AtomicStatset{
+		AtomicExpressions: model.AtomicStatset{
 			Types: map[string]int{
 				"cmpxchg": 0,
 				"fence":   0,
@@ -64,7 +68,7 @@ mem-orders.statement.memory_order_seq_cst 0`)
 				"memory_order_seq_cst": 6,
 			},
 		},
-		AtomicStatements: AtomicStatset{
+		AtomicStatements: model.AtomicStatset{
 			Types: map[string]int{
 				"cmpxchg": 0,
 				"fence":   1,
@@ -84,8 +88,8 @@ mem-orders.statement.memory_order_seq_cst 0`)
 		},
 	}
 
-	var got Statset
-	err := got.Parse(r)
+	var got model.Statset
+	err := act.ParseStats(&got, r)
 	require.NoError(t, err)
 	assert.Equal(t, got, want)
 }

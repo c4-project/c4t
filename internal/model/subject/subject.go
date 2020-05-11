@@ -12,19 +12,21 @@ package subject
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
 // Subject represents a single test subject in a corpus.
 type Subject struct {
-	// Threads is the number of threads contained in this subject.
-	Threads int `toml:"threads,omitzero"`
+	// Stats is the statistics set for this subject.
+	Stats model.Statset `toml:"threads,omitempty"`
 
 	// Fuzz is the fuzzing pathset for this subject, if it has been fuzzed.
 	Fuzz *Fuzz `toml:"fuzz,omitempty"`
 
 	// Litmus is the (slashed) path to this subject's original Litmus file.
-	Litmus string `toml:"litmus,omitempty"`
+	OrigLitmus string `toml:"orig_litmus,omitempty"`
 
 	// Compiles contains information about this subject's compilation attempts.
 	// It maps from the string form of each compiler's ID.
@@ -42,6 +44,38 @@ type Subject struct {
 	Runs map[string]RunResult `toml:"runs, omitempty"`
 }
 
+// New is a convenience constructor for subjects.
+func New(origLitmus string, opt ...Option) (*Subject, error) {
+	s := Subject{OrigLitmus: origLitmus}
+	for _, c := range opt {
+		if err := c(&s); err != nil {
+			return nil, err
+		}
+	}
+	return &s, nil
+}
+
+// NewOrPanic is like New, but panics if there is an error.
+// Use in tests only.
+func NewOrPanic(origLitmus string, opt ...Option) *Subject {
+	n, err := New(origLitmus, opt...)
+	if err != nil {
+		panic(err)
+	}
+	return n
+}
+
+// Option is the type of (functional) options to the New constructor.
+type Option func(*Subject) error
+
+// WithThreads is an option that sets the subject's threads to threads.
+func WithThreads(threads int) Option {
+	return func(s *Subject) error {
+		s.Stats.Threads = threads
+		return nil
+	}
+}
+
 // BestLitmus tries to get the 'best' litmus test path for further development.
 //
 // When there is a fuzzing record for this subject, the fuzz output is the best path.
@@ -51,8 +85,8 @@ func (s *Subject) BestLitmus() (string, error) {
 	switch {
 	case s.Fuzz != nil && s.Fuzz.Files.Litmus != "":
 		return s.Fuzz.Files.Litmus, nil
-	case s.Litmus != "":
-		return s.Litmus, nil
+	case s.OrigLitmus != "":
+		return s.OrigLitmus, nil
 	default:
 		return "", ErrNoBestLitmus
 	}

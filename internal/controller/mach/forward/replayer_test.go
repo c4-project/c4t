@@ -39,7 +39,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	add := builder.AddRequest(
 		&subject.Named{
 			Name:    "foo",
-			Subject: subject.Subject{Litmus: "foo.litmus"},
+			Subject: subject.Subject{OrigLitmus: "foo.litmus"},
 		})
 	harness := builder.HarnessRequest(
 		"foo",

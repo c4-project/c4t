@@ -31,12 +31,14 @@ func (t *TestProber) ProbeSubject(_ context.Context, litmus string) (subject.Nam
 	}
 	t.probes[litmus] = struct{}{}
 
+	s, err := subject.New(litmus, subject.WithThreads(2))
+	if err != nil {
+		return subject.Named{}, err
+	}
+
 	return subject.Named{
-		Name: iohelp.ExtlessFile(litmus),
-		Subject: subject.Subject{
-			Threads: 2,
-			Litmus:  litmus,
-		},
+		Name:    iohelp.ExtlessFile(litmus),
+		Subject: *s,
 	}, t.err
 }
 
@@ -60,8 +62,8 @@ func TestCorpusPlanner_Plan(t *testing.T) {
 			t.Errorf("unexpected corpus subject %q", n)
 		}
 
-		if s.Litmus != f {
-			t.Errorf("subject %q file mismatch: got=%q, want=%q", n, s.Litmus, f)
+		if s.OrigLitmus != f {
+			t.Errorf("subject %q file mismatch: got=%q, want=%q", n, s.OrigLitmus, f)
 		}
 
 		if _, ok := tp.probes[f]; !ok {

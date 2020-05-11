@@ -18,11 +18,11 @@ import (
 // ExampleCorpus_Add is a runnable example for Add.
 func ExampleCorpus_Add() {
 	c := make(corpus.Corpus)
-	_ = c.Add(subject.Named{Name: "foo", Subject: subject.Subject{Litmus: "bar/baz.litmus"}})
-	fmt.Println(c["foo"].Litmus)
+	_ = c.Add(subject.Named{Name: "foo", Subject: subject.Subject{OrigLitmus: "bar/baz.litmus"}})
+	fmt.Println(c["foo"].OrigLitmus)
 
 	// We can't add duplicates to a corpus.
-	err := c.Add(subject.Named{Name: "foo", Subject: subject.Subject{Litmus: "bar/baz2.litmus"}})
+	err := c.Add(subject.Named{Name: "foo", Subject: subject.Subject{OrigLitmus: "bar/baz2.litmus"}})
 	fmt.Println(err)
 
 	// Output:

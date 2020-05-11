@@ -8,6 +8,8 @@ package corpus
 import (
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
@@ -17,7 +19,7 @@ import (
 // - a subject with a flagged observation.
 func Mock() Corpus {
 	return Corpus{
-		"foo":    subject.Subject{Threads: 1, Litmus: "foo.litmus"},
+		"foo":    subject.Subject{Stats: model.Statset{Threads: 1}, OrigLitmus: "foo.litmus"},
 		"bar":    MockFailedCompile("bar"),
 		"baz":    MockFlaggedRun("baz"),
 		"barbaz": MockTimeoutRun("barbaz"),
@@ -27,8 +29,10 @@ func Mock() Corpus {
 // MockFailedCompile expands to a realistic looking Subject that contains a failed compilation.
 func MockFailedCompile(name string) subject.Subject {
 	return subject.Subject{
-		Threads: 8,
-		Litmus:  name + ".litmus",
+		Stats: model.Statset{
+			Threads: 8,
+		},
+		OrigLitmus: name + ".litmus",
 		Harnesses: map[string]subject.Harness{
 			id.ArchArm.String(): {
 				Dir:   "arm",
@@ -56,8 +60,8 @@ func MockFailedCompile(name string) subject.Subject {
 // MockFlaggedRun expands to a realistic looking Subject that contains some flagged runs.
 func MockFlaggedRun(name string) subject.Subject {
 	return subject.Subject{
-		Threads: 2,
-		Litmus:  name + ".litmus",
+		Stats:      model.Statset{Threads: 2},
+		OrigLitmus: name + ".litmus",
 		Harnesses: map[string]subject.Harness{
 			id.ArchX8664.String(): MockHarness("x86"),
 		},
@@ -75,8 +79,8 @@ func MockFlaggedRun(name string) subject.Subject {
 // MockTimeoutRun expands to a realistic looking Subject that contains some timed-out runs.
 func MockTimeoutRun(name string) subject.Subject {
 	return subject.Subject{
-		Threads: 4,
-		Litmus:  "baz.litmus",
+		Stats:      model.Statset{Threads: 4},
+		OrigLitmus: "baz.litmus",
 		Harnesses: map[string]subject.Harness{
 			id.ArchX8664.String(): MockHarness("x86"),
 			id.ArchPPC.String():   MockHarness("ppc"),

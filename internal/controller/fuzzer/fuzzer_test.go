@@ -9,6 +9,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -41,18 +43,9 @@ func makePlan() *plan.Plan {
 	return &plan.Plan{
 		Header: plan.Header{Version: plan.CurrentVer},
 		Corpus: map[string]subject.Subject{
-			"foo": {
-				Threads: 1,
-				Litmus:  "foo.litmus",
-			},
-			"bar": {
-				Threads: 2,
-				Litmus:  "bar.litmus",
-			},
-			"baz": {
-				Threads: 3,
-				Litmus:  "baz.litmus",
-			},
+			"foo": *subject.NewOrPanic("foo.litmus", subject.WithThreads(1)),
+			"bar": *subject.NewOrPanic("bar.litmus", subject.WithThreads(2)),
+			"baz": *subject.NewOrPanic("baz.litmus", subject.WithThreads(3)),
 		},
 	}
 }
@@ -173,11 +166,7 @@ func TestFuzzer_Fuzz_nop(t *testing.T) {
 		require.Truef(t, ok, "subject %s in fuzzer output has no corresponding input", name)
 
 		// This isn't exhaustive, but should be enough to catch out issues.
-		if s.Threads != sf.Threads {
-			t.Errorf("thread mismatch: orig=%d, fuzz=%d", s.Threads, sf.Threads)
-		}
-		if s.Litmus != sf.Litmus {
-			t.Errorf("litmus mismatch: orig=%q, fuzz=%q", s.Litmus, sf.Litmus)
-		}
+		assert.Equal(t, sf.Stats, s.Stats, "stats mismatch")
+		assert.Equal(t, sf.OrigLitmus, s.OrigLitmus, "litmus file mismatch")
 	}
 }

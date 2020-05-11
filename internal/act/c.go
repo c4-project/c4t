@@ -10,6 +10,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model"
+
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
@@ -23,18 +25,17 @@ func (a *Runner) ProbeSubject(ctx context.Context, litmus string) (subject.Named
 		return subject.Named{}, fmt.Errorf("header read on %s failed: %w", litmus, err)
 	}
 
-	var st Statset
-	if err := a.DumpStats(ctx, &st, litmus); err != nil {
-		return subject.Named{}, fmt.Errorf("stats read on %s failed: %w", litmus, err)
-	}
-
 	s := subject.Named{
 		Name: h.Name,
 		Subject: subject.Subject{
-			Litmus:  litmus,
-			Threads: st.Threads,
+			OrigLitmus: litmus,
 		},
 	}
+
+	if err := a.DumpStats(ctx, &s.Stats, litmus); err != nil {
+		return subject.Named{}, fmt.Errorf("stats read on %s failed: %w", litmus, err)
+	}
+
 	return s, nil
 }
 
@@ -54,7 +55,7 @@ func (a *Runner) DumpHeader(ctx context.Context, h *Header, path string) error {
 }
 
 // DumpStats runs act-c dump-stats on the subject at path, writing the stats to s.
-func (a *Runner) DumpStats(ctx context.Context, s *Statset, path string) error {
+func (a *Runner) DumpStats(ctx context.Context, s *model.Statset, path string) error {
 	var obuf bytes.Buffer
 	sargs := StandardArgs{Verbose: false}
 
@@ -65,5 +66,5 @@ func (a *Runner) DumpStats(ctx context.Context, s *Statset, path string) error {
 		return err
 	}
 
-	return s.Parse(&obuf)
+	return ParseStats(s, &obuf)
 }

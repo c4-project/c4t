@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
@@ -26,15 +28,15 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	adds := []subject.Named{
 		{
 			Name:    "foo",
-			Subject: subject.Subject{Threads: 2, Litmus: "foo.litmus"},
+			Subject: subject.Subject{Stats: model.Statset{Threads: 2}, OrigLitmus: "foo.litmus"},
 		},
 		{
 			Name:    "bar",
-			Subject: subject.Subject{Threads: 1, Litmus: "foo.litmus"},
+			Subject: subject.Subject{Stats: model.Statset{Threads: 1}, OrigLitmus: "foo.litmus"},
 		},
 		{
 			Name:    "baz",
-			Subject: subject.Subject{Threads: 4, Litmus: "foo.litmus"},
+			Subject: subject.Subject{Stats: model.Statset{Threads: 4}, OrigLitmus: "foo.litmus"},
 		},
 	}
 
@@ -120,11 +122,9 @@ func TestBuilderReq_SendTo(t *testing.T) {
 
 func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan builder.Request) error {
 	want := builder.AddRequest(&subject.Named{
-		Name: "foo",
-		Subject: subject.Subject{
-			Threads: 5,
-			Litmus:  "blah",
-		}})
+		Name:    "foo",
+		Subject: *subject.NewOrPanic("blah", subject.WithThreads(5)),
+	})
 
 	eg.Go(func() error {
 		select {
