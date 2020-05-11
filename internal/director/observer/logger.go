@@ -66,7 +66,7 @@ func Log(b BasicLogger, s collate.Sourced) error {
 }
 
 func logBuckets(b BasicLogger, s collate.Sourced) error {
-	sc := s.Collation.ByStatus()
+	sc := s.Collation.ByStatus
 	for i := subject.FirstBadStatus; i < subject.NumStatus; i++ {
 		if err := logBucket(b, i, sc[i]); err != nil {
 			return err

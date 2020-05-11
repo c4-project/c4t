@@ -44,9 +44,8 @@ func (t *tally) grid() []grid.Element {
 }
 
 func (t *tally) tallyCollation(c *collate.Collation) error {
-	sc := c.ByStatus()
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
-		t.nstatus[i] += uint64(len(sc[i]))
+		t.nstatus[i] += uint64(len(c.ByStatus[i]))
 		if err := t.updateCollation(i); err != nil {
 			return err
 		}

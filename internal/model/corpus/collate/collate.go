@@ -18,29 +18,15 @@ import (
 
 // Collation represents a grouping of corpus subjects according to various issues.
 type Collation struct {
-	// Successes contains the subset of the collated corpus that doesn't fit into any of the above boxes.
-	Successes corpus.Corpus
-	// Flagged contains the subset of the collated corpus that has been flagged as possibly buggy.
-	Flagged corpus.Corpus
-	// Compile contains the subset of the collated corpus that ran into compiler failures.
-	Compile FailCollation
-	// Run contains the subset of the collated corpus that ran into runtime failures.
-	Run FailCollation
-}
-
-// FailCollation represents a grouping of failed corpus subjects under a particular stage (compile, run, etc).
-type FailCollation struct {
-	// Failures contains 'pure' failures.
-	Failures corpus.Corpus
-	// Timeouts contains failures due to timeouts.
-	Timeouts corpus.Corpus
+	// ByStatus maps each status to the corpus of subjects that fall into it.
+	ByStatus map[subject.Status]corpus.Corpus
 }
 
 // String summarises this collation as a string.
 func (c *Collation) String() string {
 	var sb strings.Builder
 
-	bf := c.ByStatus()
+	bf := c.ByStatus
 
 	// We range over this to enforce a deterministic order.
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
@@ -57,16 +43,10 @@ func (c *Collation) String() string {
 func Collate(ctx context.Context, c corpus.Corpus, nworkers int) (*Collation, error) {
 	l := len(c)
 	col := Collation{
-		Successes: make(corpus.Corpus, l),
-		Flagged:   make(corpus.Corpus, l),
-		Compile: FailCollation{
-			Failures: make(corpus.Corpus, l),
-			Timeouts: make(corpus.Corpus, l),
-		},
-		Run: FailCollation{
-			Failures: make(corpus.Corpus, l),
-			Timeouts: make(corpus.Corpus, l),
-		},
+		ByStatus: make(map[subject.Status]corpus.Corpus, subject.NumStatus),
+	}
+	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+		col.ByStatus[i] = make(corpus.Corpus, l)
 	}
 
 	// Various bits of the collator expect there to be at least one subject.
@@ -108,7 +88,7 @@ func (c *Collation) build(ctx context.Context, ch <-chan collationRequest, count
 }
 
 func (c *Collation) file(rq collationRequest) {
-	for s, c := range c.ByStatus() {
+	for s, c := range c.ByStatus {
 		if rq.flags.matches(statusFlags[s]) {
 			c[rq.sub.Name] = rq.sub.Subject
 		}

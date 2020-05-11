@@ -8,53 +8,22 @@ package collate_test
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
 )
 
-// ExampleCollation_ByStatus is a runnable example for ByStatus.
-func ExampleCollation_ByStatus() {
-	c := collate.Collation{
-		Successes: corpus.New("a", "b", "c", "ch"),
-		Flagged:   corpus.New("barbaz"),
-		Compile: collate.FailCollation{
-			Failures: corpus.New("foo", "bar", "baz"),
-			Timeouts: corpus.New(),
-		},
-		Run: collate.FailCollation{
-			Failures: corpus.New("foobaz", "barbaz"),
-			Timeouts: corpus.New(),
-		},
-	}
-	for k, v := range c.ByStatus() {
-		fmt.Printf("%s:", k)
-		for _, n := range v.Names() {
-			fmt.Printf(" %s", n)
-		}
-		fmt.Println()
-	}
-
-	// Unordered output:
-	// ok: a b c ch
-	// flagged: barbaz
-	// compile/fail: bar baz foo
-	// compile/timeout:
-	// run/fail: barbaz foobaz
-	// run/timeout:
-}
-
 // ExampleCollation_String is a runnable example for String.
 func ExampleCollation_String() {
 	c := collate.Collation{
-		Successes: corpus.New("a", "b", "c", "ch"),
-		Flagged:   corpus.New("barbaz"),
-		Compile: collate.FailCollation{
-			Failures: corpus.New("foo", "bar", "baz"),
-			Timeouts: corpus.New(),
-		},
-		Run: collate.FailCollation{
-			Failures: corpus.New("foobaz", "barbaz"),
-			Timeouts: corpus.New(),
+		ByStatus: map[subject.Status]corpus.Corpus{
+			subject.StatusOk:             corpus.New("a", "b", "c", "ch"),
+			subject.StatusFlagged:        corpus.New("barbaz"),
+			subject.StatusCompileFail:    corpus.New("foo", "bar", "baz"),
+			subject.StatusCompileTimeout: corpus.New(),
+			subject.StatusRunFail:        corpus.New("foobaz", "barbaz"),
+			subject.StatusRunTimeout:     corpus.New(),
 		},
 	}
 	fmt.Println(&c)

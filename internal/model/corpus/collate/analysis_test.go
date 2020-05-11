@@ -8,6 +8,8 @@ package collate_test
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/collate"
 )
@@ -18,7 +20,9 @@ func ExampleCollation_HasFlagged() {
 	fmt.Println("empty:", empty.HasFlagged())
 
 	flagged := collate.Collation{
-		Flagged: corpus.New("foo", "bar", "baz"),
+		ByStatus: map[subject.Status]corpus.Corpus{
+			subject.StatusFlagged: corpus.New("foo", "bar", "baz"),
+		},
 	}
 	fmt.Println("flagged:", flagged.HasFlagged())
 
@@ -33,15 +37,15 @@ func ExampleCollation_HasFailures() {
 	fmt.Println("empty:", empty.HasFailures())
 
 	cfails := collate.Collation{
-		Compile: collate.FailCollation{
-			Failures: corpus.New("foo", "bar", "baz"),
+		ByStatus: map[subject.Status]corpus.Corpus{
+			subject.StatusCompileFail: corpus.New("foo", "bar", "baz"),
 		},
 	}
 	fmt.Println("compiler failures:", cfails.HasFailures())
 
 	rfails := collate.Collation{
-		Run: collate.FailCollation{
-			Failures: corpus.New("foo", "bar", "baz"),
+		ByStatus: map[subject.Status]corpus.Corpus{
+			subject.StatusRunFail: corpus.New("foo", "bar", "baz"),
 		},
 	}
 	fmt.Println("run failures:", rfails.HasFailures())
@@ -50,19 +54,4 @@ func ExampleCollation_HasFailures() {
 	// empty: false
 	// compiler failures: true
 	// run failures: true
-}
-
-// ExampleFailCollation_IsEmpty is a runnable example for IsEmpty.
-func ExampleFailCollation_IsEmpty() {
-	var empty collate.FailCollation
-	fmt.Println("empty:", empty.IsEmpty())
-
-	notEmpty := collate.FailCollation{
-		Failures: corpus.New("foo", "bar", "baz"),
-	}
-	fmt.Println("not empty:", notEmpty.IsEmpty())
-
-	// Output:
-	// empty: true
-	// not empty: false
 }

@@ -61,7 +61,7 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	}
 	observer.OnCollation(coll, s.Observers...)
 
-	for st, c := range coll.ByStatus() {
+	for st, c := range coll.ByStatus {
 		if st < subject.FirstBadStatus || len(c) == 0 {
 			continue
 		}

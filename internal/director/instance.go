@@ -204,9 +204,10 @@ func (i *Instance) makeSave() *Save {
 func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error) {
 	// TODO(@MattWindsor91): move planner config outside of instance
 	c := planner.Config{
-		Source:    i.Env.Planner,
-		Logger:    i.Logger,
-		Observers: planner.NewObserverSet(obs...),
+		Source:     i.Env.Planner,
+		Logger:     i.Logger,
+		Observers:  planner.NewObserverSet(obs...),
+		Quantities: i.Quantities.Plan,
 	}
 	return planner.New(&c, i.machineForPlan(), i.InFiles, plan.UseDateSeed)
 }

@@ -49,9 +49,8 @@ func (s *sparkset) grid() []grid.Element {
 }
 
 func (s *sparkset) sparkCollation(c *collate.Collation) error {
-	st := c.ByStatus()
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
-		if err := s.statusLines[i].Add([]int{len(st[i])}); err != nil {
+		if err := s.statusLines[i].Add([]int{len(c.ByStatus[i])}); err != nil {
 			return err
 		}
 	}

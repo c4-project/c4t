@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
@@ -32,15 +34,13 @@ func ExampleSourced_String() {
 
 	// With collation:
 	sc.Collation = &collate.Collation{
-		Successes: corpus.New("a", "b", "c", "ch"),
-		Flagged:   corpus.New("barbaz"),
-		Compile: collate.FailCollation{
-			Failures: corpus.New("foo", "bar", "baz"),
-			Timeouts: corpus.New(),
-		},
-		Run: collate.FailCollation{
-			Failures: corpus.New("foobaz", "barbaz"),
-			Timeouts: corpus.New(),
+		ByStatus: map[subject.Status]corpus.Corpus{
+			subject.StatusOk:             corpus.New("a", "b", "c", "ch"),
+			subject.StatusFlagged:        corpus.New("barbaz"),
+			subject.StatusCompileFail:    corpus.New("foo", "bar", "baz"),
+			subject.StatusCompileTimeout: corpus.New(),
+			subject.StatusRunFail:        corpus.New("foobaz", "barbaz"),
+			subject.StatusRunTimeout:     corpus.New(),
 		},
 	}
 	fmt.Println(&sc)
