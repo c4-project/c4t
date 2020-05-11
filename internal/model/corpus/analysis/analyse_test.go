@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/stretchr/testify/assert"
@@ -23,9 +25,7 @@ func TestAnalyse_empty(t *testing.T) {
 	t.Parallel()
 
 	c, err := analysis.Analyse(context.Background(), corpus.Corpus{}, 10)
-	if err != nil {
-		t.Fatal("unexpected error collating empty corpus:", err)
-	}
+	require.NoError(t, err, "unexpected error collating empty corpus")
 	for k, coll := range c.ByStatus {
 		assert.Emptyf(t, coll, "%s not empty", k)
 	}

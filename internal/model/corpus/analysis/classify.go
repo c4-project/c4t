@@ -16,25 +16,27 @@ var statusFlags = [subject.NumStatus]flag{
 	subject.StatusRunFail:        flagRunFailure,
 }
 
-func classify(named subject.Named) flag {
-	var f flag
-	f |= classifyCompiles(named.Compiles)
-	f |= classifyRuns(named.Runs)
-	return f
+func classify(named subject.Named) classification {
+	c := classification{
+		flags:     flagOk,
+		compilers: map[string]flag{},
+		sub:       named,
+	}
+	c.classifyCompiles(named.Compiles)
+	c.classifyRuns(named.Runs)
+	return c
 }
 
-func classifyCompiles(cs map[string]subject.CompileResult) flag {
-	f := flagOk
-	for _, c := range cs {
-		f |= statusFlags[c.Status]
+func (c *classification) classifyCompiles(cs map[string]subject.CompileResult) {
+	for n, cm := range cs {
+		c.compilers[n] |= statusFlags[cm.Status]
+		c.flags |= statusFlags[cm.Status]
 	}
-	return f
 }
 
-func classifyRuns(rs map[string]subject.RunResult) flag {
-	f := flagOk
-	for _, r := range rs {
-		f |= statusFlags[r.Status]
+func (c *classification) classifyRuns(rs map[string]subject.RunResult) {
+	for n, r := range rs {
+		c.compilers[n] |= statusFlags[r.Status]
+		c.flags |= statusFlags[r.Status]
 	}
-	return f
 }
