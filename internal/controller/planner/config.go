@@ -26,11 +26,8 @@ type Config struct {
 	// Observers contains the set of observers used to get feedback on the planning action as it completes.
 	Observers ObserverSet
 
-	// CorpusSize is the requested size of the test corpus.
-	// If zero, no corpus sampling is done, but the planner will still error if the final corpus size is 0.
-	// If nonzero, the corpus will be sampled if larger than the size, and an error occurs if the final size is below
-	// that requested.
-	CorpusSize int
+	// Quantities contains quantity information for this planner.
+	Quantities QuantitySet
 }
 
 // Plan constructs a Planner using this config, then runs it using ctx on the file set fs and machine mach.

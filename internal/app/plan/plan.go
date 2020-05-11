@@ -69,6 +69,7 @@ func flags() []c.Flag {
 			Aliases: []string{stdflag.FlagNum},
 			Usage:   usageCorpusSize,
 		},
+		stdflag.WorkerCountCliFlag(),
 	}
 	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
 }
@@ -81,7 +82,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 		return err
 	}
 
-	pc, err := makePlanConfig(cfg, errw, a, ctx.Int(flagCorpusSize))
+	pc, err := makePlanConfig(cfg, errw, a, ctx.Int(flagCorpusSize), stdflag.WorkerCountFromCli(ctx))
 	if err != nil {
 		return err
 	}
@@ -118,10 +119,13 @@ func getMachine(cfg *config.Config, midstr string) (plan.NamedMachine, error) {
 	return m, nil
 }
 
-func makePlanConfig(c *config.Config, errw io.Writer, a *act.Runner, cs int) (*planner.Config, error) {
+func makePlanConfig(c *config.Config, errw io.Writer, a *act.Runner, cs, nw int) (*planner.Config, error) {
 	l := log.New(errw, "", 0)
 	cfg := planner.Config{
-		CorpusSize: cs,
+		Quantities: planner.QuantitySet{
+			CorpusSize: cs,
+			NWorkers:   nw,
+		},
 		Source: planner.Source{
 			BProbe:     c,
 			CLister:    c,

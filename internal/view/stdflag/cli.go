@@ -112,3 +112,18 @@ func CPUProfileCliFlag() c.Flag {
 func CPUProfileFromCli(ctx *c.Context) string {
 	return ctx.Path(FlagCPUProfile)
 }
+
+// WorkerCountCliFlag sets up a worker count flag.
+func WorkerCountCliFlag() c.Flag {
+	return &c.IntFlag{
+		Name:    FlagWorkerCountLong,
+		Aliases: []string{FlagWorkerCount},
+		Value:   1,
+		Usage:   "number of `workers` to run in parallel",
+	}
+}
+
+// WorkerCountFromCli retrieves a 'worker count' flag set up by WorkerCountCliFlag.
+func WorkerCountFromCli(ctx *c.Context) int {
+	return ctx.Int(FlagWorkerCountLong)
+}

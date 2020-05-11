@@ -10,6 +10,7 @@ import (
 	"errors"
 	"math/rand"
 	"sort"
+	"sync"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
@@ -21,15 +22,12 @@ import (
 
 type TestProber struct {
 	err    error
-	probes map[string]struct{}
+	probes sync.Map
 }
 
 // ProbeSubject is a mock implementation of subject probing.
 func (t *TestProber) ProbeSubject(_ context.Context, litmus string) (subject.Named, error) {
-	if t.probes == nil {
-		t.probes = make(map[string]struct{})
-	}
-	t.probes[litmus] = struct{}{}
+	t.probes.Store(litmus, struct{}{})
 
 	s, err := subject.New(litmus, subject.WithThreads(2))
 	if err != nil {
@@ -51,8 +49,8 @@ func TestCorpusPlanner_Plan(t *testing.T) {
 		t.Fatal("unexpected error in Plan:", err)
 	}
 
-	if len(c) != p.Size {
-		t.Fatalf("corpus size mismatch: got=%d, want=%d", len(c), p.Size)
+	if len(c) != p.Quantities.CorpusSize {
+		t.Fatalf("corpus size mismatch: got=%d, want=%d", len(c), p.Quantities.CorpusSize)
 	}
 
 	for n, s := range c {
@@ -66,7 +64,7 @@ func TestCorpusPlanner_Plan(t *testing.T) {
 			t.Errorf("subject %q file mismatch: got=%q, want=%q", n, s.OrigLitmus, f)
 		}
 
-		if _, ok := tp.probes[f]; !ok {
+		if _, ok := tp.probes.Load(f); !ok {
 			t.Errorf("subject %q not probed by prober", n)
 		}
 	}
@@ -89,7 +87,11 @@ func makeCorpusPlanner(tp *TestProber) *planner.CorpusPlanner {
 		Files:  in,
 		Prober: tp,
 		Rng:    r,
-		// This should enforce a degree of sampling.
-		Size: len(in) / 2,
+		Quantities: planner.QuantitySet{
+			// This should enforce a degree of sampling.
+			CorpusSize: len(in) / 2,
+			// This should enforce a degree of parallelism.
+			NWorkers: len(in) / 2,
+		},
 	}
 }

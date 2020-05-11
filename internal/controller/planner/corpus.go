@@ -13,8 +13,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
-	"golang.org/x/sync/errgroup"
-
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -32,11 +30,11 @@ func (p *Planner) planCorpus(ctx context.Context) error {
 		return err
 	}
 	c := CorpusPlanner{
-		Files:     files,
-		Prober:    p.conf.Source.SProbe,
-		Observers: p.conf.Observers.Corpus,
-		Rng:       p.rng,
-		Size:      p.conf.CorpusSize,
+		Files:      files,
+		Prober:     p.conf.Source.SProbe,
+		Observers:  p.conf.Observers.Corpus,
+		Rng:        p.rng,
+		Quantities: p.conf.Quantities,
 	}
 	p.plan.Corpus, err = c.Plan(ctx)
 	return err
@@ -52,8 +50,8 @@ type CorpusPlanner struct {
 	Prober SubjectProber
 	// Rng is the random number generator to use in corpus sampling.
 	Rng *rand.Rand
-	// Size is the target size of the corpus.
-	Size int
+	// Quantities contains the target size and worker count of the corpus.
+	Quantities QuantitySet
 }
 
 func (p *CorpusPlanner) Plan(ctx context.Context) (corpus.Corpus, error) {
@@ -68,29 +66,18 @@ func (p *CorpusPlanner) Plan(ctx context.Context) (corpus.Corpus, error) {
 
 // probe probes each subject in this planner's corpus file list, producing a Corpus proper.
 func (p *CorpusPlanner) probe(ctx context.Context) (corpus.Corpus, error) {
-	var c corpus.Corpus
-
-	b, berr := p.makeBuilder()
-	if berr != nil {
-		return nil, berr
-	}
-
-	eg, ectx := errgroup.WithContext(ctx)
-	eg.Go(func() error {
-		return p.probeInner(ectx, b.SendCh)
-	})
-	eg.Go(func() error {
-		var err error
-		c, err = b.Run(ectx)
-		return err
-	})
-	err := eg.Wait()
-
-	return c, err
+	cfg := p.makeBuilderConfig()
+	return builder.ParBuild(ctx, p.Quantities.NWorkers, corpus.New(p.Files...), cfg,
+		func(ctx context.Context, named subject.Named, requests chan<- builder.Request) error {
+			// TODO(@MattWindsor91): make it so we don't get the litmus file through the *name* of the subject!
+			// TODO(@MattWindsor91): overwrite 'named' with gleaned information
+			return p.probeSubject(ctx, named.Name, requests)
+		},
+	)
 }
 
-func (p *CorpusPlanner) makeBuilder() (*builder.Builder, error) {
-	bc := builder.Config{
+func (p *CorpusPlanner) makeBuilderConfig() builder.Config {
+	return builder.Config{
 		Init:      nil,
 		Observers: p.Observers,
 		Manifest: builder.Manifest{
@@ -98,16 +85,6 @@ func (p *CorpusPlanner) makeBuilder() (*builder.Builder, error) {
 			NReqs: len(p.Files),
 		},
 	}
-	return builder.New(bc)
-}
-
-func (p *CorpusPlanner) probeInner(ctx context.Context, ch chan<- builder.Request) error {
-	for _, f := range p.Files {
-		if err := p.probeSubject(ctx, f, ch); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func expandFiles(in []string) ([]string, error) {
@@ -149,5 +126,5 @@ func (p *CorpusPlanner) probeSubject(ctx context.Context, f string, ch chan<- bu
 }
 
 func (p *CorpusPlanner) sample(c corpus.Corpus) (corpus.Corpus, error) {
-	return c.Sample(p.Rng, p.Size)
+	return c.Sample(p.Rng, p.Quantities.CorpusSize)
 }
