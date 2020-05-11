@@ -73,9 +73,8 @@ var (
 	// OptLevelNames is a consistently named list of the optimisation levels in OptLevels.
 	OptLevelNames = []string{"", "0", "1", "2", "3", "fast", "s", "z", "g"}
 
-	// TODO(@MattWindsor91): use this
-	// OptLevelDisabledNames contains optimisation levels that are disabled by default, as they aren't portable.
-	OptLevelDisabledNames = []string{"g", "z"}
+	// OptLevelDisabledNames contains optimisation levels that are disabled by default, as they are redundant or non-portable.
+	OptLevelDisabledNames = []string{"", "0", "g", "z"}
 )
 
 // DefaultOptLevels gets the default level set for GCC.
