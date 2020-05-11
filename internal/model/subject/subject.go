@@ -20,7 +20,7 @@ import (
 // Subject represents a single test subject in a corpus.
 type Subject struct {
 	// Stats is the statistics set for this subject.
-	Stats model.Statset `toml:"threads,omitempty"`
+	Stats model.Statset `toml:"stats,omitempty"`
 
 	// Fuzz is the fuzzing pathset for this subject, if it has been fuzzed.
 	Fuzz *Fuzz `toml:"fuzz,omitempty"`
