@@ -22,8 +22,11 @@ type analyser struct {
 	// analysis is the analysis being built.
 	analysis *Analysis
 
-	// compilerTimes contains raw durations from each compiler's runs.
+	// compilerTimes contains raw durations from each compiler's compilations.
 	compilerTimes map[string][]time.Duration
+
+	// runTimes contains raw durations from each compiler's runs.
+	runTimes map[string][]time.Duration
 
 	// corpus is the incoming corpus.
 	corpus corpus.Corpus
@@ -51,7 +54,8 @@ func (a *analyser) analyse(ctx context.Context) (*Analysis, error) {
 		return nil, err
 	}
 	for n, c := range a.analysis.Compilers {
-		c.Time = calcTimeSet(a.compilerTimes[n])
+		c.Time = NewTimeSet(a.compilerTimes[n]...)
+		c.RunTime = NewTimeSet(a.runTimes[n]...)
 		a.analysis.Compilers[n] = c
 	}
 	return a.analysis, nil
@@ -87,6 +91,7 @@ func initAnalyser(c corpus.Corpus, compilers map[string]compiler.Compiler, nwork
 		},
 		corpus:        c,
 		compilerTimes: make(map[string][]time.Duration, lc),
+		runTimes:      make(map[string][]time.Duration, lc),
 		nworkers:      nworkers,
 	}
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
@@ -95,6 +100,7 @@ func initAnalyser(c corpus.Corpus, compilers map[string]compiler.Compiler, nwork
 	for cn, c := range compilers {
 		a.analysis.Compilers[cn] = Compiler{Counts: map[subject.Status]int{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}
+		a.runTimes[cn] = []time.Duration{}
 	}
 	return &a
 }
@@ -120,7 +126,7 @@ func (a *analyser) Apply(r classification) {
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
 		sf := statusFlags[i]
 
-		if r.flags.matches(sf) {
+		if r.flags.Matches(sf) {
 			a.analysis.ByStatus[i][r.sub.Name] = r.sub.Subject
 		}
 
@@ -129,38 +135,15 @@ func (a *analyser) Apply(r classification) {
 				continue
 			}
 
-			if f.matches(sf) {
+			if f.Matches(sf) {
 				a.analysis.Compilers[cstr].Counts[i]++
 			}
 		}
 		for cstr, ts := range r.ctimes {
 			a.compilerTimes[cstr] = append(a.compilerTimes[cstr], ts...)
 		}
+		for cstr, ts := range r.rtimes {
+			a.runTimes[cstr] = append(a.runTimes[cstr], ts...)
+		}
 	}
-
-}
-
-// add logs r if it is the minimum or maximum time, and adds it to the mean.
-// Note that this does not calculate a rolling mean, but instead a sum; the .Mean field will need to be divided
-// once all adds are done.
-func (t *TimeSet) add(r time.Duration) {
-	t.Mean += r
-	if t.Min == 0 || r < t.Min {
-		t.Min = r
-	}
-	if t.Max == 0 || t.Max < r {
-		t.Max = r
-	}
-}
-
-func calcTimeSet(raw []time.Duration) *TimeSet {
-	var t TimeSet
-
-	for _, r := range raw {
-		t.add(r)
-	}
-
-	t.Mean /= time.Duration(len(raw))
-
-	return &t
 }

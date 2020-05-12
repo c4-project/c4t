@@ -13,9 +13,10 @@ import (
 
 type classification struct {
 	flags  Flag
+	sub    subject.Named
 	cflags map[string]Flag
 	ctimes map[string][]time.Duration
-	sub    subject.Named
+	rtimes map[string][]time.Duration
 }
 
 func classify(named subject.Named) classification {
@@ -23,6 +24,7 @@ func classify(named subject.Named) classification {
 		flags:  FlagOk,
 		cflags: map[string]Flag{},
 		ctimes: map[string][]time.Duration{},
+		rtimes: map[string][]time.Duration{},
 		sub:    named,
 	}
 	c.classifyCompiles(named.Compiles)
@@ -32,9 +34,11 @@ func classify(named subject.Named) classification {
 
 func (c *classification) classifyCompiles(cs map[string]subject.CompileResult) {
 	for n, cm := range cs {
-		c.cflags[n] |= statusFlags[cm.Status]
-		c.flags |= statusFlags[cm.Status]
-		if cm.Duration != 0 {
+		sf := statusFlags[cm.Status]
+		c.flags |= sf
+		c.cflags[n] |= sf
+
+		if cm.Duration != 0 && !(FlagFail | FlagTimeout).Matches(sf) {
 			c.ctimes[n] = append(c.ctimes[n], cm.Duration)
 		}
 	}
@@ -42,7 +46,12 @@ func (c *classification) classifyCompiles(cs map[string]subject.CompileResult) {
 
 func (c *classification) classifyRuns(rs map[string]subject.RunResult) {
 	for n, r := range rs {
-		c.cflags[n] |= statusFlags[r.Status]
-		c.flags |= statusFlags[r.Status]
+		sf := statusFlags[r.Status]
+		c.flags |= sf
+		c.cflags[n] |= sf
+
+		if r.Duration != 0 && !(FlagRunFail | FlagRunTimeout).Matches(sf) {
+			c.rtimes[n] = append(c.rtimes[n], r.Duration)
+		}
 	}
 }

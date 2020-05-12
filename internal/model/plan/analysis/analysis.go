@@ -8,7 +8,6 @@ package analysis
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
@@ -36,13 +35,13 @@ type Compiler struct {
 	// Counts maps each status to the number of times it was observed across the corpus.
 	Counts map[subject.Status]int
 
+	// Time gathers statistics about how long, on average, this compiler took to compile corpus subjects.
+	// It doesn't contain information about failed compilations.
 	Time *TimeSet
-}
 
-type TimeSet struct {
-	Min  time.Duration
-	Mean time.Duration
-	Max  time.Duration
+	// RunTime gathers statistics about how long, on average, this compiler's compiled subjects took to run.
+	// It doesn't contain information about failed compilations or runs (flagged runs are counted).
+	RunTime *TimeSet
 }
 
 // String summarises this collation as a string.
@@ -64,7 +63,7 @@ func (a *Analysis) String() string {
 
 // HasFlagged tests whether a collation has flagged cases.
 func (a *Analysis) HasFlagged() bool {
-	return a.Flags.matches(FlagFlagged)
+	return a.Flags.Matches(FlagFlagged)
 }
 
 // HasFailures tests whether a collation has failure cases.

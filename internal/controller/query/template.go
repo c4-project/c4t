@@ -20,12 +20,13 @@ const (
 	tmplCompilerCounts = `{{ range $status, $count := . }}  {{ $status }}: {{ $count }}
 {{ end -}}`
 
-	tmplTime = `{{ if . }}time sec min={{ .Min.Seconds }} avg={{ .Mean.Seconds }} max={{ .Max.Seconds }}{{ else }}no time report{{ end }}`
+	tmplTime = `{{ if . }}sec min={{ .Min.Seconds }} avg={{ .Mean.Seconds }} max={{ .Max.Seconds }}{{ else }}no time report{{ end }}`
 
 	tmplCompilers = `
 {{- range $cname, $compiler := .Compilers -}}
 compiler {{ $cname }} ({{ .Info }}):
-  {{ template "timeset" .Time }}
+  compile times: {{ template "timeset" .Time }}
+  run times: {{ template "timeset" .RunTime }}
 {{ template "compilerCounts" .Counts }}
 {{- end -}}
 `

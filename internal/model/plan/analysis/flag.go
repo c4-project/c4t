@@ -23,11 +23,16 @@ const (
 	FlagRunFail
 	// FlagRunTimeout signifies a runtime timeout.
 	FlagRunTimeout
+
+	// FlagFail is the union of all failure flags.
+	FlagFail = FlagCompileFail | FlagRunFail
+	// FlagTimeout is the union of all timeout flags.
+	FlagTimeout = FlagCompileTimeout | FlagRunTimeout
 )
 
-// matches tests whether this Flag matches expected.
-// Generally this a bitwise test, except that FlagOk only matches FlagOk.
-func (f Flag) matches(expected Flag) bool {
+// Matches tests whether this Flag Matches expected.
+// Generally this a bitwise test, except that FlagOk only Matches FlagOk.
+func (f Flag) Matches(expected Flag) bool {
 	if expected == FlagOk {
 		return f == FlagOk
 	}
@@ -35,7 +40,7 @@ func (f Flag) matches(expected Flag) bool {
 	return (f & expected) == expected
 }
 
-// statusFlags matches statuses to flags.
+// statusFlags Matches statuses to flags.
 var statusFlags = [subject.NumStatus]Flag{
 	subject.StatusOk:             FlagOk,
 	subject.StatusFlagged:        FlagFlagged,
