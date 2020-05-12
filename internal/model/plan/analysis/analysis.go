@@ -8,6 +8,7 @@ package analysis
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
@@ -34,6 +35,14 @@ type Compiler struct {
 
 	// Counts maps each status to the number of times it was observed across the corpus.
 	Counts map[subject.Status]int
+
+	Time *TimeSet
+}
+
+type TimeSet struct {
+	Min  time.Duration
+	Mean time.Duration
+	Max  time.Duration
 }
 
 // String summarises this collation as a string.

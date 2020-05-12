@@ -5,22 +5,25 @@
 
 package analysis
 
-import "github.com/MattWindsor91/act-tester/internal/model/subject"
+import (
+	"time"
 
-var statusFlags = [subject.NumStatus]Flag{
-	subject.StatusOk:             FlagOk,
-	subject.StatusFlagged:        FlagFlagged,
-	subject.StatusCompileTimeout: FlagCompileTimeout,
-	subject.StatusCompileFail:    FlagCompileFail,
-	subject.StatusRunTimeout:     FlagRunTimeout,
-	subject.StatusRunFail:        FlagRunFail,
+	"github.com/MattWindsor91/act-tester/internal/model/subject"
+)
+
+type classification struct {
+	flags  Flag
+	cflags map[string]Flag
+	ctimes map[string][]time.Duration
+	sub    subject.Named
 }
 
 func classify(named subject.Named) classification {
 	c := classification{
-		flags:     FlagOk,
-		compilers: map[string]Flag{},
-		sub:       named,
+		flags:  FlagOk,
+		cflags: map[string]Flag{},
+		ctimes: map[string][]time.Duration{},
+		sub:    named,
 	}
 	c.classifyCompiles(named.Compiles)
 	c.classifyRuns(named.Runs)
@@ -29,14 +32,17 @@ func classify(named subject.Named) classification {
 
 func (c *classification) classifyCompiles(cs map[string]subject.CompileResult) {
 	for n, cm := range cs {
-		c.compilers[n] |= statusFlags[cm.Status]
+		c.cflags[n] |= statusFlags[cm.Status]
 		c.flags |= statusFlags[cm.Status]
+		if cm.Duration != 0 {
+			c.ctimes[n] = append(c.ctimes[n], cm.Duration)
+		}
 	}
 }
 
 func (c *classification) classifyRuns(rs map[string]subject.RunResult) {
 	for n, r := range rs {
-		c.compilers[n] |= statusFlags[r.Status]
+		c.cflags[n] |= statusFlags[r.Status]
 		c.flags |= statusFlags[r.Status]
 	}
 }

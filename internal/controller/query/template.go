@@ -17,12 +17,15 @@ const (
 {{ template "states" .CounterExamples }}
   {{- end -}}`
 
-	tmplCompilerCounts = `{{ range $status, $count := . }} {{ $status }}: {{ $count }}
+	tmplCompilerCounts = `{{ range $status, $count := . }}  {{ $status }}: {{ $count }}
 {{ end -}}`
+
+	tmplTime = `{{ if . }}time sec min={{ .Min.Seconds }} avg={{ .Mean.Seconds }} max={{ .Max.Seconds }}{{ else }}no time report{{ end }}`
 
 	tmplCompilers = `
 {{- range $cname, $compiler := .Compilers -}}
 compiler {{ $cname }} ({{ .Info }}):
+  {{ template "timeset" .Time }}
 {{ template "compilerCounts" .Counts }}
 {{- end -}}
 `
@@ -62,6 +65,7 @@ func getTemplate() (*template.Template, error) {
 		return nil, err
 	}
 	for n, ts := range map[string]string{
+		"timeset":        tmplTime,
 		"states":         tmplStateset,
 		"byStatus":       tmplByStatus,
 		"compilers":      tmplCompilers,
