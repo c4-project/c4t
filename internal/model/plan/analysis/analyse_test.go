@@ -10,32 +10,29 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
 
-// TestAnalyse_empty tests that collating an empty corpus gives an empty collation.
+// TestAnalyse_empty tests that analysing an empty corpus gives an error.
 func TestAnalyse_empty(t *testing.T) {
 	t.Parallel()
 
-	c, err := analysis.Analyse(context.Background(), corpus.Corpus{}, 10)
-	require.NoError(t, err, "unexpected error collating empty corpus")
-	for k, coll := range c.ByStatus {
-		assert.Emptyf(t, coll, "%s not empty", k)
-	}
+	_, err := analysis.Analyse(context.Background(), &plan.Plan{Header: plan.Header{Version: plan.CurrentVer}}, 10)
+	testhelp.ExpectErrorIs(t, err, corpus.ErrNone, "analysing empty plan")
 }
 
-// TestAnalyse_mock tests that collating an example corpus gives the expected collation.
+// TestAnalyse_mock tests that analysing an example corpus gives the expected collation.
 func TestAnalyse_mock(t *testing.T) {
 	t.Parallel()
 
-	m := corpus.Mock()
+	m := plan.Mock()
 	crp, err := analysis.Analyse(context.Background(), m, 10)
 	if err != nil {
 		t.Fatal("unexpected error collating mock corpus:", err)

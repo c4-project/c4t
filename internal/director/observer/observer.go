@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
 

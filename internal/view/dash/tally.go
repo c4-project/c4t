@@ -8,7 +8,7 @@ package dash
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container/grid"

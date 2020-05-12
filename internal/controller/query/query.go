@@ -10,23 +10,17 @@ package query
 import (
 	"context"
 	"errors"
-	"io"
-	"text/template"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
 // Query represents the state of the plan querying tool.
 type Query struct {
-	cfg      *Config
-	plan     *plan.Plan
-	w        io.Writer
-	planTmpl *template.Template
+	cfg  *Config
+	plan *plan.Plan
+	aw   *AnalysisWriter
 }
 
 // New constructs a new query runner on config c and plan p.
@@ -37,11 +31,12 @@ func New(c *Config, p *plan.Plan) (*Query, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
-	t, err := getTemplate()
+	aw, err := NewAnalysisWriter(c)
 	if err != nil {
 		return nil, err
 	}
-	return &Query{cfg: c, plan: p, planTmpl: t, w: iohelp.EnsureWriter(c.Out)}, nil
+
+	return &Query{cfg: c, plan: p, aw: aw}, nil
 }
 
 func checkConfig(c *Config) error {
@@ -61,16 +56,11 @@ func checkPlan(p *plan.Plan) error {
 // Run runs the query, outputting to the configured output writer.
 func (q *Query) Run(ctx context.Context) (*plan.Plan, error) {
 	// TODO(@MattWindsor91): allow customisation of nworkers here
-	a, err := analysis.Analyse(ctx, q.plan.Corpus, 20)
+	a, err := analysis.Analyse(ctx, q.plan, 20)
 	if err != nil {
 		return nil, err
 	}
-
-	err = q.planTmpl.ExecuteTemplate(q.w, "root", Context{Compilers: q.plan.Compilers, Analysis: a})
+	// TODO(@MattWindsor91): merge this with the analysis/saving step in the test director.
+	err = q.aw.Write(a)
 	return q.plan, err
-}
-
-type Context struct {
-	Compilers map[string]compiler.Compiler
-	Analysis  *analysis.Analysis
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
 
 // ExampleAnalysis_String is a runnable example for String.
@@ -41,6 +41,7 @@ func ExampleAnalysis_HasFlagged() {
 		ByStatus: map[subject.Status]corpus.Corpus{
 			subject.StatusFlagged: corpus.New("foo", "bar", "baz"),
 		},
+		Flags: analysis.FlagFlagged,
 	}
 	fmt.Println("flagged:", flagged.HasFlagged())
 
@@ -55,16 +56,12 @@ func ExampleAnalysis_HasFailures() {
 	fmt.Println("empty:", empty.HasFailures())
 
 	cfails := analysis.Analysis{
-		ByStatus: map[subject.Status]corpus.Corpus{
-			subject.StatusCompileFail: corpus.New("foo", "bar", "baz"),
-		},
+		Flags: analysis.FlagCompileFail,
 	}
 	fmt.Println("compiler failures:", cfails.HasFailures())
 
 	rfails := analysis.Analysis{
-		ByStatus: map[subject.Status]corpus.Corpus{
-			subject.StatusRunFail: corpus.New("foo", "bar", "baz"),
-		},
+		Flags: analysis.FlagRunFail,
 	}
 	fmt.Println("run failures:", rfails.HasFailures())
 

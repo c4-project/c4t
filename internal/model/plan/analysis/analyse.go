@@ -9,23 +9,30 @@ package analysis
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Analyse collates a corpus c using up to nworkers workers.
-func Analyse(ctx context.Context, c corpus.Corpus, nworkers int) (*Analysis, error) {
-	l := len(c)
+// Analyse analyses a plan p using up to nworkers workers.
+func Analyse(ctx context.Context, p *plan.Plan, nworkers int) (*Analysis, error) {
+	if err := checkPlan(p); err != nil {
+		return nil, err
+	}
 
-	col := initAnalysis(l)
+	l := len(p.Corpus)
+
+	col := initAnalysis(l, p.Compilers)
 	// Various bits of the collator expect there to be at least one subject.
 	if l == 0 {
 		return col, nil
 	}
 
 	ch := make(chan classification)
-	err := c.Par(ctx, nworkers,
+	err := p.Corpus.Par(ctx, nworkers,
 		func(ctx context.Context, named subject.Named) error {
 			classifyAndSend(named, ch)
 			return nil
@@ -37,13 +44,23 @@ func Analyse(ctx context.Context, c corpus.Corpus, nworkers int) (*Analysis, err
 	return col, err
 }
 
-func initAnalysis(l int) *Analysis {
+func checkPlan(p *plan.Plan) error {
+	if p == nil {
+		return plan.ErrNil
+	}
+	return p.Check()
+}
+
+func initAnalysis(l int, compilers map[string]compiler.Compiler) *Analysis {
 	col := Analysis{
-		ByStatus:       make(map[subject.Status]corpus.Corpus, subject.NumStatus),
-		CompilerCounts: map[string]map[subject.Status]int{},
+		ByStatus:  make(map[subject.Status]corpus.Corpus, subject.NumStatus),
+		Compilers: make(map[string]Compiler, len(compilers)),
 	}
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
 		col.ByStatus[i] = make(corpus.Corpus, l)
+	}
+	for cn, c := range compilers {
+		col.Compilers[cn] = Compiler{Counts: map[subject.Status]int{}, Info: c}
 	}
 	return &col
 }
@@ -65,6 +82,7 @@ func (a *Analysis) build(ctx context.Context, ch <-chan classification, count in
 }
 
 func (a *Analysis) Apply(r classification) {
+	a.Flags |= r.flags
 	for i := subject.StatusOk; i < subject.NumStatus; i++ {
 		sf := statusFlags[i]
 
@@ -73,11 +91,12 @@ func (a *Analysis) Apply(r classification) {
 		}
 
 		for cstr, f := range r.compilers {
+			if _, ok := a.Compilers[cstr]; !ok {
+				continue
+			}
+
 			if f.matches(sf) {
-				if a.CompilerCounts[cstr] == nil {
-					a.CompilerCounts[cstr] = make(map[subject.Status]int)
-				}
-				a.CompilerCounts[cstr][i]++
+				a.Compilers[cstr].Counts[i]++
 			}
 		}
 	}
@@ -85,7 +104,7 @@ func (a *Analysis) Apply(r classification) {
 }
 
 type classification struct {
-	flags     flag
-	compilers map[string]flag
+	flags     Flag
+	compilers map[string]Flag
 	sub       subject.Named
 }

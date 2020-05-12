@@ -22,8 +22,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
@@ -55,7 +55,7 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, err
 	}
 
-	coll, err := analysis.Analyse(ctx, p.Corpus, s.NWorkers)
+	coll, err := analysis.Analyse(ctx, p, s.NWorkers)
 	if err != nil {
 		return nil, fmt.Errorf("when collating: %w", err)
 	}

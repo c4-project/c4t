@@ -7,19 +7,19 @@ package analysis
 
 import "github.com/MattWindsor91/act-tester/internal/model/subject"
 
-var statusFlags = [subject.NumStatus]flag{
-	subject.StatusOk:             flagOk,
-	subject.StatusFlagged:        flagFlagged,
-	subject.StatusCompileTimeout: flagCompileTimeout,
-	subject.StatusCompileFail:    flagCompileFail,
-	subject.StatusRunTimeout:     flagRunTimeout,
-	subject.StatusRunFail:        flagRunFailure,
+var statusFlags = [subject.NumStatus]Flag{
+	subject.StatusOk:             FlagOk,
+	subject.StatusFlagged:        FlagFlagged,
+	subject.StatusCompileTimeout: FlagCompileTimeout,
+	subject.StatusCompileFail:    FlagCompileFail,
+	subject.StatusRunTimeout:     FlagRunTimeout,
+	subject.StatusRunFail:        FlagRunFail,
 }
 
 func classify(named subject.Named) classification {
 	c := classification{
-		flags:     flagOk,
-		compilers: map[string]flag{},
+		flags:     FlagOk,
+		compilers: map[string]Flag{},
 		sub:       named,
 	}
 	c.classifyCompiles(named.Compiles)

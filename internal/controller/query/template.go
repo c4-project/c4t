@@ -17,17 +17,18 @@ const (
 {{ template "states" .CounterExamples }}
   {{- end -}}`
 
-	tmplCompilerCounts = `
-{{- $compilers := .Compilers -}}
-{{- range $cname, $compiler := .Analysis.CompilerCounts -}}
-compiler {{ $cname }} ({{ index $compilers $cname }}):
-{{ range $status, $count := $compiler }}  {{ $status }}: {{ $count }}
-{{ end -}}
+	tmplCompilerCounts = `{{ range $status, $count := . }} {{ $status }}: {{ $count }}
+{{ end -}}`
+
+	tmplCompilers = `
+{{- range $cname, $compiler := .Compilers -}}
+compiler {{ $cname }} ({{ .Info }}):
+{{ template "compilerCounts" .Counts }}
 {{- end -}}
 `
 
 	tmplByStatus = `
-{{- range $status, $corpus := .Analysis.ByStatus -}}
+{{- range $status, $corpus := .ByStatus -}}
 {{- if not $status.IsOk -}}
 {{- if $corpus -}}
 status {{ $status }}:
@@ -48,7 +49,7 @@ status {{ $status }}:
 
 	tmplRoot = `COMPILER BREAKDOWN:
 
-{{ template "compilerCounts" . }}
+{{ template "compilers" . }}
 SUBJECT REPORT:
 
 {{ template "byStatus" . -}}
@@ -63,6 +64,7 @@ func getTemplate() (*template.Template, error) {
 	for n, ts := range map[string]string{
 		"states":         tmplStateset,
 		"byStatus":       tmplByStatus,
+		"compilers":      tmplCompilers,
 		"compilerCounts": tmplCompilerCounts,
 		"obs":            tmplObs,
 	} {

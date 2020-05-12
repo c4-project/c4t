@@ -9,17 +9,31 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Analysis represents an analysis of a corpus.
+// Analysis represents an analysis of a plan.
 type Analysis struct {
 	// ByStatus maps each status to the corpus of subjects that fall into it.
 	ByStatus map[subject.Status]corpus.Corpus
 
-	// CompilerCounts maps each compiler ID to the counts of each status observed across the corpus.
-	CompilerCounts map[string]map[subject.Status]int
+	// Compilers maps each compiler ID to an analysis of that compiler.
+	Compilers map[string]Compiler
+
+	// Flags aggregates all flags found during the analysis.
+	Flags Flag
+}
+
+// Compiler represents information about a compiler in a corpus analysis.
+type Compiler struct {
+	// Info contains the compiler's plan record.
+	Info compiler.Compiler
+
+	// Counts maps each status to the number of times it was observed across the corpus.
+	Counts map[subject.Status]int
 }
 
 // String summarises this collation as a string.
@@ -41,15 +55,10 @@ func (a *Analysis) String() string {
 
 // HasFlagged tests whether a collation has flagged cases.
 func (a *Analysis) HasFlagged() bool {
-	return len(a.ByStatus[subject.StatusFlagged]) != 0
+	return a.Flags.matches(FlagFlagged)
 }
 
 // HasFailures tests whether a collation has failure cases.
 func (a *Analysis) HasFailures() bool {
-	for i := subject.FirstBadStatus; i < subject.NumStatus; i++ {
-		if len(a.ByStatus[i]) != 0 {
-			return true
-		}
-	}
-	return false
+	return a.Flags&(FlagCompileFail|FlagRunFail) != 0
 }

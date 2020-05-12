@@ -17,9 +17,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
 
 // BasicLogger is an interface for things that can use the Log func.
@@ -39,19 +39,19 @@ type Writer struct {
 	io.Writer
 }
 
-// LogHeader logs a collation header to the writer.
+// LogHeader logs an analysis header to the writer.
 func (w Writer) LogHeader(s analysis.Sourced) error {
 	_, err := fmt.Fprintln(w.Writer, &s)
 	return err
 }
 
-// LogBucketHeader logs a collation bucket header to the writer.
+// LogBucketHeader logs an analysis bucket header to the writer.
 func (w Writer) LogBucketHeader(s subject.Status) error {
 	_, err := fmt.Fprintf(w.Writer, "  [%s]\n", s)
 	return err
 }
 
-// LogBucketEntry logs a collation subject name to the writer.
+// LogBucketEntry logs an analysis subject name (and associated compilers) to the writer.
 func (w Writer) LogBucketEntry(sname string) error {
 	_, err := fmt.Fprintf(w.Writer, "  - %s\n", sname)
 	return err

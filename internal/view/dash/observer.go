@@ -10,7 +10,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/analysis"
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
