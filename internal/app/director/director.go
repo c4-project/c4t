@@ -189,7 +189,7 @@ func makeObservers(mids []id.ID, logw io.Writer) ([]observer.Observer, io.Writer
 	if err != nil {
 		return nil, nil, err
 	}
-	lo := observer.NewLogger(logw)
+	lo, err := observer.NewLogger(logw)
 	return []observer.Observer{do, lo}, do, err
 }
 

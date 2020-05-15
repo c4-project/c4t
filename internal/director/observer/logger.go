@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/query"
+
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
@@ -32,29 +34,6 @@ type BasicLogger interface {
 
 	// LogBucketEntry should log the given subject name, assuming LogBucketHeader has been called.
 	LogBucketEntry(string) error
-}
-
-// Writer wraps io.Writer to implement BasicLogger.
-type Writer struct {
-	io.Writer
-}
-
-// LogHeader logs an analysis header to the writer.
-func (w Writer) LogHeader(s analysis.Sourced) error {
-	_, err := fmt.Fprintln(w.Writer, &s)
-	return err
-}
-
-// LogBucketHeader logs an analysis bucket header to the writer.
-func (w Writer) LogBucketHeader(s subject.Status) error {
-	_, err := fmt.Fprintf(w.Writer, "  [%s]\n", s)
-	return err
-}
-
-// LogBucketEntry logs an analysis subject name (and associated compilers) to the writer.
-func (w Writer) LogBucketEntry(sname string) error {
-	_, err := fmt.Fprintf(w.Writer, "  - %s\n", sname)
-	return err
 }
 
 // Log logs s to b.
@@ -94,15 +73,21 @@ func logBucket(b BasicLogger, s subject.Status, bucket corpus.Corpus) error {
 type Logger struct {
 	// out is the writer to use for logging collations.
 	out io.Writer
-	// collCh is used to send sourced collations for logging.
+	// aw is the analysis writer used for outputting sourced analyses.
+	aw *query.AnalysisWriter
+	// collCh is used to send sourced analyses for logging.
 	collCh chan analysis.Sourced
-	// compCh is used to send sourced collations for logging.
+	// compCh is used to send compilers for logging.
 	compCh chan compilerSet
 }
 
-// NewLogger constructs a new LogObserver writing into w, ranging over machine IDs ids.
-func NewLogger(w io.Writer) *Logger {
-	return &Logger{out: w, collCh: make(chan analysis.Sourced), compCh: make(chan compilerSet)}
+// NewLogger constructs a new Logger writing into w, ranging over machine IDs ids.
+func NewLogger(w io.Writer) (*Logger, error) {
+	aw, err := query.NewAnalysisWriter(&query.Config{Out: w})
+	if err != nil {
+		return nil, err
+	}
+	return &Logger{out: w, aw: aw, collCh: make(chan analysis.Sourced), compCh: make(chan compilerSet)}, nil
 }
 
 // Run runs the log observer.
@@ -132,7 +117,7 @@ func (j *Logger) Instance(id.ID) (Instance, error) {
 
 // logCollation logs s to this Logger's file.
 func (j *Logger) logCollation(s analysis.Sourced) error {
-	return Log(Writer{j.out}, s)
+	return j.aw.WriteSourced(&s)
 }
 
 // logCompilers logs compilers to this Logger's file.

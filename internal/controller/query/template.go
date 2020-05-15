@@ -11,35 +11,41 @@ const (
 	tmplStateset = `{{ range . }}      {{ range $k, $v := . }}  {{ $k }} = {{ $v }}{{- end }}
 {{ end -}}`
 
-	tmplObs = `{{- if .CounterExamples }}      valid final states observed:
+	tmplObs = `{{- if .CounterExamples -}}
+{{- if .Witnesses }}      obs valid
 {{ template "states" .Witnesses }}
-      counter-examples observed:
+{{ end }}      obs counter-examples
 {{ template "states" .CounterExamples }}
-  {{- end -}}`
+{{- end -}}`
 
-	tmplCompilerCounts = `{{ range $status, $count := . }}  {{ $status }}: {{ $count }}
+	tmplCompilerCounts = `{{ range $status, $count := . }}  count {{ $status }} {{ $count }}
 {{ end -}}`
 
-	tmplTime = `{{ if . }}sec min={{ .Min.Seconds }} avg={{ .Mean.Seconds }} max={{ .Max.Seconds }}{{ else }}no time report{{ end }}`
+	tmplTime = `{{ if . }}sec min {{ .Min.Seconds }} avg {{ .Mean.Seconds }} max {{ .Max.Seconds }}{{ else }}n/a{{ end }}`
+
+	tmplCompilerInfo = `style {{ .Style }} arch {{ .Arch }} opt {{ if .SelectedOpt -}}
+{{if .SelectedOpt.Name}}{{ .SelectedOpt.Name }}{{ else }}none{{ end -}}{{ else }}none
+{{- end }} mopt {{ if .SelectedMOpt }}{{ .SelectedMOpt }}{{ else }}none{{ end }}`
 
 	tmplCompilers = `
 {{- range $cname, $compiler := .Compilers -}}
-compiler {{ $cname }} ({{ .Info }}):
-  compile times: {{ template "timeset" .Time }}
-  run times: {{ template "timeset" .RunTime }}
-{{ template "compilerCounts" .Counts }}
-{{- end -}}
+compiler {{ $cname }}
+  spec {{ template "compilerInfo" .Info }}
+  timings compile {{ template "timeset" .Time }}
+  timings run {{ template "timeset" .RunTime }}
+{{ template "compilerCounts" .Counts -}}
+{{ end -}}
 `
 
 	tmplByStatus = `
 {{- range $status, $corpus := .ByStatus -}}
 {{- if not $status.IsOk -}}
 {{- if $corpus -}}
-status {{ $status }}:
-{{ range $sname, $subject := $corpus }}  subject {{ $sname }}:
+status {{ $status }}
+{{ range $sname, $subject := $corpus }}  subject {{ $sname }}
 {{ range $compiler, $compile := .Runs -}}
 
-{{- if eq $status .Status }}    {{ $compiler }}
+{{- if eq $status .Status }}    compiler {{ $compiler }}
 {{ end -}}
 
 {{- if .Obs -}}{{- template "obs" .Obs -}}{{- end -}}
@@ -51,10 +57,10 @@ status {{ $status }}:
 {{- end -}}
 `
 
-	tmplRoot = `COMPILER BREAKDOWN:
+	tmplRoot = `COMPILER BREAKDOWN
 
 {{ template "compilers" . }}
-SUBJECT REPORT:
+SUBJECT REPORT
 
 {{ template "byStatus" . -}}
 `
@@ -71,6 +77,7 @@ func getTemplate() (*template.Template, error) {
 		"byStatus":       tmplByStatus,
 		"compilers":      tmplCompilers,
 		"compilerCounts": tmplCompilerCounts,
+		"compilerInfo":   tmplCompilerInfo,
 		"obs":            tmplObs,
 	} {
 		t, err = t.New(n).Parse(ts)
