@@ -6,30 +6,34 @@
 package plan
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 
-	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
 
 // Read reads plan information from r into p.
 func Read(r io.Reader, p *Plan) error {
-	_, err := toml.DecodeReader(r, p)
-	return err
+	return json.NewDecoder(r).Decode(p)
 }
 
 // ReadFile reads plan information from the file named by path into p.
 func ReadFile(path string, p *Plan) error {
-	_, err := toml.DecodeFile(path, p)
-	return err
+	r, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("opening plan file %q: %w", path, err)
+	}
+	perr := Read(r, p)
+	cerr := r.Close()
+	return iohelp.FirstError(perr, cerr)
 }
 
 // Write dumps plan p to w.
 func (p *Plan) Write(w io.Writer) error {
-	enc := toml.NewEncoder(w)
-	enc.Indent = "  "
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "\t")
 	return enc.Encode(p)
 }
 

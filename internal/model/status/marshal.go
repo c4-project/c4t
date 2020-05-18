@@ -15,7 +15,7 @@ func (s Status) MarshalText() ([]byte, error) {
 // UnmarshalText unmarshals a Status from text via its string representation.
 func (s *Status) UnmarshalText(text []byte) error {
 	var err error
-	*s, err = OfString(string(text))
+	*s, err = FromString(string(text))
 	return err
 }
 
@@ -33,6 +33,6 @@ func (s *Status) UnmarshalJSON(bytes []byte) error {
 	if err = json.Unmarshal(bytes, &sstr); err != nil {
 		return err
 	}
-	*s, err = OfString(sstr)
+	*s, err = FromString(sstr)
 	return err
 }

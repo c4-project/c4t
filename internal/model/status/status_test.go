@@ -34,7 +34,7 @@ func TestOfString_RoundTrip(t *testing.T) {
 		want := want
 		t.Run(strconv.Itoa(int(want)), func(t *testing.T) {
 			t.Parallel()
-			got, err := status.OfString(want.String())
+			got, err := status.FromString(want.String())
 			if err != nil {
 				t.Errorf("unexpected error round-tripping status %s(%d): %v", want.String(), want, err)
 			} else if got != want {
@@ -56,8 +56,8 @@ func TestOfString_Bad(t *testing.T) {
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			_, err := status.OfString(c)
-			testhelp.ExpectErrorIs(t, err, status.ErrBad, "in bad OfString")
+			_, err := status.FromString(c)
+			testhelp.ExpectErrorIs(t, err, status.ErrBad, "in bad FromString")
 		})
 	}
 }

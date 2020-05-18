@@ -11,8 +11,6 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
-
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
 )
 
 // Status is the type of completed-run statuses.
@@ -42,7 +40,7 @@ const (
 )
 
 var (
-	// ErrBad occurs when OfString encounters an unknown status string.
+	// ErrBad occurs when FromString encounters an unknown status string.
 	ErrBad = errors.New("bad status")
 
 	// Strings enumerates string equivalents for each Status.
@@ -57,17 +55,17 @@ var (
 	}
 )
 
-// OfCompileError tries to see if err represents a non-fatal issue such as a timeout or process error.
+// FromCompileError tries to see if err represents a non-fatal issue such as a timeout or process error.
 // If so, it converts that error to a status and returns it alongside nil.
 // Otherwise, it propagates the error forwards.
-func OfCompileError(err error) (Status, error) {
+func FromCompileError(err error) (Status, error) {
 	return statusOfError(err, CompileTimeout, CompileFail)
 }
 
-// OfRunError tries to see if err represents a non-fatal issue such as a timeout or process error.
+// FromRunError tries to see if err represents a non-fatal issue such as a timeout or process error.
 // If so, it converts that error to a status and returns it alongside nil.
 // Otherwise, it propagates the error forwards.
-func OfRunError(err error) (Status, error) {
+func FromRunError(err error) (Status, error) {
 	return statusOfError(err, RunTimeout, RunFail)
 }
 
@@ -85,8 +83,8 @@ func statusOfError(err error, timeout, fail Status) (Status, error) {
 	}
 }
 
-// OfString tries to resolve s to a status code.
-func OfString(s string) (Status, error) {
+// FromString tries to resolve s to a status code.
+func FromString(s string) (Status, error) {
 	for i, sc := range Strings {
 		if strings.EqualFold(s, sc) {
 			return Status(i), nil
@@ -106,20 +104,4 @@ func (s Status) String() string {
 // IsOk is true if, and only if, this status is StatusOk.
 func (s Status) IsOk() bool {
 	return s == Ok
-}
-
-// OfObs determines the status of an observation o given various items of context.
-// The error runErr should contain any error that occurred when running the binary giving the observation.
-// OfObs returns any error passed to it that it deems too fatal to represent in the status code.
-func OfObs(o *obs.Obs, runErr error) (Status, error) {
-	if runErr != nil {
-		return OfRunError(runErr)
-	}
-
-	// TODO(@MattWindsor91): allow interestingness criteria
-	if o.Unsat() {
-		return Flagged, nil
-	}
-
-	return Ok, nil
 }

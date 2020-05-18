@@ -10,10 +10,10 @@ import "strings"
 // RunInfo gives hints as to how to run a service.
 type RunInfo struct {
 	// Cmd overrides the command for the service.
-	Cmd string `toml:"cmd,omitzero"`
+	Cmd string `toml:"cmd,omitzero" json:"cmd,omitempty"`
 
 	// Args specifies (extra) arguments to supply to the service.
-	Args []string `toml:"args,omitempty"`
+	Args []string `toml:"args,omitempty" json:"args,omitempty"`
 }
 
 // NewRunInfo programmatically creates a RunInfo using command cmd and arguments args.

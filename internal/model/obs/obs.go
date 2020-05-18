@@ -6,6 +6,8 @@
 // Package obs concerns 'observations': the end result of running a test harness on a particular machine.
 package obs
 
+import "github.com/MattWindsor91/act-tester/internal/model/status"
+
 // Obs represents an observation in ACT's JSON-based format.
 type Obs struct {
 	// Flags contains any flags that are active on Obs.
@@ -40,4 +42,13 @@ func (o *Obs) AddState(t Tag, s State) {
 	case TagCounter:
 		o.CounterExamples = append(o.CounterExamples, s)
 	}
+}
+
+// Status determines the status of an observation o.
+func (o *Obs) Status() status.Status {
+	// TODO(@MattWindsor91): allow interestingness criteria
+	if o.Unsat() {
+		return status.Flagged
+	}
+	return status.Ok
 }

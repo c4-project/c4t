@@ -20,9 +20,9 @@ type StatDumper interface {
 // AtomicStatset contains a set of statistics about atomics (expressions or statements).
 type AtomicStatset struct {
 	// Types gives the types of atomic, categorised by type.
-	Types map[string]int `toml:"types,omitzero,omitempty"`
+	Types map[string]int `toml:"types,omitzero,omitempty" json:"types,omitempty"`
 	// MemOrders gives the types of memory order, categorised by type.
-	MemOrders map[string]int `toml:"mem_orders,omitzero,omitempty"`
+	MemOrders map[string]int `toml:"mem_orders,omitzero,omitempty" json:"mem_orders,omitempty"`
 }
 
 // AddType adds k to the type with ID id.
@@ -44,17 +44,17 @@ func (s *AtomicStatset) AddMemOrder(id id.ID, k int) {
 // Statset contains a set of statistics acquired from `act-c dump-stats`.
 type Statset struct {
 	// Threads is the number of threads.
-	Threads int `toml:"threads,omitzero"`
+	Threads int `toml:"threads,omitzero" json:"threads,omitempty"`
 
 	// Returns is the number of return statements.
-	Returns int `toml:"returns,omitzero"`
+	Returns int `toml:"returns,omitzero" json:"returns,omitempty"`
 
 	// LiteralBools is the number of Boolean literals (true, false, etc).
-	LiteralBools int `toml:"literal_bools,omitzero"`
+	LiteralBools int `toml:"literal_bools,omitzero" json:"literal_bools,omitempty"`
 
 	// AtomicExpressions gives information about atomic statements.
-	AtomicExpressions AtomicStatset `toml:"atomic_expressions,omitempty,omitzero"`
+	AtomicExpressions AtomicStatset `toml:"atomic_expressions,omitempty,omitzero" json:"atomic_expressions,omitempty"`
 
 	// AtomicStatements gives information about atomic statements.
-	AtomicStatements AtomicStatset `toml:"atomic_statements,omitempty,omitzero"`
+	AtomicStatements AtomicStatset `toml:"atomic_statements,omitempty,omitzero" json:"atomic_statements,omitempty"`
 }

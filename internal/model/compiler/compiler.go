@@ -20,30 +20,30 @@ import (
 // Config collects the part of a compiler's specification that comes from the act-tester configuration.
 type Config struct {
 	// Disabled specifies whether this compiler has been disabled.
-	Disabled bool `toml:"disabled,omitempty"`
+	Disabled bool `toml:"disabled,omitempty" json:"disabled,omitempty"`
 
 	// Style is the declared style of the compile.
-	Style id.ID `toml:"style"`
+	Style id.ID `toml:"style" json:"style"`
 
 	// Arch is the architecture (or 'emits') ID for the compiler.
-	Arch id.ID `toml:"arch"`
+	Arch id.ID `toml:"arch" json:"arch"`
 
 	// Run contains information on how to run the compiler.
-	Run *service.RunInfo `toml:"run,omitempty"`
+	Run *service.RunInfo `toml:"run,omitempty" json:"run,omitempty"`
 
 	// MOpt contains information on the 'mopt' (compiler architecture tuning) levels to select for the compiler.
-	MOpt *optlevel.Selection `toml:"mopt,optempty"`
+	MOpt *optlevel.Selection `toml:"mopt,optempty" json:"mopt,omitempty"`
 
 	// Opt contains information on the optimisation levels to select for the compiler.
-	Opt *optlevel.Selection `toml:"opt,omitempty"`
+	Opt *optlevel.Selection `toml:"opt,omitempty" json:"opt,omitempty"`
 }
 
 // Compiler collects all test-relevant information about a compiler.
 type Compiler struct {
 	// SelectedMOpt refers to an architecture tuning level chosen using the compiler's configured march selection.
-	SelectedMOpt string `toml:"selected_mopt,optempty"`
+	SelectedMOpt string `toml:"selected_mopt,optempty" json:"selected_mopt,omitempty"`
 	// SelectedOpt refers to an optimisation level chosen using the compiler's configured optimisation selection.
-	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty"`
+	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty" json:"selected_opt,omitempty"`
 
 	Config
 }

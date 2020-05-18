@@ -122,7 +122,7 @@ func (j *Job) makeCompileResult(sp subject.CompileFileset, start time.Time, err 
 		Files: sp.StripMissing(),
 	}
 
-	cr.Status, err = status.OfCompileError(err)
+	cr.Status, err = status.FromCompileError(err)
 	return cr, err
 }
 

@@ -19,7 +19,7 @@ const (
 	// CurrentVer is the current plan version.
 	// It changes when the interface between various bits of the tester (generally manifested within the plan version)
 	// changes.
-	CurrentVer uint32 = 20200511
+	CurrentVer uint32 = 20200518
 )
 
 var (

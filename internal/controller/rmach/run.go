@@ -13,7 +13,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
-	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 	"golang.org/x/sync/errgroup"
 
@@ -75,7 +74,7 @@ func (m *RMach) runPipework(ctx context.Context, rp *plan.Plan, ps *remote.Pipes
 		return sendPlan(rp, ps.Stdin)
 	})
 	eg.Go(func() error {
-		if _, err := toml.DecodeReader(ps.Stdout, &p2); err != nil {
+		if err := plan.Read(ps.Stdout, &p2); err != nil {
 			return fmt.Errorf("while decoding the output plan: %w", err)
 		}
 		return nil

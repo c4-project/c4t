@@ -12,7 +12,7 @@ import (
 // Named wraps a Compiler with its ID.
 type Named struct {
 	// ID is the ID of the compiler.
-	ID id.ID `toml:"id"`
+	ID id.ID `toml:"id" json:"id"`
 
 	Compiler
 }

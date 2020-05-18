@@ -10,10 +10,10 @@ import "github.com/MattWindsor91/act-tester/internal/model/id"
 // Backend tells the tester how to run a backend.
 type Backend struct {
 	// Style is the declared style of the backend.
-	Style id.ID `toml:"style"`
+	Style id.ID `toml:"style" json:"style"`
 
-	// Run contains information on how to run the compiler.
-	Run *RunInfo `toml:"run,omitempty"`
+	// Run contains information on how to run the backend.
+	Run *RunInfo `toml:"run,omitempty" json:"run,omitempty"`
 }
 
 // NamedBackend wraps a Backend with its ID.

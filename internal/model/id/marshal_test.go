@@ -7,8 +7,12 @@ package id_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -24,34 +28,85 @@ var cases = map[string]string{
 
 // TestID_MarshalText tests whether text marshalling for IDs works by means of TOML encoding.
 func TestID_MarshalText(t *testing.T) {
+	t.Parallel()
 	for name, ids := range cases {
+		ids := ids
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			i := wrappedID{id.FromString(ids)}
 			want := fmt.Sprintf("ID = %q\n", i.ID)
-			if s, err := encodeToString(t, i); err != nil {
-				t.Errorf("error marshalling %q: %v", i, err)
-			} else if s != want {
-				t.Errorf("TOML of %q=%q, want %q", i.ID, s, want)
-			}
+			s, err := encodeToString(t, i)
+			require.NoErrorf(t, err, "error marshalling %q", i)
+			assert.Equalf(t, want, s, "TOML of %q=%q, want %q", i.ID, s, want)
 		})
 	}
 }
 
 // TestID_MarshalText_roundTrip tests whether text marshalling for IDs works by means of round-trip encoding/decoding.
 func TestID_MarshalText_roundTrip(t *testing.T) {
+	t.Parallel()
+
 	for name, ids := range cases {
+		ids := ids
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			i := id.FromString(ids)
 
 			var got wrappedID
 
-			if str, err := encodeToString(t, wrappedID{i}); err != nil {
-				t.Errorf("error marshalling %q: %v", i, err)
-			} else if _, err = toml.Decode(str, &got); err != nil {
-				t.Errorf("error unmarshalling %q: %v", i, err)
-			} else if !i.Equal(got.ID) {
-				t.Errorf("marshal roundtrip %q came back as %q", i, got.ID)
-			}
+			str, err := encodeToString(t, wrappedID{i})
+			require.NoErrorf(t, err, "error marshalling %q", i)
+			_, err = toml.Decode(str, &got)
+			require.NoErrorf(t, err, "error unmarshalling %q", i)
+			assert.Truef(t, i.Equal(got.ID), "marshal roundtrip %q came back as %q", i, got.ID)
+		})
+	}
+}
+
+// TestID_MarshalJSON tests whether text marshalling for IDs works by means of JSON encoding.
+func TestID_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	for name, ids := range cases {
+		ids := ids
+
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			var b bytes.Buffer
+			want := fmt.Sprintf("%q", ids)
+			i, err := id.TryFromString(ids)
+			require.NoErrorf(t, err, "error id-converting %q", ids)
+			err = json.NewEncoder(&b).Encode(i)
+			require.NoErrorf(t, err, "error marshalling %q", ids)
+			assert.JSONEq(t, want, b.String(), "comparing baseline against marshalled")
+		})
+	}
+}
+
+// TestID_MarshalJSON_roundTrip tests whether JSON marshalling for IDs works by means of round-trip encoding/decoding.
+func TestID_MarshalJSON_roundTrip(t *testing.T) {
+	t.Parallel()
+
+	for name, ids := range cases {
+		ids := ids
+
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			var b bytes.Buffer
+
+			want, err := id.TryFromString(ids)
+			require.NoErrorf(t, err, "error id-converting %q", ids)
+			err = json.NewEncoder(&b).Encode(want)
+			require.NoErrorf(t, err, "error marshalling %q", ids)
+
+			var got id.ID
+			err = json.NewDecoder(&b).Decode(&got)
+			require.NoErrorf(t, err, "error unmarshalling %q", ids)
+
+			assert.True(t, want.Equal(got), "comparing baseline against marshalled")
 		})
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"time"
 
-	status2 "github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
@@ -60,30 +60,40 @@ func (j *Job) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResul
 }
 
 func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.RunResult, error) {
-	if c.Status != status2.Ok {
+	if !c.Status.IsOk() {
 		return subject.RunResult{Result: subject.Result{Status: c.Status}}, nil
 	}
 
 	bin := c.Files.Bin
 	if bin == "" {
 		return subject.RunResult{
-			Result: subject.Result{Status: status2.Unknown},
+			Result: subject.Result{Status: status.Unknown},
 		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.Subject.Name, cid.String())
 	}
 
 	start := time.Now()
 	o, runErr := j.runAndParseBin(ctx, cid, bin)
-	status, err := status2.OfObs(o, runErr)
+	s, err := statusOfRun(o, runErr)
 
-	rr := subject.RunResult{
+	return j.makeResult(start, s, o), err
+}
+
+func (j *Job) makeResult(start time.Time, s status.Status, o *obs.Obs) subject.RunResult {
+	return subject.RunResult{
 		Result: subject.Result{
 			Time:     start,
 			Duration: time.Since(start),
-			Status:   status,
+			Status:   s,
 		},
 		Obs: o,
 	}
-	return rr, err
+}
+
+func statusOfRun(o *obs.Obs, runErr error) (status.Status, error) {
+	if runErr != nil {
+		return status.FromRunError(runErr)
+	}
+	return o.Status(), nil
 }
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
