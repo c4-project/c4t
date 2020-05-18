@@ -1,0 +1,65 @@
+.nh
+.TH act\-tester\-mach 8
+
+.SH NAME
+.PP
+act\-tester\-mach \- runs the machine\-dependent phase of an ACT test
+
+
+.SH SYNOPSIS
+.PP
+act\-tester\-mach
+
+.PP
+.RS
+
+.nf
+[\-\-compiler\-timeout|\-t]=[value]
+[\-\-emit\-json|\-J]
+[\-\-num\-workers|\-j]=[value]
+[\-\-run\-timeout|\-T]=[value]
+[\-\-skip\-compiler]
+[\-\-skip\-runner]
+[\-d]=[value]
+[\-i]=[value]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+act\-tester\-mach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-compiler\-timeout, \-t\fP="": a \fB\fCtimeout\fR to apply to each compilation (default: 1m0s)
+
+.PP
+\fB\-\-emit\-json, \-J\fP: emit progress reports in JSON form on stderr
+
+.PP
+\fB\-\-num\-workers, \-j\fP="": number of \fB\fCworkers\fR to run in parallel (default: 1)
+
+.PP
+\fB\-\-run\-timeout, \-T\fP="": a \fB\fCtimeout\fR to apply to each run (default: 1m0s)
+
+.PP
+\fB\-\-skip\-compiler\fP: if given, skip the compiler
+
+.PP
+\fB\-\-skip\-runner\fP: if given, skip the runner
+
+.PP
+\fB\-d\fP="": \fB\fCdirectory\fR to which outputs will be written (default: mach\_results)
+
+.PP
+\fB\-i\fP="": read from this plan \fB\fCfile\fR instead of stdin

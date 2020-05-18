@@ -11,6 +11,13 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/app/fuzz"
+	"github.com/MattWindsor91/act-tester/internal/app/lift"
+	"github.com/MattWindsor91/act-tester/internal/app/rmach"
+
+	"github.com/MattWindsor91/act-tester/internal/app/gccnt"
+	"github.com/MattWindsor91/act-tester/internal/app/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/app/director"
 	"github.com/MattWindsor91/act-tester/internal/app/mach"
 	"github.com/MattWindsor91/act-tester/internal/app/query"
@@ -51,14 +58,25 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	return nil
 }
 
+var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
+	director.App,
+	fuzz.App,
+	gccnt.App,
+	lift.App,
+	litmus.App,
+	mach.App,
+	plan.App,
+	query.App,
+	rmach.App,
+}
+
 func appsToDocument(ctx *c.Context, outw io.Writer, errw io.Writer) []*c.App {
-	return []*c.App{
-		director.App(outw, errw),
-		mach.App(outw, errw),
-		plan.App(outw, errw),
-		query.App(outw, errw),
-		ctx.App,
+	apps := make([]*c.App, len(appFuncs)+1)
+	apps[0] = ctx.App
+	for i, f := range appFuncs {
+		apps[i+1] = f(outw, errw)
 	}
+	return apps
 }
 
 func runApp(outroot string, app *c.App) error {

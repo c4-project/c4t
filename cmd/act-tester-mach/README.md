@@ -1,23 +1,45 @@
-# act-tester-mach
+% act-tester-mach 8
 
-`act-tester-mach` performs the parts of an ACT test run that are machine-dependent.
-By default, it accepts a lifted, potentially-fuzzed plan and:
+# NAME
 
-- compiles each lifted test harness to a binary using each planned compiler;
-- runs each compiled binary;
-- returns a plan with the results of said runs.
+act-tester-mach - runs the machine-dependent phase of an ACT test
 
-## Usage
+# SYNOPSIS
 
-`act-tester-mach [FLAGS] -i PLAN`
+act-tester-mach
 
-### Flags
+```
+[--compiler-timeout|-t]=[value]
+[--emit-json|-J]
+[--num-workers|-j]=[value]
+[--run-timeout|-T]=[value]
+[--skip-compiler]
+[--skip-runner]
+[-d]=[value]
+[-i]=[value]
+```
 
-- `-compiler-timeout DURATION` sets the compiler timeout.
-- `-run-timeout DURATION` sets the run timeout.
-- `-num-workers N` sets the number of parallel run workers.
+**Usage**:
 
-- `-emit-json` causes the machine runner to emit progress information in JSON,
-  in the format expected by `act-tester-rmach` and `act-tester`.
-- `-skip-compiler` disables the compiling phase.
-- `-skip-runner` disables the running phase.
+```
+act-tester-mach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+```
+
+# GLOBAL OPTIONS
+
+**--compiler-timeout, -t**="": a `timeout` to apply to each compilation (default: 1m0s)
+
+**--emit-json, -J**: emit progress reports in JSON form on stderr
+
+**--num-workers, -j**="": number of `workers` to run in parallel (default: 1)
+
+**--run-timeout, -T**="": a `timeout` to apply to each run (default: 1m0s)
+
+**--skip-compiler**: if given, skip the compiler
+
+**--skip-runner**: if given, skip the runner
+
+**-d**="": `directory` to which outputs will be written (default: mach_results)
+
+**-i**="": read from this plan `file` instead of stdin
+

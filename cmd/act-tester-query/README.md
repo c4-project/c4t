@@ -1,4 +1,24 @@
-# act-tester-query
+% act-tester-query 8
 
-`act-tester-query` queries a plan file (generally an output of a tester run) and outputs some human-readable
-statistics.
+# NAME
+
+act-tester-query - performs human-readable queries on a plan file
+
+# SYNOPSIS
+
+act-tester-query
+
+```
+[-i]=[value]
+```
+
+**Usage**:
+
+```
+act-tester-query [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+```
+
+# GLOBAL OPTIONS
+
+**-i**="": read from this plan `file` instead of stdin
+

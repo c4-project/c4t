@@ -23,10 +23,10 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
-// defaultOutDir is the default directory used for the results of the lifter.
+// defaultOutDir is the default directory used for the results of the fuzzer.
 const defaultOutDir = "fuzz_results"
 
-// App creates the act-tester-mach app.
+// App creates the act-tester-fuzz app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  "act-tester-fuzz",

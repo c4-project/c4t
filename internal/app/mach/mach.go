@@ -3,6 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
+// Package mach contains the app definition for act-tester-mach.
 package mach
 
 import (

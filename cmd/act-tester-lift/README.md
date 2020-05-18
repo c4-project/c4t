@@ -1,4 +1,33 @@
-# act-tester-lift
+% act-tester-lift 8
 
-`act-tester-lift` lifts the Litmus tests of a potentially fuzzed plan into test
-harnesses using each machine's configured backend.
+# NAME
+
+act-tester-lift - runs the harness-lifter phase of an ACT test
+
+# SYNOPSIS
+
+act-tester-lift
+
+```
+[-A]=[value]
+[-d]=[value]
+[-i]=[value]
+[-x]
+```
+
+**Usage**:
+
+```
+act-tester-lift [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+```
+
+# GLOBAL OPTIONS
+
+**-A**="": read ACT config from this `file`
+
+**-d**="": `directory` to which outputs will be written (default: lift_results)
+
+**-i**="": read from this plan `file` instead of stdin
+
+**-x**: read ACT config from this `file`
+

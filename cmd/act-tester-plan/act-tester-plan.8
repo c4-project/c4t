@@ -1,0 +1,62 @@
+.nh
+.TH act\-tester\-plan 8
+
+.SH NAME
+.PP
+act\-tester\-plan \- runs the planning phase of an ACT test standalone
+
+
+.SH SYNOPSIS
+.PP
+act\-tester\-plan
+
+.PP
+.RS
+
+.nf
+[\-\-corpus\-size|\-n]=[value]
+[\-\-num\-workers|\-j]=[value]
+[\-\-seed|\-s]=[value]
+[\-A]=[value]
+[\-C]=[value]
+[\-m]=[value]
+[\-x]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+act\-tester\-plan [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-corpus\-size, \-n\fP="": \fB\fCnumber\fR of corpus files to select for this test plan;
+if positive, the planner will use all viable provided corpus files (default: 0)
+
+.PP
+\fB\-\-num\-workers, \-j\fP="": number of \fB\fCworkers\fR to run in parallel (default: 1)
+
+.PP
+\fB\-\-seed, \-s\fP="": \fB\fCseed\fR to use for any randomised components of this test plan; \-1 uses run time as seed (default: \-1)
+
+.PP
+\fB\-A\fP="": read ACT config from this \fB\fCfile\fR
+
+.PP
+\fB\-C\fP="": read ACT config from this \fB\fCfile\fR
+
+.PP
+\fB\-m\fP="": ID of machine to use for this test plan
+
+.PP
+\fB\-x\fP: read ACT config from this \fB\fCfile\fR

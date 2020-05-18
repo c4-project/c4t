@@ -1,18 +1,39 @@
-# act-litmus
+% act-litmus 8
 
-`act-litmus` is a wrapper around [`litmus`](https://github.com/herd/herdtools7)
-that handles various corner cases that arise when using `litmus` in ACT tests.  Specifically, it:
+# NAME
 
-- automatically enables `-ascall true` if the input Litmus test has return values;
-- patches the test harness
+act-litmus - wraps litmus with various issue workarounds
 
-It depends on both `litmus7` and `act-c` being in `PATH`.
+# SYNOPSIS
 
-## Usage
+act-litmus
 
-`act-litmus -carch ARCH -o DIR FILE`
+```
+[--c11]=[value]
+[--carch]=[value]
+[-A]=[value]
+[-o]=[value]
+[-v]
+[-x]
+```
 
-Both `-carch` and `-o` are mandatory.
+**Usage**:
 
-`act-litmus` always runs in C11 harness outputting mode,
-and doesn't support any other operating mode; `-c11` is ignored.
+```
+act-litmus [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+```
+
+# GLOBAL OPTIONS
+
+**--c11**="": for Litmus compatibility; ignored
+
+**--carch**="": C architecture to pass through to litmus
+
+**-A**="": read ACT config from this `file`
+
+**-o**="": output directory for harness
+
+**-v**: be more verbose
+
+**-x**: read ACT config from this `file`
+
