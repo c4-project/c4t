@@ -8,7 +8,7 @@ package dash
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/mum4k/termdash/cell"
 )
 
@@ -34,7 +34,7 @@ const (
 
 // statusColours maps each status flag to its colour.
 // This will need to be kept in sync with the status enum.
-var statusColours = [subject.NumStatus]cell.Color{
+var statusColours = [status.Num]cell.Color{
 	colourUnknown,
 	colourOk,
 	colourFlagged,

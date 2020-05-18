@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 )
 
 const (
@@ -27,31 +27,31 @@ const (
 // Saved contains the pre-computed paths for saving 'interesting' run results.
 type Saved struct {
 	// Dirs maps 'interesting' statuses to directories.
-	Dirs [subject.NumStatus]string
+	Dirs [status.Num]string
 }
 
 // NewSaved creates a save pathset rooted at root.
 func NewSaved(root string) *Saved {
 	return &Saved{
-		Dirs: [subject.NumStatus]string{
-			subject.StatusFlagged:        filepath.Join(root, segFlagged),
-			subject.StatusCompileFail:    filepath.Join(root, segCompileFailures),
-			subject.StatusCompileTimeout: filepath.Join(root, segCompileTimeouts),
-			subject.StatusRunFail:        filepath.Join(root, segRunFailures),
-			subject.StatusRunTimeout:     filepath.Join(root, segRunTimeouts),
+		Dirs: [status.Num]string{
+			status.Flagged:        filepath.Join(root, segFlagged),
+			status.CompileFail:    filepath.Join(root, segCompileFailures),
+			status.CompileTimeout: filepath.Join(root, segCompileTimeouts),
+			status.RunFail:        filepath.Join(root, segRunFailures),
+			status.RunTimeout:     filepath.Join(root, segRunTimeouts),
 		},
 	}
 }
 
 // DirList gets the list of directories in the save pathset, ordered by subject number.
 func (s *Saved) DirList() []string {
-	return s.Dirs[subject.FirstBadStatus:]
+	return s.Dirs[status.FirstBad:]
 }
 
 // SubjectDir tries to get the directory for saved subjects for status st and iteration time iterTime.
-func (s *Saved) SubjectDir(st subject.Status, iterTime time.Time) (string, error) {
-	if st < subject.FirstBadStatus || subject.NumStatus <= st {
-		return "", fmt.Errorf("%w: not an 'interesting' status", subject.ErrBadStatus)
+func (s *Saved) SubjectDir(st status.Status, iterTime time.Time) (string, error) {
+	if st < status.FirstBad || status.Num <= st {
+		return "", fmt.Errorf("%w: not an 'interesting' status", status.ErrBad)
 	}
 	return filepath.Join(
 		s.Dirs[st],
@@ -64,17 +64,17 @@ func (s *Saved) SubjectDir(st subject.Status, iterTime time.Time) (string, error
 
 // PlanFile gets the path to which a final plan file for the test at time iterTime, failing with final status st,
 // should be saved.
-func (s *Saved) PlanFile(st subject.Status, iterTime time.Time) (string, error) {
+func (s *Saved) PlanFile(st status.Status, iterTime time.Time) (string, error) {
 	return s.subjectFile(planBasename, st, iterTime)
 }
 
 // SubjectTarFile gets the path to which a tarball for compile-failed subject sname,
 // from the test at time iterTime and with final status st, should be saved.
-func (s *Saved) SubjectTarFile(sname string, st subject.Status, iterTime time.Time) (string, error) {
+func (s *Saved) SubjectTarFile(sname string, st status.Status, iterTime time.Time) (string, error) {
 	return s.subjectFile(sname+tarSuffix, st, iterTime)
 }
 
-func (s *Saved) subjectFile(fname string, st subject.Status, iterTime time.Time) (string, error) {
+func (s *Saved) subjectFile(fname string, st status.Status, iterTime time.Time) (string, error) {
 	root, err := s.SubjectDir(st, iterTime)
 	if err != nil {
 		return "", err

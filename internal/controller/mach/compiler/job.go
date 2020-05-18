@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
@@ -115,12 +117,12 @@ func (j *Job) makeCompileResult(sp subject.CompileFileset, start time.Time, err 
 		Result: subject.Result{
 			Time:     start,
 			Duration: time.Since(start),
-			Status:   subject.StatusUnknown,
+			Status:   status.Unknown,
 		},
 		Files: sp.StripMissing(),
 	}
 
-	cr.Status, err = subject.StatusOfCompileError(err)
+	cr.Status, err = status.OfCompileError(err)
 	return cr, err
 }
 

@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/query"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
@@ -17,8 +19,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
-
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
@@ -30,7 +30,7 @@ type BasicLogger interface {
 	LogHeader(analysis.Sourced) error
 
 	// LogBucketHeader should log a header for the collation bucket with the given status.
-	LogBucketHeader(subject.Status) error
+	LogBucketHeader(status.Status) error
 
 	// LogBucketEntry should log the given subject name, assuming LogBucketHeader has been called.
 	LogBucketEntry(string) error
@@ -46,7 +46,7 @@ func Log(b BasicLogger, s analysis.Sourced) error {
 
 func logBuckets(b BasicLogger, s analysis.Sourced) error {
 	sc := s.Collation.ByStatus
-	for i := subject.FirstBadStatus; i < subject.NumStatus; i++ {
+	for i := status.FirstBad; i < status.Num; i++ {
 		if err := logBucket(b, i, sc[i]); err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func logBuckets(b BasicLogger, s analysis.Sourced) error {
 	return nil
 }
 
-func logBucket(b BasicLogger, s subject.Status, bucket corpus.Corpus) error {
+func logBucket(b BasicLogger, s status.Status, bucket corpus.Corpus) error {
 	if len(bucket) == 0 {
 		return nil
 	}

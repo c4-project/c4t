@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 )
@@ -19,7 +19,7 @@ import (
 func ExampleNewSaved() {
 	p := pathset.NewSaved("saved")
 
-	for s := subject.FirstBadStatus; s < subject.NumStatus; s++ {
+	for s := status.FirstBad; s < status.Num; s++ {
 		fmt.Printf("%s: %s\n", s, p.Dirs[s])
 	}
 
@@ -35,7 +35,7 @@ func ExampleNewSaved() {
 func ExampleSaved_PlanFile() {
 	p := pathset.NewSaved("saved")
 	t := time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60))
-	stf, _ := p.PlanFile(subject.StatusCompileFail, t)
+	stf, _ := p.PlanFile(status.CompileFail, t)
 	fmt.Println(filepath.ToSlash(stf))
 
 	// Output:
@@ -46,7 +46,7 @@ func ExampleSaved_PlanFile() {
 func ExampleSaved_SubjectTarFile() {
 	p := pathset.NewSaved("saved")
 	t := time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60))
-	stf, _ := p.SubjectTarFile("foo", subject.StatusCompileFail, t)
+	stf, _ := p.SubjectTarFile("foo", status.CompileFail, t)
 	fmt.Println(filepath.ToSlash(stf))
 
 	// Output:

@@ -7,7 +7,7 @@ package dash
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"
 )
@@ -16,7 +16,7 @@ import (
 type sparkset struct {
 	// statusLines contains one sparkline for each status.
 	// (This _includes_ StatusUnknown to simplify calculations later, but we don't display it as a line.)
-	statusLines [subject.NumStatus]*sparkline.SparkLine
+	statusLines [status.Num]*sparkline.SparkLine
 }
 
 func newSparkset() (*sparkset, error) {
@@ -25,7 +25,7 @@ func newSparkset() (*sparkset, error) {
 		err error
 	)
 
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+	for i := status.Ok; i < status.Num; i++ {
 		if s.statusLines[i], err = sparkline.New(
 			sparkline.Color(statusColours[i]), sparkline.Label(i.String()),
 		); err != nil {
@@ -36,7 +36,7 @@ func newSparkset() (*sparkset, error) {
 }
 
 func (s *sparkset) sparkLines() []*sparkline.SparkLine {
-	return s.statusLines[subject.StatusOk:]
+	return s.statusLines[status.Ok:]
 }
 
 func (s *sparkset) grid() []grid.Element {
@@ -49,7 +49,7 @@ func (s *sparkset) grid() []grid.Element {
 }
 
 func (s *sparkset) sparkCollation(c *analysis.Analysis) error {
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+	for i := status.Ok; i < status.Num; i++ {
 		if err := s.statusLines[i].Add([]int{len(c.ByStatus[i])}); err != nil {
 			return err
 		}

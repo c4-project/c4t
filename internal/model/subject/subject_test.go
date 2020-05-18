@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -38,8 +40,8 @@ func ExampleSubject_BestLitmus() {
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
 	s := subject.Subject{Compiles: map[string]subject.CompileResult{
-		"gcc":   {Result: subject.Result{Status: subject.StatusOk}, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
-		"clang": {Result: subject.Result{Status: subject.StatusCompileFail}, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
+		"gcc":   {Result: subject.Result{Status: status.Ok}, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
+		"clang": {Result: subject.Result{Status: status.CompileFail}, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
 	gr, _ := s.CompileResult(id.FromString("gcc"))
 	cr, _ := s.CompileResult(id.FromString("clang"))
@@ -77,8 +79,8 @@ func ExampleSubject_Harness() {
 // ExampleSubject_RunOf is a testable example for RunOf.
 func ExampleSubject_RunOf() {
 	s := subject.Subject{Runs: map[string]subject.RunResult{
-		"gcc":   {Result: subject.Result{Status: subject.StatusOk}},
-		"clang": {Result: subject.Result{Status: subject.StatusRunTimeout}},
+		"gcc":   {Result: subject.Result{Status: status.Ok}},
+		"clang": {Result: subject.Result{Status: status.RunTimeout}},
 	}}
 	gr, _ := s.RunOf(id.FromString("gcc"))
 	cr, _ := s.RunOf(id.FromString("clang"))
@@ -103,7 +105,7 @@ func TestSubject_CompileResult_Missing(t *testing.T) {
 func TestSubject_AddCompileResult(t *testing.T) {
 	var s subject.Subject
 	c := subject.CompileResult{
-		Result: subject.Result{Status: subject.StatusOk},
+		Result: subject.Result{Status: status.Ok},
 		Files: subject.CompileFileset{
 			Bin: "a.out",
 			Log: "gcc.log",
@@ -181,7 +183,7 @@ func TestSubject_RunOf_Missing(t *testing.T) {
 // TestSubject_AddRun checks that AddRun is working properly.
 func TestSubject_AddRun(t *testing.T) {
 	var s subject.Subject
-	c := subject.RunResult{Result: subject.Result{Status: subject.StatusRunTimeout}}
+	c := subject.RunResult{Result: subject.Result{Status: status.RunTimeout}}
 
 	mcomp := id.FromString("gcc")
 

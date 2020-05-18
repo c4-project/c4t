@@ -5,7 +5,9 @@
 
 package analysis
 
-import "github.com/MattWindsor91/act-tester/internal/model/subject"
+import (
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+)
 
 // Flag programmatically represents, as a bitwise Flag set, the possible classifications for a subject in a collation.
 type Flag int
@@ -41,11 +43,11 @@ func (f Flag) Matches(expected Flag) bool {
 }
 
 // statusFlags Matches statuses to flags.
-var statusFlags = [subject.NumStatus]Flag{
-	subject.StatusOk:             FlagOk,
-	subject.StatusFlagged:        FlagFlagged,
-	subject.StatusCompileTimeout: FlagCompileTimeout,
-	subject.StatusCompileFail:    FlagCompileFail,
-	subject.StatusRunTimeout:     FlagRunTimeout,
-	subject.StatusRunFail:        FlagRunFail,
+var statusFlags = [status.Num]Flag{
+	status.Ok:             FlagOk,
+	status.Flagged:        FlagFlagged,
+	status.CompileTimeout: FlagCompileTimeout,
+	status.CompileFail:    FlagCompileFail,
+	status.RunTimeout:     FlagRunTimeout,
+	status.RunFail:        FlagRunFail,
 }

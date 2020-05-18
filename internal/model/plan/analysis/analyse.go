@@ -10,6 +10,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 
@@ -86,7 +88,7 @@ func initAnalyser(c corpus.Corpus, compilers map[string]compiler.Compiler, nwork
 	lc := len(compilers)
 	a := analyser{
 		analysis: &Analysis{
-			ByStatus:  make(map[subject.Status]corpus.Corpus, subject.NumStatus),
+			ByStatus:  make(map[status.Status]corpus.Corpus, status.Num),
 			Compilers: make(map[string]Compiler, lc),
 		},
 		corpus:        c,
@@ -94,11 +96,11 @@ func initAnalyser(c corpus.Corpus, compilers map[string]compiler.Compiler, nwork
 		runTimes:      make(map[string][]time.Duration, lc),
 		nworkers:      nworkers,
 	}
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+	for i := status.Ok; i < status.Num; i++ {
 		a.analysis.ByStatus[i] = make(corpus.Corpus, len(c))
 	}
 	for cn, c := range compilers {
-		a.analysis.Compilers[cn] = Compiler{Counts: map[subject.Status]int{}, Info: c}
+		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}
 		a.runTimes[cn] = []time.Duration{}
 	}
@@ -123,7 +125,7 @@ func (a *analyser) build(ctx context.Context, ch <-chan classification, count in
 
 func (a *analyser) Apply(r classification) {
 	a.analysis.Flags |= r.flags
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+	for i := status.Ok; i < status.Num; i++ {
 		sf := statusFlags[i]
 
 		if r.flags.Matches(sf) {

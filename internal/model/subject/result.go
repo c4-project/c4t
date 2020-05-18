@@ -5,7 +5,11 @@
 
 package subject
 
-import "time"
+import (
+	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+)
 
 // Result is the base structure for things that represent the result of an external process.
 type Result struct {
@@ -16,5 +20,5 @@ type Result struct {
 	Duration time.Duration `toml:"duration,omitzero"`
 
 	// Status is the status of the process.
-	Status Status `toml:"status"`
+	Status status.Status `toml:"status"`
 }

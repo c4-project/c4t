@@ -9,16 +9,17 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
 // Analysis represents an analysis of a plan.
 type Analysis struct {
 	// ByStatus maps each status to the corpus of subjects that fall into it.
-	ByStatus map[subject.Status]corpus.Corpus
+	ByStatus map[status.Status]corpus.Corpus
 
 	// Compilers maps each compiler ID to an analysis of that compiler.
 	Compilers map[string]Compiler
@@ -33,7 +34,7 @@ type Compiler struct {
 	Info compiler.Compiler
 
 	// Counts maps each status to the number of times it was observed across the corpus.
-	Counts map[subject.Status]int
+	Counts map[status.Status]int
 
 	// Time gathers statistics about how long, on average, this compiler took to compile corpus subjects.
 	// It doesn't contain information about failed compilations.
@@ -51,8 +52,8 @@ func (a *Analysis) String() string {
 	bf := a.ByStatus
 
 	// We range over this to enforce a deterministic order.
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
-		if i != subject.StatusOk {
+	for i := status.Ok; i < status.Num; i++ {
+		if i != status.Ok {
 			sb.WriteString(", ")
 		}
 		_, _ = fmt.Fprintf(&sb, "%d %s", len(bf[i]), i.String())

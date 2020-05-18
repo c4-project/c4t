@@ -3,23 +3,23 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package subject_test
+package status_test
 
 import (
 	"fmt"
 	"strconv"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 )
 
 // ExampleStatus_IsOk is a runnable example for IsOk.
 func ExampleStatus_IsOk() {
-	fmt.Println("is", subject.StatusOk, "ok?", subject.StatusOk.IsOk())
-	fmt.Println("is", subject.StatusFlagged, "ok?", subject.StatusFlagged.IsOk())
-	fmt.Println("is", subject.StatusCompileFail, "ok?", subject.StatusCompileFail.IsOk())
+	fmt.Println("is", status.Ok, "ok?", status.Ok.IsOk())
+	fmt.Println("is", status.Flagged, "ok?", status.Flagged.IsOk())
+	fmt.Println("is", status.CompileFail, "ok?", status.CompileFail.IsOk())
 
 	// Output:
 	// is ok ok? true
@@ -27,14 +27,14 @@ func ExampleStatus_IsOk() {
 	// is compile/fail ok? false
 }
 
-// TestStatusOfString_RoundTrip checks that converting a status to and back from its string is the identity.
-func TestStatusOfString_RoundTrip(t *testing.T) {
+// TestOfString_RoundTrip checks that converting a status to and back from its string is the identity.
+func TestOfString_RoundTrip(t *testing.T) {
 	t.Parallel()
-	for want := subject.StatusUnknown; want < subject.NumStatus; want++ {
+	for want := status.Unknown; want < status.Num; want++ {
 		want := want
 		t.Run(strconv.Itoa(int(want)), func(t *testing.T) {
 			t.Parallel()
-			got, err := subject.StatusOfString(want.String())
+			got, err := status.OfString(want.String())
 			if err != nil {
 				t.Errorf("unexpected error round-tripping status %s(%d): %v", want.String(), want, err)
 			} else if got != want {
@@ -44,8 +44,8 @@ func TestStatusOfString_RoundTrip(t *testing.T) {
 	}
 }
 
-// TestStatusOfString_Bad checks that trying to convert several bad statuses gives errors.
-func TestStatusOfString_Bad(t *testing.T) {
+// TestOfString_Bad checks that trying to convert several bad statuses gives errors.
+func TestOfString_Bad(t *testing.T) {
 	t.Parallel()
 	cases := map[string]string{
 		"empty":   "",
@@ -56,8 +56,8 @@ func TestStatusOfString_Bad(t *testing.T) {
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			_, err := subject.StatusOfString(c)
-			testhelp.ExpectErrorIs(t, err, subject.ErrBadStatus, "in bad StatusOfString")
+			_, err := status.OfString(c)
+			testhelp.ExpectErrorIs(t, err, status.ErrBad, "in bad OfString")
 		})
 	}
 }

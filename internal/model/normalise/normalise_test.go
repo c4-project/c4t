@@ -10,6 +10,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/normalise"
@@ -119,14 +121,14 @@ func TestNormaliser_Subject(t *testing.T) {
 			in: subject.Subject{
 				Compiles: map[string]subject.CompileResult{
 					"clang": {
-						Result: subject.Result{Status: subject.StatusOk},
+						Result: subject.Result{Status: status.Ok},
 						Files: subject.CompileFileset{
 							Bin: path.Join("foobaz", "clang", "a.out"),
 							Log: path.Join("foobaz", "clang", "errors"),
 						},
 					},
 					"gcc": {
-						Result: subject.Result{Status: subject.StatusOk},
+						Result: subject.Result{Status: status.Ok},
 						Files: subject.CompileFileset{
 							Bin: path.Join("foobaz", "gcc", "a.out"),
 							Log: path.Join("foobaz", "gcc", "errors"),
@@ -137,14 +139,14 @@ func TestNormaliser_Subject(t *testing.T) {
 			out: subject.Subject{
 				Compiles: map[string]subject.CompileResult{
 					"clang": {
-						Result: subject.Result{Status: subject.StatusOk},
+						Result: subject.Result{Status: status.Ok},
 						Files: subject.CompileFileset{
 							Bin: path.Join(normalise.DirCompiles, "clang", normalise.FileBin),
 							Log: path.Join(normalise.DirCompiles, "clang", normalise.FileCompileLog),
 						},
 					},
 					"gcc": {
-						Result: subject.Result{Status: subject.StatusOk},
+						Result: subject.Result{Status: status.Ok},
 						Files: subject.CompileFileset{
 							Bin: path.Join(normalise.DirCompiles, "gcc", normalise.FileBin),
 							Log: path.Join(normalise.DirCompiles, "gcc", normalise.FileCompileLog),
@@ -200,7 +202,7 @@ func ExampleNormaliser_MappingsOfKind() {
 		},
 		Compiles: map[string]subject.CompileResult{
 			"clang": {
-				Result: subject.Result{Status: subject.StatusOk},
+				Result: subject.Result{Status: status.Ok},
 				Files: subject.CompileFileset{
 					Bin: path.Join("foobaz", "clang", "a.out"),
 					Log: path.Join("foobaz", "clang", "errors"),

@@ -14,6 +14,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
@@ -52,7 +54,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		"foo",
 		id.CStyleGCC,
 		subject.CompileResult{
-			Result: subject.Result{Status: subject.StatusOk},
+			Result: subject.Result{Status: status.Ok},
 			Files: subject.CompileFileset{
 				Bin: "foo/bin",
 				Log: "foo/log",
@@ -62,7 +64,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		"foo",
 		id.CStyleGCC,
 		subject.RunResult{
-			Result: subject.Result{Status: subject.StatusFlagged},
+			Result: subject.Result{Status: status.Flagged},
 		})
 
 	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {

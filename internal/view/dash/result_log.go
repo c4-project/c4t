@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 	"github.com/mum4k/termdash/cell"
@@ -65,7 +65,7 @@ func (r *ResultLog) overflow() error {
 }
 
 // LogHeader logs the header of a collation bucket with status st.
-func (r *ResultLog) LogBucketHeader(st subject.Status) error {
+func (r *ResultLog) LogBucketHeader(st status.Status) error {
 	header := fmt.Sprintf("  [%s]\n", st)
 	return r.log.Write(header, text.WriteCellOpts(cell.FgColor(statusColours[st])))
 }

@@ -12,6 +12,8 @@ import (
 	"os/exec"
 	"time"
 
+	status2 "github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -58,20 +60,20 @@ func (j *Job) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResul
 }
 
 func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.RunResult, error) {
-	if c.Status != subject.StatusOk {
+	if c.Status != status2.Ok {
 		return subject.RunResult{Result: subject.Result{Status: c.Status}}, nil
 	}
 
 	bin := c.Files.Bin
 	if bin == "" {
 		return subject.RunResult{
-			Result: subject.Result{Status: subject.StatusUnknown},
+			Result: subject.Result{Status: status2.Unknown},
 		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.Subject.Name, cid.String())
 	}
 
 	start := time.Now()
 	o, runErr := j.runAndParseBin(ctx, cid, bin)
-	status, err := subject.StatusOfObs(o, runErr)
+	status, err := status2.OfObs(o, runErr)
 
 	rr := subject.RunResult{
 		Result: subject.Result{

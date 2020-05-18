@@ -8,12 +8,13 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
 // Logger lifts a Logger to an observer.
@@ -25,9 +26,9 @@ func (l *Logger) OnBuildStart(builder.Manifest) {}
 // OnBuildRequest logs failed compile and run results.
 func (l *Logger) OnBuildRequest(r builder.Request) {
 	switch {
-	case r.Compile != nil && r.Compile.Result.Status != subject.StatusOk:
+	case r.Compile != nil && r.Compile.Result.Status != status.Ok:
 		(*log.Logger)(l).Printf("subject %q on compiler %q: %s", r.Name, r.Compile.CompilerID.String(), r.Compile.Result.Status)
-	case r.Run != nil && r.Run.Result.Status != subject.StatusOk:
+	case r.Run != nil && r.Run.Result.Status != status.Ok:
 		(*log.Logger)(l).Printf("subject %q on compiler %q: %s", r.Name, r.Run.CompilerID.String(), r.Run.Result.Status)
 	}
 }

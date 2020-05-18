@@ -8,6 +8,8 @@ package dash
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
@@ -97,8 +99,8 @@ func (o *actionObserver) onHarness(sname string, b *builder.Harness) {
 	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colourHarness)
 }
 
-func suffixOfStatus(s subject.Status) string {
-	if s == subject.StatusOk {
+func suffixOfStatus(s status.Status) string {
+	if s == status.Ok {
 		return ""
 	}
 	return fmt.Sprintf(" [%s]", s)

@@ -8,9 +8,9 @@ package runner
 import (
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/obs"
 )
 
 // Result is the type of results from a single test run.
@@ -33,7 +33,7 @@ type SubjectResult struct {
 // CompilerResult contains results from a subject/compiler pairing.
 type CompilerResult struct {
 	// Status is the status of this run.
-	Status subject.Status `json:"status"`
+	Status status.Status `json:"status"`
 
 	// Obs is this subject's processed observation, if any.
 	Obs *obs.Obs `json:"obs,omitempty"`

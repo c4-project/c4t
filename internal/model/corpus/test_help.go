@@ -8,6 +8,8 @@ package corpus
 import (
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -41,17 +43,17 @@ func MockFailedCompile(name string) subject.Subject {
 		},
 		Compiles: map[string]subject.CompileResult{
 			"gcc": {
-				Result: subject.Result{Status: subject.StatusCompileFail},
+				Result: subject.Result{Status: status.CompileFail},
 				Files:  subject.CompileFileset{},
 			},
 			"clang": MockSuccessfulCompile("clang", name),
 		},
 		Runs: map[string]subject.RunResult{
 			"gcc": {
-				Result: subject.Result{Status: subject.StatusCompileFail},
+				Result: subject.Result{Status: status.CompileFail},
 			},
 			"clang": {
-				Result: subject.Result{Status: subject.StatusOk},
+				Result: subject.Result{Status: status.Ok},
 			},
 		},
 	}
@@ -70,8 +72,8 @@ func MockFlaggedRun(name string) subject.Subject {
 			"icc": MockSuccessfulCompile("icc", name),
 		},
 		Runs: map[string]subject.RunResult{
-			"gcc": {Result: subject.Result{Status: subject.StatusFlagged}},
-			"icc": {Result: subject.Result{Status: subject.StatusFlagged}},
+			"gcc": {Result: subject.Result{Status: status.Flagged}},
+			"icc": {Result: subject.Result{Status: status.Flagged}},
 		},
 	}
 }
@@ -89,7 +91,7 @@ func MockTimeoutRun(name string) subject.Subject {
 			"msvc": MockSuccessfulCompile("msvc", name),
 		},
 		Runs: map[string]subject.RunResult{
-			"msvc": {Result: subject.Result{Status: subject.StatusRunTimeout}},
+			"msvc": {Result: subject.Result{Status: status.RunTimeout}},
 		},
 	}
 }
@@ -98,7 +100,7 @@ func MockTimeoutRun(name string) subject.Subject {
 func MockSuccessfulCompile(cstr string, sname string) subject.CompileResult {
 	return subject.CompileResult{
 		Result: subject.Result{
-			Status: subject.StatusOk,
+			Status: status.Ok,
 		},
 		Files: subject.CompileFileset{
 			Bin: path.Join(cstr, sname, "a.out"),

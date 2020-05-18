@@ -10,12 +10,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
-
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
@@ -39,15 +39,15 @@ func TestAnalyse_mock(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		subc         subject.Status
+		subc         status.Status
 		wantSubjects []string
 	}{
-		"flagged":          {subc: subject.StatusFlagged, wantSubjects: []string{"baz"}},
-		"run-failures":     {subc: subject.StatusRunFail, wantSubjects: []string{}},
-		"run-timeouts":     {subc: subject.StatusRunTimeout, wantSubjects: []string{"barbaz"}},
-		"compile-failures": {subc: subject.StatusCompileFail, wantSubjects: []string{"bar"}},
-		"compile-timeouts": {subc: subject.StatusCompileTimeout, wantSubjects: []string{}},
-		"successes":        {subc: subject.StatusOk, wantSubjects: []string{"foo"}},
+		"flagged":          {subc: status.Flagged, wantSubjects: []string{"baz"}},
+		"run-failures":     {subc: status.RunFail, wantSubjects: []string{}},
+		"run-timeouts":     {subc: status.RunTimeout, wantSubjects: []string{"barbaz"}},
+		"compile-failures": {subc: status.CompileFail, wantSubjects: []string{"bar"}},
+		"compile-timeouts": {subc: status.CompileTimeout, wantSubjects: []string{}},
+		"successes":        {subc: status.Ok, wantSubjects: []string{"foo"}},
 	}
 	for name, c := range cases {
 		c := c

@@ -8,16 +8,17 @@ package dash
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/text"
 )
 
 type tally struct {
-	nstatus [subject.NumStatus]uint64
-	dstatus [subject.NumStatus]*text.Text
+	nstatus [status.Num]uint64
+	dstatus [status.Num]*text.Text
 }
 
 func newTally() (*tally, error) {
@@ -26,7 +27,7 @@ func newTally() (*tally, error) {
 		err error
 	)
 
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+	for i := status.Ok; i < status.Num; i++ {
 		if t.dstatus[i], err = text.New(text.DisableScrolling()); err != nil {
 			return nil, err
 		}
@@ -35,7 +36,7 @@ func newTally() (*tally, error) {
 }
 
 func (t *tally) grid() []grid.Element {
-	widgets := t.dstatus[subject.StatusOk:]
+	widgets := t.dstatus[status.Ok:]
 	els := make([]grid.Element, len(widgets))
 	for i, w := range widgets {
 		els[i] = grid.RowHeightFixed(1, grid.Widget(w))
@@ -44,7 +45,7 @@ func (t *tally) grid() []grid.Element {
 }
 
 func (t *tally) tallyCollation(c *analysis.Analysis) error {
-	for i := subject.StatusOk; i < subject.NumStatus; i++ {
+	for i := status.Ok; i < status.Num; i++ {
 		t.nstatus[i] += uint64(len(c.ByStatus[i]))
 		if err := t.updateCollation(i); err != nil {
 			return err
@@ -53,7 +54,7 @@ func (t *tally) tallyCollation(c *analysis.Analysis) error {
 	return nil
 }
 
-func (t *tally) updateCollation(s subject.Status) error {
+func (t *tally) updateCollation(s status.Status) error {
 	if err := t.dstatus[s].Write(
 		s.String(), text.WriteCellOpts(cell.FgColor(statusColours[s])), text.WriteReplace(),
 	); err != nil {

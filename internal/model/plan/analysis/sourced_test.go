@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
@@ -34,13 +34,13 @@ func ExampleSourced_String() {
 
 	// With collation:
 	sc.Collation = &analysis.Analysis{
-		ByStatus: map[subject.Status]corpus.Corpus{
-			subject.StatusOk:             corpus.New("a", "b", "c", "ch"),
-			subject.StatusFlagged:        corpus.New("barbaz"),
-			subject.StatusCompileFail:    corpus.New("foo", "bar", "baz"),
-			subject.StatusCompileTimeout: corpus.New(),
-			subject.StatusRunFail:        corpus.New("foobaz", "barbaz"),
-			subject.StatusRunTimeout:     corpus.New(),
+		ByStatus: map[status.Status]corpus.Corpus{
+			status.Ok:             corpus.New("a", "b", "c", "ch"),
+			status.Flagged:        corpus.New("barbaz"),
+			status.CompileFail:    corpus.New("foo", "bar", "baz"),
+			status.CompileTimeout: corpus.New(),
+			status.RunFail:        corpus.New("foobaz", "barbaz"),
+			status.RunTimeout:     corpus.New(),
 		},
 	}
 	fmt.Println(&sc)

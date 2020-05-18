@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/status"
+
 	"github.com/1set/gut/yos"
 
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
@@ -62,7 +64,7 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	observer.OnCollation(coll, s.Observers...)
 
 	for st, c := range coll.ByStatus {
-		if st < subject.FirstBadStatus || len(c) == 0 {
+		if st < status.FirstBad || len(c) == 0 {
 			continue
 		}
 		if err := s.saveBucket(st, c, p, p.Header.Creation); err != nil {
@@ -72,7 +74,7 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	return p, nil
 }
 
-func (s *Save) saveBucket(st subject.Status, c corpus.Corpus, p *plan.Plan, creation time.Time) error {
+func (s *Save) saveBucket(st status.Status, c corpus.Corpus, p *plan.Plan, creation time.Time) error {
 	if err := s.prepareDir(st, creation); err != nil {
 		return err
 	}
@@ -82,7 +84,7 @@ func (s *Save) saveBucket(st subject.Status, c corpus.Corpus, p *plan.Plan, crea
 	return s.tarSubjects(st, c, creation)
 }
 
-func (s *Save) prepareDir(st subject.Status, creation time.Time) error {
+func (s *Save) prepareDir(st status.Status, creation time.Time) error {
 	dir, err := s.Paths.SubjectDir(st, creation)
 	if err != nil {
 		return err
@@ -90,7 +92,7 @@ func (s *Save) prepareDir(st subject.Status, creation time.Time) error {
 	return yos.MakeDir(dir)
 }
 
-func (s *Save) writePlan(st subject.Status, p *plan.Plan, creation time.Time) error {
+func (s *Save) writePlan(st status.Status, p *plan.Plan, creation time.Time) error {
 	path, err := s.Paths.PlanFile(st, creation)
 	if err != nil {
 		return err
@@ -98,7 +100,7 @@ func (s *Save) writePlan(st subject.Status, p *plan.Plan, creation time.Time) er
 	return p.DumpFile(path)
 }
 
-func (s *Save) tarSubjects(st subject.Status, corp corpus.Corpus, creation time.Time) error {
+func (s *Save) tarSubjects(st status.Status, corp corpus.Corpus, creation time.Time) error {
 	for name, sub := range corp {
 		if err := s.tarSubject(st, name, sub, creation); err != nil {
 			return err
@@ -107,7 +109,7 @@ func (s *Save) tarSubjects(st subject.Status, corp corpus.Corpus, creation time.
 	return nil
 }
 
-func (s *Save) tarSubject(st subject.Status, name string, sub subject.Subject, creation time.Time) error {
+func (s *Save) tarSubject(st status.Status, name string, sub subject.Subject, creation time.Time) error {
 	tarpath, err := s.Paths.SubjectTarFile(name, st, creation)
 	if err != nil {
 		return err
