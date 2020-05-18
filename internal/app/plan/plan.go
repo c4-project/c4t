@@ -36,18 +36,15 @@ const (
 
 // App creates the act-tester-plan app.
 func App(outw, errw io.Writer) *c.App {
-	return &c.App{
+	a := c.App{
 		Name:  "act-tester-plan",
 		Usage: "runs the planning phase of an ACT test standalone",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, os.Stdout, os.Stderr)
 		},
-		Writer:                 outw,
-		ErrWriter:              errw,
-		HideHelpCommand:        true,
-		UseShortOptionHandling: true,
 	}
+	return stdflag.SetCommonAppSettings(&a, outw, errw)
 }
 
 func flags() []c.Flag {

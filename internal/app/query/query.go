@@ -18,18 +18,15 @@ import (
 )
 
 func App(outw, errw io.Writer) *c.App {
-	return &c.App{
+	a := c.App{
 		Name:  "act-tester-query",
 		Usage: "performs human-readable queries on a plan file",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
 		},
-		Writer:                 outw,
-		ErrWriter:              errw,
-		HideHelpCommand:        true,
-		UseShortOptionHandling: true,
 	}
+	return stdflag.SetCommonAppSettings(&a, outw, errw)
 }
 
 func flags() []c.Flag {

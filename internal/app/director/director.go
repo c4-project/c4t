@@ -36,18 +36,15 @@ import (
 
 // App creates the act-tester app.
 func App(outw, errw io.Writer) *c.App {
-	return &c.App{
+	a := c.App{
 		Name:  "act-tester",
 		Usage: "makes documentation for act-tester commands",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, errw)
 		},
-		Writer:                 outw,
-		ErrWriter:              errw,
-		HideHelpCommand:        true,
-		UseShortOptionHandling: true,
 	}
+	return stdflag.SetCommonAppSettings(&a, outw, errw)
 }
 
 const flagMFilter = "machine-filter"

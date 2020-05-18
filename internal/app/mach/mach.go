@@ -30,16 +30,15 @@ import (
 
 // App creates the act-tester-mach app.
 func App(outw, errw io.Writer) *c.App {
-	return &c.App{
-		Name:                   "act-tester-mach",
-		Usage:                  "runs the machine-dependent phase of an ACT test",
-		Flags:                  flags(),
-		HideHelpCommand:        true,
-		UseShortOptionHandling: true,
+	a := c.App{
+		Name:  "act-tester-mach",
+		Usage: "runs the machine-dependent phase of an ACT test",
+		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
 		},
 	}
+	return stdflag.SetCommonAppSettings(&a, outw, errw)
 }
 
 func flags() []c.Flag {

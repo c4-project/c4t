@@ -24,18 +24,15 @@ import (
 
 // App creates the act-tester-mkdoc app.
 func App(outw, errw io.Writer) *c.App {
-	return &c.App{
+	a := c.App{
 		Name:  "act-tester-mkdoc",
 		Usage: "makes documentation for act-tester commands",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
 		},
-		Writer:                 outw,
-		ErrWriter:              errw,
-		HideHelpCommand:        true,
-		UseShortOptionHandling: true,
 	}
+	return stdflag.SetCommonAppSettings(&a, outw, errw)
 }
 
 func flags() []c.Flag {
