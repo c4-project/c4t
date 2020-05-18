@@ -6,50 +6,14 @@
 package main
 
 import (
-	"context"
-	"flag"
-	"io"
-	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/app/lift"
 
-	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
-
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
-
-	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
-// defaultOutDir is the default directory used for the results of the lifter.
-const defaultOutDir = "lift_results"
-
 func main() {
-	err := run(os.Args, os.Stdout, os.Stderr)
-	view.LogTopError(err)
-}
-
-func run(args []string, outw, errw io.Writer) error {
-	var pf string
-	l := log.New(errw, "", 0)
-
-	fs := flag.NewFlagSet(args[0], flag.ExitOnError)
-	var od string
-	stdflag.OutDirFlag(fs, &od, defaultOutDir)
-	stdflag.PlanFileFlag(fs, &pf)
-
-	if err := fs.Parse(args[1:]); err != nil {
-		return err
-	}
-
-	cfg := lifter.Config{
-		Maker:     &backend.BResolve,
-		Logger:    l,
-		Observers: singleobs.Builder(l),
-		Paths:     lifter.NewPathset(od),
-		Stderr:    errw,
-	}
-
-	return view.RunOnPlanFile(context.Background(), &cfg, pf, outw)
+	app := lift.App(os.Stdout, os.Stderr)
+	view.LogTopError(app.Run(os.Args))
 }
