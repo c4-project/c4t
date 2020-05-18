@@ -9,8 +9,11 @@ package mkdoc
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"path/filepath"
+
+	"github.com/MattWindsor91/act-tester/internal/app/director"
+	"github.com/MattWindsor91/act-tester/internal/app/mach"
+	"github.com/MattWindsor91/act-tester/internal/app/query"
 
 	"github.com/1set/gut/yos"
 	"github.com/MattWindsor91/act-tester/internal/app/plan"
@@ -43,10 +46,7 @@ func flags() []c.Flag {
 
 func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	outdir := stdflag.OutDirFromCli(ctx)
-	for _, app := range []*c.App{
-		plan.App(outw, errw),
-		ctx.App,
-	} {
+	for _, app := range appsToDocument(ctx, outw, errw) {
 		if err := runApp(outdir, app); err != nil {
 			return fmt.Errorf("in app %s: %w", app.Name, err)
 		}
@@ -54,18 +54,13 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	return nil
 }
 
-type method struct {
-	name string
-	make func() (string, error)
-}
-
-const extMan = ".8"
-const fileMarkdown = "README.md"
-
-func methodsOf(app *c.App) map[string]method {
-	return map[string]method{
-		"manpage":  {name: app.Name + extMan, make: app.ToMan},
-		"markdown": {name: fileMarkdown, make: app.ToMarkdown},
+func appsToDocument(ctx *c.Context, outw io.Writer, errw io.Writer) []*c.App {
+	return []*c.App{
+		director.App(outw, errw),
+		mach.App(outw, errw),
+		plan.App(outw, errw),
+		query.App(outw, errw),
+		ctx.App,
 	}
 }
 
@@ -82,13 +77,4 @@ func runApp(outroot string, app *c.App) error {
 		}
 	}
 	return nil
-}
-
-func (m method) run(outdir string) error {
-	s, err := m.make()
-	if err != nil {
-		return err
-	}
-	fname := filepath.Join(outdir, m.name)
-	return ioutil.WriteFile(fname, []byte(s), 0744)
 }
