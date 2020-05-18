@@ -10,6 +10,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
@@ -95,4 +99,50 @@ func TestPlan_Dump_roundTrip(t *testing.T) {
 	assert.Truef(t,
 		p.Header.Creation.Equal(p2.Header.Creation),
 		"date not equal after round-trip: send=%v, recv=%v", p.Header.Creation, p2.Header.Creation)
+}
+
+// TestPlan_Check tests the Check method.
+func TestPlan_Check(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		in  plan.Plan
+		err error
+	}{
+		"no version": {
+			in:  plan.Plan{},
+			err: plan.ErrVersionMismatch,
+		},
+		"version too low": {
+			in: plan.Plan{Header: plan.Header{
+				Version: plan.CurrentVer - 1,
+			}},
+			err: plan.ErrVersionMismatch,
+		},
+		"version too high": {
+			in: plan.Plan{Header: plan.Header{
+				Version: plan.CurrentVer + 1,
+			}},
+			err: plan.ErrVersionMismatch,
+		},
+		"no corpus": {
+			in: plan.Plan{Header: plan.Header{
+				Version: plan.CurrentVer,
+			}},
+			err: corpus.ErrNone,
+		},
+		"known good plan": {
+			in: *plan.Mock(),
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			err := c.in.Check()
+			testhelp.ExpectErrorIs(t, err, c.err, "check plan")
+		})
+	}
 }

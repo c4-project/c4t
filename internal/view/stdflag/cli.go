@@ -35,7 +35,7 @@ func ActRunnerCliFlags() []c.Flag {
 		},
 		&c.BoolFlag{
 			Name:  flagActDuneExec,
-			Usage: usageActConfFile,
+			Usage: usageActDuneExec,
 		},
 	}
 }

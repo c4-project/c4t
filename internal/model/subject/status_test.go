@@ -6,6 +6,7 @@
 package subject_test
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 
@@ -13,6 +14,18 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 )
+
+// ExampleStatus_IsOk is a runnable example for IsOk.
+func ExampleStatus_IsOk() {
+	fmt.Println("is", subject.StatusOk, "ok?", subject.StatusOk.IsOk())
+	fmt.Println("is", subject.StatusFlagged, "ok?", subject.StatusFlagged.IsOk())
+	fmt.Println("is", subject.StatusCompileFail, "ok?", subject.StatusCompileFail.IsOk())
+
+	// Output:
+	// is ok ok? true
+	// is flagged ok? false
+	// is compile/fail ok? false
+}
 
 // TestStatusOfString_RoundTrip checks that converting a status to and back from its string is the identity.
 func TestStatusOfString_RoundTrip(t *testing.T) {
