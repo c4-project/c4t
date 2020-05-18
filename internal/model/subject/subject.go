@@ -12,6 +12,8 @@ package subject
 import (
 	"fmt"
 
+	"github.com/1set/gut/ystring"
+
 	"github.com/MattWindsor91/act-tester/internal/model"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -20,28 +22,28 @@ import (
 // Subject represents a single test subject in a corpus.
 type Subject struct {
 	// Stats is the statistics set for this subject.
-	Stats model.Statset `toml:"stats,omitempty"`
+	Stats model.Statset `toml:"stats,omitempty" json:"stats,omitempty"`
 
 	// Fuzz is the fuzzing pathset for this subject, if it has been fuzzed.
-	Fuzz *Fuzz `toml:"fuzz,omitempty"`
+	Fuzz *Fuzz `toml:"fuzz,omitempty" json:"fuzz,omitempty"`
 
 	// Litmus is the (slashed) path to this subject's original Litmus file.
-	OrigLitmus string `toml:"orig_litmus,omitempty"`
+	OrigLitmus string `toml:"orig_litmus,omitempty" json:"orig_litmus,omitempty"`
 
 	// Compiles contains information about this subject's compilation attempts.
 	// It maps from the string form of each compiler's ID.
 	// If nil, this subject hasn't had any compilations.
-	Compiles map[string]CompileResult `toml:"compiles, omitempty"`
+	Compiles map[string]CompileResult `toml:"compiles,omitempty" json:"compiles,omitempty"`
 
 	// Harnesses contains information about this subject's test harnesses.
 	// It maps the string form of each harness's target architecture's ID.
 	// If nil, this subject hasn't had a harness generated.
-	Harnesses map[string]Harness `toml:"harnesses,omitempty"`
+	Harnesses map[string]Harness `toml:"harnesses,omitempty" json:"harnesses,omitempty"`
 
 	// Runs contains information about this subject's runs so far.
 	// It maps from the string form of each compiler's ID.
 	// If nil, this subject hasn't had any runs.
-	Runs map[string]RunResult `toml:"runs, omitempty"`
+	Runs map[string]RunResult `toml:"runs,omitempty" json:"runs,omitempty"`
 }
 
 // New is a convenience constructor for subjects.
@@ -83,13 +85,18 @@ func WithThreads(threads int) Option {
 // Else, BestLitmus returns an error.
 func (s *Subject) BestLitmus() (string, error) {
 	switch {
-	case s.Fuzz != nil && s.Fuzz.Files.Litmus != "":
+	case s.HasFuzzFile():
 		return s.Fuzz.Files.Litmus, nil
 	case s.OrigLitmus != "":
 		return s.OrigLitmus, nil
 	default:
 		return "", ErrNoBestLitmus
 	}
+}
+
+// HasFuzzFile gets whether this subject has a fuzzed testcase file.
+func (s *Subject) HasFuzzFile() bool {
+	return s.Fuzz != nil && ystring.IsNotBlank(s.Fuzz.Files.Litmus)
 }
 
 // Note that all of these maps work in basically the same way; their being separate and duplicated is just a

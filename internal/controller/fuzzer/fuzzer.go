@@ -99,7 +99,7 @@ func (f *Fuzzer) Fuzz(ctx context.Context) (*plan.Plan, error) {
 	}
 
 	f.l.Println("now fuzzing")
-	rng := f.plan.Header.Rand()
+	rng := f.plan.Metadata.Rand()
 	fcs, ferr := f.fuzzInner(ctx, rng)
 	if ferr != nil {
 		return nil, ferr
@@ -118,7 +118,7 @@ func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand) (*plan.P
 
 	f.l.Println("updating plan")
 	f.plan.Corpus = scs
-	f.plan.Header = *plan.NewHeader(plan.UseDateSeed)
+	f.plan.Metadata = *plan.NewHeader(plan.UseDateSeed)
 	return &f.plan, nil
 }
 

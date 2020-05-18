@@ -49,7 +49,7 @@ func (f *Fixset) PopulateFromStats(s *model.Statset) {
 	}
 }
 
-// Dump dumps a human-readable description of the fixset to the given writer.
+// Write dumps a human-readable description of the fixset to the given writer.
 func (f *Fixset) Dump(w io.Writer) error {
 	for _, c := range []struct {
 		field string

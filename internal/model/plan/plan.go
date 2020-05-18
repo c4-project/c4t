@@ -8,12 +8,7 @@ package plan
 
 import (
 	"errors"
-	"fmt"
-	"io"
-	"os"
 	"sort"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
@@ -22,8 +17,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-
-	"github.com/BurntSushi/toml"
 )
 
 // ErrNil is an error that can be returned if a tester stage gets a nil plan.
@@ -32,25 +25,25 @@ var ErrNil = errors.New("plan nil")
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
 type Plan struct {
-	Header Header `toml:"header"`
+	Metadata Header `toml:"metadata" json:"metadata"`
 
 	// Machine represents the machine targeted by this plan.
-	Machine NamedMachine `toml:"machine"`
+	Machine NamedMachine `toml:"machine" json:"machine"`
 
 	// Backend represents the backend targeted by this plan.
-	Backend *service.Backend `toml:"backend, omitempty"`
+	Backend *service.Backend `toml:"backend,omitempty" json:"backend,omitempty"`
 
 	// Compilers represents the compilers to be targeted by this plan.
 	// Each compiler's key is a stringified form of its machine CompilerID.
-	Compilers map[string]compiler.Compiler `toml:"compilers"`
+	Compilers map[string]compiler.Compiler `toml:"compilers" json:"compilers"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
-	Corpus corpus.Corpus `toml:"corpus"`
+	Corpus corpus.Corpus `toml:"corpus" json:"corpus"`
 }
 
 // Check checks various basic properties on a plan.
 func (p *Plan) Check() error {
-	if err := p.Header.CheckVersion(); err != nil {
+	if err := p.Metadata.CheckVersion(); err != nil {
 		return err
 	}
 	if len(p.Corpus) == 0 {
@@ -58,24 +51,6 @@ func (p *Plan) Check() error {
 	}
 	// TODO(@MattWindsor91): make sure compilers exist
 	return nil
-}
-
-// Dump dumps plan p to w.
-func (p *Plan) Dump(w io.Writer) error {
-	enc := toml.NewEncoder(w)
-	enc.Indent = "  "
-	return enc.Encode(p)
-}
-
-// DumpFile dumps plan p to the file named by path.
-func (p *Plan) DumpFile(path string) error {
-	f, err := os.Create(path)
-	if err != nil {
-		return fmt.Errorf("creating plan file: %w", err)
-	}
-	err = p.Dump(f)
-	cerr := f.Close()
-	return iohelp.FirstError(err, cerr)
 }
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.

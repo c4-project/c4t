@@ -79,14 +79,14 @@ func TestMachinePlan_Arches(t *testing.T) {
 	}
 }
 
-// TestPlan_Dump_roundTrip exercises Dump by doing a round-trip and checking if the reconstituted plan is similar.
+// TestPlan_Dump_roundTrip exercises Write by doing a round-trip and checking if the reconstituted plan is similar.
 func TestPlan_Dump_roundTrip(t *testing.T) {
 	t.Parallel()
 
 	p := plan.Mock()
 
 	var b bytes.Buffer
-	if err := p.Dump(&b); err != nil {
+	if err := p.Write(&b); err != nil {
 		t.Fatal("error dumping:", err)
 	}
 
@@ -97,8 +97,8 @@ func TestPlan_Dump_roundTrip(t *testing.T) {
 
 	// TODO(@MattWindsor91): more comparisons?
 	assert.Truef(t,
-		p.Header.Creation.Equal(p2.Header.Creation),
-		"date not equal after round-trip: send=%v, recv=%v", p.Header.Creation, p2.Header.Creation)
+		p.Metadata.Creation.Equal(p2.Metadata.Creation),
+		"date not equal after round-trip: send=%v, recv=%v", p.Metadata.Creation, p2.Metadata.Creation)
 }
 
 // TestPlan_Check tests the Check method.
@@ -114,19 +114,19 @@ func TestPlan_Check(t *testing.T) {
 			err: plan.ErrVersionMismatch,
 		},
 		"version too low": {
-			in: plan.Plan{Header: plan.Header{
+			in: plan.Plan{Metadata: plan.Header{
 				Version: plan.CurrentVer - 1,
 			}},
 			err: plan.ErrVersionMismatch,
 		},
 		"version too high": {
-			in: plan.Plan{Header: plan.Header{
+			in: plan.Plan{Metadata: plan.Header{
 				Version: plan.CurrentVer + 1,
 			}},
 			err: plan.ErrVersionMismatch,
 		},
 		"no corpus": {
-			in: plan.Plan{Header: plan.Header{
+			in: plan.Plan{Metadata: plan.Header{
 				Version: plan.CurrentVer,
 			}},
 			err: corpus.ErrNone,

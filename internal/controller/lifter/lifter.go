@@ -112,7 +112,7 @@ func (l *Lifter) lift(ctx context.Context) error {
 		},
 	}
 
-	mrng := l.plan.Header.Rand()
+	mrng := l.plan.Metadata.Rand()
 
 	var err error
 	// TODO(@MattWindsor91): extract this 20 into configuration.

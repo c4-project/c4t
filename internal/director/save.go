@@ -67,7 +67,7 @@ func (s *Save) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		if st < status.FirstBad || len(c) == 0 {
 			continue
 		}
-		if err := s.saveBucket(st, c, p, p.Header.Creation); err != nil {
+		if err := s.saveBucket(st, c, p, p.Metadata.Creation); err != nil {
 			return nil, err
 		}
 	}
@@ -97,7 +97,7 @@ func (s *Save) writePlan(st status.Status, p *plan.Plan, creation time.Time) err
 	if err != nil {
 		return err
 	}
-	return p.DumpFile(path)
+	return p.WriteFile(path)
 }
 
 func (s *Save) tarSubjects(st status.Status, corp corpus.Corpus, creation time.Time) error {

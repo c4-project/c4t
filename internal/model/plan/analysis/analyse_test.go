@@ -24,7 +24,7 @@ import (
 func TestAnalyse_empty(t *testing.T) {
 	t.Parallel()
 
-	_, err := analysis.Analyse(context.Background(), &plan.Plan{Header: plan.Header{Version: plan.CurrentVer}}, 10)
+	_, err := analysis.Analyse(context.Background(), &plan.Plan{Metadata: plan.Header{Version: plan.CurrentVer}}, 10)
 	testhelp.ExpectErrorIs(t, err, corpus.ErrNone, "analysing empty plan")
 }
 

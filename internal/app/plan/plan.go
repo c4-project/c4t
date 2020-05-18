@@ -96,7 +96,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 		return err
 	}
 
-	return p.Dump(outw)
+	return p.Write(outw)
 }
 
 func getMachine(cfg *config.Config, midstr string) (plan.NamedMachine, error) {

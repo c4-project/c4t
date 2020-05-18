@@ -22,7 +22,7 @@ func ExampleFixset_Args() {
 	// true
 }
 
-// ExampleFixset_Dump is a runnable example for Dump.
+// ExampleFixset_Dump is a runnable example for Write.
 func ExampleFixset_Dump() {
 	f := Fixset{InjectStdbool: true, UseAsCall: true}
 	_ = f.Dump(os.Stdout)

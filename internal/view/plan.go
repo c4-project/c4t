@@ -10,7 +10,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/BurntSushi/toml"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
@@ -26,9 +25,9 @@ func LoadPlan(f string) (*plan.Plan, error) {
 	)
 
 	if f == "" || f == StdinFile {
-		_, err = toml.DecodeReader(os.Stdin, &p)
+		err = plan.Read(os.Stdin, &p)
 	} else {
-		_, err = toml.DecodeFile(f, &p)
+		err = plan.ReadFile(f, &p)
 	}
 	return &p, err
 }
@@ -49,5 +48,5 @@ func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string, outw io.Write
 		return nil
 	}
 
-	return q.Dump(outw)
+	return q.Write(outw)
 }

@@ -41,7 +41,7 @@ func makeConfig() (*fuzzer.Config, *fuzzer.MockPathset) {
 // makePlan makes a 'valid' plan.
 func makePlan() *plan.Plan {
 	return &plan.Plan{
-		Header: plan.Header{Version: plan.CurrentVer},
+		Metadata: plan.Header{Version: plan.CurrentVer},
 		Corpus: map[string]subject.Subject{
 			"foo": *subject.NewOrPanic("foo.litmus", subject.WithThreads(1)),
 			"bar": *subject.NewOrPanic("bar.litmus", subject.WithThreads(2)),

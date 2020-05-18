@@ -10,7 +10,7 @@ import (
 	"io"
 )
 
-// Header represents a Litmus test header in the form that act-c accepts and dumps.
+// Metadata represents a Litmus test header in the form that act-c accepts and dumps.
 type Header struct {
 	// Name is the name of the Litmus test.
 	Name string `json:"name"`
@@ -25,7 +25,7 @@ type Header struct {
 	Postcondition string `json:"postcondition"`
 }
 
-// ReadHeader tries to read a Header from JSON in r.
+// ReadHeader tries to read a Metadata from JSON in r.
 func (h *Header) Read(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	return dec.Decode(&h)

@@ -14,5 +14,5 @@ type RunResult struct {
 	Result
 
 	// Obs is this run's processed observation, if any.
-	Obs *obs.Obs `toml:"obs,omitempty"`
+	Obs *obs.Obs `toml:"obs,omitempty" json:"obs,omitempty"`
 }

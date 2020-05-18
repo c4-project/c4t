@@ -270,5 +270,5 @@ func (i *Instance) makeRMachConfig(cobs []remote.CopyObserver, bobs []builder.Ob
 
 // dump dumps a plan p to its expected plan file given the stage name name.
 func (i *Instance) dump(name string, p *plan.Plan) error {
-	return p.DumpFile(i.ScratchPaths.PlanForStage(name))
+	return p.WriteFile(i.ScratchPaths.PlanForStage(name))
 }
