@@ -6,9 +6,14 @@
 package status_test
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"os/exec"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -27,8 +32,90 @@ func ExampleStatus_IsOk() {
 	// is compile/fail ok? false
 }
 
-// TestOfString_RoundTrip checks that converting a status to and back from its string is the identity.
-func TestOfString_RoundTrip(t *testing.T) {
+// TestFromCompileError tests several run errors to see if their status equivalent is as expected.
+func TestFromCompileError(t *testing.T) {
+	t.Parallel()
+
+	e := errors.New("bloop")
+
+	cases := map[string]struct {
+		in   error
+		want status.Status
+		out  error
+	}{
+		"ok": {
+			in:   nil,
+			want: status.Ok,
+		},
+		"timeout": {
+			in:   context.DeadlineExceeded,
+			want: status.CompileTimeout,
+		},
+		"err": {
+			in:   &exec.ExitError{},
+			want: status.CompileFail,
+		},
+		"other": {
+			in:  e,
+			out: e,
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := status.FromCompileError(c.in)
+			testhelp.ExpectErrorIs(t, err, c.out, "FromCompileError foldback")
+			assert.Equal(t, c.want, got, "unexpected status")
+		})
+	}
+}
+
+// TestFromRunError tests several run errors to see if their status equivalent is as expected.
+func TestFromRunError(t *testing.T) {
+	t.Parallel()
+
+	e := errors.New("bloop")
+
+	cases := map[string]struct {
+		in   error
+		want status.Status
+		out  error
+	}{
+		"ok": {
+			in:   nil,
+			want: status.Ok,
+		},
+		"timeout": {
+			in:   context.DeadlineExceeded,
+			want: status.RunTimeout,
+		},
+		"err": {
+			in:   &exec.ExitError{},
+			want: status.RunFail,
+		},
+		"other": {
+			in:  e,
+			out: e,
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := status.FromRunError(c.in)
+			testhelp.ExpectErrorIs(t, err, c.out, "FromRunError foldback")
+			assert.Equal(t, c.want, got, "unexpected status")
+		})
+	}
+}
+
+// TestFromString_roundTrip checks that converting a status to and back from its string is the identity.
+func TestFromString_roundTrip(t *testing.T) {
 	t.Parallel()
 	for want := status.Unknown; want < status.Num; want++ {
 		want := want
