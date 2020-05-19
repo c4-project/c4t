@@ -13,6 +13,5 @@ import (
 )
 
 func main() {
-	app := analyse.App(os.Stdout, os.Stderr)
-	view.LogTopError(app.Run(os.Args))
+	view.LogTopError(analyse.App(os.Stdout, os.Stderr).Run(os.Args))
 }

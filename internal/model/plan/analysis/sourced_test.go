@@ -26,26 +26,19 @@ func ExampleSourced_String() {
 			Iter:      42,
 			Start:     time.Date(1997, time.May, 1, 10, 0, 0, 0, time.FixedZone("BST", 60*60)),
 		},
-		Collation: nil,
-	}
-
-	// Without collation:
-	fmt.Println(&sc)
-
-	// With collation:
-	sc.Collation = &analysis.Analysis{
-		ByStatus: map[status.Status]corpus.Corpus{
-			status.Ok:             corpus.New("a", "b", "c", "ch"),
-			status.Flagged:        corpus.New("barbaz"),
-			status.CompileFail:    corpus.New("foo", "bar", "baz"),
-			status.CompileTimeout: corpus.New(),
-			status.RunFail:        corpus.New("foobaz", "barbaz"),
-			status.RunTimeout:     corpus.New(),
+		Analysis: analysis.Analysis{
+			ByStatus: map[status.Status]corpus.Corpus{
+				status.Ok:             corpus.New("a", "b", "c", "ch"),
+				status.Flagged:        corpus.New("barbaz"),
+				status.CompileFail:    corpus.New("foo", "bar", "baz"),
+				status.CompileTimeout: corpus.New(),
+				status.RunFail:        corpus.New("foobaz", "barbaz"),
+				status.RunTimeout:     corpus.New(),
+			},
 		},
 	}
 	fmt.Println(&sc)
 
 	// Output:
-	// [foo.bar.baz #42 (May  1 10:00:00)] (nil)
 	// [foo.bar.baz #42 (May  1 10:00:00)] 4 ok, 1 flagged, 3 compile/fail, 0 compile/timeout, 2 run/fail, 0 run/timeout
 }

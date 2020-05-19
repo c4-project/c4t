@@ -6,9 +6,9 @@
 package dash
 
 import (
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/model/run"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
@@ -23,7 +23,7 @@ import (
 	"github.com/mum4k/termdash/widgets/text"
 )
 
-// Observer is a BuilderObserver that attaches into a Dash.
+// Observer represents a single machine instance inside a dash.
 type Observer struct {
 	mid id.ID
 
@@ -125,18 +125,39 @@ func (o *Observer) OnIteration(r run.Run) {
 	o.action.reset()
 }
 
-// OnCollation observes a collation by adding failure/timeout/flag rates to the sparklines.
-func (o *Observer) OnCollation(c *analysis.Analysis) {
-	terr := o.tally.tallyCollation(c)
-	serr := o.sparks.sparkCollation(c)
-	lerr := o.logCollation(c)
-	o.logError(iohelp.FirstError(terr, serr, lerr))
+// OnAnalysis observes an analysis by adding failure/timeout/flag rates to the sparklines.
+func (o *Observer) OnAnalysis(a analysis.Analysis) {
+	for i := status.Ok; i < status.Num; i++ {
+		o.sendStatusCount(i, len(a.ByStatus[i]))
+	}
+	if err := o.logAnalysis(a); err != nil {
+		o.logError(err)
+	}
 }
 
-func (o *Observer) logCollation(c *analysis.Analysis) error {
+// OnSave currently ignores a save observation.
+func (o *Observer) OnSave(observer.Saving) {
+	// TODO(@MattWindsor91): do something with this?
+}
+
+// OnSaveFileMissing currently ignores a save missing-file observation.
+func (o *Observer) OnSaveFileMissing(observer.Saving, string) {
+	// TODO(@MattWindsor91): do something with this?
+}
+
+func (o *Observer) sendStatusCount(i status.Status, n int) {
+	if err := o.tally.tallyStatus(i, n); err != nil {
+		o.logError(err)
+	}
+	if err := o.sparks.sparkStatus(i, n); err != nil {
+		o.logError(err)
+	}
+}
+
+func (o *Observer) logAnalysis(a analysis.Analysis) error {
 	sc := analysis.Sourced{
-		Run:       o.run.last,
-		Collation: c,
+		Run:      o.run.last,
+		Analysis: a,
 	}
 	return o.rlog.Log(sc)
 }

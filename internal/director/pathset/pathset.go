@@ -10,6 +10,8 @@ package pathset
 import (
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
@@ -40,9 +42,9 @@ func New(root string) *Pathset {
 }
 
 // MachineSave gets the saved-subjects pathset for a machine with ID mid.
-func (p *Pathset) MachineSaved(mid id.ID) *Saved {
+func (p *Pathset) MachineSaved(mid id.ID) *save.Pathset {
 	segs := append([]string{p.DirSaved}, mid.Tags()...)
-	return NewSaved(filepath.Join(segs...))
+	return save.NewPathset(filepath.Join(segs...))
 }
 
 // MachineScratch gets the scratch pathset for a machine with ID mid.

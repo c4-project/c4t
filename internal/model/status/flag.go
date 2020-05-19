@@ -3,13 +3,9 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis
+package status
 
-import (
-	"github.com/MattWindsor91/act-tester/internal/model/status"
-)
-
-// Flag programmatically represents, as a bitwise Flag set, the possible classifications for a subject in a collation.
+// Flag programmatically represents, as a bitwise Flag set, the possible classifications for a subject.
 type Flag int
 
 const (
@@ -32,7 +28,7 @@ const (
 	FlagTimeout = FlagCompileTimeout | FlagRunTimeout
 )
 
-// Matches tests whether this Flag Matches expected.
+// Matches tests whether this Flag matches expected.
 // Generally this a bitwise test, except that FlagOk only Matches FlagOk.
 func (f Flag) Matches(expected Flag) bool {
 	if expected == FlagOk {
@@ -42,12 +38,17 @@ func (f Flag) Matches(expected Flag) bool {
 	return (f & expected) == expected
 }
 
-// statusFlags Matches statuses to flags.
-var statusFlags = [status.Num]Flag{
-	status.Ok:             FlagOk,
-	status.Flagged:        FlagFlagged,
-	status.CompileTimeout: FlagCompileTimeout,
-	status.CompileFail:    FlagCompileFail,
-	status.RunTimeout:     FlagRunTimeout,
-	status.RunFail:        FlagRunFail,
+// statusFlags matches statuses to flags.
+var statusFlags = [Num]Flag{
+	Ok:             FlagOk,
+	Flagged:        FlagFlagged,
+	CompileTimeout: FlagCompileTimeout,
+	CompileFail:    FlagCompileFail,
+	RunTimeout:     FlagRunTimeout,
+	RunFail:        FlagRunFail,
+}
+
+// Flag gets the flag equivalent of this status.
+func (s Status) Flag() Flag {
+	return statusFlags[s]
 }

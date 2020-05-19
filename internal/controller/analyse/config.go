@@ -7,15 +7,22 @@ package analyse
 
 import (
 	"context"
-	"io"
+
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// Config is the configuration for the plan query controller.
+// Config is the configuration for the plan analyse controller.
 type Config struct {
-	// Out is the writer to which query reports will be sent.
-	Out io.Writer
+	// NWorkers is the number of parallel workers to use when performing subject analysis.
+	NWorkers int
+	// Observers is the list of observers to which analyses are sent.
+	Observers []observer.Observer
+	// SavedPaths, if present, is the pathset to which failing corpora should be sent.
+	SavedPaths *save.Pathset
 }
 
 // Run constructs a query controller from this config, then runs it.

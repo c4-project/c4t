@@ -6,7 +6,6 @@
 package dash
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"
@@ -48,11 +47,6 @@ func (s *sparkset) grid() []grid.Element {
 	return els
 }
 
-func (s *sparkset) sparkCollation(c *analysis.Analysis) error {
-	for i := status.Ok; i < status.Num; i++ {
-		if err := s.statusLines[i].Add([]int{len(c.ByStatus[i])}); err != nil {
-			return err
-		}
-	}
-	return nil
+func (s *sparkset) sparkStatus(st status.Status, n int) error {
+	return s.statusLines[st].Add([]int{n})
 }

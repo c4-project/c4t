@@ -7,6 +7,7 @@ package corpus
 
 import (
 	"path"
+	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -100,7 +101,8 @@ func MockTimeoutRun(name string) subject.Subject {
 func MockSuccessfulCompile(cstr string, sname string) subject.CompileResult {
 	return subject.CompileResult{
 		Result: subject.Result{
-			Status: status.Ok,
+			Duration: 200 * time.Second,
+			Status:   status.Ok,
 		},
 		Files: subject.CompileFileset{
 			Bin: path.Join(cstr, sname, "a.out"),

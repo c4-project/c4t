@@ -59,9 +59,9 @@ func optColour(o *optlevel.Named) cell.Color {
 // summaryColor retrieves a colour to use for the log header of sc, according to a 'traffic lights' system.
 func summaryColor(sc analysis.Sourced) cell.Color {
 	switch {
-	case sc.Collation.HasFailures():
+	case sc.Analysis.HasFailures():
 		return colourCompileFail
-	case sc.Collation.HasFlagged():
+	case sc.Analysis.HasFlagged():
 		return colourFlagged
 	default:
 		return colourRun

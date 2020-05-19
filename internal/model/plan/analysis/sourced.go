@@ -15,14 +15,10 @@ type Sourced struct {
 	Run run.Run
 
 	// Analysis is the collation proper.
-	Collation *Analysis
+	Analysis
 }
 
 // String formats a log header for this sourced collation.
 func (s *Sourced) String() string {
-	cstr := "(nil)"
-	if s.Collation != nil {
-		cstr = s.Collation.String()
-	}
-	return s.Run.String() + " " + cstr
+	return s.Run.String() + " " + s.Analysis.String()
 }

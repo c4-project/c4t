@@ -8,10 +8,11 @@ package analysis_test
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
 
 // ExampleAnalysis_String is a runnable example for String.
@@ -41,7 +42,7 @@ func ExampleAnalysis_HasFlagged() {
 		ByStatus: map[status.Status]corpus.Corpus{
 			status.Flagged: corpus.New("foo", "bar", "baz"),
 		},
-		Flags: analysis.FlagFlagged,
+		Flags: status.FlagFlagged,
 	}
 	fmt.Println("flagged:", flagged.HasFlagged())
 
@@ -56,12 +57,12 @@ func ExampleAnalysis_HasFailures() {
 	fmt.Println("empty:", empty.HasFailures())
 
 	cfails := analysis.Analysis{
-		Flags: analysis.FlagCompileFail,
+		Flags: status.FlagCompileFail,
 	}
 	fmt.Println("compiler failures:", cfails.HasFailures())
 
 	rfails := analysis.Analysis{
-		Flags: analysis.FlagRunFail,
+		Flags: status.FlagRunFail,
 	}
 	fmt.Println("run failures:", rfails.HasFailures())
 

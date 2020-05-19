@@ -9,12 +9,22 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/1set/gut/ystring"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
 
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
 	c "github.com/urfave/cli/v2"
+)
+
+const (
+	flagSaveDir  = "save-dir"
+	usageSaveDir = "if present, save failing corpora to this `directory`"
 )
 
 func App(outw, errw io.Writer) *c.App {
@@ -31,11 +41,34 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	return []c.Flag{
+		stdflag.WorkerCountCliFlag(),
+		&c.PathFlag{
+			Name:        flagSaveDir,
+			Aliases:     []string{stdflag.FlagOutDir},
+			Usage:       usageSaveDir,
+			DefaultText: "do not save",
+		},
 		// TODO(@MattWindsor91): template stuff
 	}
 }
 
 func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
-	q := analyse.Config{Out: outw}
+	obs, err := observer.NewAnalysisWriter(outw)
+	if err != nil {
+		return err
+	}
+
+	q := analyse.Config{Observers: []observer.Observer{obs},
+		NWorkers:   stdflag.WorkerCountFromCli(ctx),
+		SavedPaths: savedPaths(ctx),
+	}
 	return view.RunOnCliPlan(ctx, &q, ioutil.Discard)
+}
+
+func savedPaths(ctx *c.Context) *save.Pathset {
+	root := ctx.Path(flagSaveDir)
+	if ystring.IsBlank(root) {
+		return nil
+	}
+	return save.NewPathset(root)
 }

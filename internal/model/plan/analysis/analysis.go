@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
@@ -18,6 +20,9 @@ import (
 
 // Analysis represents an analysis of a plan.
 type Analysis struct {
+	// Plan points to the plan that created this analysis.
+	Plan *plan.Plan
+
 	// ByStatus maps each status to the corpus of subjects that fall into it.
 	ByStatus map[status.Status]corpus.Corpus
 
@@ -25,7 +30,7 @@ type Analysis struct {
 	Compilers map[string]Compiler
 
 	// Flags aggregates all flags found during the analysis.
-	Flags Flag
+	Flags status.Flag
 }
 
 // Compiler represents information about a compiler in a corpus analysis.
@@ -64,10 +69,10 @@ func (a *Analysis) String() string {
 
 // HasFlagged tests whether a collation has flagged cases.
 func (a *Analysis) HasFlagged() bool {
-	return a.Flags.Matches(FlagFlagged)
+	return a.Flags.Matches(status.FlagFlagged)
 }
 
 // HasFailures tests whether a collation has failure cases.
 func (a *Analysis) HasFailures() bool {
-	return a.Flags&(FlagCompileFail|FlagRunFail) != 0
+	return a.Flags&(status.FlagCompileFail|status.FlagRunFail) != 0
 }

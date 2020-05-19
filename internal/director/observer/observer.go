@@ -9,11 +9,11 @@ package observer
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
-
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
@@ -39,8 +39,8 @@ type Instance interface {
 	// time is the time at which the iteration started.
 	OnIteration(run run.Run)
 
-	// OnCollation lets the observer know that the run results have been received and collated into c.
-	OnCollation(c *analysis.Analysis)
+	// Instance observers can observe plan analyses.
+	observer.Observer
 
 	// Instance observers can observe planner operations.
 	planner.Observer
@@ -56,11 +56,13 @@ func OnIteration(r run.Run, obs ...Instance) {
 	}
 }
 
-// OnCollation sends OnCollation to every instance observer in obs.
-func OnCollation(c *analysis.Analysis, obs ...Instance) {
-	for _, o := range obs {
-		o.OnCollation(c)
+// LowerToAnalyse lowers a slice of instance observers to a slice of builder observers.
+func LowerToAnalyse(obs []Instance) []observer.Observer {
+	cos := make([]observer.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
 	}
+	return cos
 }
 
 // LowerToPlanner lowers a slice of instance observers to a slice of planner observers.

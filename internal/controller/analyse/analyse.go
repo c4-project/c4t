@@ -11,32 +11,41 @@ import (
 	"context"
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// Query represents the state of the plan querying tool.
-type Query struct {
+// Analyse represents the state of the plan analyse stage.
+type Analyse struct {
 	cfg  *Config
 	plan *plan.Plan
-	aw   *AnalysisWriter
+	save *save.Saver
 }
 
 // New constructs a new query runner on config c and plan p.
-func New(c *Config, p *plan.Plan) (*Query, error) {
+func New(c *Config, p *plan.Plan) (*Analyse, error) {
 	if err := checkConfig(c); err != nil {
 		return nil, err
 	}
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
-	aw, err := NewAnalysisWriter(c)
-	if err != nil {
-		return nil, err
-	}
 
-	return &Query{cfg: c, plan: p, aw: aw}, nil
+	return &Analyse{cfg: c, plan: p, save: maybeNewSave(c)}, nil
+}
+
+func maybeNewSave(c *Config) *save.Saver {
+	if c.SavedPaths == nil {
+		return nil
+	}
+	return &save.Saver{
+		Observers: c.Observers,
+		Paths:     c.SavedPaths,
+	}
 }
 
 func checkConfig(c *Config) error {
@@ -54,13 +63,27 @@ func checkPlan(p *plan.Plan) error {
 }
 
 // Run runs the query, outputting to the configured output writer.
-func (q *Query) Run(ctx context.Context) (*plan.Plan, error) {
-	// TODO(@MattWindsor91): allow customisation of nworkers here
-	a, err := analysis.Analyse(ctx, q.plan, 20)
+func (q *Analyse) Run(ctx context.Context) (*plan.Plan, error) {
+	a, err := q.analyse(ctx)
 	if err != nil {
 		return nil, err
 	}
-	// TODO(@MattWindsor91): merge this with the analysis/saving step in the test director.
-	err = q.aw.Write(a)
-	return q.plan, err
+
+	observer.OnAnalysis(*a, q.cfg.Observers...)
+
+	if q.save != nil {
+		if err := q.save.Run(*a); err != nil {
+			return nil, err
+		}
+	}
+
+	return q.plan, nil
+}
+
+func (q *Analyse) analyse(ctx context.Context) (*analysis.Analysis, error) {
+	ar, err := NewAnalyser(q.plan, q.cfg.NWorkers)
+	if err != nil {
+		return nil, err
+	}
+	return ar.Analyse(ctx)
 }

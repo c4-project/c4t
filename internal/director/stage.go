@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/rmach"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
@@ -28,8 +30,8 @@ type StageConfig struct {
 	Lift *lifter.Config
 	// Mach contains configuration for the instance's machine-specific stage.
 	Mach *rmach.Config
-	// Save contains configuration for the instance's error saving stage.
-	Save *Save
+	// Analyse contains configuration for the instance's analysis stage.
+	Analyse *analyse.Config
 }
 
 var ErrStageConfigMissing = errors.New("stage config missing")
@@ -48,8 +50,8 @@ func (c *StageConfig) Check() error {
 	if c.Mach == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageMach)
 	}
-	if c.Save == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageSave)
+	if c.Analyse == nil {
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageAnalyse)
 	}
 	return nil
 }
@@ -63,11 +65,11 @@ type stage struct {
 }
 
 const (
-	stagePlan = "plan"
-	stageFuzz = "fuzz"
-	stageLift = "lift"
-	stageMach = "mach"
-	stageSave = "save"
+	stagePlan    = "plan"
+	stageFuzz    = "fuzz"
+	stageLift    = "lift"
+	stageMach    = "mach"
+	stageAnalyse = "analyse"
 )
 
 // Stages is the list of director stages.
@@ -97,9 +99,9 @@ var Stages = []stage{
 		},
 	},
 	{
-		Name: stageSave,
+		Name: stageAnalyse,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-			return c.Save.Run(ctx, p)
+			return c.Analyse.Run(ctx, p)
 		},
 	},
 }

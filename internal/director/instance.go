@@ -12,6 +12,11 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
+
+	aobserver "github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
 
@@ -68,7 +73,7 @@ type Instance struct {
 	Observers []observer.Instance
 
 	// SavedPaths contains the save pathset for this machine.
-	SavedPaths *pathset.Saved
+	SavedPaths *save.Pathset
 	// ScratchPaths contains the scratch pathset for this machine.
 	ScratchPaths *pathset.Scratch
 
@@ -170,6 +175,7 @@ func (i *Instance) iterate(ctx context.Context, iter uint64, sc *StageConfig) er
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
+	aobs := observer.LowerToAnalyse(i.Observers)
 	bobs := observer.LowerToBuilder(i.Observers)
 	cobs := observer.LowerToCopy(i.Observers)
 
@@ -188,16 +194,15 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
 	sc.Mach = i.makeRMachConfig(cobs, bobs)
-	sc.Save = i.makeSave()
+	sc.Analyse = i.makeAnalyseConfig(aobs)
 	return &sc, nil
 }
 
-func (i *Instance) makeSave() *Save {
-	return &Save{
-		Logger:    i.Logger,
-		Observers: i.Observers,
-		NWorkers:  10, // TODO(@MattWindsor91): get this from somewhere
-		Paths:     i.SavedPaths,
+func (i *Instance) makeAnalyseConfig(aobs []aobserver.Observer) *analyse.Config {
+	return &analyse.Config{
+		Observers:  aobs,
+		NWorkers:   10, // TODO(@MattWindsor91): get this from somewhere
+		SavedPaths: i.SavedPaths,
 	}
 }
 

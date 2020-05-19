@@ -5,7 +5,9 @@
 
 package pathset
 
-import "github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+import (
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+)
 
 // All of these methods alter the filesystem, and so are quite hard to test...!
 
@@ -17,9 +19,4 @@ func (p *Pathset) Prepare() error {
 // Prepare prepares this pathset by making its directories.
 func (p *Scratch) Prepare() error {
 	return iohelp.Mkdirs(p.DirPlan, p.DirFuzz, p.DirLift, p.DirRun)
-}
-
-// Prepare prepares this pathset by making its directories.
-func (s *Saved) Prepare() error {
-	return iohelp.Mkdirs(s.DirList()...)
 }

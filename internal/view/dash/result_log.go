@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
+	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 	"github.com/mum4k/termdash/cell"
@@ -39,7 +39,35 @@ func NewResultLog() (*ResultLog, error) {
 
 // Log logs a sourced collation sc.
 func (r *ResultLog) Log(sc analysis.Sourced) error {
-	return observer.Log(r, sc)
+	if err := r.LogHeader(sc); err != nil {
+		return err
+	}
+	return r.logBuckets(sc)
+}
+
+func (r *ResultLog) logBuckets(s analysis.Sourced) error {
+	sc := s.Analysis.ByStatus
+	for i := status.FirstBad; i < status.Num; i++ {
+		if err := r.logBucket(i, sc[i]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *ResultLog) logBucket(s status.Status, bucket corpus.Corpus) error {
+	if len(bucket) == 0 {
+		return nil
+	}
+	if err := r.LogBucketHeader(s); err != nil {
+		return err
+	}
+	for _, n := range bucket.Names() {
+		if err := r.LogBucketEntry(n); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // LogHeader logs the header of a sourced collation sc.

@@ -3,12 +3,16 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis_test
+package analyse_test
 
 import (
 	"context"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -16,27 +20,25 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
-
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
 
-// TestAnalyse_empty tests that analysing an empty corpus gives an error.
-func TestAnalyse_empty(t *testing.T) {
+// TestNewAnalyser_empty tests that analysing an empty corpus gives an error.
+func TestNewAnalyser_empty(t *testing.T) {
 	t.Parallel()
 
-	_, err := analysis.Analyse(context.Background(), &plan.Plan{Metadata: plan.Header{Version: plan.CurrentVer}}, 10)
+	_, err := analyse.NewAnalyser(&plan.Plan{Metadata: plan.Header{Version: plan.CurrentVer}}, 10)
 	testhelp.ExpectErrorIs(t, err, corpus.ErrNone, "analysing empty plan")
 }
 
-// TestAnalyse_mock tests that analysing an example corpus gives the expected collation.
-func TestAnalyse_mock(t *testing.T) {
+// TestAnalyser_Analyse_mock tests that analysing an example corpus gives the expected collation.
+func TestAnalyser_Analyse_mock(t *testing.T) {
 	t.Parallel()
 
 	m := plan.Mock()
-	crp, err := analysis.Analyse(context.Background(), m, 10)
-	if err != nil {
-		t.Fatal("unexpected error collating mock corpus:", err)
-	}
+	a, err := analyse.NewAnalyser(m, 10)
+	require.NoError(t, err, "unexpected error initialising analyser")
+	crp, err := a.Analyse(context.Background())
+	require.NoError(t, err, "unexpected error analysing")
 
 	cases := map[string]struct {
 		subc         status.Status

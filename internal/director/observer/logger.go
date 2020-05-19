@@ -10,84 +10,38 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
-
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
-
-// BasicLogger is an interface for things that can use the Log func.
-type BasicLogger interface {
-	// LogHeader should log the String() of the argument collation.
-	LogHeader(analysis.Sourced) error
-
-	// LogBucketHeader should log a header for the collation bucket with the given status.
-	LogBucketHeader(status.Status) error
-
-	// LogBucketEntry should log the given subject name, assuming LogBucketHeader has been called.
-	LogBucketEntry(string) error
-}
-
-// Log logs s to b.
-func Log(b BasicLogger, s analysis.Sourced) error {
-	if err := b.LogHeader(s); err != nil {
-		return err
-	}
-	return logBuckets(b, s)
-}
-
-func logBuckets(b BasicLogger, s analysis.Sourced) error {
-	sc := s.Collation.ByStatus
-	for i := status.FirstBad; i < status.Num; i++ {
-		if err := logBucket(b, i, sc[i]); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func logBucket(b BasicLogger, s status.Status, bucket corpus.Corpus) error {
-	if len(bucket) == 0 {
-		return nil
-	}
-	if err := b.LogBucketHeader(s); err != nil {
-		return err
-	}
-	for _, n := range bucket.Names() {
-		if err := b.LogBucketEntry(n); err != nil {
-			return err
-		}
-	}
-	return nil
-}
 
 // Logger is a director observer that emits logs to a writer when runs finish up.
 type Logger struct {
 	// out is the writer to use for logging collations.
 	out io.Writer
 	// aw is the analysis writer used for outputting sourced analyses.
-	aw *analyse.AnalysisWriter
-	// collCh is used to send sourced analyses for logging.
-	collCh chan analysis.Sourced
+	aw *observer.AnalysisWriter
+	// anaCh is used to send sourced analyses for logging.
+	anaCh chan analysis.Sourced
 	// compCh is used to send compilers for logging.
 	compCh chan compilerSet
+	// saveCh is used to send save actions for logging.
+	saveCh chan saveMessage
 }
 
 // NewLogger constructs a new Logger writing into w, ranging over machine IDs ids.
 func NewLogger(w io.Writer) (*Logger, error) {
-	aw, err := analyse.NewAnalysisWriter(&analyse.Config{Out: w})
+	aw, err := observer.NewAnalysisWriter(w)
 	if err != nil {
 		return nil, err
 	}
-	return &Logger{out: w, aw: aw, collCh: make(chan analysis.Sourced), compCh: make(chan compilerSet)}, nil
+	return &Logger{out: w, aw: aw, anaCh: make(chan analysis.Sourced), compCh: make(chan compilerSet)}, nil
 }
 
 // Run runs the log observer.
@@ -103,21 +57,33 @@ func (j *Logger) runStep(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case sc := <-j.collCh:
-		return j.logCollation(sc)
+	case ac := <-j.anaCh:
+		return j.logAnalysis(ac)
 	case cc := <-j.compCh:
 		return j.logCompilers(cc)
+	case sc := <-j.saveCh:
+		return j.logSaving(sc)
 	}
 }
 
 // Instance creates an instance logger.
 func (j *Logger) Instance(id.ID) (Instance, error) {
-	return &InstanceLogger{collCh: j.collCh, compCh: j.compCh}, nil
+	return &InstanceLogger{anaCh: j.anaCh, compCh: j.compCh}, nil
 }
 
-// logCollation logs s to this Logger's file.
-func (j *Logger) logCollation(s analysis.Sourced) error {
-	return j.aw.WriteSourced(&s)
+// logAnalysis logs s to this logger's file.
+func (j *Logger) logAnalysis(s analysis.Sourced) error {
+	return j.aw.WriteSourced(s)
+}
+
+// logSaving logs s to this logger's file.
+func (j *Logger) logSaving(s saveMessage) error {
+	result := "success"
+	if s.missing != "" {
+		result = fmt.Sprintf("missing file %q", s.missing)
+	}
+	_, err := fmt.Fprintf(j.out, "save (run %s) %s to %s: %s\n", s.run, s.saving.SubjectName, s.saving.Dest, result)
+	return err
 }
 
 // logCompilers logs compilers to this Logger's file.
@@ -140,8 +106,10 @@ type InstanceLogger struct {
 	done <-chan struct{}
 	// compCh is the channel used to send compiler sets for logging.
 	compCh chan<- compilerSet
-	// collCh is the channel used to send sourced collations for logging.
-	collCh chan<- analysis.Sourced
+	// anaCh is the channel used to send sourced analyses for logging.
+	anaCh chan<- analysis.Sourced
+	// saveCh is the channel used to send save actions for logging.
+	saveCh chan<- saveMessage
 	// run contains information about the current iteration.
 	run run.Run
 	// compilers stores the current, if any, compiler set.
@@ -153,6 +121,12 @@ type InstanceLogger struct {
 type compilerSet struct {
 	run       run.Run
 	compilers []compiler.Named
+}
+
+type saveMessage struct {
+	run     run.Run
+	saving  observer.Saving
+	missing string
 }
 
 func (l *InstanceLogger) OnCompilerPlanStart(ncompilers int) {
@@ -185,17 +159,37 @@ func (l *InstanceLogger) OnIteration(r run.Run) {
 }
 
 // OnCollation logs a collation to this logger.
-func (l *InstanceLogger) OnCollation(c *analysis.Analysis) {
+func (l *InstanceLogger) OnAnalysis(c analysis.Analysis) {
 	select {
 	case <-l.done:
-	case l.collCh <- l.addSource(c):
+	case l.anaCh <- l.addSource(c):
 	}
 }
 
-func (l *InstanceLogger) addSource(c *analysis.Analysis) analysis.Sourced {
+func (l *InstanceLogger) OnSave(s observer.Saving) {
+	l.onSaveMessage(s, "")
+}
+
+func (l *InstanceLogger) OnSaveFileMissing(s observer.Saving, missing string) {
+	l.onSaveMessage(s, missing)
+}
+
+func (l *InstanceLogger) onSaveMessage(s observer.Saving, missing string) {
+	msg := saveMessage{
+		run:     l.run,
+		saving:  s,
+		missing: missing,
+	}
+	select {
+	case <-l.done:
+	case l.saveCh <- msg:
+	}
+}
+
+func (l *InstanceLogger) addSource(c analysis.Analysis) analysis.Sourced {
 	return analysis.Sourced{
-		Run:       l.run,
-		Collation: c,
+		Run:      l.run,
+		Analysis: c,
 	}
 }
 

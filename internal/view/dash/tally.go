@@ -10,7 +10,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/text"
@@ -44,17 +43,9 @@ func (t *tally) grid() []grid.Element {
 	return els
 }
 
-func (t *tally) tallyCollation(c *analysis.Analysis) error {
-	for i := status.Ok; i < status.Num; i++ {
-		t.nstatus[i] += uint64(len(c.ByStatus[i]))
-		if err := t.updateCollation(i); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+func (t *tally) tallyStatus(s status.Status, n int) error {
+	t.nstatus[s] += uint64(n)
 
-func (t *tally) updateCollation(s status.Status) error {
 	if err := t.dstatus[s].Write(
 		s.String(), text.WriteCellOpts(cell.FgColor(statusColours[s])), text.WriteReplace(),
 	); err != nil {
