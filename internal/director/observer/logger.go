@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/query"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
@@ -74,7 +74,7 @@ type Logger struct {
 	// out is the writer to use for logging collations.
 	out io.Writer
 	// aw is the analysis writer used for outputting sourced analyses.
-	aw *query.AnalysisWriter
+	aw *analyse.AnalysisWriter
 	// collCh is used to send sourced analyses for logging.
 	collCh chan analysis.Sourced
 	// compCh is used to send compilers for logging.
@@ -83,7 +83,7 @@ type Logger struct {
 
 // NewLogger constructs a new Logger writing into w, ranging over machine IDs ids.
 func NewLogger(w io.Writer) (*Logger, error) {
-	aw, err := query.NewAnalysisWriter(&query.Config{Out: w})
+	aw, err := analyse.NewAnalysisWriter(&analyse.Config{Out: w})
 	if err != nil {
 		return nil, err
 	}

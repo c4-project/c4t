@@ -8,11 +8,11 @@ package main
 import (
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/app/query"
+	"github.com/MattWindsor91/act-tester/internal/app/analyse"
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
 func main() {
-	app := query.App(os.Stdout, os.Stderr)
+	app := analyse.App(os.Stdout, os.Stderr)
 	view.LogTopError(app.Run(os.Args))
 }

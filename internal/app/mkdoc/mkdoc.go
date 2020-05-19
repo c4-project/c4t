@@ -18,9 +18,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/app/gccnt"
 	"github.com/MattWindsor91/act-tester/internal/app/litmus"
 
+	"github.com/MattWindsor91/act-tester/internal/app/analyse"
 	"github.com/MattWindsor91/act-tester/internal/app/director"
 	"github.com/MattWindsor91/act-tester/internal/app/mach"
-	"github.com/MattWindsor91/act-tester/internal/app/query"
 
 	"github.com/1set/gut/yos"
 	"github.com/MattWindsor91/act-tester/internal/app/plan"
@@ -66,7 +66,7 @@ var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	litmus.App,
 	mach.App,
 	plan.App,
-	query.App,
+	analyse.App,
 	rmach.App,
 }
 

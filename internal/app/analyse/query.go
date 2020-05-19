@@ -3,13 +3,13 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package query
+package analyse
 
 import (
 	"io"
 	"io/ioutil"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/query"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
 
@@ -19,7 +19,7 @@ import (
 
 func App(outw, errw io.Writer) *c.App {
 	a := &c.App{
-		Name:  "act-tester-query",
+		Name:  "act-tester-analyse",
 		Usage: "performs human-readable queries on a plan file",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
@@ -36,6 +36,6 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
-	q := query.Config{Out: outw}
+	q := analyse.Config{Out: outw}
 	return view.RunOnCliPlan(ctx, &q, ioutil.Discard)
 }

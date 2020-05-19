@@ -3,9 +3,9 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package query represents the stage of the tester that takes a plan, performs various statistics on it, and outputs
+// Package analyse represents the stage of the tester that takes a plan, performs various statistics on it, and outputs
 // reports.
-package query
+package analyse
 
 import (
 	"context"
