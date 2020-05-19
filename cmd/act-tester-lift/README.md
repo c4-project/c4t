@@ -11,7 +11,6 @@ act-tester-lift
 ```
 [-A]=[value]
 [-d]=[value]
-[-i]=[value]
 [-x]
 ```
 
@@ -27,7 +26,5 @@ act-tester-lift [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-d**="": `directory` to which outputs will be written (default: lift_results)
 
-**-i**="": read from this plan `file` instead of stdin
-
-**-x**: read ACT config from this `file`
+**-x**: if true, use 'dune exec' to run OCaml ACT binaries
 

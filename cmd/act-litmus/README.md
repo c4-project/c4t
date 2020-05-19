@@ -35,5 +35,5 @@ act-litmus [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-v**: be more verbose
 
-**-x**: read ACT config from this `file`
+**-x**: if true, use 'dune exec' to run OCaml ACT binaries
 

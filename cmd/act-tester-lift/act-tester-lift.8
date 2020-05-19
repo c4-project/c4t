@@ -16,7 +16,6 @@ act\-tester\-lift
 .nf
 [\-A]=[value]
 [\-d]=[value]
-[\-i]=[value]
 [\-x]
 
 .fi
@@ -43,7 +42,4 @@ act\-tester\-lift [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 \fB\-d\fP="": \fB\fCdirectory\fR to which outputs will be written (default: lift\_results)
 
 .PP
-\fB\-i\fP="": read from this plan \fB\fCfile\fR instead of stdin
-
-.PP
-\fB\-x\fP: read ACT config from this \fB\fCfile\fR
+\fB\-x\fP: if true, use 'dune exec' to run OCaml ACT binaries

@@ -39,5 +39,5 @@ if positive, the planner will use all viable provided corpus files (default: 0)
 
 **-m**="": ID of machine to use for this test plan
 
-**-x**: read ACT config from this `file`
+**-x**: if true, use 'dune exec' to run OCaml ACT binaries
 

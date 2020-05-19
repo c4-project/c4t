@@ -16,7 +16,6 @@ act-tester-mach
 [--skip-compiler]
 [--skip-runner]
 [-d]=[value]
-[-i]=[value]
 ```
 
 **Usage**:
@@ -40,6 +39,4 @@ act-tester-mach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 **--skip-runner**: if given, skip the runner
 
 **-d**="": `directory` to which outputs will be written (default: mach_results)
-
-**-i**="": read from this plan `file` instead of stdin
 

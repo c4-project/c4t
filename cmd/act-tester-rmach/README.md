@@ -17,7 +17,6 @@ act-tester-rmach
 [--skip-runner]
 [-C]=[value]
 [-d]=[value]
-[-i]=[value]
 ```
 
 **Usage**:
@@ -43,6 +42,4 @@ act-tester-rmach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 **-C**="": read ACT config from this `file`
 
 **-d**="": `directory` to which outputs will be written (default: mach_results)
-
-**-i**="": read from this plan `file` instead of stdin
 

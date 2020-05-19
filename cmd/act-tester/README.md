@@ -39,5 +39,5 @@ act-tester [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 **-n**="": `number` of corpus files to select for this test plan;
 if non-positive, the planner will use all viable provided corpus files (default: 0)
 
-**-x**: read ACT config from this `file`
+**-x**: if true, use 'dune exec' to run OCaml ACT binaries
 
