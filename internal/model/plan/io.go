@@ -14,6 +14,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
 
+// Ext is the file extension, if any, that should be used for plan files.
+const Ext = ".json"
+
 // Read reads plan information from r into p.
 func Read(r io.Reader, p *Plan) error {
 	return json.NewDecoder(r).Decode(p)

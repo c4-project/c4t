@@ -6,8 +6,10 @@
 package pathset
 
 import (
+	"fmt"
 	"path/filepath"
-	"strings"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
 // Scratch contains the pre-computed paths for a machine run.
@@ -35,6 +37,6 @@ func NewScratch(root string) *Scratch {
 // PlanForStage gets the path to the plan file for stage stage.
 // Note that neither Prepare nor this method create or otherwise access the plan file.
 func (p *Scratch) PlanForStage(stage string) string {
-	file := strings.Join([]string{"plan", stage, "toml"}, ".")
+	file := fmt.Sprintf("plan.%s%s", stage, plan.Ext)
 	return filepath.Join(p.DirPlan, file)
 }

@@ -14,8 +14,6 @@ const (
 	FlagUseJSON = "J"
 	// FlagOutDir is a short flag for specifying an output directory.
 	FlagOutDir = "d"
-	// FlagInputFile is a standard flag for arguments that suggest an alternative to stdin for commands that read files.
-	FlagInputFile = "i"
 	// FlagWorkerCount is a standard flag for arguments that set a worker count.
 	FlagWorkerCount   = "j"
 	flagSubjectCycles = "k"
@@ -47,7 +45,6 @@ const (
 		"if non-positive, the planner will use all viable provided corpus files"
 	usageActDuneExec   = "if true, use 'dune exec' to run OCaml ACT binaries"
 	usageOutDir        = "`directory` to which outputs will be written"
-	usagePlanFile      = "read from this plan `file` instead of stdin"
 	usageSubjectCycles = "number of `cycles` to run for each subject in the corpus"
 	usageCPUProfile    = "`file` into which we should dump pprof information"
 )

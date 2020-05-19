@@ -28,7 +28,7 @@ const defaultOutDir = "fuzz_results"
 
 // App creates the act-tester-fuzz app.
 func App(outw, errw io.Writer) *c.App {
-	a := c.App{
+	a := &c.App{
 		Name:  "act-tester-fuzz",
 		Usage: "runs the batch-fuzzer phase of an ACT test",
 		Flags: flags(),
@@ -36,13 +36,12 @@ func App(outw, errw io.Writer) *c.App {
 			return run(ctx, outw, errw)
 		},
 	}
-	return stdflag.SetCommonAppSettings(&a, outw, errw)
+	return stdflag.SetPlanAppSettings(a, outw, errw)
 }
 
 func flags() []c.Flag {
 	fs := []c.Flag{
 		stdflag.OutDirCliFlag(defaultOutDir),
-		stdflag.PlanFileCliFlag(),
 		stdflag.CorpusSizeCliFlag(),
 		stdflag.SubjectCyclesCliFlag(),
 	}
@@ -53,8 +52,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	a := stdflag.ActRunnerFromCli(ctx, errw)
 	l := log.New(errw, "", 0)
 	cfg := makeConfig(ctx, a, l)
-	pf := stdflag.PlanFileFromCli(ctx)
-	return view.RunOnPlanFile(ctx.Context, cfg, pf, outw)
+	return view.RunOnCliPlan(ctx, cfg, outw)
 }
 
 func makeConfig(ctx *c.Context, a *act.Runner, l *log.Logger) *fuzzer.Config {

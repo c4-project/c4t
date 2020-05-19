@@ -95,7 +95,6 @@ func MachCliFlags() []c.Flag {
 			Aliases: []string{FlagUseJSON},
 			Usage:   "emit progress reports in JSON form on stderr",
 		},
-		PlanFileCliFlag(),
 	)
 }
 

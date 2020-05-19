@@ -10,6 +10,9 @@ import (
 	"io"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	c "github.com/urfave/cli/v2"
+
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
@@ -49,4 +52,13 @@ func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string, outw io.Write
 	}
 
 	return q.Write(outw)
+}
+
+// RunOnCliPlan runs r on the plan pointed to by the arguments of ctx, dumping the resulting plan to outw.
+func RunOnCliPlan(ctx *c.Context, r plan.Runner, outw io.Writer) error {
+	pf, err := stdflag.PlanFileFromCli(ctx)
+	if err != nil {
+		return err
+	}
+	return RunOnPlanFile(ctx.Context, r, pf, outw)
 }

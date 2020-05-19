@@ -35,13 +35,12 @@ func App(outw, errw io.Writer) *c.App {
 			return run(ctx, outw, errw)
 		},
 	}
-	return stdflag.SetCommonAppSettings(&a, outw, errw)
+	return stdflag.SetPlanAppSettings(&a, outw, errw)
 }
 
 func flags() []c.Flag {
 	fs := []c.Flag{
 		stdflag.OutDirCliFlag(defaultOutDir),
-		stdflag.PlanFileCliFlag(),
 	}
 	return append(fs, stdflag.ActRunnerCliFlags()...)
 }
@@ -49,7 +48,10 @@ func flags() []c.Flag {
 func run(ctx *c.Context, outw, errw io.Writer) error {
 	l := log.New(errw, "", 0)
 	cfg := makeConfig(ctx, l, errw)
-	pf := stdflag.PlanFileFromCli(ctx)
+	pf, err := stdflag.PlanFileFromCli(ctx)
+	if err != nil {
+		return err
+	}
 	return view.RunOnPlanFile(ctx.Context, cfg, pf, outw)
 }
 

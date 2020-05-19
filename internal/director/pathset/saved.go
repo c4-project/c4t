@@ -11,11 +11,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 )
 
 const (
-	planBasename       = "plan.toml"
+	planBasename       = "plan"
 	segFlagged         = "flagged"
 	segCompileFailures = "compile_fail"
 	segCompileTimeouts = "compile_timeout"
@@ -65,7 +66,7 @@ func (s *Saved) SubjectDir(st status.Status, iterTime time.Time) (string, error)
 // PlanFile gets the path to which a final plan file for the test at time iterTime, failing with final status st,
 // should be saved.
 func (s *Saved) PlanFile(st status.Status, iterTime time.Time) (string, error) {
-	return s.subjectFile(planBasename, st, iterTime)
+	return s.subjectFile(planBasename+plan.Ext, st, iterTime)
 }
 
 // SubjectTarFile gets the path to which a tarball for compile-failed subject sname,

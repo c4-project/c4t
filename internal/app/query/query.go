@@ -18,7 +18,7 @@ import (
 )
 
 func App(outw, errw io.Writer) *c.App {
-	a := c.App{
+	a := &c.App{
 		Name:  "act-tester-query",
 		Usage: "performs human-readable queries on a plan file",
 		Flags: flags(),
@@ -26,18 +26,16 @@ func App(outw, errw io.Writer) *c.App {
 			return run(ctx, outw, errw)
 		},
 	}
-	return stdflag.SetCommonAppSettings(&a, outw, errw)
+	return stdflag.SetPlanAppSettings(a, outw, errw)
 }
 
 func flags() []c.Flag {
 	return []c.Flag{
-		stdflag.PlanFileCliFlag(),
 		// TODO(@MattWindsor91): template stuff
 	}
 }
 
 func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
-	pf := stdflag.PlanFileFromCli(ctx)
 	q := query.Config{Out: outw}
-	return view.RunOnPlanFile(ctx.Context, &q, pf, ioutil.Discard)
+	return view.RunOnCliPlan(ctx, &q, ioutil.Discard)
 }

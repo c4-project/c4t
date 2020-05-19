@@ -6,6 +6,8 @@
 package stdflag
 
 import (
+	"errors"
+	"fmt"
 	"io"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
@@ -69,18 +71,18 @@ func OutDirFromCli(ctx *c.Context) string {
 	return ctx.Path(FlagOutDir)
 }
 
-// PlanFileCliFlag sets up a standard cli flag for loading a plan file.
-func PlanFileCliFlag() c.Flag {
-	return &c.PathFlag{
-		Name:      FlagInputFile,
-		TakesFile: true,
-		Usage:     usagePlanFile,
-	}
-}
+// ErrBadPlanArguments occurs when we expect a plan file argument, but get something else.
+var ErrBadPlanArguments = errors.New("expected plan file argument")
 
-// PlanFileFromCli retrieves a plan file using the file flag set up by PlanFileCliFlag.
-func PlanFileFromCli(ctx *c.Context) string {
-	return ctx.Path(FlagInputFile)
+// PlanFileFromCli retrieves a plan file (which may be empty) from the arguments of ctx.
+// Its corresponding setup function is SetupPlanAppSettings; there is no 'plan file' flag.
+func PlanFileFromCli(ctx *c.Context) (string, error) {
+	args := ctx.Args()
+	narg := args.Len()
+	if 1 < narg {
+		return "", fmt.Errorf("%w: got %d arguments, expected at most one", ErrBadPlanArguments, narg)
+	}
+	return args.First(), nil
 }
 
 // CorpusSizeCliFlag sets up a 'target corpus size' flag.

@@ -7,7 +7,6 @@
 package rmach
 
 import (
-	"context"
 	"io"
 	"log"
 
@@ -25,17 +24,19 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
+const Name = "act-tester-rmach"
+
 // App creates the act-tester-rmach app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester-rmach",
+		Name:  Name,
 		Usage: "runs the machine-dependent phase of an ACT test, potentially remotely",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
 		},
 	}
-	return stdflag.SetCommonAppSettings(&a, outw, errw)
+	return stdflag.SetPlanAppSettings(&a, outw, errw)
 }
 
 func flags() []c.Flag {
@@ -53,8 +54,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 
 	errw = iohelp.EnsureWriter(errw)
 	rcfg := makeConfig(ctx, cfg, errw)
-	pfile := stdflag.PlanFileFromCli(ctx)
-	return view.RunOnPlanFile(context.Background(), rcfg, pfile, outw)
+	return view.RunOnCliPlan(ctx, rcfg, outw)
 }
 
 func makeConfig(ctx *c.Context, cfg *config.Config, errw io.Writer) *rmach.Config {

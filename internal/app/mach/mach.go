@@ -7,39 +7,50 @@
 package mach
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"log"
+	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/app/rmach"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
-
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
-
 	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
-
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
-
-	c "github.com/urfave/cli/v2"
-
 	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
+	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	c "github.com/urfave/cli/v2"
+)
+
+const (
+	Name = "act-tester-mach"
+
+	readme = `
+   This part of the tester, also known as the 'machine invoker', runs the parts
+   of a testing cycle that are specific to the machine-under-test.
+
+   This command's target audience is a pipe, possibly over SSH, connected to an
+   instance of the ` + rmach.Name + ` command.  As such, it doesn't make many
+   efforts to be user-friendly, and you probably want to use that command
+   instead.
+`
 )
 
 // App creates the act-tester-mach app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester-mach",
-		Usage: "runs the machine-dependent phase of an ACT test",
-		Flags: flags(),
+		Name:        Name,
+		Usage:       "runs the machine-dependent phase of an ACT test",
+		Description: strings.TrimSpace(readme),
+		Flags:       flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
 		},
 	}
-	return stdflag.SetCommonAppSettings(&a, outw, errw)
+	return stdflag.SetPlanAppSettings(&a, outw, errw)
 }
 
 func flags() []c.Flag {
@@ -48,8 +59,7 @@ func flags() []c.Flag {
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
 	cfg := makeConfig(ctx, outw, errw)
-	pfile := stdflag.PlanFileFromCli(ctx)
-	return view.RunOnPlanFile(context.Background(), cfg, pfile, outw)
+	return view.RunOnCliPlan(ctx, cfg, outw)
 }
 
 func makeConfig(ctx *c.Context, outw, errw io.Writer) *mach.Config {

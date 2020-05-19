@@ -37,5 +37,5 @@ func ExampleScratch_PlanForStage() {
 	}
 	fmt.Print(filepath.ToSlash(mp.PlanForStage("fuzz")))
 	// Output:
-	// foo/plan/plan.fuzz.toml
+	// foo/plan/plan.fuzz.json
 }

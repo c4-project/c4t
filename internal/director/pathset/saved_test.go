@@ -39,7 +39,7 @@ func ExampleSaved_PlanFile() {
 	fmt.Println(filepath.ToSlash(stf))
 
 	// Output:
-	// saved/compile_fail/2015/10/21/072800/plan.toml
+	// saved/compile_fail/2015/10/21/072800/plan.json
 }
 
 // ExampleSaved_SubjectTarFile is a runnable example for SubjectTarFile.
