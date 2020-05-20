@@ -51,22 +51,22 @@ func (t *TGZWriter) Close() error {
 	return nil
 }
 
-// TarFile tars the file at rpath to wpath within the tar archive represented by tarw.
+// TarFile tars the file at rpath to wpath within this tar archive, and with the flags mode.
 // If rpath is empty, no tarring occurs.
 // If rpath doesn't exist, an error occurs unless NotFoundCb is set and handles the error in a different way.
-func (t *TGZWriter) TarFile(rpath, wpath string) error {
+func (t *TGZWriter) TarFile(rpath, wpath string, mode int64) error {
 	if rpath == "" {
 		return nil
 	}
 
-	if err := t.tarFileHeader(rpath, wpath); err != nil {
+	if err := t.tarFileHeader(rpath, wpath, mode); err != nil {
 		return err
 	}
 	return t.tarFileContents(rpath)
 }
 
-func (t *TGZWriter) tarFileHeader(rpath string, wpath string) error {
-	hdr, err := makeTarFileHeader(rpath, wpath)
+func (t *TGZWriter) tarFileHeader(rpath string, wpath string, mode int64) error {
+	hdr, err := makeTarFileHeader(rpath, wpath, mode)
 	if err != nil {
 		return fmt.Errorf("making tar header for %s: %w", rpath, err)
 	}
@@ -87,7 +87,7 @@ func (t *TGZWriter) tarFileContents(rpath string) error {
 	return nil
 }
 
-func makeTarFileHeader(rpath, wpath string) (*tar.Header, error) {
+func makeTarFileHeader(rpath, wpath string, mode int64) (*tar.Header, error) {
 	info, err := os.Stat(rpath)
 	if err != nil {
 		return nil, fmt.Errorf("can't stat %s: %w", rpath, err)
@@ -97,5 +97,6 @@ func makeTarFileHeader(rpath, wpath string) (*tar.Header, error) {
 		return nil, fmt.Errorf("can't get header for %s: %w", rpath, err)
 	}
 	hdr.Name = wpath
+	hdr.Mode = mode
 	return hdr, nil
 }
