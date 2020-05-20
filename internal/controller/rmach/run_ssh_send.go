@@ -8,6 +8,8 @@ package rmach
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/model/normalise"
@@ -23,8 +25,8 @@ func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) 
 		return nil, err
 	}
 
-	// We only send the harnesses, to avoid wasting SFTP bandwidth.
-	return &rp, r.sendMapping(ctx, n.MappingsOfKind(normalise.NKHarness))
+	// We only send the harness source code, to avoid wasting SFTP bandwidth.
+	return &rp, r.sendMapping(ctx, n.MappingsMatching(filekind.C, filekind.InHarness))
 }
 
 func (r *SSHRunner) sendMapping(ctx context.Context, ms map[string]string) error {

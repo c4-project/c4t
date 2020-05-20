@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/1set/gut/ystring"
@@ -104,7 +106,7 @@ func (j *Job) openLogFile(l string) (io.WriteCloser, error) {
 
 func (j *Job) compileJob(h subject.Harness, sp subject.CompileFileset) job.Compile {
 	return job.Compile{
-		In:       h.CPaths(),
+		In:       filekind.CSrc.FilterFiles(h.Paths()),
 		Out:      sp.Bin,
 		Compiler: &j.Compiler.Compiler,
 	}

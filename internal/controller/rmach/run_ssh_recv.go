@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
@@ -39,7 +41,7 @@ func (r *SSHRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp co
 	}
 	ls.Runs = ns.Runs
 	ls.Compiles = ns.Compiles
-	return r.recvMapping(ctx, norm.MappingsOfKind(normalise.NKCompile))
+	return r.recvMapping(ctx, norm.MappingsMatching(filekind.Any, filekind.InCompile))
 }
 
 func (r *SSHRunner) recvMapping(ctx context.Context, ms map[string]string) error {

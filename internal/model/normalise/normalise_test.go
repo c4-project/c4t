@@ -10,6 +10,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/stretchr/testify/assert"
@@ -41,7 +43,8 @@ func TestNormaliser_Subject(t *testing.T) {
 			maps: map[string]normalise.Normalisation{
 				normalise.FileOrigLitmus: {
 					Original: path.Join("foo", "bar", "baz.litmus"),
-					Kind:     normalise.NKOrigLitmus,
+					Kind:     filekind.Litmus,
+					Loc:      filekind.InOrig,
 				},
 			},
 		},
@@ -65,11 +68,13 @@ func TestNormaliser_Subject(t *testing.T) {
 			maps: map[string]normalise.Normalisation{
 				normalise.FileFuzzLitmus: {
 					Original: path.Join("barbaz", "baz.1.litmus"),
-					Kind:     normalise.NKFuzz,
+					Kind:     filekind.Litmus,
+					Loc:      filekind.InFuzz,
 				},
 				normalise.FileFuzzTrace: {
 					Original: path.Join("barbaz", "baz.1.trace"),
-					Kind:     normalise.NKFuzz,
+					Kind:     filekind.Trace,
+					Loc:      filekind.InFuzz,
 				},
 			},
 		},
@@ -101,19 +106,23 @@ func TestNormaliser_Subject(t *testing.T) {
 			maps: map[string]normalise.Normalisation{
 				path.Join(normalise.DirHarnesses, "arm", "inky.c"): {
 					Original: path.Join("burble", "armv8", "inky.c"),
-					Kind:     normalise.NKHarness,
+					Kind:     filekind.CSrc,
+					Loc:      filekind.InHarness,
 				},
 				path.Join(normalise.DirHarnesses, "arm", "pinky.c"): {
 					Original: path.Join("burble", "armv8", "pinky.c"),
-					Kind:     normalise.NKHarness,
+					Kind:     filekind.CSrc,
+					Loc:      filekind.InHarness,
 				},
 				path.Join(normalise.DirHarnesses, "x86", "inky.c"): {
 					Original: path.Join("burble", "i386", "inky.c"),
-					Kind:     normalise.NKHarness,
+					Kind:     filekind.CSrc,
+					Loc:      filekind.InHarness,
 				},
 				path.Join(normalise.DirHarnesses, "x86", "pinky.c"): {
 					Original: path.Join("burble", "i386", "pinky.c"),
-					Kind:     normalise.NKHarness,
+					Kind:     filekind.CSrc,
+					Loc:      filekind.InHarness,
 				},
 			},
 		},
@@ -157,19 +166,23 @@ func TestNormaliser_Subject(t *testing.T) {
 			maps: map[string]normalise.Normalisation{
 				path.Join(normalise.DirCompiles, "clang", normalise.FileBin): {
 					Original: path.Join("foobaz", "clang", "a.out"),
-					Kind:     normalise.NKCompile,
+					Kind:     filekind.Bin,
+					Loc:      filekind.InCompile,
 				},
 				path.Join(normalise.DirCompiles, "gcc", normalise.FileBin): {
 					Original: path.Join("foobaz", "gcc", "a.out"),
-					Kind:     normalise.NKCompile,
+					Kind:     filekind.Bin,
+					Loc:      filekind.InCompile,
 				},
 				path.Join(normalise.DirCompiles, "clang", normalise.FileCompileLog): {
 					Original: path.Join("foobaz", "clang", "errors"),
-					Kind:     normalise.NKCompile,
+					Kind:     filekind.Log,
+					Loc:      filekind.InCompile,
 				},
 				path.Join(normalise.DirCompiles, "gcc", normalise.FileCompileLog): {
 					Original: path.Join("foobaz", "gcc", "errors"),
-					Kind:     normalise.NKCompile,
+					Kind:     filekind.Log,
+					Loc:      filekind.InCompile,
 				},
 			},
 		},
@@ -189,8 +202,8 @@ func TestNormaliser_Subject(t *testing.T) {
 	}
 }
 
-// ExampleNormaliser_MappingsOfKind is a runnable example for MappingsOfKind.
-func ExampleNormaliser_MappingsOfKind() {
+// ExampleNormaliser_MappingsMatching is a runnable example for MappingsMatching.
+func ExampleNormaliser_MappingsMatching() {
 	n := normalise.NewNormaliser("root")
 	s := subject.Subject{
 		OrigLitmus: path.Join("foo", "bar", "baz.litmus"),
@@ -221,7 +234,7 @@ func ExampleNormaliser_MappingsOfKind() {
 		},
 	}
 	_, _ = n.Subject(s)
-	for k, v := range n.MappingsOfKind(normalise.NKHarness) {
+	for k, v := range n.MappingsMatching(filekind.Any, filekind.InHarness) {
 		fmt.Println(k, "<-", v)
 	}
 
