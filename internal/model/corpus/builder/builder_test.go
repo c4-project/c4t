@@ -121,10 +121,7 @@ func TestBuilderReq_SendTo(t *testing.T) {
 }
 
 func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan builder.Request) error {
-	want := builder.AddRequest(&subject.Named{
-		Name:    "foo",
-		Subject: *subject.NewOrPanic("blah", subject.WithThreads(5)),
-	})
+	want := builder.AddRequest(subject.NewOrPanic("blah", subject.WithThreads(5)).AddName("foo"))
 
 	eg.Go(func() error {
 		select {

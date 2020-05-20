@@ -106,10 +106,7 @@ func (b *bucketSaver) tarSubject(name string, sub subject.Subject) error {
 	}
 
 	st := subjectTar{
-		sub: subject.Named{
-			Name:    name,
-			Subject: sub,
-		},
+		sub:       sub.AddName(name),
 		path:      tarpath,
 		observers: b.parent.Observers,
 	}

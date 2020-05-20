@@ -17,7 +17,7 @@ import (
 )
 
 type subjectTar struct {
-	sub       subject.Named
+	sub       *subject.Named
 	path      string
 	observers []observer.Observer
 }
@@ -50,7 +50,7 @@ func (s *subjectTar) tarToWriter(tgz *TGZWriter) error {
 	}
 	for wpath, norm := range fs {
 		rpath := norm.Original
-		if err := s.rescueNotExistError(tgz.TarFile(rpath, wpath), rpath); err != nil {
+		if err := s.rescueNotExistError(tgz.TarFile(rpath, wpath, 0744), rpath); err != nil {
 			return fmt.Errorf("archiving %q: %w", rpath, err)
 		}
 	}

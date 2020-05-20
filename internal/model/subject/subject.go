@@ -188,3 +188,8 @@ func (s *Subject) ensureRunMap() {
 		s.Runs = make(map[string]RunResult)
 	}
 }
+
+// AddName copies this subject into a new Named with the given name.
+func (s *Subject) AddName(name string) *Named {
+	return &Named{Name: name, Subject: *s}
+}
