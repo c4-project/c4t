@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package normalise provides utilities for archiving and transferring plans, corpi, and subjects.
+// Package normalise provides utilities for archiving and transferring plans, corpora, and subjects.
 package normalise
 
 import (

@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package builder describes a set of types and methods for building corpi asynchronously.
+// Package builder describes a set of types and methods for building corpora asynchronously.
 package builder
 
 import (
@@ -29,7 +29,7 @@ var (
 	ErrBadBuilderRequest = errors.New("unhandled builder request type")
 )
 
-// Builder handles the assembly of corpi from asynchronously-constructed subjects.
+// Builder handles the assembly of corpora from asynchronously-constructed subjects.
 type Builder struct {
 	// c is the corpus being built.
 	c corpus.Corpus

@@ -16,12 +16,12 @@ import (
 func ExamplePluralQuantity() {
 	fmt.Println(iohelp.PluralQuantity(0, "director", "y", "ies"))
 	fmt.Println(iohelp.PluralQuantity(1, "fil", "e", "es"))
-	fmt.Println(iohelp.PluralQuantity(2, "corp", "us", "i"))
+	fmt.Println(iohelp.PluralQuantity(2, "corp", "us", "ora"))
 
 	// Output:
 	// 0 directories
 	// 1 file
-	// 2 corpi
+	// 2 corpora
 }
 
 // BenchmarkPluralQuantity_zero benchmarks PluralQuantity with a quantity of 0.

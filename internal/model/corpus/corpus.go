@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package corpus concerns test corpi (collections of named subjects).
+// Package corpus concerns test corpora (collections of named subjects).
 
 package corpus
 
@@ -29,7 +29,7 @@ var (
 	ErrNone = fmt.Errorf("%w: no corpus given", ErrSmall)
 )
 
-// Corpus is the type of test corpi (groups of test subjects).
+// Corpus is the type of test corpora (groups of test subjects).
 type Corpus map[string]subject.Subject
 
 // New creates a blank Corpus from a list of names.
