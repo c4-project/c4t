@@ -28,6 +28,7 @@ func ExampleGuessFromFile() {
 // ExampleKind_FilterFiles is a runnable example for FilterFiles.
 func ExampleKind_FilterFiles() {
 	for _, f := range filekind.C.FilterFiles([]string{
+		"barbaz.trace",
 		"foo.c",
 		"foo.h",
 		"baz.sh",
