@@ -34,22 +34,22 @@ type Litmus struct {
 	// These statistics then switch on various fixes.
 	Stat model.StatDumper
 
+	// Err is the writer to which stderr output should be written.
+	Err io.Writer
+
 	// CArch is the architecture that the litmus shim should target.
 	// It corresponds to Litmus's 'carch' argument.
 	CArch string
+
+	// Fixset is the set of enabled fixes.
+	// It is part of the config to allow the forcing of fixes that the shim would otherwise deem unnecessary.
+	Fixset Fixset
 
 	// Verbose toggles various 'verbose' dumping actions.
 	Verbose bool
 
 	// Pathset is the set of specified paths for this litmus invocation.
 	Pathset Pathset
-
-	// Fixset is the set of enabled fixes.
-	// It is part of the config to allow the forcing of fixes that the shim would otherwise deem unnecessary.
-	Fixset Fixset
-
-	// Err is the writer to which stderr output should be written.
-	Err io.Writer
 }
 
 // Run runs the litmus wrapper according to the configuration c.

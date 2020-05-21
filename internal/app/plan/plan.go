@@ -12,7 +12,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -116,7 +115,7 @@ func getMachine(cfg *config.Config, midstr string) (plan.NamedMachine, error) {
 	return m, nil
 }
 
-func makePlanConfig(c *config.Config, errw io.Writer, a *act.Runner, cs, nw int) (*planner.Config, error) {
+func makePlanConfig(c *config.Config, errw io.Writer, a planner.SubjectProber, cs, nw int) (*planner.Config, error) {
 	l := log.New(errw, "", 0)
 	cfg := planner.Config{
 		Quantities: planner.QuantitySet{

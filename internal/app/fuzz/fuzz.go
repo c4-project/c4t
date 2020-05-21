@@ -10,8 +10,6 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
-
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
@@ -55,7 +53,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	return view.RunOnCliPlan(ctx, cfg, outw)
 }
 
-func makeConfig(ctx *c.Context, a *act.Runner, l *log.Logger) *fuzzer.Config {
+func makeConfig(ctx *c.Context, a fuzzer.SingleFuzzer, l *log.Logger) *fuzzer.Config {
 	cfg := fuzzer.Config{
 		Driver:     a,
 		Observers:  singleobs.Builder(l),
