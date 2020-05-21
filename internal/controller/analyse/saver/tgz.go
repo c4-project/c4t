@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package save
+package saver
 
 import (
 	"archive/tar"
@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
 
-/// TGZWriter is a wrapper over a gzipped tar writer.
+/// TGZWriter is a wrapper over a gzipped archive writer.
 type TGZWriter struct {
 	tw *tar.Writer
 	gw *gzip.Writer
@@ -33,6 +33,15 @@ func NewTGZWriter(w io.WriteCloser) *TGZWriter {
 	}
 }
 
+// CreateTGZ creates the file at path and opens a TGZWriter into it.
+func CreateTGZ(path string) (*TGZWriter, error) {
+	tarfile, err := os.Create(path)
+	if err != nil {
+		return nil, fmt.Errorf("create %s: %w", path, err)
+	}
+	return NewTGZWriter(tarfile), nil
+}
+
 // Close closes all of this writer's inner writers in order, returning the first error.
 func (t *TGZWriter) Close() error {
 	terr := t.tw.Close()
@@ -40,7 +49,7 @@ func (t *TGZWriter) Close() error {
 	berr := t.bw.Close()
 
 	if terr != nil {
-		return fmt.Errorf("closing tar: %w", terr)
+		return fmt.Errorf("closing archive: %w", terr)
 	}
 	if gerr != nil {
 		return fmt.Errorf("closing gzip: %w", gerr)
@@ -51,10 +60,10 @@ func (t *TGZWriter) Close() error {
 	return nil
 }
 
-// TarFile tars the file at rpath to wpath within this tar archive, and with the flags mode.
+// ArchiveFile tars the file at rpath to wpath within this archive archive, and with the flags mode.
 // If rpath is empty, no tarring occurs.
 // If rpath doesn't exist, an error occurs unless NotFoundCb is set and handles the error in a different way.
-func (t *TGZWriter) TarFile(rpath, wpath string, mode int64) error {
+func (t *TGZWriter) ArchiveFile(rpath, wpath string, mode int64) error {
 	if rpath == "" {
 		return nil
 	}
@@ -68,10 +77,10 @@ func (t *TGZWriter) TarFile(rpath, wpath string, mode int64) error {
 func (t *TGZWriter) tarFileHeader(rpath string, wpath string, mode int64) error {
 	hdr, err := makeTarFileHeader(rpath, wpath, mode)
 	if err != nil {
-		return fmt.Errorf("making tar header for %s: %w", rpath, err)
+		return fmt.Errorf("making archive header for %s: %w", rpath, err)
 	}
 	if err := t.tw.WriteHeader(hdr); err != nil {
-		return fmt.Errorf("writing tar header for %s: %w", rpath, err)
+		return fmt.Errorf("writing archive header for %s: %w", rpath, err)
 	}
 	return nil
 }

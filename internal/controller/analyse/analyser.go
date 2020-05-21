@@ -81,7 +81,7 @@ func NewAnalyser(p *plan.Plan, nworkers int) (*Analyser, error) {
 	a := Analyser{
 		analysis: &analysis.Analysis{
 			Plan:      p,
-			ByStatus:  make(map[status.Status]corpus.Corpus, status.Num),
+			ByStatus:  make(map[status.Status]corpus.Corpus, status.Last),
 			Compilers: make(map[string]analysis.Compiler, lc),
 		},
 		corpus:        p.Corpus,
@@ -95,7 +95,7 @@ func NewAnalyser(p *plan.Plan, nworkers int) (*Analyser, error) {
 }
 
 func (a *Analyser) initCorpora(size int) {
-	for i := status.Ok; i < status.Num; i++ {
+	for i := status.Ok; i <= status.Last; i++ {
 		a.analysis.ByStatus[i] = make(corpus.Corpus, size)
 	}
 }
@@ -126,7 +126,7 @@ func (a *Analyser) build(ctx context.Context, ch <-chan classification, count in
 
 func (a *Analyser) Apply(r classification) {
 	a.analysis.Flags |= r.flags
-	for i := status.Ok; i < status.Num; i++ {
+	for i := status.Ok; i <= status.Last; i++ {
 		sf := i.Flag()
 
 		if r.flags.Matches(sf) {

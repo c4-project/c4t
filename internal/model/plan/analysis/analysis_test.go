@@ -30,7 +30,7 @@ func ExampleAnalysis_String() {
 	fmt.Println(&c)
 
 	// Output:
-	// 4 ok, 1 flagged, 3 compile/fail, 0 compile/timeout, 2 run/fail, 0 run/timeout
+	// 4 Ok, 1 Flagged, 3 CompileFail, 0 CompileTimeout, 2 RunFail, 0 RunTimeout
 }
 
 // ExampleAnalysis_HasFlagged is a runnable example for HasFailures.

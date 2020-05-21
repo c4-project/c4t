@@ -15,7 +15,7 @@ import (
 type sparkset struct {
 	// statusLines contains one sparkline for each status.
 	// (This _includes_ StatusUnknown to simplify calculations later, but we don't display it as a line.)
-	statusLines [status.Num]*sparkline.SparkLine
+	statusLines [status.Last + 1]*sparkline.SparkLine
 }
 
 func newSparkset() (*sparkset, error) {
@@ -24,7 +24,7 @@ func newSparkset() (*sparkset, error) {
 		err error
 	)
 
-	for i := status.Ok; i < status.Num; i++ {
+	for i := status.Ok; i <= status.Last; i++ {
 		if s.statusLines[i], err = sparkline.New(
 			sparkline.Color(statusColours[i]), sparkline.Label(i.String()),
 		); err != nil {

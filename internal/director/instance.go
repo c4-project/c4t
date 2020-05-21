@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	aobserver "github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
@@ -73,7 +73,7 @@ type Instance struct {
 	Observers []observer.Instance
 
 	// SavedPaths contains the save pathset for this machine.
-	SavedPaths *save.Pathset
+	SavedPaths *saver.Pathset
 	// ScratchPaths contains the scratch pathset for this machine.
 	ScratchPaths *pathset.Scratch
 

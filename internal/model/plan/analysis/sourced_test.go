@@ -40,5 +40,5 @@ func ExampleSourced_String() {
 	fmt.Println(&sc)
 
 	// Output:
-	// [foo.bar.baz #42 (May  1 10:00:00)] 4 ok, 1 flagged, 3 compile/fail, 0 compile/timeout, 2 run/fail, 0 run/timeout
+	// [foo.bar.baz #42 (May  1 10:00:00)] 4 Ok, 1 Flagged, 3 CompileFail, 0 CompileTimeout, 2 RunFail, 0 RunTimeout
 }

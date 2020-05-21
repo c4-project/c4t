@@ -12,7 +12,7 @@ import (
 	"errors"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
@@ -23,7 +23,7 @@ import (
 type Analyse struct {
 	cfg  *Config
 	plan *plan.Plan
-	save *save.Saver
+	save *saver.Saver
 }
 
 // New constructs a new query runner on config c and plan p.
@@ -34,18 +34,23 @@ func New(c *Config, p *plan.Plan) (*Analyse, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
-
-	return &Analyse{cfg: c, plan: p, save: maybeNewSave(c)}, nil
+	s, err := maybeNewSave(c)
+	if err != nil {
+		return nil, err
+	}
+	return &Analyse{cfg: c, plan: p, save: s}, nil
 }
 
-func maybeNewSave(c *Config) *save.Saver {
+func maybeNewSave(c *Config) (*saver.Saver, error) {
 	if c.SavedPaths == nil {
-		return nil
+		return nil, nil
 	}
-	return &save.Saver{
-		Observers: c.Observers,
-		Paths:     c.SavedPaths,
-	}
+	return saver.New(
+		c.SavedPaths,
+		func(path string) (saver.Archiver, error) {
+			return saver.CreateTGZ(path)
+		},
+		saver.WithObservers(c.Observers...))
 }
 
 func checkConfig(c *Config) error {

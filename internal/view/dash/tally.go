@@ -16,8 +16,8 @@ import (
 )
 
 type tally struct {
-	nstatus [status.Num]uint64
-	dstatus [status.Num]*text.Text
+	nstatus [status.Last + 1]uint64
+	dstatus [status.Last + 1]*text.Text
 }
 
 func newTally() (*tally, error) {
@@ -26,7 +26,7 @@ func newTally() (*tally, error) {
 		err error
 	)
 
-	for i := status.Ok; i < status.Num; i++ {
+	for i := status.Ok; i <= status.Last; i++ {
 		if t.dstatus[i], err = text.New(text.DisableScrolling()); err != nil {
 			return nil, err
 		}

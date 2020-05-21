@@ -127,7 +127,7 @@ func (o *Observer) OnIteration(r run.Run) {
 
 // OnAnalysis observes an analysis by adding failure/timeout/flag rates to the sparklines.
 func (o *Observer) OnAnalysis(a analysis.Analysis) {
-	for i := status.Ok; i < status.Num; i++ {
+	for i := status.Ok; i <= status.Last; i++ {
 		o.sendStatusCount(i, len(a.ByStatus[i]))
 	}
 	if err := o.logAnalysis(a); err != nil {

@@ -39,7 +39,7 @@ func (f Flag) Matches(expected Flag) bool {
 }
 
 // statusFlags matches statuses to flags.
-var statusFlags = [Num]Flag{
+var statusFlags = [Last + 1]Flag{
 	Ok:             FlagOk,
 	Flagged:        FlagFlagged,
 	CompileTimeout: FlagCompileTimeout,
@@ -49,6 +49,6 @@ var statusFlags = [Num]Flag{
 }
 
 // Flag gets the flag equivalent of this status.
-func (s Status) Flag() Flag {
-	return statusFlags[s]
+func (i Status) Flag() Flag {
+	return statusFlags[i]
 }

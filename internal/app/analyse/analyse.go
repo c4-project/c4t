@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 
@@ -65,10 +65,10 @@ func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 	return view.RunOnCliPlan(ctx, &q, ioutil.Discard)
 }
 
-func savedPaths(ctx *c.Context) *save.Pathset {
+func savedPaths(ctx *c.Context) *saver.Pathset {
 	root := ctx.Path(flagSaveDir)
 	if ystring.IsBlank(root) {
 		return nil
 	}
-	return save.NewPathset(root)
+	return saver.NewPathset(root)
 }

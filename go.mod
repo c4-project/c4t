@@ -22,5 +22,6 @@ require (
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 	golang.org/x/sys v0.0.0-20200515095857-1151b9dac4a9 // indirect
 	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/tools v0.0.0-20200520220537-cf2d1e09c845 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

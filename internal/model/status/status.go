@@ -33,27 +33,16 @@ const (
 	// RunTimeout indicates that a run timed out.
 	RunTimeout
 
-	// Num is the number of status flags.
-	Num
 	// FirstBad refers to the first status that is neither OK nor 'unknown'.
 	FirstBad = Flagged
+	// Last is the last valid status.
+	Last = RunTimeout
 )
 
-var (
-	// ErrBad occurs when FromString encounters an unknown status string.
-	ErrBad = errors.New("bad status")
+//go:generate stringer -type=Status
 
-	// Strings enumerates string equivalents for each Status.
-	Strings = [Num]string{
-		"unknown",
-		"ok",
-		"flagged",
-		"compile/fail",
-		"compile/timeout",
-		"run/fail",
-		"run/timeout",
-	}
-)
+// ErrBad occurs when FromString encounters an unknown status string.
+var ErrBad = errors.New("bad status")
 
 // FromCompileError tries to see if err represents a non-fatal issue such as a timeout or process error.
 // If so, it converts that error to a status and returns it alongside nil.
@@ -85,23 +74,25 @@ func statusOfError(err error, timeout, fail Status) (Status, error) {
 
 // FromString tries to resolve s to a status code.
 func FromString(s string) (Status, error) {
-	for i, sc := range Strings {
-		if strings.EqualFold(s, sc) {
+	for i := Unknown; i <= Last; i++ {
+		if strings.EqualFold(s, i.String()) {
 			return Status(i), nil
 		}
 	}
 	return Unknown, fmt.Errorf("%w: %q", ErrBad, s)
 }
 
-// String gets the string representation of a Status.
-func (s Status) String() string {
-	if len(Strings) <= int(s) || s < 0 {
-		return "(BAD STATUS)"
-	}
-	return Strings[s]
+// IsOk is true if, and only if, this status is StatusOk.
+func (i Status) IsOk() bool {
+	return i == Ok
 }
 
-// IsOk is true if, and only if, this status is StatusOk.
-func (s Status) IsOk() bool {
-	return s == Ok
+// IsInBounds is true if, and only if, this status is in bounds.
+func (i Status) IsInBounds() bool {
+	return Ok <= i && i <= Last
+}
+
+// IsBad is true if, and only if, this status is in-bounds, not OK, and not unknown.
+func (i Status) IsBad() bool {
+	return FirstBad <= i && i <= Last
 }

@@ -27,9 +27,9 @@ func ExampleStatus_IsOk() {
 	fmt.Println("is", status.CompileFail, "ok?", status.CompileFail.IsOk())
 
 	// Output:
-	// is ok ok? true
-	// is flagged ok? false
-	// is compile/fail ok? false
+	// is Ok ok? true
+	// is Flagged ok? false
+	// is CompileFail ok? false
 }
 
 // TestFromCompileError tests several run errors to see if their status equivalent is as expected.
@@ -117,7 +117,7 @@ func TestFromRunError(t *testing.T) {
 // TestFromString_roundTrip checks that converting a status to and back from its string is the identity.
 func TestFromString_roundTrip(t *testing.T) {
 	t.Parallel()
-	for want := status.Unknown; want < status.Num; want++ {
+	for want := status.Unknown; want <= status.Last; want++ {
 		want := want
 		t.Run(strconv.Itoa(int(want)), func(t *testing.T) {
 			t.Parallel()

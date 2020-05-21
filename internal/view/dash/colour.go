@@ -34,7 +34,7 @@ const (
 
 // statusColours maps each status flag to its colour.
 // This will need to be kept in sync with the status enum.
-var statusColours = [status.Num]cell.Color{
+var statusColours = [status.Last + 1]cell.Color{
 	colourUnknown,
 	colourOk,
 	colourFlagged,

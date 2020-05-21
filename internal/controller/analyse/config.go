@@ -8,7 +8,7 @@ package analyse
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/save"
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 
@@ -22,7 +22,7 @@ type Config struct {
 	// Observers is the list of observers to which analyses are sent.
 	Observers []observer.Observer
 	// SavedPaths, if present, is the pathset to which failing corpora should be sent.
-	SavedPaths *save.Pathset
+	SavedPaths *saver.Pathset
 }
 
 // Run constructs a query controller from this config, then runs it.

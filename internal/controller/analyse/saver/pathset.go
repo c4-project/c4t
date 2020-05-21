@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package save
+package saver
 
 import (
 	"fmt"
@@ -30,13 +30,13 @@ const (
 // Pathset contains the pre-computed paths for saving 'interesting' run results.
 type Pathset struct {
 	// Dirs maps 'interesting' statuses to directories.
-	Dirs [status.Num]string
+	Dirs [status.Last + 1]string
 }
 
 // NewPathset creates a save pathset rooted at root.
 func NewPathset(root string) *Pathset {
 	return &Pathset{
-		Dirs: [status.Num]string{
+		Dirs: [...]string{
 			status.Flagged:        filepath.Join(root, segFlagged),
 			status.CompileFail:    filepath.Join(root, segCompileFailures),
 			status.CompileTimeout: filepath.Join(root, segCompileTimeouts),
@@ -51,41 +51,55 @@ func (s *Pathset) DirList() []string {
 	return s.Dirs[status.FirstBad:]
 }
 
-// SubjectDir tries to get the directory for saved subjects for status st and iteration time iterTime.
-func (s *Pathset) SubjectDir(st status.Status, iterTime time.Time) (string, error) {
-	if st < status.FirstBad || status.Num <= st {
-		return "", fmt.Errorf("%w: not an 'interesting' status", status.ErrBad)
+func (s *Pathset) SubjectRun(st status.Status, time time.Time) (*RunPathset, error) {
+	if !st.IsBad() {
+		return nil, fmt.Errorf("%w: not an 'interesting' status", status.ErrBad)
 	}
+	return s.run(s.Dirs[st], time), nil
+}
+
+func (s *Pathset) run(root string, time time.Time) *RunPathset {
+	rroot := runRoot(root, time)
+	return &RunPathset{
+		DirRoot:  rroot,
+		FilePlan: filepath.Join(rroot, planBasename+plan.Ext),
+	}
+}
+
+// RunPathset represents a pathset containing a saved run.
+type RunPathset struct {
+	// The root directory of the run's pathset.
+	DirRoot string
+
+	// The file to which the run's plan should be saved.
+	FilePlan string
+}
+
+func runRoot(root string, iterTime time.Time) string {
 	return filepath.Join(
-		s.Dirs[st],
+		root,
 		strconv.Itoa(iterTime.Year()),
 		strconv.Itoa(int(iterTime.Month())),
 		strconv.Itoa(iterTime.Day()),
 		iterTime.Format("15_04_05"),
-	), nil
+	)
 }
 
-// PlanFile gets the path to which a final plan file for the test at time iterTime, failing with final status st,
-// should be saved.
-func (s *Pathset) PlanFile(st status.Status, iterTime time.Time) (string, error) {
-	return s.subjectFile(planBasename+plan.Ext, st, iterTime)
+// SubjectTarFile gets the path to which a tarball for subject sname should be saved.
+func (s *RunPathset) SubjectTarFile(sname string) string {
+	return s.subjectFile(sname + tarSuffix)
 }
 
-// SubjectTarFile gets the path to which a tarball for compile-failed subject sname,
-// from the test at time iterTime and with final status st, should be saved.
-func (s *Pathset) SubjectTarFile(sname string, st status.Status, iterTime time.Time) (string, error) {
-	return s.subjectFile(sname+tarSuffix, st, iterTime)
-}
-
-func (s *Pathset) subjectFile(fname string, st status.Status, iterTime time.Time) (string, error) {
-	root, err := s.SubjectDir(st, iterTime)
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(root, fname), nil
+func (s *RunPathset) subjectFile(fname string) string {
+	return filepath.Join(s.DirRoot, fname)
 }
 
 // Prepare prepares this pathset by making its directories.
 func (s *Pathset) Prepare() error {
 	return iohelp.Mkdirs(s.DirList()...)
+}
+
+// Prepare prepares this pathset by making its directories.
+func (s *RunPathset) Prepare() error {
+	return iohelp.Mkdirs(s.DirRoot)
 }

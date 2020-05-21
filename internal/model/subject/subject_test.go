@@ -50,8 +50,8 @@ func ExampleSubject_CompileResult() {
 	fmt.Println("clang:", cr.Status, cr.Files.Bin, cr.Files.Log)
 
 	// Output:
-	// gcc: ok a.out gcc.log
-	// clang: compile/fail a.out clang.log
+	// gcc: Ok a.out gcc.log
+	// clang: CompileFail a.out clang.log
 }
 
 // ExampleSubject_Harness is a testable example for Harness.
@@ -89,8 +89,8 @@ func ExampleSubject_RunOf() {
 	fmt.Println("clang:", cr.Status)
 
 	// Output:
-	// gcc: ok
-	// clang: run/timeout
+	// gcc: Ok
+	// clang: RunTimeout
 }
 
 // TestSubject_CompileResult_Missing checks that trying to get a compile for a missing compiler triggers

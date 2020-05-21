@@ -47,7 +47,7 @@ func (r *ResultLog) Log(sc analysis.Sourced) error {
 
 func (r *ResultLog) logBuckets(s analysis.Sourced) error {
 	sc := s.Analysis.ByStatus
-	for i := status.FirstBad; i < status.Num; i++ {
+	for i := status.FirstBad; i <= status.Last; i++ {
 		if err := r.logBucket(i, sc[i]); err != nil {
 			return err
 		}

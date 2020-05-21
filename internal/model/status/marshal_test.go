@@ -19,7 +19,7 @@ import (
 func TestStatus_MarshalJSON_roundTrip(t *testing.T) {
 	t.Parallel()
 
-	for i := status.Ok; i < status.Num; i++ {
+	for i := status.Ok; i <= status.Last; i++ {
 		i := i
 		t.Run(i.String(), func(t *testing.T) {
 			var b bytes.Buffer

@@ -57,7 +57,7 @@ func (a *Analysis) String() string {
 	bf := a.ByStatus
 
 	// We range over this to enforce a deterministic order.
-	for i := status.Ok; i < status.Num; i++ {
+	for i := status.Ok; i <= status.Last; i++ {
 		if i != status.Ok {
 			sb.WriteString(", ")
 		}
