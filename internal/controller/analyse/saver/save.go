@@ -90,9 +90,13 @@ func (s *Saver) Run(a analysis.Analysis) error {
 }
 
 func (s *Saver) runBucket(st status.Status, c corpus.Corpus, p *plan.Plan, creation time.Time) error {
-	if st < status.FirstBad || len(c) == 0 {
+	if !st.IsBad() || len(c) == 0 {
 		return nil
 	}
-	b := bucketSaver{s: st, plan: p, parent: s, creation: creation}
+	paths, err := s.paths.SubjectRun(st, creation)
+	if err != nil {
+		return err
+	}
+	b := bucketSaver{archiveMaker: s.archiveMaker, s: st, plan: p, paths: paths, observers: s.observers, creation: creation}
 	return b.save(c)
 }

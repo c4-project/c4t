@@ -8,6 +8,8 @@ package saver
 import (
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
@@ -17,11 +19,12 @@ import (
 
 // bucketSaver handles the setup of per-status buckets in an analysis save.
 type bucketSaver struct {
-	s        status.Status
-	plan     *plan.Plan
-	paths    *RunPathset
-	parent   *Saver
-	creation time.Time
+	archiveMaker func(string) (Archiver, error)
+	s            status.Status
+	observers    []observer.Observer
+	plan         *plan.Plan
+	paths        *RunPathset
+	creation     time.Time
 }
 
 func (b *bucketSaver) save(c corpus.Corpus) error {
@@ -59,13 +62,13 @@ func (b *bucketSaver) archiveSubject(name string, sub subject.Subject) error {
 
 func (b *bucketSaver) makeArchiver(name string, sub subject.Subject) (*subjectArchiver, error) {
 	path := b.paths.SubjectTarFile(name)
-	ar, err := b.parent.archiveMaker(path)
+	ar, err := b.archiveMaker(path)
 	if err != nil {
 		return nil, err
 	}
 	st := subjectArchiver{
 		sub:       sub.AddName(name),
-		observers: b.parent.observers,
+		observers: b.observers,
 		archiver:  ar,
 		path:      path,
 	}

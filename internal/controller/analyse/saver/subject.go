@@ -11,6 +11,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -45,14 +47,29 @@ func (s *subjectArchiver) archive() error {
 		return err
 	}
 	for wpath, norm := range fs {
-		rpath := norm.Original
-		if err := s.rescueNotExistError(s.archiver.ArchiveFile(rpath, wpath, 0744), rpath); err != nil {
-			return fmt.Errorf("archiving %q: %w", rpath, err)
+		if err := s.archiveFile(wpath, norm); err != nil {
+			return err
 		}
 	}
 
 	observer.OnSave(s.saving(), s.observers...)
 	return nil
+}
+
+func (s *subjectArchiver) archiveFile(wpath string, norm normaliser.Entry) error {
+	perm := perm(norm.Kind)
+	rpath := norm.Original
+	if err := s.rescueNotExistError(s.archiver.ArchiveFile(rpath, wpath, perm), rpath); err != nil {
+		return fmt.Errorf("archiving %q: %w", rpath, err)
+	}
+	return nil
+}
+
+func perm(k filekind.Kind) int64 {
+	if k.Matches(filekind.Bin) {
+		return 0755
+	}
+	return 0644
 }
 
 func filesToArchive(s subject.Subject) (map[string]normaliser.Entry, error) {
