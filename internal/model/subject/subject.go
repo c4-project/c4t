@@ -19,7 +19,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// Subject represents a single test subject in a corpus.
+// Normalise represents a single test subject in a corpus.
 type Subject struct {
 	// Stats is the statistics set for this subject.
 	Stats model.Statset `toml:"stats,omitempty" json:"stats,omitempty"`

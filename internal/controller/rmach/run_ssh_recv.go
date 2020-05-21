@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/normalise"
+	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
@@ -30,18 +30,18 @@ func (r *SSHRunner) Recv(ctx context.Context, locp, remp *plan.Plan) (*plan.Plan
 }
 
 func (r *SSHRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp corpus.Corpus) error {
-	norm := normalise.NewNormaliser(path.Join(r.recvRoot, ls.Name))
+	norm := normaliser.New(path.Join(r.recvRoot, ls.Name))
 	rs, ok := rcorp[ls.Name]
 	if !ok {
 		return fmt.Errorf("subject not in remote corpus: %s", ls.Name)
 	}
-	ns, err := norm.Subject(rs)
+	ns, err := norm.Normalise(rs)
 	if err != nil {
-		return fmt.Errorf("can't normalise corpus: %w", err)
+		return fmt.Errorf("can't normalise subject: %w", err)
 	}
 	ls.Runs = ns.Runs
 	ls.Compiles = ns.Compiles
-	return r.recvMapping(ctx, norm.MappingsMatching(filekind.Any, filekind.InCompile))
+	return r.recvMapping(ctx, norm.Mappings.RenamesMatching(filekind.Any, filekind.InCompile))
 }
 
 func (r *SSHRunner) recvMapping(ctx context.Context, ms map[string]string) error {

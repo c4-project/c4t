@@ -18,7 +18,7 @@ type Result struct {
 	// Time is the time at which the run commenced.
 	Time time.Time `json:"time,omitempty"`
 
-	// Subject is the set of results categorised by subject.
+	// Normalise is the set of results categorised by subject.
 	// Each key is the subject's name.
 	Subjects map[string]SubjectResult `json:"subject,omitempty"`
 }

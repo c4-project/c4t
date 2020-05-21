@@ -32,7 +32,7 @@ type Error struct {
 	// Compiler is the ID of the compiler that produced the binary whose run caused the error.
 	Compiler id.ID
 
-	// Subject is the name of the subject that caused the error.
+	// Normalise is the name of the subject that caused the error.
 	Subject string
 
 	// Inner is the inner error, if any, that caused this error.

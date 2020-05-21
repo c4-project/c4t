@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/model/normalise"
+	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
@@ -57,9 +57,9 @@ func (s *subjectTar) tarToWriter(tgz *TGZWriter) error {
 	return nil
 }
 
-func filesToTar(s subject.Subject) (map[string]normalise.Normalisation, error) {
-	n := normalise.NewNormaliser("")
-	if _, err := n.Subject(s); err != nil {
+func filesToTar(s subject.Subject) (map[string]normaliser.Entry, error) {
+	n := normaliser.New("")
+	if _, err := n.Normalise(s); err != nil {
 		return nil, err
 	}
 	return n.Mappings, nil

@@ -39,7 +39,7 @@ type Job struct {
 	// Stderr is the writer to which harness maker stderr should be redirected.
 	Stderr io.Writer
 
-	// Subject is the subject that we are trying to lift.
+	// Normalise is the subject that we are trying to lift.
 	Subject subject.Named
 
 	// Rng is the random number generator to use for fuzz seeds.

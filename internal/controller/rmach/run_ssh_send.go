@@ -12,21 +12,21 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
-	"github.com/MattWindsor91/act-tester/internal/model/normalise"
+	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
 // Send translates p to the remote host, using SFTP to copy over its harness files.
 func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	n := normalise.NewNormaliser(r.runner.Config.DirCopy)
+	n := normaliser.NewCorpus(r.runner.Config.DirCopy)
 	rp := *p
 	var err error
-	if rp.Corpus, err = n.Corpus(rp.Corpus); err != nil {
+	if rp.Corpus, err = n.Normalise(rp.Corpus); err != nil {
 		return nil, err
 	}
 
 	// We only send the harness source code, to avoid wasting SFTP bandwidth.
-	return &rp, r.sendMapping(ctx, n.MappingsMatching(filekind.C, filekind.InHarness))
+	return &rp, r.sendMapping(ctx, n.Mappings.RenamesMatching(filekind.C, filekind.InHarness))
 }
 
 func (r *SSHRunner) sendMapping(ctx context.Context, ms map[string]string) error {

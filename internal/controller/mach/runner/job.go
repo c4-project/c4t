@@ -36,7 +36,7 @@ type Job struct {
 	// ResCh is the channel to which we're sending the run result.
 	ResCh chan<- builder.Request
 
-	// Subject is a pointer to the subject being run.
+	// Normalise is a pointer to the subject being run.
 	Subject *subject.Named
 }
 

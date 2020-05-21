@@ -29,7 +29,7 @@ func Mock() Corpus {
 	}
 }
 
-// MockFailedCompile expands to a realistic looking Subject that contains a failed compilation.
+// MockFailedCompile expands to a realistic looking Normalise that contains a failed compilation.
 func MockFailedCompile(name string) subject.Subject {
 	return subject.Subject{
 		Stats: model.Statset{
@@ -60,7 +60,7 @@ func MockFailedCompile(name string) subject.Subject {
 	}
 }
 
-// MockFlaggedRun expands to a realistic looking Subject that contains some flagged runs.
+// MockFlaggedRun expands to a realistic looking Normalise that contains some flagged runs.
 func MockFlaggedRun(name string) subject.Subject {
 	return subject.Subject{
 		Stats:      model.Statset{Threads: 2},
@@ -79,7 +79,7 @@ func MockFlaggedRun(name string) subject.Subject {
 	}
 }
 
-// MockTimeoutRun expands to a realistic looking Subject that contains some timed-out runs.
+// MockTimeoutRun expands to a realistic looking Normalise that contains some timed-out runs.
 func MockTimeoutRun(name string) subject.Subject {
 	return subject.Subject{
 		Stats:      model.Statset{Threads: 4},

@@ -20,7 +20,7 @@ import (
 
 // Job contains state for a single fuzzer batch-Job.
 type Job struct {
-	// Subject contains the subject for which this Job is responsible.
+	// Normalise contains the subject for which this Job is responsible.
 	Subject subject.Named
 
 	// Driver is the low-level fuzzer.
