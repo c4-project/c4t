@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
+
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
@@ -25,6 +27,8 @@ import (
 type Saver struct {
 	// archiveMaker is a factory function opening an Archiver on an archive at file path.
 	archiveMaker func(path string) (Archiver, error)
+	// norm is a normaliser used to translate a corpus's paths to the ones used in its archival.
+	norm *normaliser.Corpus
 	// observers is the list of observers.
 	observers []observer.Observer
 	// paths contains the pathset used to save subjects for a particular machine.
@@ -41,6 +45,7 @@ func New(paths *Pathset, archiveMaker func(path string) (Archiver, error), ops .
 	s := Saver{
 		paths:        paths,
 		archiveMaker: archiveMaker,
+		norm:         normaliser.NewCorpus(""),
 	}
 	if s.paths == nil {
 		return nil, iohelp.ErrPathsetNil
@@ -81,15 +86,28 @@ func (s *Saver) Run(a analysis.Analysis) error {
 	}
 	creation := p.Metadata.Creation
 
+	np, err := s.normalisePlan(p)
+	if err != nil {
+		return err
+	}
+
 	for st, c := range a.ByStatus {
-		if err := s.runBucket(st, c, p, creation); err != nil {
+		if err := s.runBucket(st, c, np, creation); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (s *Saver) runBucket(st status.Status, c corpus.Corpus, p *plan.Plan, creation time.Time) error {
+func (s *Saver) normalisePlan(p *plan.Plan) (*plan.Plan, error) {
+	var err error
+
+	np := *p
+	np.Corpus, err = s.norm.Normalise(p.Corpus)
+	return &np, err
+}
+
+func (s *Saver) runBucket(st status.Status, c corpus.Corpus, np *plan.Plan, creation time.Time) error {
 	if !st.IsBad() || len(c) == 0 {
 		return nil
 	}
@@ -97,6 +115,12 @@ func (s *Saver) runBucket(st status.Status, c corpus.Corpus, p *plan.Plan, creat
 	if err != nil {
 		return err
 	}
-	b := bucketSaver{archiveMaker: s.archiveMaker, s: st, plan: p, paths: paths, observers: s.observers, creation: creation}
+	b := bucketSaver{
+		parent:   s,
+		s:        st,
+		plan:     np,
+		paths:    paths,
+		creation: creation,
+	}
 	return b.save(c)
 }

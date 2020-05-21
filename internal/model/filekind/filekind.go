@@ -38,3 +38,11 @@ const (
 func (k Kind) Matches(pat Kind) bool {
 	return k&pat == k
 }
+
+// ArchivePerm gets the idealised Unix permission set for archiving a file of this kind.
+func (k Kind) ArchivePerm() int64 {
+	if k.Matches(Bin) {
+		return 0755
+	}
+	return 0644
+}

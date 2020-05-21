@@ -14,17 +14,15 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
 // bucketSaver handles the setup of per-status buckets in an analysis save.
 type bucketSaver struct {
-	archiveMaker func(string) (Archiver, error)
-	s            status.Status
-	observers    []observer.Observer
-	plan         *plan.Plan
-	paths        *RunPathset
-	creation     time.Time
+	parent   *Saver
+	s        status.Status
+	plan     *plan.Plan
+	paths    *RunPathset
+	creation time.Time
 }
 
 func (b *bucketSaver) save(c corpus.Corpus) error {
@@ -42,35 +40,23 @@ func (b *bucketSaver) writePlan() error {
 }
 
 func (b *bucketSaver) archiveSubjects(corp corpus.Corpus) error {
-	for name, sub := range corp {
-		if err := b.archiveSubject(name, sub); err != nil {
+	for name := range corp {
+		if err := b.archiveSubject(name); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (b *bucketSaver) archiveSubject(name string, sub subject.Subject) error {
-	st, err := b.makeArchiver(name, sub)
+func (b *bucketSaver) archiveSubject(name string) error {
+	path := b.paths.SubjectTarFile(name)
+	ar, err := b.parent.archiveMaker(path)
 	if err != nil {
 		return err
 	}
-	aerr := st.archive()
-	cerr := st.archiver.Close()
+	nameMap := b.parent.norm.BySubject[name].Mappings
+	saving := observer.Saving{SubjectName: name, Dest: path}
+	aerr := ArchiveSubject(ar, nameMap, saving, b.parent.observers...)
+	cerr := ar.Close()
 	return iohelp.FirstError(aerr, cerr)
-}
-
-func (b *bucketSaver) makeArchiver(name string, sub subject.Subject) (*subjectArchiver, error) {
-	path := b.paths.SubjectTarFile(name)
-	ar, err := b.archiveMaker(path)
-	if err != nil {
-		return nil, err
-	}
-	st := subjectArchiver{
-		sub:       sub.AddName(name),
-		observers: b.observers,
-		archiver:  ar,
-		path:      path,
-	}
-	return &st, nil
 }

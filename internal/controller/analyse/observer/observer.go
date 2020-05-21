@@ -19,6 +19,8 @@ type Observer interface {
 	OnSaveFileMissing(s Saving, missing string)
 }
 
+//go:generate mockery -name=Observer
+
 // OnAnalysis sends OnAnalysis to every instance observer in obs.
 func OnAnalysis(a analysis.Analysis, obs ...Observer) {
 	for _, o := range obs {

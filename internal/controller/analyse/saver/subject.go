@@ -11,11 +11,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
-
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
 // Archiver is the interface of types that can archive subject files.
@@ -27,37 +24,50 @@ type Archiver interface {
 	io.Closer
 }
 
+//go:generate mockery -name=Archiver
+
 type subjectArchiver struct {
-	sub       *subject.Named
-	path      string
+	nameMap   normaliser.Map
+	saving    observer.Saving
 	observers []observer.Observer
 	archiver  Archiver
 }
 
-func (s *subjectArchiver) saving() observer.Saving {
-	return observer.Saving{
-		SubjectName: s.sub.Name,
-		Dest:        s.path,
+var (
+	// ErrArchiverNil occurs when we try to archive a subject with no archiver.
+	ErrArchiverNil = errors.New("archiver nil")
+)
+
+// ArchiveSubject archives the subject defined by saving and nameMap to ar, announcing progress to obs.
+func ArchiveSubject(ar Archiver, nameMap normaliser.Map, saving observer.Saving, obs ...observer.Observer) error {
+	if ar == nil {
+		return ErrArchiverNil
 	}
+	if len(nameMap) == 0 {
+		return nil
+	}
+	s := subjectArchiver{
+		nameMap:   nameMap,
+		saving:    saving,
+		observers: obs,
+		archiver:  ar,
+	}
+	return s.archive()
 }
 
 func (s *subjectArchiver) archive() error {
-	fs, err := filesToArchive(s.sub.Subject)
-	if err != nil {
-		return err
-	}
-	for wpath, norm := range fs {
+	for wpath, norm := range s.nameMap {
 		if err := s.archiveFile(wpath, norm); err != nil {
 			return err
 		}
 	}
 
-	observer.OnSave(s.saving(), s.observers...)
+	observer.OnSave(s.saving, s.observers...)
 	return nil
 }
 
 func (s *subjectArchiver) archiveFile(wpath string, norm normaliser.Entry) error {
-	perm := perm(norm.Kind)
+	perm := norm.Kind.ArchivePerm()
 	rpath := norm.Original
 	if err := s.rescueNotExistError(s.archiver.ArchiveFile(rpath, wpath, perm), rpath); err != nil {
 		return fmt.Errorf("archiving %q: %w", rpath, err)
@@ -65,25 +75,10 @@ func (s *subjectArchiver) archiveFile(wpath string, norm normaliser.Entry) error
 	return nil
 }
 
-func perm(k filekind.Kind) int64 {
-	if k.Matches(filekind.Bin) {
-		return 0755
-	}
-	return 0644
-}
-
-func filesToArchive(s subject.Subject) (map[string]normaliser.Entry, error) {
-	n := normaliser.New("")
-	if _, err := n.Normalise(s); err != nil {
-		return nil, err
-	}
-	return n.Mappings, nil
-}
-
 func (s *subjectArchiver) rescueNotExistError(err error, rpath string) error {
 	if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
-	observer.OnSaveFileMissing(s.saving(), rpath, s.observers...)
+	observer.OnSaveFileMissing(s.saving, rpath, s.observers...)
 	return nil
 }
