@@ -147,21 +147,19 @@ func amendConfig(cfg *config.Config, qs *config.QuantitySet, mfilter string) err
 }
 
 func makeDirector(c *config.Config, a *act.Runner, logw io.Writer, files []string) (*director.Director, error) {
-	dc, err := makeDirectorConfig(c, a, logw)
+	e := makeEnv(a, c)
+	opts, err := makeOptions(c, logw)
 	if err != nil {
 		return nil, err
 	}
-
-	d, err := director.New(dc, files)
+	d, err := director.New(e, c.Machines, files, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return d, nil
 }
 
-func makeDirectorConfig(c *config.Config, a *act.Runner, logw io.Writer) (*director.Config, error) {
-	e := makeEnv(a, c)
-
+func makeOptions(c *config.Config, logw io.Writer) ([]director.Option, error) {
 	mids, err := c.MachineIDs()
 	if err != nil {
 		return nil, err
@@ -174,11 +172,8 @@ func makeDirectorConfig(c *config.Config, a *act.Runner, logw io.Writer) (*direc
 
 	l := log.New(lw, "", 0)
 
-	dc, err := director.ConfigFromGlobal(c, l, e, o)
-	if err != nil {
-		return nil, err
-	}
-	return dc, nil
+	dc := director.ConfigFromGlobal(c)
+	return append(dc, director.ObserveWith(o...), director.LogWith(l)), nil
 }
 
 func makeObservers(mids []id.ID, logw io.Writer) ([]observer.Observer, io.Writer, error) {

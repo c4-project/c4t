@@ -9,13 +9,13 @@ import (
 	"errors"
 	"log"
 
+	"github.com/1set/gut/ystring"
+
+	"github.com/MattWindsor91/act-tester/internal/remote"
+
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-
-	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 
@@ -29,39 +29,71 @@ import (
 )
 
 var (
-	// ErrConfigNil occurs when we try to build a director from a nil config.
-	ErrConfigNil = errors.New("config nil")
+	// ErrObserverNil occurs when we try to pass a nil observer as an option.
+	ErrObserverNil = errors.New("observer nil")
 
-	// ErrNoMachines occurs when we try to build a director from a config with no machines defined.
-	ErrNoMachines = errors.New("no machines defined in config")
+	// ErrNoMachines occurs when we try to build a director without defining any machines defined.
+	ErrNoMachines = errors.New("no machines defined")
 
 	// ErrNoOutDir occurs when we try to build a director with no output directory specified in the config.
 	ErrNoOutDir = errors.New("no output directory specified in config")
 )
 
-// Config groups together the various bits of configuration needed to create a director.
-type Config struct {
-	// Logger is the logger to which the director should log.
-	// If nil, logging will proceed silently.
-	Logger *log.Logger
+// Option is the type of options for the director.
+type Option func(*Director) error
 
-	// Paths provides path resolving functionality for the director.
-	Paths *pathset.Pathset
+// ObserveWith adds obs to the director's observer pool.
+func ObserveWith(obs ...observer.Observer) Option {
+	return func(d *Director) error {
+		for _, o := range obs {
+			if o == nil {
+				return ErrObserverNil
+			}
+			d.observers = append(d.observers, o)
+		}
+		return nil
+	}
+}
 
-	// Machines contains the machines that will be used in the test.
-	Machines map[string]config.Machine
+// LogWith sets the director's logger to l.
+func LogWith(l *log.Logger) Option {
+	// TODO(@MattWindsor91): replace logger with observer
+	return func(d *Director) error {
+		d.l = l
+		return nil
+	}
+}
 
-	// Observers contains multi-machine observers for the director.
-	Observers []observer.Observer
+// OverrideQuantities overrides the director's quantities with qs.
+func OverrideQuantities(qs config.QuantitySet) Option {
+	return func(d *Director) error {
+		d.quantities.Override(qs)
+		return nil
+	}
+}
 
-	// Env groups together the bits of configuration that pertain to dealing with the environment.
-	Env Env
+// SSH sets the director's SSH config to s.
+func SSH(s *remote.Config) Option {
+	return func(d *Director) error {
+		d.ssh = s
+		return nil
+	}
+}
 
-	// SSH, if present, provides configuration for the director's remote invocation.
-	SSH *remote.Config
-
-	// Quantities contains various tunable quantities for the director's stages.
-	Quantities config.QuantitySet
+// OutDir sets the director's paths relative to dir.
+// It performs home directory expansion in dir.
+func OutDir(dir string) Option {
+	return func(d *Director) error {
+		if ystring.IsBlank(dir) {
+			return ErrNoOutDir
+		}
+		edir, err := homedir.Expand(dir)
+		if err != nil {
+			return err
+		}
+		d.paths = pathset.New(edir)
+		return nil
+	}
 }
 
 // Env groups together the bits of configuration that pertain to dealing with the environment.
@@ -76,46 +108,23 @@ type Env struct {
 	Planner planner.Source
 }
 
-// ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
-func ConfigFromGlobal(g *config.Config, l *log.Logger, e Env, os []observer.Observer) (*Config, error) {
-	if g == nil {
-		return nil, config.ErrNil
+// Check makes sure the environment is sensible.
+func (e Env) Check() error {
+	if e.Fuzzer == nil {
+		return fuzzer.ErrDriverNil
 	}
-	if g.Backend == nil {
-		return nil, errors.New("config has no backend")
+	if e.Lifter == nil {
+		return lifter.ErrMakerNil
 	}
-	if g.OutDir == "" {
-		return nil, ErrNoOutDir
-	}
-
-	edir, err := homedir.Expand(g.OutDir)
-	if err != nil {
-		return nil, err
-	}
-
-	c := Config{
-		Logger:     l,
-		Env:        e,
-		Paths:      pathset.New(edir),
-		SSH:        g.SSH,
-		Machines:   g.Machines,
-		Quantities: g.Quantities,
-		Observers:  os,
-	}
-	return &c, nil
+	// TODO(@MattWindsor): check source
+	return nil
 }
 
-// Check checks various potential issues in this config.
-func (c *Config) Check() error {
-	if c == nil {
-		return ErrConfigNil
+// ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
+func ConfigFromGlobal(g *config.Config) []Option {
+	return []Option{
+		OutDir(g.OutDir),
+		OverrideQuantities(g.Quantities),
+		SSH(g.SSH),
 	}
-	if c.Paths == nil {
-		return iohelp.ErrPathsetNil
-	}
-	if c.Machines == nil || len(c.Machines) == 0 {
-		return ErrNoMachines
-	}
-	// TODO(@MattWindsor91): SSH config?
-	return nil
 }
