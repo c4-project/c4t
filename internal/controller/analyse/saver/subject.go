@@ -27,10 +27,10 @@ type Archiver interface {
 //go:generate mockery -name=Archiver
 
 type subjectArchiver struct {
-	nameMap   normaliser.Map
-	saving    observer.Saving
-	observers []observer.Observer
-	archiver  Archiver
+	nameMap     normaliser.Map
+	sname, dest string
+	observers   []observer.Observer
+	archiver    Archiver
 }
 
 var (
@@ -38,8 +38,8 @@ var (
 	ErrArchiverNil = errors.New("archiver nil")
 )
 
-// ArchiveSubject archives the subject defined by saving and nameMap to ar, announcing progress to obs.
-func ArchiveSubject(ar Archiver, nameMap normaliser.Map, saving observer.Saving, obs ...observer.Observer) error {
+// ArchiveSubject archives the subject defined by sname and nameMap to dest via ar, announcing progress to obs.
+func ArchiveSubject(ar Archiver, sname, dest string, nameMap normaliser.Map, obs ...observer.Observer) error {
 	if ar == nil {
 		return ErrArchiverNil
 	}
@@ -48,7 +48,8 @@ func ArchiveSubject(ar Archiver, nameMap normaliser.Map, saving observer.Saving,
 	}
 	s := subjectArchiver{
 		nameMap:   nameMap,
-		saving:    saving,
+		sname:     sname,
+		dest:      dest,
 		observers: obs,
 		archiver:  ar,
 	}
@@ -56,29 +57,35 @@ func ArchiveSubject(ar Archiver, nameMap normaliser.Map, saving observer.Saving,
 }
 
 func (s *subjectArchiver) archive() error {
+	observer.OnArchiveStart(s.sname, s.dest, len(s.nameMap), s.observers...)
+
+	i := 0
 	for wpath, norm := range s.nameMap {
-		if err := s.archiveFile(wpath, norm); err != nil {
-			return err
+		if err := s.archiveFile(i, wpath, norm); err != nil {
+			return fmt.Errorf("archiving %q: %w", norm.Original, err)
 		}
+		i++
 	}
 
-	observer.OnSave(s.saving, s.observers...)
+	observer.OnArchiveFinish(s.sname, s.observers...)
 	return nil
 }
 
-func (s *subjectArchiver) archiveFile(wpath string, norm normaliser.Entry) error {
+func (s *subjectArchiver) archiveFile(i int, wpath string, norm normaliser.Entry) error {
 	perm := norm.Kind.ArchivePerm()
 	rpath := norm.Original
-	if err := s.rescueNotExistError(s.archiver.ArchiveFile(rpath, wpath, perm), rpath); err != nil {
-		return fmt.Errorf("archiving %q: %w", rpath, err)
+	err := s.archiver.ArchiveFile(rpath, wpath, perm)
+	if err != nil {
+		return s.rescueNotExistError(err, rpath, i)
 	}
+	observer.OnArchiveFileAdded(s.sname, rpath, i, s.observers...)
 	return nil
 }
 
-func (s *subjectArchiver) rescueNotExistError(err error, rpath string) error {
+func (s *subjectArchiver) rescueNotExistError(err error, rpath string, i int) error {
 	if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
-	observer.OnSaveFileMissing(s.saving, rpath, s.observers...)
+	observer.OnArchiveFileMissing(s.sname, rpath, i, s.observers...)
 	return nil
 }

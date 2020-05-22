@@ -135,13 +135,8 @@ func (o *Observer) OnAnalysis(a analysis.Analysis) {
 	}
 }
 
-// OnSave currently ignores a save observation.
-func (o *Observer) OnSave(observer.Saving) {
-	// TODO(@MattWindsor91): do something with this?
-}
-
-// OnSaveFileMissing currently ignores a save missing-file observation.
-func (o *Observer) OnSaveFileMissing(observer.Saving, string) {
+// OnArchive currently ignores a save observation.
+func (o *Observer) OnArchive(observer.ArchiveMessage) {
 	// TODO(@MattWindsor91): do something with this?
 }
 

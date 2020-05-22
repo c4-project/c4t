@@ -32,7 +32,7 @@ type Logger struct {
 	// compCh is used to send compilers for logging.
 	compCh chan compilerSet
 	// saveCh is used to send save actions for logging.
-	saveCh chan saveMessage
+	saveCh chan archiveMessage
 }
 
 // NewLogger constructs a new Logger writing into w, ranging over machine IDs ids.
@@ -77,12 +77,14 @@ func (j *Logger) logAnalysis(s analysis.Sourced) error {
 }
 
 // logSaving logs s to this logger's file.
-func (j *Logger) logSaving(s saveMessage) error {
-	result := "success"
-	if s.missing != "" {
-		result = fmt.Sprintf("missing file %q", s.missing)
+func (j *Logger) logSaving(s archiveMessage) error {
+	var err error
+	switch s.body.Kind {
+	case observer.ArchiveStart:
+		_, err = fmt.Fprintf(j.out, "saving (run %s) %s to %s\n", s.run, s.body.SubjectName, s.body.File)
+	case observer.ArchiveFileMissing:
+		_, err = fmt.Fprintf(j.out, "when saving (run %s) %s: missing file %s\n", s.run, s.body.SubjectName, s.body.File)
 	}
-	_, err := fmt.Fprintf(j.out, "save (run %s) %s to %s: %s\n", s.run, s.saving.SubjectName, s.saving.Dest, result)
 	return err
 }
 
@@ -109,7 +111,7 @@ type InstanceLogger struct {
 	// anaCh is the channel used to send sourced analyses for logging.
 	anaCh chan<- analysis.Sourced
 	// saveCh is the channel used to send save actions for logging.
-	saveCh chan<- saveMessage
+	saveCh chan<- archiveMessage
 	// run contains information about the current iteration.
 	run run.Run
 	// compilers stores the current, if any, compiler set.
@@ -123,10 +125,9 @@ type compilerSet struct {
 	compilers []compiler.Named
 }
 
-type saveMessage struct {
-	run     run.Run
-	saving  observer.Saving
-	missing string
+type archiveMessage struct {
+	run  run.Run
+	body observer.ArchiveMessage
 }
 
 func (l *InstanceLogger) OnCompilerPlanStart(ncompilers int) {
@@ -166,19 +167,10 @@ func (l *InstanceLogger) OnAnalysis(c analysis.Analysis) {
 	}
 }
 
-func (l *InstanceLogger) OnSave(s observer.Saving) {
-	l.onSaveMessage(s, "")
-}
-
-func (l *InstanceLogger) OnSaveFileMissing(s observer.Saving, missing string) {
-	l.onSaveMessage(s, missing)
-}
-
-func (l *InstanceLogger) onSaveMessage(s observer.Saving, missing string) {
-	msg := saveMessage{
-		run:     l.run,
-		saving:  s,
-		missing: missing,
+func (l *InstanceLogger) OnArchive(s observer.ArchiveMessage) {
+	msg := archiveMessage{
+		run:  l.run,
+		body: s,
 	}
 	select {
 	case <-l.done:

@@ -8,6 +8,8 @@ package saver_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
@@ -51,18 +53,23 @@ func TestArchiveSubject(t *testing.T) {
 			Loc:      filekind.InFuzz,
 		},
 	}
-	saving := observer.Saving{
-		SubjectName: "foo_9",
-		Dest:        "foo_9_saved",
-	}
 
 	for n, m := range nm {
 		ar.On("ArchiveFile", m.Original, n, m.Kind.ArchivePerm()).Return(nil).Once()
+		orig := m.Original
+		obs.On("OnArchive", mock.MatchedBy(func(s observer.ArchiveMessage) bool {
+			return s.Kind == observer.ArchiveFileAdded && s.SubjectName == "foo_9" && s.File == orig
+		})).Return().Once()
 	}
 
-	obs.On("OnSave", saving).Return().Once()
+	obs.On("OnArchive", mock.MatchedBy(func(s observer.ArchiveMessage) bool {
+		return s.Kind == observer.ArchiveStart && s.Index == len(nm) && s.SubjectName == "foo_9" && s.File == "foo_9_saved"
+	})).Return().Once()
+	obs.On("OnArchive", mock.MatchedBy(func(s observer.ArchiveMessage) bool {
+		return s.Kind == observer.ArchiveFinish && s.SubjectName == "foo_9"
+	})).Return().Once()
 
-	err := saver.ArchiveSubject(&ar, nm, saving, &obs)
+	err := saver.ArchiveSubject(&ar, "foo_9", "foo_9_saved", nm, &obs)
 	require.NoError(t, err, "ArchiveSubject")
 
 	ar.AssertExpectations(t)

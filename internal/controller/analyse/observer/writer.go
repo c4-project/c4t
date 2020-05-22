@@ -43,12 +43,8 @@ func (a *AnalysisWriter) OnAnalysis(an analysis.Analysis) {
 	}
 }
 
-// OnSave does nothing (for now).
-func (a *AnalysisWriter) OnSave(Saving) {
-}
-
-// OnSaveFileMissing does nothing (for now).
-func (a *AnalysisWriter) OnSaveFileMissing(Saving, string) {
+// OnArchive does nothing (for now).
+func (a *AnalysisWriter) OnArchive(ArchiveMessage) {
 }
 
 // WriteSourced writes a sourced analysis an to this writer.

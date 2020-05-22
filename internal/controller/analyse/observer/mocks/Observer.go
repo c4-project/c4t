@@ -19,12 +19,7 @@ func (_m *Observer) OnAnalysis(a analysis.Analysis) {
 	_m.Called(a)
 }
 
-// OnSave provides a mock function with given fields: s
-func (_m *Observer) OnSave(s observer.Saving) {
+// OnArchive provides a mock function with given fields: s
+func (_m *Observer) OnArchive(s observer.ArchiveMessage) {
 	_m.Called(s)
-}
-
-// OnSaveFileMissing provides a mock function with given fields: s, missing
-func (_m *Observer) OnSaveFileMissing(s observer.Saving, missing string) {
-	_m.Called(s, missing)
 }

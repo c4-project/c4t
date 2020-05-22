@@ -12,11 +12,8 @@ type Observer interface {
 	// OnAnalysis lets the observer know that the current plan has been analysed and the results are in a.
 	OnAnalysis(a analysis.Analysis)
 
-	// OnSave lets the observer know that a save action has occurred.
-	OnSave(s Saving)
-
-	// OnSaveFileMissing lets the observer know that a save action couldn't find a file.
-	OnSaveFileMissing(s Saving, missing string)
+	// OnArchive lets the observer know that an archive action has occurred.
+	OnArchive(s ArchiveMessage)
 }
 
 //go:generate mockery -name=Observer
@@ -26,26 +23,4 @@ func OnAnalysis(a analysis.Analysis, obs ...Observer) {
 	for _, o := range obs {
 		o.OnAnalysis(a)
 	}
-}
-
-// OnSave sends OnSave to every instance observer in obs.
-func OnSave(s Saving, obs ...Observer) {
-	for _, o := range obs {
-		o.OnSave(s)
-	}
-}
-
-// OnSaveFileMissing sends OnSaveFileMissing to every instance observer in obs.
-func OnSaveFileMissing(s Saving, missing string, obs ...Observer) {
-	for _, o := range obs {
-		o.OnSaveFileMissing(s, missing)
-	}
-}
-
-// Saving represents a pair of saved subject and destination, used in OnSave messages.
-type Saving struct {
-	// SubjectName is the name of the subject that was saved
-	SubjectName string
-	// Dest is the destination of the saving action.
-	Dest string
 }
