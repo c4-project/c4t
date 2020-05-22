@@ -14,6 +14,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -23,6 +27,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder/mocks"
 
 	"golang.org/x/sync/errgroup"
 
@@ -68,36 +73,39 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		})
 
 	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {
-		obs.OnBuildStart(m)
-		obs.OnBuildRequest(add)
-		obs.OnBuildRequest(harness)
-		obs.OnBuildRequest(compile)
-		obs.OnBuildRequest(run)
-		obs.OnBuildFinish()
+		builder.OnBuildStart(m, obs)
+		builder.OnBuildRequest(add, obs)
+		builder.OnBuildRequest(harness, obs)
+		builder.OnBuildRequest(compile, obs)
+		builder.OnBuildRequest(run, obs)
+		builder.OnBuildFinish(obs)
+	}, func(obs *mocks.Observer) {
+		obs.On("OnBuild", mock.MatchedBy(func(msg builder.Message) bool {
+			return msg.Kind == builder.BuildStart &&
+				reflect.DeepEqual(*msg.Manifest, m)
+		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+			return m.Kind == builder.BuildRequest &&
+				m.Request.Name == add.Name &&
+				m.Request.Add != nil
+		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+			return m.Kind == builder.BuildRequest &&
+				m.Request.Name == harness.Name &&
+				m.Request.Harness != nil
+		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+			return m.Kind == builder.BuildRequest &&
+				m.Request.Name == compile.Name &&
+				m.Request.Compile != nil
+		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+			return m.Kind == builder.BuildRequest &&
+				m.Request.Name == run.Name &&
+				m.Request.Run != nil
+		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+			return m.Kind == builder.BuildFinish
+		})).Return().Once()
 	})
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
+	require.NoError(t, err)
 
-	if !reflect.DeepEqual(tobs.Manifest, m) {
-		t.Errorf("manifest mismatch: recv=%v, send=%v", tobs.Manifest, m)
-	}
-	if !tobs.Done {
-		t.Error("test observer didn't receive OnBuildFinish")
-	}
-
-	if _, addOk := tobs.Adds[add.Name]; !addOk {
-		t.Error("add not propagated")
-	}
-	if len(tobs.Harnesses[harness.Name]) != 1 {
-		t.Error("harness not propagated")
-	}
-	if len(tobs.Compiles[compile.Name]) != 1 {
-		t.Error("compile not propagated")
-	}
-	if len(tobs.Runs[run.Name]) != 1 {
-		t.Error("run not propagated")
-	}
+	tobs.AssertExpectations(t)
 }
 
 // TestReplayer_Run_roundTripError tests an error round-trip between Observer and Replayer.
@@ -108,7 +116,7 @@ func TestReplayer_Run_roundTripError(t *testing.T) {
 
 	_, err := roundTrip(context.Background(), func(obs *forward.Observer) {
 		obs.Error(e)
-	})
+	}, func(*mocks.Observer) {})
 
 	testhelp.ExpectErrorIs(t, err, forward.ErrRemote, "round-tripping an error")
 
@@ -122,13 +130,13 @@ func TestReplayer_Run_immediateCancel(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	_, err := roundTrip(ctx, func(*forward.Observer) {})
+	_, err := roundTrip(ctx, func(*forward.Observer) {}, func(*mocks.Observer) {})
 	testhelp.ExpectErrorIs(t, err, ctx.Err(), "replay with immediate cancel")
 }
 
-func roundTrip(ctx context.Context, input func(*forward.Observer)) (*builder.MockObserver, error) {
+func roundTrip(ctx context.Context, input func(*forward.Observer), obsf func(*mocks.Observer)) (*mocks.Observer, error) {
 	pw, obs, tobs, rep := roundTripPipe()
-
+	obsf(tobs)
 	eg, ectx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
 		input(&obs)
@@ -140,10 +148,10 @@ func roundTrip(ctx context.Context, input func(*forward.Observer)) (*builder.Moc
 	return tobs, eg.Wait()
 }
 
-func roundTripPipe() (io.Closer, forward.Observer, *builder.MockObserver, forward.Replayer) {
+func roundTripPipe() (io.Closer, forward.Observer, *mocks.Observer, forward.Replayer) {
 	pr, pw := io.Pipe()
 	obs := forward.Observer{Encoder: json.NewEncoder(pw)}
-	tobs := builder.MockObserver{}
+	tobs := mocks.Observer{}
 	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observers: []builder.Observer{&tobs}}
 	return pw, obs, &tobs, rep
 }

@@ -20,11 +20,16 @@ import (
 // Logger lifts a Logger to an observer.
 type Logger log.Logger
 
-// OnBuildStart does nothing.
-func (l *Logger) OnBuildStart(builder.Manifest) {}
+// OnBuild logs build messages.
+func (l *Logger) OnBuild(b builder.Message) {
+	switch b.Kind {
+	case builder.BuildRequest:
+		l.onBuildRequest(b.Request)
+	}
+}
 
 // OnBuildRequest logs failed compile and run results.
-func (l *Logger) OnBuildRequest(r builder.Request) {
+func (l *Logger) onBuildRequest(r *builder.Request) {
 	switch {
 	case r.Compile != nil && r.Compile.Result.Status != status.Ok:
 		(*log.Logger)(l).Printf("subject %q on compiler %q: %s", r.Name, r.Compile.CompilerID.String(), r.Compile.Result.Status)

@@ -157,19 +157,16 @@ func (o *Observer) logAnalysis(a analysis.Analysis) error {
 	return o.rlog.Log(sc)
 }
 
-// OnBuildStart forwards a build start observation.
-func (o *Observer) OnBuildStart(m builder.Manifest) {
-	o.action.OnBuildStart(m)
-}
-
-// OnBuildRequest forwards a build request observation.
-func (o *Observer) OnBuildRequest(r builder.Request) {
-	o.action.OnBuildRequest(r)
-}
-
-// OnBuildFinish forwards a build finish observation.
-func (o *Observer) OnBuildFinish() {
-	o.action.OnBuildFinish()
+// OnBuild forwards a build observation.
+func (o *Observer) OnBuild(m builder.Message) {
+	switch m.Kind {
+	case builder.BuildStart:
+		o.action.OnBuildStart(*m.Manifest)
+	case builder.BuildRequest:
+		o.action.OnBuildRequest(*m.Request)
+	case builder.BuildFinish:
+		o.action.OnBuildFinish()
+	}
 }
 
 // OnCopyStart forwards a copy start observation.

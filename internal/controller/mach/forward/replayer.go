@@ -50,16 +50,10 @@ func (r *Replayer) Run(ctx context.Context) error {
 
 func (r *Replayer) forwardToObs(f Forward) error {
 	switch {
-	case f.BuildEnd:
-		builder.OnBuildFinish(r.Observers...)
-		return nil
 	case f.Error != "":
 		return fmt.Errorf("%w: %s", ErrRemote, f.Error)
-	case f.BuildStart != nil:
-		builder.OnBuildStart(*f.BuildStart, r.Observers...)
-		return nil
-	case f.BuildUpdate != nil:
-		builder.OnBuildRequest(*f.BuildUpdate, r.Observers...)
+	case f.Build != nil:
+		builder.OnBuild(*f.Build, r.Observers...)
 		return nil
 	default:
 		return errors.New("received forward with nothing present")

@@ -10,7 +10,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+
 	"github.com/MattWindsor91/act-tester/internal/model"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder/mocks"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -23,7 +26,7 @@ import (
 
 // TestBuilder_Run_Adds is a long-form test for exercising a corpus builder on an add run.
 func TestBuilder_Run_Adds(t *testing.T) {
-	obs := builder.MockObserver{}
+	var obs mocks.Observer
 
 	adds := []subject.Named{
 		{
@@ -56,6 +59,22 @@ func TestBuilder_Run_Adds(t *testing.T) {
 
 	var got corpus.Corpus
 
+	obs.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+		return m.Kind == builder.BuildStart && m.Manifest.NReqs == c.NReqs
+	})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+		return m.Kind == builder.BuildFinish
+	})).Return().Once()
+
+	for _, c := range adds {
+		c := c
+		obs.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+			return m.Kind == builder.BuildRequest &&
+				m.Request.Name == c.Name &&
+				m.Request.Add != nil &&
+				m.Request.Add.OrigLitmus == c.OrigLitmus
+		})).Return().Once()
+	}
+
 	eg, ectx := errgroup.WithContext(context.Background())
 	eg.Go(func() error {
 		var rerr error
@@ -74,8 +93,10 @@ func TestBuilder_Run_Adds(t *testing.T) {
 		t.Fatal("unexpected error running builder on Adds:", err)
 	}
 
-	checkAddObs(t, obs, c)
+	//	checkAddObs(t, obs, c)
 	checkAddCorpus(t, adds, got)
+
+	obs.AssertExpectations(t)
 }
 
 func checkAddCorpus(t *testing.T, adds []subject.Named, got corpus.Corpus) {
@@ -91,16 +112,16 @@ func checkAddCorpus(t *testing.T, adds []subject.Named, got corpus.Corpus) {
 	}
 }
 
-func checkAddObs(t *testing.T, obs builder.MockObserver, c builder.Config) {
-	if obs.Manifest.NReqs != c.NReqs {
-		t.Helper()
-		t.Errorf("observer told to expect %d requests; want %d", obs.Manifest.NReqs, c.NReqs)
-	}
-	if !obs.Done {
-		t.Helper()
-		t.Error("observer not told the builder was done")
-	}
-}
+//func checkAddObs(t *testing.T, obs builder.MockObserver, c builder.Config) {
+//	if obs.Manifest.NReqs != c.NReqs {
+//		t.Helper()
+//		t.Errorf("observer told to expect %d requests; want %d", obs.Manifest.NReqs, c.NReqs)
+//	}
+//	if !obs.Done {
+//		t.Helper()
+//		t.Error("observer not told the builder was done")
+//	}
+//}
 
 func TestBuilderReq_SendTo(t *testing.T) {
 	ch := make(chan builder.Request)

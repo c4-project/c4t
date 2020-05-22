@@ -14,12 +14,6 @@ type Forward struct {
 	// Error carries an error's Error string.
 	Error string `json:"error,omitempty"`
 
-	// BuildStart carries information about the beginning of a corpus build.
-	BuildStart *builder.Manifest `json:"build_start,omitempty"`
-
-	// BuildUpdate carries an update from a corpus build.
-	BuildUpdate *builder.Request `json:"build_update,omitempty"`
-
-	// BuildEnd being true signifies that this is the end of a corpus build.
-	BuildEnd bool `json:"build_end,omitempty"`
+	// Build carries information about a corpus build.
+	Build *builder.Message `json:"build,omitempty"`
 }

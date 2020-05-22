@@ -76,8 +76,8 @@ func initCorpus(init corpus.Corpus, nreqs int) corpus.Corpus {
 // Run runs the builder in context ctx.
 // Run is not thread-safe.
 func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
-	b.onStart()
-	defer b.onFinish()
+	OnBuildStart(b.m, b.obs...)
+	defer func() { OnBuildFinish(b.obs...) }()
 
 	for i := 0; i < b.m.NReqs; i++ {
 		if err := b.runSingle(ctx); err != nil {
@@ -86,18 +86,6 @@ func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
 	}
 
 	return b.c, nil
-}
-
-func (b *Builder) onStart() {
-	for _, o := range b.obs {
-		o.OnBuildStart(b.m)
-	}
-}
-
-func (b *Builder) onFinish() {
-	for _, o := range b.obs {
-		o.OnBuildFinish()
-	}
 }
 
 func (b *Builder) runSingle(ctx context.Context) error {
@@ -110,7 +98,7 @@ func (b *Builder) runSingle(ctx context.Context) error {
 }
 
 func (b *Builder) runRequest(r Request) error {
-	b.onRequest(r)
+	OnBuildRequest(r, b.obs...)
 	switch {
 	case r.Add != nil:
 		return b.add(r.Name, subject.Subject(*r.Add))
@@ -122,12 +110,6 @@ func (b *Builder) runRequest(r Request) error {
 		return b.addRun(r.Name, r.Run.CompilerID, r.Run.Result)
 	default:
 		return fmt.Errorf("%w: %v", ErrBadBuilderRequest, r)
-	}
-}
-
-func (b *Builder) onRequest(r Request) {
-	for _, o := range b.obs {
-		o.OnBuildRequest(r)
 	}
 }
 

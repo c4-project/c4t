@@ -185,14 +185,8 @@ func (l *InstanceLogger) addSource(c analysis.Analysis) analysis.Sourced {
 	}
 }
 
-// OnBuildStart does nothing.
-func (l *InstanceLogger) OnBuildStart(builder.Manifest) {}
-
-// OnBuildRequest does nothing.
-func (l *InstanceLogger) OnBuildRequest(builder.Request) {}
-
-// OnBuildFinish does nothing.
-func (l *InstanceLogger) OnBuildFinish() {}
+// OnBuild does nothing.
+func (l *InstanceLogger) OnBuild(builder.Message) {}
 
 // OnCopyStart does nothing.
 func (l *InstanceLogger) OnCopyStart(int) {}

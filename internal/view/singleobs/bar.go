@@ -23,18 +23,15 @@ func NewBar() *Bar {
 }
 
 // OnBuildStart observes the start of a corpus build using a progress bar.
-func (p *Bar) OnBuildStart(m builder.Manifest) {
-	p.start(m.NReqs)
-}
-
-// OnBuildRequest observes a request on a corpus build using a progress bar.
-func (p *Bar) OnBuildRequest(builder.Request) {
-	p.step()
-}
-
-// OnBuildFinish observes the end of a corpus build using a progress bar.
-func (p *Bar) OnBuildFinish() {
-	p.finish()
+func (p *Bar) OnBuild(m builder.Message) {
+	switch m.Kind {
+	case builder.BuildStart:
+		p.start(m.Manifest.NReqs)
+	case builder.BuildRequest:
+		p.step()
+	case builder.BuildFinish:
+		p.finish()
+	}
 }
 
 // OnCompilerPlanStart observes the start of a compiler plan using a progress bar.
