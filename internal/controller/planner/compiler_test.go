@@ -11,6 +11,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/planner/mocks"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/stretchr/testify/assert"
@@ -33,7 +35,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	var (
 		mi mockInspector
 		ml mockCompilerLister
-		mo mockCompilerObserver
+		mo mocks.CompilerObserver
 	)
 
 	rng := rand.New(rand.NewSource(0))
@@ -183,24 +185,4 @@ func (m *mockInspector) OptLevels(c *compiler.Config) (map[string]optlevel.Level
 func (m *mockInspector) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
 	args := m.Called(c)
 	return args.Get(0).(stringhelp.Set), args.Error(1)
-}
-
-// mockCompilerObserver mocks the CompilerObserver interface.
-type mockCompilerObserver struct {
-	mock.Mock
-}
-
-// OnCompilerPlanStart mocks the eponymous interface method.
-func (m *mockCompilerObserver) OnCompilerPlanStart(ncompilers int) {
-	_ = m.Called(ncompilers)
-}
-
-// OnCompilerPlan mocks the eponymous interface method.
-func (m *mockCompilerObserver) OnCompilerPlan(c compiler.Named) {
-	_ = m.Called(c)
-}
-
-// OnCompilerPlanFinish mocks the eponymous interface method.
-func (m *mockCompilerObserver) OnCompilerPlanFinish() {
-	_ = m.Called()
 }

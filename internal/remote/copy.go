@@ -16,39 +16,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
 
-// CopyObserver is an interface for types that observe an SFTP file copy.
-type CopyObserver interface {
-	// OnCopyStart lets the observer know when a file copy (of nfiles files) is beginning.
-	OnCopyStart(nfiles int)
-
-	// OnCopy lets the observer know that a file copy (from path src to path dst) has happened.
-	OnCopy(dst, src string)
-
-	// OnCopyFinish lets the observer know when a file copy has finished.
-	OnCopyFinish()
-}
-
-// OnCopyStart sends an OnCopyStart observation to multiple observers.
-func OnCopyStart(nfiles int, cos ...CopyObserver) {
-	for _, o := range cos {
-		o.OnCopyStart(nfiles)
-	}
-}
-
-// OnCopy sends an OnCopy observation to multiple observers.
-func OnCopy(dst, src string, cos ...CopyObserver) {
-	for _, o := range cos {
-		o.OnCopy(dst, src)
-	}
-}
-
-// OnCopyFinish sends an OnCopyFinish observation to multiple observers.
-func OnCopyFinish(cos ...CopyObserver) {
-	for _, o := range cos {
-		o.OnCopyFinish()
-	}
-}
-
 // Copier provides a mockable interface for remote copying.
 type Copier interface {
 	// Create tries to create a file at path, and, if successful, opens a write-closer pointing to it.

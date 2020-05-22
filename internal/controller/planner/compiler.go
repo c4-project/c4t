@@ -29,6 +29,8 @@ type CompilerObserver interface {
 	OnCompilerPlanFinish()
 }
 
+//go:generate mockery -name=CompilerObserver
+
 // OnCompilerPlanStart sends an OnCompilerPlanStart to every observer in obs.
 func OnCompilerPlanStart(ncompilers int, obs ...CompilerObserver) {
 	for _, o := range obs {

@@ -13,6 +13,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/remote/mocks"
+
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/stretchr/testify/assert"
@@ -35,20 +37,6 @@ func (m *mockCopier) Open(path string) (io.ReadCloser, error) {
 func (m *mockCopier) MkdirAll(dir string) error {
 	args := m.Called(dir)
 	return args.Error(0)
-}
-
-type mockObserver struct{ mock.Mock }
-
-func (m *mockObserver) OnCopyStart(nfiles int) {
-	m.Called(nfiles)
-}
-
-func (m *mockObserver) OnCopy(dst, src string) {
-	m.Called(dst, src)
-}
-
-func (m *mockObserver) OnCopyFinish() {
-	m.Called()
 }
 
 type closeBuffer struct {
@@ -85,7 +73,7 @@ func TestSendMapping(t *testing.T) {
 		m.On("Create", r).Return(buffers[r], nil).Once()
 	}
 
-	var o mockObserver
+	var o mocks.CopyObserver
 
 	o.
 		On("OnCopyStart", len(mapping)).Return().Once().
