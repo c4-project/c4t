@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/pprof"
+	"strings"
 
 	"github.com/1set/gut/ystring"
 
@@ -34,12 +35,33 @@ import (
 	c "github.com/urfave/cli/v2"
 )
 
+const (
+	name  = "act-tester"
+	usage = "runs compiler tests"
+
+	readme = `
+   This program is the main test 'director'.  It runs a series of infinite
+   loops, one per machine, of the plan, fuzz, lift, invoke, and analyse test
+   stages.
+
+   It takes, as arguments, a series of Litmus files and directories that will
+   serve as the test corpus across all machines and loop iterations.  As
+   the plan and fuzz test stages apply subsampling, the director will
+   gradually cover a range of the input, but isn't guaranteed to visit each
+   input file.
+
+   Most of the director's options can be configured through the main config
+   file.  Options specified on the command line, where appropriate, override
+   that configuration.`
+)
+
 // App creates the act-tester app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester",
-		Usage: "makes documentation for act-tester commands",
-		Flags: flags(),
+		Name:        name,
+		Usage:       usage,
+		Description: strings.TrimSpace(readme),
+		Flags:       flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, errw)
 		},
