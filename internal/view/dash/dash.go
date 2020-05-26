@@ -180,7 +180,7 @@ func machineGridPercent(nmachines int) int {
 // Run runs a dashboard in a blocking manner.
 func (d *Dash) Run(ctx context.Context, cancel func()) error {
 	err := termdash.Run(ctx, d.term, d.container, termdash.KeyboardSubscriber(func(k *terminalapi.Keyboard) {
-		if k.Key == keyboard.KeyCtrlQ {
+		if k.Key == keyboard.KeyCtrlC {
 			cancel()
 		}
 	}))
