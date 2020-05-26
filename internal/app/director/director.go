@@ -172,8 +172,8 @@ func makeOptions(c *config.Config, logw io.Writer) ([]director.Option, error) {
 
 	l := log.New(lw, "", 0)
 
-	dc := director.ConfigFromGlobal(c)
-	return append(dc, director.ObserveWith(o...), director.LogWith(l)), nil
+	opts := []director.Option{director.ConfigFromGlobal(c), director.ObserveWith(o...), director.LogWith(l)}
+	return opts, nil
 }
 
 func makeObservers(mids []id.ID, logw io.Writer) ([]observer.Observer, io.Writer, error) {

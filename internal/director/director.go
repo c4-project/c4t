@@ -59,19 +59,10 @@ func New(e Env, ms map[string]config.Machine, files []string, opt ...Option) (*D
 		return nil, liftInitError(err)
 	}
 	d := Director{files: files, env: e, machines: ms}
-	if err := d.applyOptions(opt); err != nil {
+	if err := Options(opt...)(&d); err != nil {
 		return nil, liftInitError(err)
 	}
 	return &d, d.tidyAfterOptions()
-}
-
-func (d *Director) applyOptions(opt []Option) error {
-	for _, o := range opt {
-		if err := o(d); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (d *Director) tidyAfterOptions() error {

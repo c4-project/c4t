@@ -42,6 +42,18 @@ var (
 // Option is the type of options for the director.
 type Option func(*Director) error
 
+// Options bundles the separate options ops into a single option.
+func Options(ops ...Option) Option {
+	return func(d *Director) error {
+		for _, op := range ops {
+			if err := op(d); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
 // ObserveWith adds obs to the director's observer pool.
 func ObserveWith(obs ...observer.Observer) Option {
 	return func(d *Director) error {
@@ -121,10 +133,10 @@ func (e Env) Check() error {
 }
 
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
-func ConfigFromGlobal(g *config.Config) []Option {
-	return []Option{
+func ConfigFromGlobal(g *config.Config) Option {
+	return Options(
 		OutDir(g.OutDir),
 		OverrideQuantities(g.Quantities),
 		SSH(g.SSH),
-	}
+	)
 }
