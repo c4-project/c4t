@@ -2,7 +2,7 @@
 
 # NAME
 
-act-tester - makes documentation for act-tester commands
+act-tester - runs compiler tests
 
 # SYNOPSIS
 
@@ -11,6 +11,7 @@ act-tester
 ```
 [--cpuprofile]=[value]
 [--machine-filter|-m]=[value]
+[--no-dashboard|-D]
 [-A]=[value]
 [-C]=[value]
 [-k]=[value]
@@ -28,7 +29,9 @@ act-tester [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--cpuprofile**="": `file` into which we should dump pprof information
 
-**--machine-filter, -m**="": A `glob` to use to filter incoming machines by ID.
+**--machine-filter, -m**="": a `glob` to use to filter incoming machines by ID
+
+**--no-dashboard, -D**: turns off the dashboard
 
 **-A**="": read ACT config from this `file`
 

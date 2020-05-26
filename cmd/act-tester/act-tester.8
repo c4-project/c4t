@@ -3,7 +3,7 @@
 
 .SH NAME
 .PP
-act\-tester \- makes documentation for act\-tester commands
+act\-tester \- runs compiler tests
 
 
 .SH SYNOPSIS
@@ -16,6 +16,7 @@ act\-tester
 .nf
 [\-\-cpuprofile]=[value]
 [\-\-machine\-filter|\-m]=[value]
+[\-\-no\-dashboard|\-D]
 [\-A]=[value]
 [\-C]=[value]
 [\-k]=[value]
@@ -43,7 +44,10 @@ act\-tester [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 \fB\-\-cpuprofile\fP="": \fB\fCfile\fR into which we should dump pprof information
 
 .PP
-\fB\-\-machine\-filter, \-m\fP="": A \fB\fCglob\fR to use to filter incoming machines by ID.
+\fB\-\-machine\-filter, \-m\fP="": a \fB\fCglob\fR to use to filter incoming machines by ID
+
+.PP
+\fB\-\-no\-dashboard, \-D\fP: turns off the dashboard
 
 .PP
 \fB\-A\fP="": read ACT config from this \fB\fCfile\fR

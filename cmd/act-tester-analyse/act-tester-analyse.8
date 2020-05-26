@@ -11,6 +11,16 @@ act\-tester\-analyse \- performs human\-readable queries on a plan file
 act\-tester\-analyse
 
 .PP
+.RS
+
+.nf
+[\-\-num\-workers|\-j]=[value]
+[\-\-save\-dir|\-d]=[value]
+
+.fi
+.RE
+
+.PP
 \fBUsage\fP:
 
 .PP
@@ -21,3 +31,11 @@ act\-tester\-analyse [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 .fi
 .RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-num\-workers, \-j\fP="": number of \fB\fCworkers\fR to run in parallel (default: 1)
+
+.PP
+\fB\-\-save\-dir, \-d\fP="": if present, save failing corpora to this \fB\fCdirectory\fR
