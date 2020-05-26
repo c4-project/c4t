@@ -50,9 +50,25 @@ const (
    gradually cover a range of the input, but isn't guaranteed to visit each
    input file.
 
+   By default, the director shows its progress through an interactive terminal
+   dashboard.  This dashboard can consume a large amount of resources; pass
+   --` + flagNoDash + ` to disable it.
+
+   In dashboard mode (the default), pressing Ctrl-C on the terminal stops the
+   tester gracefully.  In no-dashboard mode, the tester will shut down in
+   response to interrupt signals, which can usually be sent by pressing Ctrl-C
+   anyway.
+
    Most of the director's options can be configured through the main config
    file.  Options specified on the command line, where appropriate, override
    that configuration.`
+
+	flagMFilter  = "machine-filter"
+	usageMFilter = "a `glob` to use to filter incoming machines by ID"
+
+	flagNoDash      = "no-dashboard"
+	flagNoDashShort = "D"
+	usageNoDash     = "turns off the dashboard"
 )
 
 // App creates the act-tester app.
@@ -69,15 +85,18 @@ func App(outw, errw io.Writer) *c.App {
 	return stdflag.SetCommonAppSettings(&a, outw, errw)
 }
 
-const flagMFilter = "machine-filter"
-
 func flags() []c.Flag {
 	nflags := []c.Flag{
 		stdflag.ConfFileCliFlag(),
+		&c.BoolFlag{
+			Name:    flagNoDash,
+			Aliases: []string{flagNoDashShort},
+			Usage:   usageNoDash,
+		},
 		&c.StringFlag{
 			Name:    flagMFilter,
 			Aliases: []string{stdflag.FlagMachine},
-			Usage:   "A `glob` to use to filter incoming machines by ID.",
+			Usage:   usageMFilter,
 			Value:   "",
 		},
 		stdflag.SubjectCyclesCliFlag(),
@@ -102,9 +121,22 @@ func run(ctx *c.Context, errw io.Writer) error {
 		return err
 	}
 	qs := setupQuantityOverrides(ctx)
-	mfilter := ctx.String(flagMFilter)
 
-	return runWithArgs(cfg, qs, a, mfilter, ctx.Args().Slice())
+	args := args{
+		dash:    !ctx.Bool(flagNoDash),
+		errw:    errw,
+		mfilter: ctx.String(flagMFilter),
+		files:   ctx.Args().Slice(),
+	}
+
+	return runWithArgs(cfg, qs, a, args)
+}
+
+type args struct {
+	dash    bool
+	errw    io.Writer
+	mfilter string
+	files   []string
 }
 
 func setupPprof(cppath string) (func(), error) {
@@ -122,20 +154,20 @@ func setupPprof(cppath string) (func(), error) {
 	}, nil
 }
 
-func runWithArgs(cfg *config.Config, qs config.QuantitySet, a *act.Runner, mfilter string, files []string) error {
-	o, lw, err := makeObservers(cfg)
+func runWithArgs(cfg *config.Config, qs config.QuantitySet, a *act.Runner, args args) error {
+	o, lw, err := makeObservers(cfg, args)
 	if err != nil {
 		return err
 	}
 
-	opts, err := makeOptions(cfg, qs, mfilter, lw, o...)
+	opts, err := makeOptions(cfg, qs, args.mfilter, lw, o...)
 	if err != nil {
 		_ = observer.CloseAll(o...)
 		return err
 	}
 
 	e := makeEnv(a, cfg)
-	d, err := director.New(e, cfg.Machines, files, opts...)
+	d, err := director.New(e, cfg.Machines, args.files, opts...)
 	if err != nil {
 		_ = observer.CloseAll(o...)
 		return err
@@ -182,19 +214,21 @@ func makeGlob(mfilter string) (id.ID, error) {
 	return id.TryFromString(mfilter)
 }
 
-func makeObservers(cfg *config.Config) ([]observer.Observer, io.Writer, error) {
+func makeObservers(cfg *config.Config, args args) ([]observer.Observer, io.Writer, error) {
 	logw, err := createResultLogFile(cfg)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	do, err := dash.New()
 	if err != nil {
 		return nil, nil, err
 	}
 	lo, err := observer.NewLogger(logw)
 	if err != nil {
-		_ = do.Close()
+		return nil, nil, err
+	}
+	if !args.dash {
+		return []observer.Observer{lo}, args.errw, nil
+	}
+	do, err := dash.New()
+	if err != nil {
+		_ = lo.Close()
 		return nil, nil, err
 	}
 
