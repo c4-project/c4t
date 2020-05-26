@@ -8,6 +8,8 @@ package plan
 import (
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
@@ -23,7 +25,7 @@ func Mock() *Plan {
 			Seed:     8675309,
 			Version:  CurrentVer,
 		},
-		Machine: NamedMachine{
+		Machine: machine.Named{
 			ID: id.FromString("localhost"),
 		},
 		Backend: &service.Backend{

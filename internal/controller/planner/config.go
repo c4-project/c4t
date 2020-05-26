@@ -9,6 +9,8 @@ import (
 	"context"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
@@ -31,7 +33,7 @@ type Config struct {
 }
 
 // Plan constructs a Planner using this config, then runs it using ctx on the file set fs and machine mach.
-func (c *Config) Plan(ctx context.Context, mach plan.NamedMachine, fs []string, seed int64) (*plan.Plan, error) {
+func (c *Config) Plan(ctx context.Context, mach machine.Named, fs []string, seed int64) (*plan.Plan, error) {
 	p, err := New(c, mach, fs, seed)
 	if err != nil {
 		return nil, err

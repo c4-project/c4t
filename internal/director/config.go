@@ -9,6 +9,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/model/id"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
@@ -73,6 +75,18 @@ func LogWith(l *log.Logger) Option {
 	return func(d *Director) error {
 		d.l = l
 		return nil
+	}
+}
+
+// FilterMachines filters the director's machine set with glob.
+func FilterMachines(glob id.ID) Option {
+	return func(d *Director) error {
+		if glob.IsEmpty() {
+			return nil
+		}
+		var err error
+		d.machines, err = d.machines.Filter(glob)
+		return err
 	}
 }
 

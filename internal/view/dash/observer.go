@@ -16,8 +16,6 @@ import (
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/linestyle"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/mum4k/termdash/widgets/text"
@@ -25,8 +23,6 @@ import (
 
 // Observer represents a single machine instance inside a dash.
 type Observer struct {
-	mid id.ID
-
 	run   *runCounter
 	rlog  *ResultLog
 	tally *tally
@@ -42,11 +38,10 @@ type Observer struct {
 }
 
 // NewObserver constructs an Observer, initialising its various widgets.
-func NewObserver(mid id.ID, rlog *ResultLog) (*Observer, error) {
+func NewObserver(rlog *ResultLog) (*Observer, error) {
 	var err error
 
 	d := Observer{
-		mid:  mid,
 		rlog: rlog,
 	}
 
@@ -79,10 +74,13 @@ const (
 	percActions = 100 - percRun - percStats
 )
 
-// AddToGrid adds this observer to a grid builder gb.
-func (o *Observer) AddToGrid(gb *grid.Builder, midstr string, pc int) {
+// AddToGrid adds this observer to a grid builder gb with the container ID id..
+func (o *Observer) AddToGrid(gb *grid.Builder, id string, pc int) {
 	gb.Add(grid.RowHeightPercWithOpts(pc,
-		[]container.Option{container.Border(linestyle.Double), container.BorderTitle(midstr)},
+		[]container.Option{
+			container.ID(id),
+			container.Border(linestyle.Double),
+		},
 		grid.ColWidthPerc(percRun,
 			grid.RowHeightPercWithOpts(
 				40,

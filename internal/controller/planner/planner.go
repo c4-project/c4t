@@ -12,6 +12,8 @@ import (
 	"log"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
@@ -34,7 +36,7 @@ var ErrConfigNil = errors.New("config nil")
 
 // New constructs a new planner with the given config, machine information, files, and seed override.
 // If seed is UseDateSeed, it will be ignored and a date-specific seed generated at runtime.
-func New(c *Config, mach plan.NamedMachine, fs []string, seed int64) (*Planner, error) {
+func New(c *Config, mach machine.Named, fs []string, seed int64) (*Planner, error) {
 	if err := checkConfig(c); err != nil {
 		return nil, err
 	}

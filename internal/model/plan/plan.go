@@ -10,6 +10,8 @@ import (
 	"errors"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -28,7 +30,7 @@ type Plan struct {
 	Metadata Header `toml:"metadata" json:"metadata"`
 
 	// Machine represents the machine targeted by this plan.
-	Machine NamedMachine `toml:"machine" json:"machine"`
+	Machine machine.Named `toml:"machine" json:"machine"`
 
 	// Backend represents the backend targeted by this plan.
 	Backend *service.Backend `toml:"backend,omitempty" json:"backend,omitempty"`

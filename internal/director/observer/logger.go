@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
@@ -24,7 +27,8 @@ import (
 // Logger is a director observer that emits logs to a writer when runs finish up.
 type Logger struct {
 	// out is the writer to use for logging collations.
-	out io.Writer
+	// It will be closed by the director.
+	out io.WriteCloser
 	// aw is the analysis writer used for outputting sourced analyses.
 	aw *observer.AnalysisWriter
 	// anaCh is used to send sourced analyses for logging.
@@ -36,7 +40,7 @@ type Logger struct {
 }
 
 // NewLogger constructs a new Logger writing into w, ranging over machine IDs ids.
-func NewLogger(w io.Writer) (*Logger, error) {
+func NewLogger(w io.WriteCloser) (*Logger, error) {
 	aw, err := observer.NewAnalysisWriter(w)
 	if err != nil {
 		return nil, err
@@ -53,6 +57,10 @@ func (j *Logger) Run(ctx context.Context, _ func()) error {
 	}
 }
 
+func (j *Logger) Close() error {
+	return j.out.Close()
+}
+
 func (j *Logger) runStep(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
@@ -63,6 +71,17 @@ func (j *Logger) runStep(ctx context.Context) error {
 		return j.logCompilers(cc)
 	case sc := <-j.saveCh:
 		return j.logSaving(sc)
+	}
+}
+
+// OnMachines logs a machine block.
+func (j *Logger) OnMachines(m machine.Message) {
+	switch m.Kind {
+	case machine.MessageStart:
+		_, _ = fmt.Fprintf(j.out, "%s:\n", iohelp.PluralQuantity(m.Index, "machine", "", "s"))
+	case machine.MessageRecord:
+		// TODO(@MattWindsor91): store more information?
+		_, _ = fmt.Fprintf(j.out, " - %s (%s)\n", m.Machine.ID, iohelp.PluralQuantity(m.Machine.Cores, "core", "", "s"))
 	}
 }
 

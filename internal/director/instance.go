@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	aobserver "github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
@@ -51,7 +53,7 @@ const maxConsecutiveErrors = 10
 // Instance contains the state necessary to run a single machine loop of a director.
 type Instance struct {
 	// MachConfig contains the machine config for this machine.
-	MachConfig config.Machine
+	MachConfig machine.Config
 	// SSHConfig contains top-level SSH configuration.
 	SSHConfig *remote.Config
 	// StageConfig is the configuration for this instance's stages.
@@ -218,8 +220,8 @@ func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error)
 }
 
 // machineForPlan massages this instance's machine config into a form with which the planner is comfortable.
-func (i *Instance) machineForPlan() plan.NamedMachine {
-	return plan.NamedMachine{
+func (i *Instance) machineForPlan() machine.Named {
+	return machine.Named{
 		ID:      i.ID,
 		Machine: i.MachConfig.Machine,
 	}

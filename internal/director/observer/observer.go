@@ -8,6 +8,9 @@ package observer
 
 import (
 	"context"
+	"io"
+
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 
@@ -22,10 +25,19 @@ import (
 )
 
 // Observer is an interface for types that implement multi-machine test progress observation.
+//
+// Unlike most observer patterns in the tester, the director takes a degree of control over the lifecycle of its
+// observers.  It will call Run for each observer in parallel with the tester instances, and call Close when its
+// observers are no longer needed.
 type Observer interface {
-	// Run runs the observer in a blocking manner using context ctx.
+	machine.Observer
+
+	// Run runs any runtime required by the observer in a blocking manner using context ctx.
 	// It will use cancel to cancel ctx if needed.
 	Run(ctx context.Context, cancel func()) error
+
+	// The director will Close observers when it is shutting down.
+	io.Closer
 
 	// Instance gets a sub-observer for the machine with ID id.
 	// It can fail if no such observer is available.
@@ -54,6 +66,15 @@ func OnIteration(r run.Run, obs ...Instance) {
 	for _, o := range obs {
 		o.OnIteration(r)
 	}
+}
+
+// LowerToMachine lowers a slice of director observers to a slice of machine observers.
+func LowerToMachine(obs []Observer) []machine.Observer {
+	cos := make([]machine.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
 }
 
 // LowerToAnalyse lowers a slice of instance observers to a slice of builder observers.
@@ -90,4 +111,13 @@ func LowerToCopy(obs []Instance) []remote.CopyObserver {
 		cos[i] = o
 	}
 	return cos
+}
+
+// CloseAll closes all observers passed to it, returning the error of the last one (if any).
+func CloseAll(obs ...Observer) error {
+	var err error
+	for _, o := range obs {
+		err = o.Close()
+	}
+	return err
 }

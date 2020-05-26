@@ -100,28 +100,27 @@ func setupPprof(cppath string) (func(), error) {
 	}, nil
 }
 
-func runWithArgs(cfg *config.Config, qs *config.QuantitySet, a *act.Runner, mfilter string, files []string) error {
-	if err := amendConfig(cfg, qs, mfilter); err != nil {
-		return err
-	}
-
-	logw, err := createResultLogFile(cfg)
+func runWithArgs(cfg *config.Config, qs config.QuantitySet, a *act.Runner, mfilter string, files []string) error {
+	o, lw, err := makeObservers(cfg)
 	if err != nil {
 		return err
 	}
 
-	d, err := makeDirector(cfg, a, logw, files)
+	opts, err := makeOptions(cfg, qs, mfilter, lw, o...)
 	if err != nil {
-		_ = logw.Close()
+		_ = observer.CloseAll(o...)
 		return err
 	}
 
-	if derr := d.Direct(context.Background()); derr != nil {
-		_ = logw.Close()
-		return derr
+	e := makeEnv(a, cfg)
+	d, err := director.New(e, cfg.Machines, files, opts...)
+	if err != nil {
+		_ = observer.CloseAll(o...)
+		return err
 	}
 
-	return logw.Close()
+	// The director will close the observers.
+	return d.Direct(context.Background())
 }
 
 func createResultLogFile(c *config.Config) (*os.File, error) {
@@ -136,64 +135,48 @@ func createResultLogFile(c *config.Config) (*os.File, error) {
 	return logw, nil
 }
 
-func amendConfig(cfg *config.Config, qs *config.QuantitySet, mfilter string) error {
-	cfg.Quantities.Override(*qs)
-	if mfilter != "" {
-		if err := applyMachineFilter(mfilter, cfg); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func makeDirector(c *config.Config, a *act.Runner, logw io.Writer, files []string) (*director.Director, error) {
-	e := makeEnv(a, c)
-	opts, err := makeOptions(c, logw)
-	if err != nil {
-		return nil, err
-	}
-	d, err := director.New(e, c.Machines, files, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return d, nil
-}
-
-func makeOptions(c *config.Config, logw io.Writer) ([]director.Option, error) {
-	mids, err := c.MachineIDs()
-	if err != nil {
-		return nil, err
-	}
-
-	o, lw, err := makeObservers(mids, logw)
+func makeOptions(c *config.Config, qs config.QuantitySet, mfilter string, lw io.Writer, o ...observer.Observer) ([]director.Option, error) {
+	glob, err := makeGlob(mfilter)
 	if err != nil {
 		return nil, err
 	}
 
 	l := log.New(lw, "", 0)
 
-	opts := []director.Option{director.ConfigFromGlobal(c), director.ObserveWith(o...), director.LogWith(l)}
+	opts := []director.Option{
+		director.ConfigFromGlobal(c),
+		director.OverrideQuantities(qs),
+		director.FilterMachines(glob),
+		director.ObserveWith(o...),
+		director.LogWith(l),
+	}
 	return opts, nil
 }
 
-func makeObservers(mids []id.ID, logw io.Writer) ([]observer.Observer, io.Writer, error) {
-	do, err := dash.New(mids)
+func makeGlob(mfilter string) (id.ID, error) {
+	if ystring.IsBlank(mfilter) {
+		return id.ID{}, nil
+	}
+	return id.TryFromString(mfilter)
+}
+
+func makeObservers(cfg *config.Config) ([]observer.Observer, io.Writer, error) {
+	logw, err := createResultLogFile(cfg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	do, err := dash.New()
 	if err != nil {
 		return nil, nil, err
 	}
 	lo, err := observer.NewLogger(logw)
-	return []observer.Observer{do, lo}, do, err
-}
-
-func applyMachineFilter(mfilter string, c *config.Config) error {
-	mglob, err := id.TryFromString(mfilter)
 	if err != nil {
-		return fmt.Errorf("parsing machine filter: %w", err)
+		_ = do.Close()
+		return nil, nil, err
 	}
-	if err := c.FilterMachines(mglob); err != nil {
-		return fmt.Errorf("applying machine filter: %w", err)
-	}
-	return nil
+
+	return []observer.Observer{do, lo}, do, nil
 }
 
 func makeEnv(a *act.Runner, c *config.Config) director.Env {
@@ -202,16 +185,16 @@ func makeEnv(a *act.Runner, c *config.Config) director.Env {
 		Lifter: &backend.BResolve,
 		Planner: planner.Source{
 			BProbe:     c,
-			CLister:    c,
+			CLister:    c.Machines,
 			CInspector: &compiler.CResolve,
 			SProbe:     a,
 		},
 	}
 }
 
-func setupQuantityOverrides(ctx *c.Context) *config.QuantitySet {
+func setupQuantityOverrides(ctx *c.Context) config.QuantitySet {
 	// TODO(@MattWindsor91): disambiguate the corpus size argument
-	return &config.QuantitySet{
+	return config.QuantitySet{
 		Fuzz: fuzzer.QuantitySet{
 			CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
 			SubjectCycles: stdflag.SubjectCyclesFromCli(ctx),

@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
@@ -32,7 +34,7 @@ type Director struct {
 	// paths provides path resolving functionality for the director.
 	paths *pathset.Pathset
 	// machines contains the machines that will be used in the test.
-	machines map[string]config.Machine
+	machines machine.ConfigMap
 	// observers contains multi-machine observers for the director.
 	observers []observer.Observer
 	// env groups together the bits of configuration that pertain to dealing with the environment.
@@ -48,7 +50,7 @@ type Director struct {
 }
 
 // New creates a new Director with driver set e, input paths files, machines ms, and options opt.
-func New(e Env, ms map[string]config.Machine, files []string, opt ...Option) (*Director, error) {
+func New(e Env, ms machine.ConfigMap, files []string, opt ...Option) (*Director, error) {
 	if len(files) == 0 {
 		return nil, liftInitError(corpus.ErrNone)
 	}
@@ -66,6 +68,9 @@ func New(e Env, ms map[string]config.Machine, files []string, opt ...Option) (*D
 }
 
 func (d *Director) tidyAfterOptions() error {
+	if len(d.machines) == 0 {
+		return ErrNoMachines
+	}
 	if d.paths == nil {
 		return iohelp.ErrPathsetNil
 	}
@@ -78,8 +83,58 @@ func liftInitError(err error) error {
 	return fmt.Errorf("while initialising director: %w", err)
 }
 
-// Direct runs the director d.
+// Direct runs the director d, closing all of its observers on termination.
 func (d *Director) Direct(ctx context.Context) error {
+	err := d.directInner(ctx)
+	cerr := observer.CloseAll(d.observers...)
+	return iohelp.FirstError(err, cerr)
+}
+
+func (d *Director) directInner(ctx context.Context) error {
+	if err := d.prepare(); err != nil {
+		return err
+	}
+
+	ms, err := d.makeMachines()
+	if err != nil {
+		return err
+	}
+
+	cctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	return d.runLoops(cctx, cancel, ms)
+}
+
+func (d *Director) runLoops(cctx context.Context, cancel func(), ms []*Instance) error {
+	eg, ectx := errgroup.WithContext(cctx)
+	for _, m := range ms {
+		m := m
+		eg.Go(func() error { return m.Run(ectx) })
+	}
+	for _, o := range d.observers {
+		o := o
+		eg.Go(func() error { return o.Run(ectx, cancel) })
+	}
+	return eg.Wait()
+}
+
+func (d *Director) makeMachines() ([]*Instance, error) {
+	ms := make([]*Instance, len(d.machines))
+	var (
+		i   int
+		err error
+	)
+	for midstr, c := range d.machines {
+		if ms[i], err = d.makeMachine(midstr, c); err != nil {
+			return nil, err
+		}
+		i++
+	}
+	return ms, nil
+}
+
+func (d *Director) prepare() error {
 	d.quantities.Log(d.l)
 
 	d.l.Println("making directories")
@@ -87,26 +142,10 @@ func (d *Director) Direct(ctx context.Context) error {
 		return err
 	}
 
-	cctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	eg, ectx := errgroup.WithContext(cctx)
-	for midstr, c := range d.machines {
-		m, err := d.makeMachine(midstr, c)
-		if err != nil {
-			return err
-		}
-		eg.Go(func() error { return m.Run(ectx) })
-	}
-
-	for _, o := range d.observers {
-		o := o
-		eg.Go(func() error { return o.Run(ectx, cancel) })
-	}
-
-	return eg.Wait()
+	return d.machines.ObserveOn(observer.LowerToMachine(d.observers)...)
 }
 
-func (d *Director) makeMachine(midstr string, c config.Machine) (*Instance, error) {
+func (d *Director) makeMachine(midstr string, c machine.Config) (*Instance, error) {
 	l := log.New(d.l.Writer(), logPrefix(midstr), 0)
 	mid, err := id.TryFromString(midstr)
 	if err != nil {

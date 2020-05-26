@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -98,17 +100,17 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	return p.Write(outw)
 }
 
-func getMachine(cfg *config.Config, midstr string) (plan.NamedMachine, error) {
+func getMachine(cfg *config.Config, midstr string) (machine.Named, error) {
 	mid, err := id.TryFromString(midstr)
 	if err != nil {
-		return plan.NamedMachine{}, err
+		return machine.Named{}, err
 	}
 
 	mach, ok := cfg.Machines[midstr]
 	if !ok {
-		return plan.NamedMachine{}, fmt.Errorf("no such machine: %s", midstr)
+		return machine.Named{}, fmt.Errorf("no such machine: %s", midstr)
 	}
-	m := plan.NamedMachine{
+	m := machine.Named{
 		ID:      mid,
 		Machine: mach.Machine,
 	}
@@ -124,7 +126,7 @@ func makePlanConfig(c *config.Config, errw io.Writer, a planner.SubjectProber, c
 		},
 		Source: planner.Source{
 			BProbe:     c,
-			CLister:    c,
+			CLister:    c.Machines,
 			CInspector: &compiler.CResolve,
 			SProbe:     a,
 		},

@@ -3,7 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package plan
+// Package machine contains models for compiler-bearing machines.
+package machine
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -20,8 +21,8 @@ type Machine struct {
 	SSH *remote.MachineConfig `toml:"ssh,omitempty" json:"ssh,omitempty"`
 }
 
-// NamedMachine wraps a plan machine with its ID.
-type NamedMachine struct {
+// Named wraps a plan machine with its ID.
+type Named struct {
 	// ID is the ID of the machine.
 	ID id.ID `toml:"id,omitzero" json:"id,omitempty"`
 	Machine

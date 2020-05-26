@@ -11,6 +11,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mum4k/termdash/keyboard"
+
+	"github.com/mum4k/termdash/cell"
+
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+
 	"github.com/mum4k/termdash/linestyle"
 
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
@@ -21,8 +27,6 @@ import (
 
 	"github.com/mum4k/termdash/terminal/tcell"
 	"github.com/mum4k/termdash/terminal/terminalapi"
-
-	"github.com/mum4k/termdash/container/grid"
 
 	"github.com/mum4k/termdash"
 	"github.com/mum4k/termdash/container"
@@ -42,10 +46,18 @@ type Dash struct {
 	// machines maps from stringified machine IDs to their observers.
 	// (There is a display order for the machines, but we don't track it ourselves.)
 	machines map[string]*Observer
+
+	// obs contains the observer records used to populate machines.
+	obs []*Observer
 }
 
-// MaxLogLines is the maximum number of lines that can be written to the log before it resets.
-const MaxLogLines = 1000
+const (
+	// idMachines is the container ID used to update the machine grid.
+	idMachines = "machines"
+
+	// MaxLogLines is the maximum number of lines that can be written to the log before it resets.
+	MaxLogLines = 1000
+)
 
 // Write lets one write to the text console in the dash as if it were stderr.
 func (d *Dash) Write(p []byte) (n int, err error) {
@@ -73,7 +85,7 @@ func countNewlines(sp string) uint {
 }
 
 // New constructs a dashboard for the given machine IDs.
-func New(mids []id.ID) (*Dash, error) {
+func New() (*Dash, error) {
 	var (
 		d   Dash
 		err error
@@ -98,17 +110,12 @@ func New(mids []id.ID) (*Dash, error) {
 		return nil, err
 	}
 
-	var g []container.Option
-	if d.machines, g, err = makeMachineGrid(mids, d.resultLog); err != nil {
-		return nil, err
-	}
-
 	logs := makeLogPane(d)
 
 	c, err := container.New(d.term,
 		container.SplitVertical(
 			container.Left(logs),
-			container.Right(g...),
+			container.Right(container.ID("machines")),
 			container.SplitPercent(25),
 		),
 	)
@@ -118,6 +125,19 @@ func New(mids []id.ID) (*Dash, error) {
 
 	d.container = c
 	return &d, nil
+}
+
+func (d *Dash) OnMachines(m machine.Message) {
+	switch m.Kind {
+	case machine.MessageStart:
+		d.setupMachineSplit(m.Index)
+	case machine.MessageRecord:
+		d.setupMachineID(m.Index, m.Machine.ID)
+	}
+}
+
+func (d *Dash) logError(err error) {
+	_ = d.log.Write(err.Error(), text.WriteCellOpts(cell.FgColor(cell.ColorRed)))
 }
 
 func makeLogPane(d Dash) container.Option {
@@ -140,26 +160,14 @@ func makeLogPane(d Dash) container.Option {
 	)
 }
 
-func makeMachineGrid(mids []id.ID, rl *ResultLog) (map[string]*Observer, []container.Option, error) {
-	gb := grid.New()
-
-	obs := make(map[string]*Observer, len(mids))
-	pc := machineGridPercent(mids)
-	for _, mid := range mids {
-		mstr := mid.String()
-		var err error
-		if obs[mstr], err = NewObserver(mid, rl); err != nil {
-			return nil, nil, err
-		}
-		obs[mstr].AddToGrid(gb, mstr, pc)
-	}
-
-	g, err := gb.Build()
-	return obs, g, err
+// machineContainerID calculates the container ID of the machine at location i.
+// This is used to rename the container once we know its ID.
+func machineContainerID(i int) string {
+	return fmt.Sprintf("Machine%d", i)
 }
 
-func machineGridPercent(mids []id.ID) int {
-	pc := 100 / len(mids)
+func machineGridPercent(nmachines int) int {
+	pc := 100 / nmachines
 	if pc == 100 {
 		pc = 99
 	}
@@ -176,8 +184,13 @@ func (d *Dash) Run(ctx context.Context, cancel func()) error {
 			cancel()
 		}
 	}))
-	d.term.Close()
 	return err
+}
+
+// Close closes the dashboard's terminal.
+func (d *Dash) Close() error {
+	d.term.Close()
+	return nil
 }
 
 // Instance locates the observer for the machine with ID mid.
