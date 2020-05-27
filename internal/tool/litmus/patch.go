@@ -13,6 +13,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+
 	"github.com/1set/gut/yos"
 )
 
@@ -28,39 +30,40 @@ const (
 
 // patch patches the Litmus files in p, which originated from a Litmus invocation in inFile.
 func (l *Litmus) patch() error {
-	// Right now, there's only one thing to patch, so this is fairly easy.
-
 	if !l.Fixset.NeedsPatch() {
 		return nil
 	}
 
-	path := l.Pathset.MainCFile()
-
-	r, rerr := os.Open(path)
-	if rerr != nil {
-		return fmt.Errorf("can't open C file for reading: %w", rerr)
+	rpath := l.Pathset.MainCFile()
+	wpath, err := l.patchToTemp(rpath)
+	if err != nil {
+		return err
 	}
+
+	// NOT os.Rename, which doesn't work between filesystems.
+	return yos.MoveFile(wpath, rpath)
+}
+
+func (l *Litmus) patchToTemp(rpath string) (wpath string, err error) {
+	r, rerr := os.Open(rpath)
+	if rerr != nil {
+		return "", fmt.Errorf("can't open C file for reading: %w", rerr)
+	}
+	wpath, werr := l.patchReaderToTemp(r)
+	cerr := r.Close()
+	return wpath, iohelp.FirstError(werr, cerr)
+}
+
+func (l *Litmus) patchReaderToTemp(r io.Reader) (string, error) {
 	w, werr := ioutil.TempFile("", "*.c")
 	if werr != nil {
-		_ = r.Close()
-		return fmt.Errorf("can't open temp file for reading: %w", rerr)
+		return "", fmt.Errorf("can't open temp file for reading: %w", werr)
 	}
 	wpath := w.Name()
-	if err := l.Fixset.PatchMainFile(r, w); err != nil {
-		_ = r.Close()
-		_ = w.Close()
-		return err
-	}
-	if err := r.Close(); err != nil {
-		_ = w.Close()
-		return err
-	}
-	if err := w.Close(); err != nil {
-		_ = w.Close()
-		return err
-	}
-	// NOT os.Rename, which doesn't work between filesystems.
-	return yos.MoveFile(wpath, path)
+	// Right now, there's only one thing to patch, so this is fairly easy.
+	err := l.Fixset.PatchMainFile(r, w)
+	cerr := w.Close()
+	return wpath, iohelp.FirstError(err, cerr)
 }
 
 // PatchMainFile patches the main C file represented by rw according to this fixset.

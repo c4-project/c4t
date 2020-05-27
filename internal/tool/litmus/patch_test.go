@@ -27,6 +27,8 @@ main(int argc, char **argv)
 `
 
 func TestFixset_PatchMainFile(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		fixset litmus.Fixset
 		want   string
@@ -69,7 +71,10 @@ main(int argc, char **argv)
 	}
 
 	for name, c := range cases {
+		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			var buf bytes.Buffer
 
 			r := strings.NewReader(mainFileExample)
