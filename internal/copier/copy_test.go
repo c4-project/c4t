@@ -3,41 +3,21 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package remote_test
+package copier_test
 
 import (
 	"bytes"
 	"context"
-	"io"
 	"io/ioutil"
 	"path"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/remote/mocks"
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/MattWindsor91/act-tester/internal/copier/mocks"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/stretchr/testify/mock"
 )
-
-type mockCopier struct{ mock.Mock }
-
-func (m *mockCopier) Create(path string) (io.WriteCloser, error) {
-	args := m.Called(path)
-	return args.Get(0).(io.WriteCloser), args.Error(1)
-}
-
-func (m *mockCopier) Open(path string) (io.ReadCloser, error) {
-	args := m.Called(path)
-	return args.Get(0).(io.ReadCloser), args.Error(1)
-}
-
-func (m *mockCopier) MkdirAll(dir string) error {
-	args := m.Called(dir)
-	return args.Error(0)
-}
 
 type closeBuffer struct {
 	bytes.Buffer
@@ -61,7 +41,7 @@ func TestSendMapping(t *testing.T) {
 		path.Join("remote", "src", "blah", "baz.c"): path.Join("testdata", "copy_test", "put3.txt"),
 	}
 
-	var m mockCopier
+	var m mocks.Copier
 
 	for _, d := range []string{"bin", "include", path.Join("src", "blah")} {
 		m.On("MkdirAll", path.Join("remote", d)).Return(nil).Once()
@@ -73,7 +53,7 @@ func TestSendMapping(t *testing.T) {
 		m.On("Create", r).Return(buffers[r], nil).Once()
 	}
 
-	var o mocks.CopyObserver
+	var o mocks.Observer
 
 	o.
 		On("OnCopyStart", len(mapping)).Return().Once().
@@ -82,7 +62,7 @@ func TestSendMapping(t *testing.T) {
 		o.On("OnCopy", r, l).Return().Once()
 	}
 
-	err := remote.SendMapping(context.Background(), &m, mapping, &o)
+	err := copy2.SendMapping(context.Background(), &m, mapping, &o)
 	assert.NoError(t, err)
 
 	if m.AssertExpectations(t) {

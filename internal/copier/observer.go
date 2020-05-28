@@ -3,10 +3,10 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package remote
+package copier
 
-// CopyObserver is an interface for types that observe an SFTP file copy.
-type CopyObserver interface {
+// Observer is an interface for types that observe an SFTP file copy.
+type Observer interface {
 	// OnCopyStart lets the observer know when a file copy (of nfiles files) is beginning.
 	OnCopyStart(nfiles int)
 
@@ -17,24 +17,24 @@ type CopyObserver interface {
 	OnCopyFinish()
 }
 
-//go:generate mockery -name=CopyObserver
+//go:generate mockery -name=Observer
 
 // OnCopyStart sends an OnCopyStart observation to multiple observers.
-func OnCopyStart(nfiles int, cos ...CopyObserver) {
+func OnCopyStart(nfiles int, cos ...Observer) {
 	for _, o := range cos {
 		o.OnCopyStart(nfiles)
 	}
 }
 
 // OnCopy sends an OnCopy observation to multiple observers.
-func OnCopy(dst, src string, cos ...CopyObserver) {
+func OnCopy(dst, src string, cos ...Observer) {
 	for _, o := range cos {
 		o.OnCopy(dst, src)
 	}
 }
 
 // OnCopyFinish sends an OnCopyFinish observation to multiple observers.
-func OnCopyFinish(cos ...CopyObserver) {
+func OnCopyFinish(cos ...Observer) {
 	for _, o := range cos {
 		o.OnCopyFinish()
 	}

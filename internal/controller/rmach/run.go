@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
@@ -25,7 +27,7 @@ import (
 type RunnerFactory interface {
 	// MakeRunner creates a new Runner, representing a particular invoker session on a machine.
 	// It takes the plan in case the factory is waiting to get machine configuration from it.
-	MakeRunner(p *plan.Plan, obs ...remote.CopyObserver) (Runner, error)
+	MakeRunner(p *plan.Plan, obs ...copy2.Observer) (Runner, error)
 
 	// Runner spawners can be closed once no more runners are needed.
 	// For SSH runner spawners, this will close the SSH connection.

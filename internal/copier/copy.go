@@ -3,13 +3,13 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package remote
+// Package copy provides a mockable interface for network-transparent(ish) file copying, and implementations thereof.
+package copier
 
 import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 	"path"
 	"path/filepath"
 
@@ -26,37 +26,21 @@ type Copier interface {
 	MkdirAll(dir string) error
 }
 
-// LocalCopier implements Copier through os.
-type LocalCopier struct{}
+//go:generate mockery -name Copier
 
-// Create calls os.Create on path.
-func (l LocalCopier) Create(path string) (io.WriteCloser, error) {
-	return os.Create(path)
+// SendMapping is shorthand for CopyMapping where the source is a Local.
+func SendMapping(ctx context.Context, dst Copier, mapping map[string]string, o ...Observer) error {
+	return CopyMapping(ctx, dst, Local{}, mapping, o...)
 }
 
-// Open calls os.Open on path.
-func (l LocalCopier) Open(path string) (io.ReadCloser, error) {
-	return os.Open(path)
-}
-
-// MkkdirAll calls os.MkdirAll on path, with vaguely sensible permissions.
-func (l LocalCopier) MkdirAll(dir string) error {
-	return os.MkdirAll(dir, 0744)
-}
-
-// SendMapping is shorthand for CopyMapping where the source is a LocalCopier.
-func SendMapping(ctx context.Context, dst Copier, mapping map[string]string, o ...CopyObserver) error {
-	return CopyMapping(ctx, dst, LocalCopier{}, mapping, o...)
-}
-
-// RecvMapping is shorthand for CopyMapping where the source is a LocalCopier.
-func RecvMapping(ctx context.Context, src Copier, mapping map[string]string, o ...CopyObserver) error {
-	return CopyMapping(ctx, LocalCopier{}, src, mapping, o...)
+// RecvMapping is shorthand for CopyMapping where the source is a Local.
+func RecvMapping(ctx context.Context, src Copier, mapping map[string]string, o ...Observer) error {
+	return CopyMapping(ctx, Local{}, src, mapping, o...)
 }
 
 // CopyMapping copies the files in the (dest-to-src) map mapping from dst to src.
 // It checks ctx for cancellation between operations.
-func CopyMapping(ctx context.Context, dst, src Copier, mapping map[string]string, o ...CopyObserver) error {
+func CopyMapping(ctx context.Context, dst, src Copier, mapping map[string]string, o ...Observer) error {
 	OnCopyStart(len(mapping), o...)
 	defer OnCopyFinish(o...)
 
@@ -66,7 +50,7 @@ func CopyMapping(ctx context.Context, dst, src Copier, mapping map[string]string
 	return copyFiles(ctx, dst, src, mapping, o...)
 }
 
-func copyFiles(ctx context.Context, dst, src Copier, mapping map[string]string, o ...CopyObserver) error {
+func copyFiles(ctx context.Context, dst, src Copier, mapping map[string]string, o ...Observer) error {
 	for dpath, spath := range mapping {
 		if err := iohelp.CheckDone(ctx); err != nil {
 			return err

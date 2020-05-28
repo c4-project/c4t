@@ -10,6 +10,8 @@ import (
 	"context"
 	"io"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
@@ -17,8 +19,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
-
-	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -58,7 +58,7 @@ type Instance interface {
 	planner.Observer
 
 	// Instance observers can observe file copies.
-	remote.CopyObserver
+	copy2.Observer
 }
 
 // OnIteration sends OnIteration to every instance observer in obs.
@@ -105,8 +105,8 @@ func LowerToBuilder(obs []Instance) []builder.Observer {
 }
 
 // LowerToCopy lowers a slice of instance observers to a slice of copy observers.
-func LowerToCopy(obs []Instance) []remote.CopyObserver {
-	cos := make([]remote.CopyObserver, len(obs))
+func LowerToCopy(obs []Instance) []copy2.Observer {
+	cos := make([]copy2.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}

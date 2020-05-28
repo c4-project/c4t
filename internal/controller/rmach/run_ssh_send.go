@@ -8,9 +8,9 @@ package rmach
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
@@ -35,7 +35,7 @@ func (r *SSHRunner) sendMapping(ctx context.Context, ms map[string]string) error
 		return err
 	}
 
-	perr := remote.SendMapping(ctx, (*remote.SFTPCopier)(cli), ms, r.observers...)
+	perr := copy2.SendMapping(ctx, (*copy2.SFTP)(cli), ms, r.observers...)
 	cerr := cli.Close()
 
 	if perr != nil {

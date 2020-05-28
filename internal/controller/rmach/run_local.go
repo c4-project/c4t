@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os/exec"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -20,7 +22,7 @@ import (
 // LocalRunnerFactory spawns local runners using the directory pointed to by interpreting itself as a path.
 type LocalRunnerFactory string
 
-func (l LocalRunnerFactory) MakeRunner(*plan.Plan, ...remote.CopyObserver) (Runner, error) {
+func (l LocalRunnerFactory) MakeRunner(*plan.Plan, ...copy2.Observer) (Runner, error) {
 	return NewLocalRunner(string(l)), nil
 }
 

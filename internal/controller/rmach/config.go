@@ -8,6 +8,8 @@ package rmach
 import (
 	"errors"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
@@ -55,7 +57,7 @@ func ObserveWith(obs ...Observer) Option {
 }
 
 // ObserveCopiesWith adds each observer given to the invoker's copy observer pool.
-func ObserveCopiesWith(obs ...remote.CopyObserver) Option {
+func ObserveCopiesWith(obs ...copy2.Observer) Option {
 	return func(r *Invoker) error {
 		for _, o := range obs {
 			if o == nil {

@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
@@ -262,7 +264,7 @@ func (i *Instance) makeLifterConfig(obs []builder.Observer) (*lifter.Config, err
 	return &lc, nil
 }
 
-func (i *Instance) makeInvoker(cobs []remote.CopyObserver, bobs []builder.Observer) (*rmach.Invoker, error) {
+func (i *Instance) makeInvoker(cobs []copy2.Observer, bobs []builder.Observer) (*rmach.Invoker, error) {
 	return rmach.New(i.ScratchPaths.DirRun,
 		stdflag.MachInvoker{
 			// TODO(@MattWindsor91): this is a bit messy.

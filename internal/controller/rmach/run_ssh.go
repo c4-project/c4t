@@ -11,6 +11,8 @@ import (
 	"path"
 	"strings"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 
 	"golang.org/x/sync/errgroup"
@@ -31,7 +33,7 @@ type PlanRunnerFactory struct {
 }
 
 // MakeRunner makes a runner using the machine configuration in pl.
-func (p *PlanRunnerFactory) MakeRunner(pl *plan.Plan, obs ...remote.CopyObserver) (Runner, error) {
+func (p *PlanRunnerFactory) MakeRunner(pl *plan.Plan, obs ...copy2.Observer) (Runner, error) {
 	var err error
 	if p.cached == nil {
 		if p.cached, err = p.makeFactory(pl); err != nil {
@@ -71,7 +73,7 @@ func NewSSHRunnerFactory(recvRoot string, gc *remote.Config, mc *remote.MachineC
 }
 
 // MakeRunner constructs a runner using this factory's open SSH connection.
-func (s *SSHRunnerFactory) MakeRunner(_ *plan.Plan, obs ...remote.CopyObserver) (Runner, error) {
+func (s *SSHRunnerFactory) MakeRunner(_ *plan.Plan, obs ...copy2.Observer) (Runner, error) {
 	// TODO(@MattWindsor91): re-establish connection if errors
 	return NewSSHRunner(s.machine, s.recvRoot, obs...)
 }
@@ -84,7 +86,7 @@ func (s *SSHRunnerFactory) Close() error {
 // SSHRunner runs the machine-runner via SSH.
 type SSHRunner struct {
 	// observers observe any copying this SSHRunner does.
-	observers []remote.CopyObserver
+	observers []copy2.Observer
 	// runner is the top-level runner to use for opening sessions and SFTP.
 	runner *remote.MachineRunner
 	// session receives the session once we start running the command.
@@ -99,7 +101,7 @@ type SSHRunner struct {
 }
 
 // NewSSHRunner creates a new SSHRunner.
-func NewSSHRunner(r *remote.MachineRunner, localRoot string, o ...remote.CopyObserver) (*SSHRunner, error) {
+func NewSSHRunner(r *remote.MachineRunner, localRoot string, o ...copy2.Observer) (*SSHRunner, error) {
 	return &SSHRunner{runner: r, observers: o, localRoot: localRoot, remoteRoot: r.Config.DirCopy}, nil
 }
 
