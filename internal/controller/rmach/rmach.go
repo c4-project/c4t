@@ -7,58 +7,40 @@
 package rmach
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/1set/gut/ystring"
 )
 
-// RMach runs the machine-runner, through SSH if needed.
-type RMach struct {
-	conf   *Config
-	plan   *plan.Plan
-	runner Runner
+// Invoker runs the machine-runner, through SSH if needed.
+type Invoker struct {
+	// dirLocal is the filepath to the directory to which local outcomes from this rmach run will appear.
+	dirLocal string
+	// invoker tells the remote-machine controller which arguments to send to the machine binary.
+	invoker InvocationGetter
+	// observers is the set of observers listening for file copying and remote corpus manipulations.
+	observers ObserverSet
+	// rfac governs how the invoker will run the machine node when given a plan to invoke.
+	rfac RunnerFactory
 }
 
-// New constructs a new Mach with ssh configuration ssh (if any) and local directory dir.
-func New(c *Config, p *plan.Plan) (*RMach, error) {
-	if err := check(c, p); err != nil {
+// New constructs a new Mach with ssh configuration ssh (if any) and local directory ldir.
+func New(ldir string, inv InvocationGetter, o ...Option) (*Invoker, error) {
+	if err := check(ldir, inv); err != nil {
 		return nil, err
 	}
 
-	r, err := newRunner(c.Observers.Copy, c.DirLocal, c.SSH, p.Machine.SSH)
-	if err != nil {
+	invoker := Invoker{dirLocal: ldir, invoker: inv, rfac: LocalRunnerFactory(ldir)}
+	if err := Options(o...)(&invoker); err != nil {
 		return nil, err
 	}
-	return &RMach{conf: c, plan: p, runner: r}, nil
+	return &invoker, nil
 }
 
-func check(c *Config, p *plan.Plan) error {
-	if err := checkConfig(c); err != nil {
-		return nil
+func check(ldir string, inv InvocationGetter) error {
+	if ystring.IsBlank(ldir) {
+		return ErrDirEmpty
 	}
-	return checkPlan(p)
-}
-
-func checkConfig(c *Config) error {
-	if c == nil {
-		return ErrConfigNil
+	if inv == nil {
+		return ErrInvokerNil
 	}
-	return c.Check()
-}
-
-func checkPlan(p *plan.Plan) error {
-	if p == nil {
-		return plan.ErrNil
-	}
-	return p.Check()
-}
-
-func newRunner(o []remote.CopyObserver, dir string, c *remote.Config, ssh *remote.MachineConfig) (Runner, error) {
-	if ssh == nil {
-		return NewLocalRunner(dir), nil
-	}
-	sc, err := ssh.MachineRunner(c)
-	if err != nil {
-		return nil, err
-	}
-	return NewSSHRunner(sc, o, dir), nil
+	return nil
 }

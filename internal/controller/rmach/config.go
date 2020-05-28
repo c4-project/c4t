@@ -6,12 +6,16 @@
 package rmach
 
 import (
-	"context"
+	"errors"
 
-	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
+)
+
+var (
+	// ErrObserverNil occurs when we try to pass a nil observer as an option.
+	ErrObserverNil = errors.New("observer nil")
 )
 
 // InvocationGetter is the interface of types that tell the remote-machine invoker how to invoke the local-machine binary.
@@ -27,39 +31,90 @@ func Invocation(i InvocationGetter, dir string) []string {
 	return append([]string{i.MachBin()}, i.MachArgs(dir)...)
 }
 
-// Config contains the parts of a remote-machine configuration that don't depend on the plan.
-type Config struct {
-	// DirLocal is the filepath to the directory to which local outcomes from this rmach run will appear.
-	DirLocal string
+// Option is the type of options for the invoker.
+type Option func(*Invoker) error
 
-	// Invoker tells the remote-machine controller which arguments to send to the machine binary.
-	Invoker InvocationGetter
-
-	// Observers is the set of observers listening for file copying and remote corpus manipulations.
-	Observers ObserverSet
-
-	// SSH tells the remote-machine invoker how to use SSH on the host machine.
-	// It may be nil, signifying a lack of specific configuration.
-	SSH *remote.Config
+// Options bundles the separate options ops into a single option.
+func Options(ops ...Option) Option {
+	return func(r *Invoker) error {
+		for _, op := range ops {
+			if err := op(r); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 }
 
-// Check makes sure all of the configuration is present and accounted-for.
-func (c *Config) Check() error {
-	if ystring.IsBlank(c.DirLocal) {
-		return ErrDirEmpty
+// ObserveWith adds each observer given to the invoker's observer pools.
+func ObserveWith(obs ...Observer) Option {
+	return func(r *Invoker) error {
+		r.observers.Append(NewObserverSet(obs...))
+		return nil
 	}
-	if c.Invoker == nil {
-		return ErrInvokerNil
-	}
-	// .SSH may be nil.
-	return nil
 }
 
-// Run abstracts over constructing a rmach from this config and running it on a plan.
-func (c *Config) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	r, err := New(c, p)
-	if err != nil {
-		return nil, err
+// ObserveCopiesWith adds each observer given to the invoker's copy observer pool.
+func ObserveCopiesWith(obs ...remote.CopyObserver) Option {
+	return func(r *Invoker) error {
+		for _, o := range obs {
+			if o == nil {
+				return ErrObserverNil
+			}
+			r.observers.Copy = append(r.observers.Copy, o)
+		}
+		return nil
 	}
-	return r.Run(ctx)
+}
+
+// ObserveCorpusWith adds each observer given to the invoker's corpus observer pool.
+func ObserveCorpusWith(obs ...builder.Observer) Option {
+	return func(r *Invoker) error {
+		for _, o := range obs {
+			if o == nil {
+				return ErrObserverNil
+			}
+			r.observers.Corpus = append(r.observers.Corpus, o)
+		}
+		return nil
+	}
+}
+
+// UsePlanSSH sets the invoker up to read any SSH configuration from the first plan it receives, and, if needed, open
+// a SSH connection to use for that and subsequent invocations.
+func UsePlanSSH(gc *remote.Config) Option {
+	return func(r *Invoker) error {
+		return MakeRunnersWith(
+			&PlanRunnerFactory{
+				recvRoot: r.dirLocal,
+				gc:       gc,
+			},
+		)(r)
+	}
+}
+
+// UseSSH opens a SSH connection according to gc and mc, and sets the invoker up so that it invokes the machine node
+// through that connection.
+//
+// If mc is nil, UseSSH is a no-op.
+func UseSSH(gc *remote.Config, mc *remote.MachineConfig) Option {
+	return func(r *Invoker) error {
+		if mc == nil {
+			return nil
+		}
+
+		sr, err := NewSSHRunnerFactory(r.dirLocal, gc, mc)
+		if err != nil {
+			return err
+		}
+		return MakeRunnersWith(sr)(r)
+	}
+}
+
+// MakeRunnersWith sets the invoker to use rf to build runners.
+func MakeRunnersWith(rf RunnerFactory) Option {
+	return func(r *Invoker) error {
+		r.rfac = rf
+		return nil
+	}
 }

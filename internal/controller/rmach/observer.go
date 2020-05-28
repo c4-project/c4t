@@ -37,3 +37,9 @@ func NewObserverSet(obs ...Observer) ObserverSet {
 	}
 	return oset
 }
+
+// Append appends the observers in os to this set.
+func (o *ObserverSet) Append(os ObserverSet) {
+	o.Copy = append(o.Copy, os.Copy...)
+	o.Corpus = append(o.Corpus, os.Corpus...)
+}

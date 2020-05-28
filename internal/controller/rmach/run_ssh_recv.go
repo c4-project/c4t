@@ -30,7 +30,7 @@ func (r *SSHRunner) Recv(ctx context.Context, locp, remp *plan.Plan) (*plan.Plan
 }
 
 func (r *SSHRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp corpus.Corpus) error {
-	norm := normaliser.New(path.Join(r.recvRoot, ls.Name))
+	norm := normaliser.New(path.Join(r.localRoot, ls.Name))
 	rs, ok := rcorp[ls.Name]
 	if !ok {
 		return fmt.Errorf("subject not in remote corpus: %s", ls.Name)

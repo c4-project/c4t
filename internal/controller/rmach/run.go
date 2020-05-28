@@ -19,6 +19,19 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
+// RunnerFactory is the interface of sources of machine node runners.
+//
+// Runner factories can contain disposable state (for example, long-running SSH connections), and so can be closed.
+type RunnerFactory interface {
+	// MakeRunner creates a new Runner, representing a particular invoker session on a machine.
+	// It takes the plan in case the factory is waiting to get machine configuration from it.
+	MakeRunner(p *plan.Plan, obs ...remote.CopyObserver) (Runner, error)
+
+	// Runner spawners can be closed once no more runners are needed.
+	// For SSH runner spawners, this will close the SSH connection.
+	io.Closer
+}
+
 // Runner is the interface that the local and SSH runners have in common.
 type Runner interface {
 	// Send performs any copying and transformation needed for p to run.
@@ -38,20 +51,29 @@ type Runner interface {
 }
 
 // Run runs the machine binary.
-func (m *RMach) Run(ctx context.Context) (*plan.Plan, error) {
-	rp, err := m.runner.Send(ctx, m.plan)
+func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	if err := checkPlan(p); err != nil {
+		return nil, err
+	}
+
+	runner, err := m.rfac.MakeRunner(p, m.observers.Copy...)
+	if err != nil {
+		return nil, fmt.Errorf("while spawning runner: %w", err)
+	}
+
+	rp, err := runner.Send(ctx, p)
 	if err != nil {
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
 
-	ps, err := m.runner.Start(ctx, m.conf.Invoker)
+	ps, err := runner.Start(ctx, m.invoker)
 	if err != nil {
 		return nil, fmt.Errorf("while starting command: %w", err)
 	}
 
 	np, err := m.runPipework(ctx, rp, ps)
 	// Waiting _should_ close the pipes.
-	werr := m.runner.Wait()
+	werr := runner.Wait()
 
 	if err != nil {
 		return nil, err
@@ -60,13 +82,20 @@ func (m *RMach) Run(ctx context.Context) (*plan.Plan, error) {
 		return nil, werr
 	}
 
-	return m.runner.Recv(ctx, m.plan, np)
+	return runner.Recv(ctx, p, np)
+}
+
+func checkPlan(p *plan.Plan) error {
+	if p == nil {
+		return plan.ErrNil
+	}
+	return p.Check()
 }
 
 // runPipework runs the various parallel processes that read to and write from the machine binary via ps.
 // These include: sending the remote plan rp to stdin; receiving the updated plan from stdout; and replaying
 // observations from stderr.
-func (m *RMach) runPipework(ctx context.Context, rp *plan.Plan, ps *remote.Pipeset) (*plan.Plan, error) {
+func (m *Invoker) runPipework(ctx context.Context, rp *plan.Plan, ps *remote.Pipeset) (*plan.Plan, error) {
 	var p2 plan.Plan
 
 	eg, ectx := errgroup.WithContext(ctx)
@@ -87,10 +116,10 @@ func (m *RMach) runPipework(ctx context.Context, rp *plan.Plan, ps *remote.Pipes
 }
 
 // runReplayer constructs and runs an observation replayer on top of r.
-func (m *RMach) runReplayer(ctx context.Context, r io.Reader) error {
+func (m *Invoker) runReplayer(ctx context.Context, r io.Reader) error {
 	rp := forward.Replayer{
 		Decoder:   json.NewDecoder(r),
-		Observers: m.conf.Observers.Corpus,
+		Observers: m.observers.Corpus,
 	}
 	return rp.Run(ctx)
 }

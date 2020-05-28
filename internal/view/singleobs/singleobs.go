@@ -33,7 +33,7 @@ func Builder(l *log.Logger) []builder.Observer {
 	}
 }
 
-// RMach builds a list of observers suitable for single-shot act-tester remote-mach binaries.
+// Invoker builds a list of observers suitable for single-shot act-tester remote-mach binaries.
 func RMach(l *log.Logger) []rmach.Observer {
 	// The ordering is important here: we want log messages to appear _before_ progress bars.
 	return []rmach.Observer{

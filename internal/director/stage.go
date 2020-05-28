@@ -28,8 +28,8 @@ type StageConfig struct {
 	Fuzz *fuzzer.Config
 	// Lift contains configuration for the instance's lift stage.
 	Lift *lifter.Config
-	// Mach contains configuration for the instance's machine-specific stage.
-	Mach *rmach.Config
+	// Invoke contains configuration for the instance's invoke stage.
+	Invoke *rmach.Invoker
 	// Analyse contains configuration for the instance's analysis stage.
 	Analyse *analyse.Config
 }
@@ -47,8 +47,8 @@ func (c *StageConfig) Check() error {
 	if c.Lift == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageLift)
 	}
-	if c.Mach == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageMach)
+	if c.Invoke == nil {
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageInvoke)
 	}
 	if c.Analyse == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageAnalyse)
@@ -68,7 +68,7 @@ const (
 	stagePlan    = "plan"
 	stageFuzz    = "fuzz"
 	stageLift    = "lift"
-	stageMach    = "mach"
+	stageInvoke  = "invoke"
 	stageAnalyse = "analyse"
 )
 
@@ -93,9 +93,9 @@ var Stages = []stage{
 		},
 	},
 	{
-		Name: stageMach,
+		Name: stageInvoke,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-			return c.Mach.Run(ctx, p)
+			return c.Invoke.Run(ctx, p)
 		},
 	},
 	{

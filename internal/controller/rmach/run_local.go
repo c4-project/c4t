@@ -17,6 +17,16 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
+// LocalRunnerFactory spawns local runners using the directory pointed to by interpreting itself as a path.
+type LocalRunnerFactory string
+
+func (l LocalRunnerFactory) MakeRunner(*plan.Plan, ...remote.CopyObserver) (Runner, error) {
+	return NewLocalRunner(string(l)), nil
+}
+
+// Close does nothing.
+func (l LocalRunnerFactory) Close() error { return nil }
+
 // LocalRunner runs the machine-runner locally.
 type LocalRunner struct {
 	// dir is the directory in which we are running the machine-runner.

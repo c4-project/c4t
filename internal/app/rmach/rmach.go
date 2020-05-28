@@ -52,21 +52,22 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 		return err
 	}
 
-	errw = iohelp.EnsureWriter(errw)
-	rcfg := makeConfig(ctx, cfg, errw)
+	rcfg, err := makeInvoker(ctx, cfg, iohelp.EnsureWriter(errw))
+	if err != nil {
+		return err
+	}
 	return view.RunOnCliPlan(ctx, rcfg, outw)
 }
 
-func makeConfig(ctx *c.Context, cfg *config.Config, errw io.Writer) *rmach.Config {
+func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*rmach.Invoker, error) {
 	l := log.New(errw, "[rmach] ", log.LstdFlags)
-	obs := rmach.NewObserverSet(singleobs.RMach(l)...)
 	mcfg := stdflag.MachConfigFromCli(ctx, cfg.Quantities.Mach)
-	return &rmach.Config{
-		DirLocal:  stdflag.OutDirFromCli(ctx),
-		Observers: obs,
-		SSH:       cfg.SSH,
-		Invoker: stdflag.MachInvoker{
+
+	return rmach.New(stdflag.OutDirFromCli(ctx),
+		stdflag.MachInvoker{
 			Config: &mcfg,
 		},
-	}
+		rmach.ObserveWith(singleobs.RMach(l)...),
+		rmach.UsePlanSSH(cfg.SSH),
+	)
 }

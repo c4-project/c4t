@@ -195,7 +195,9 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Lift, err = i.makeLifterConfig(bobs); err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	sc.Mach = i.makeRMachConfig(cobs, bobs)
+	if sc.Invoke, err = i.makeInvoker(cobs, bobs); err != nil {
+		return nil, fmt.Errorf("when making machine invoker: %w", err)
+	}
 	sc.Analyse = i.makeAnalyseConfig(aobs)
 	return &sc, nil
 }
@@ -260,19 +262,19 @@ func (i *Instance) makeLifterConfig(obs []builder.Observer) (*lifter.Config, err
 	return &lc, nil
 }
 
-func (i *Instance) makeRMachConfig(cobs []remote.CopyObserver, bobs []builder.Observer) *rmach.Config {
-	return &rmach.Config{
-		DirLocal:  i.ScratchPaths.DirRun,
-		Observers: rmach.ObserverSet{Copy: cobs, Corpus: bobs},
-		SSH:       i.SSHConfig,
-		Invoker: stdflag.MachInvoker{
+func (i *Instance) makeInvoker(cobs []remote.CopyObserver, bobs []builder.Observer) (*rmach.Invoker, error) {
+	return rmach.New(i.ScratchPaths.DirRun,
+		stdflag.MachInvoker{
 			// TODO(@MattWindsor91): this is a bit messy.
 			Config: &mach.UserConfig{
 				OutDir:     i.ScratchPaths.DirRun,
 				Quantities: i.Quantities.Mach,
 			},
 		},
-	}
+		rmach.ObserveCopiesWith(cobs...),
+		rmach.ObserveCorpusWith(bobs...),
+		rmach.UseSSH(i.SSHConfig, i.MachConfig.SSH),
+	)
 }
 
 // dump dumps a plan p to its expected plan file given the stage name name.

@@ -11,6 +11,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan"
+
 	"golang.org/x/sync/errgroup"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
@@ -19,26 +21,89 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// PlanRunnerFactory is a runner factory that instantiates either a SSH or local runner depending on the machine
+// configuration inside the first plan passed to its MakeRunner.
+type PlanRunnerFactory struct {
+	recvRoot string
+	gc       *remote.Config
+
+	cached RunnerFactory
+}
+
+// MakeRunner makes a runner using the machine configuration in pl.
+func (p *PlanRunnerFactory) MakeRunner(pl *plan.Plan, obs ...remote.CopyObserver) (Runner, error) {
+	var err error
+	if p.cached == nil {
+		if p.cached, err = p.makeFactory(pl); err != nil {
+			return nil, err
+		}
+	}
+	return p.cached.MakeRunner(pl, obs...)
+}
+
+func (p *PlanRunnerFactory) makeFactory(pl *plan.Plan) (RunnerFactory, error) {
+	if pl.Machine.SSH == nil {
+		return LocalRunnerFactory(p.recvRoot), nil
+	}
+	return NewSSHRunnerFactory(p.recvRoot, p.gc, pl.Machine.SSH)
+}
+
+// Close closes the runner factory, if it was ever instantiated.
+func (p *PlanRunnerFactory) Close() error {
+	if p.cached == nil {
+		return nil
+	}
+	return p.cached.Close()
+}
+
+// SSHRunnerFactory is a factory that produces runners in the form of SSH sessions.
+type SSHRunnerFactory struct {
+	recvRoot string
+	// machine contains the instantiated machine runner, if present.
+	machine *remote.MachineRunner
+}
+
+// NewSSHRunnerFactory opens a SSH connection using gc and mc.
+// If successful, it creates a runner factory over it, using recvRoot as the local directory.
+func NewSSHRunnerFactory(recvRoot string, gc *remote.Config, mc *remote.MachineConfig) (*SSHRunnerFactory, error) {
+	machine, err := mc.MachineRunner(gc)
+	return &SSHRunnerFactory{recvRoot: recvRoot, machine: machine}, err
+}
+
+// MakeRunner constructs a runner using this factory's open SSH connection.
+func (s *SSHRunnerFactory) MakeRunner(_ *plan.Plan, obs ...remote.CopyObserver) (Runner, error) {
+	// TODO(@MattWindsor91): re-establish connection if errors
+	return NewSSHRunner(s.machine, s.recvRoot, obs...)
+}
+
+// Close closes the underlying SSH connection being used for runners created by this factory.
+func (s *SSHRunnerFactory) Close() error {
+	return s.machine.Close()
+}
+
 // SSHRunner runs the machine-runner via SSH.
 type SSHRunner struct {
 	// observers observe any copying this SSHRunner does.
 	observers []remote.CopyObserver
-	// runner tells us how to run SSH.
+	// runner is the top-level runner to use for opening sessions and SFTP.
 	runner *remote.MachineRunner
 	// session receives the session once we start running the command.
 	session *ssh.Session
-	// recvRoot is the slash-path of the root directory into which compile files should be received.
-	recvRoot string
+	// localRoot is the slash-path of the root directory into which compile files should be received.
+	localRoot string
+	// remoteRoot is the slash-path of the remote directory into which compile files should be sent.
+	remoteRoot string
 	// eg is used to coordinate the combination of waiting for the SSH transaction to close and listening for the
 	// context cancelling underneath it.
 	eg errgroup.Group
 }
 
 // NewSSHRunner creates a new SSHRunner.
-func NewSSHRunner(r *remote.MachineRunner, o []remote.CopyObserver, recvRoot string) *SSHRunner {
-	return &SSHRunner{runner: r, observers: o, recvRoot: recvRoot}
+func NewSSHRunner(r *remote.MachineRunner, localRoot string, o ...remote.CopyObserver) (*SSHRunner, error) {
+	return &SSHRunner{runner: r, observers: o, localRoot: localRoot, remoteRoot: r.Config.DirCopy}, nil
 }
 
+// Start starts a SSH session connected to a machine node with name and arguments constructed through i.
 func (r *SSHRunner) Start(ctx context.Context, i InvocationGetter) (*remote.Pipeset, error) {
 	var (
 		err error
@@ -89,13 +154,14 @@ func (r *SSHRunner) Wait() error {
 	// I'm unsure as to whether a session close errors if the session has been waited on;
 	// hence why this error is currently unhandled.
 	_ = r.session.Close()
+	r.session = nil
 
 	return err
 }
 
 // invocation works out what the SSH command invocation for the tester should be.
 func (r *SSHRunner) invocation(i InvocationGetter) string {
-	dir := path.Join(r.runner.Config.DirCopy, "mach")
+	dir := path.Join(r.remoteRoot, "mach")
 	qdir := shellescape.Quote(dir)
 	return strings.Join(Invocation(i, qdir), " ")
 }
