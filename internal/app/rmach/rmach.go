@@ -56,7 +56,10 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return view.RunOnCliPlan(ctx, inv, outw)
+
+	err = view.RunOnCliPlan(ctx, inv, outw)
+	cerr := inv.Close()
+	return iohelp.FirstError(err, cerr)
 }
 
 func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*rmach.Invoker, error) {

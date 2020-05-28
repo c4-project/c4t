@@ -92,23 +92,34 @@ func (i *Instance) Run(ctx context.Context) error {
 		return err
 	}
 
-	i.Logger.Print("preparing scratch directories")
+	i.Logger.Println("preparing scratch directories")
 	if err := i.ScratchPaths.Prepare(); err != nil {
 		return err
 	}
 
-	i.Logger.Print("creating stage configurations")
+	i.Logger.Println("creating stage configurations")
 	sc, err := i.makeStageConfig()
 	if err != nil {
 		return err
 	}
-	i.Logger.Print("checking stage configurations")
+	i.Logger.Println("checking stage configurations")
 	if err := sc.Check(); err != nil {
 		return err
 	}
 
-	i.Logger.Print("starting loop")
-	return i.mainLoop(ctx, sc)
+	i.Logger.Println("starting loop")
+	err = i.mainLoop(ctx, sc)
+	i.Logger.Println("cleaning up")
+	cerr := i.cleanUp()
+	return iohelp.FirstError(err, cerr)
+}
+
+// cleanUp closes things that should be gracefully closed after an instance terminates.
+func (i *Instance) cleanUp() error {
+	if i.StageConfig != nil && i.StageConfig.Invoke != nil {
+		return i.StageConfig.Invoke.Close()
+	}
+	return nil
 }
 
 // check makes sure this machine has a valid configuration before starting loops.
