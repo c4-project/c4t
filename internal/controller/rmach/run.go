@@ -11,8 +11,6 @@ import (
 	"fmt"
 	"io"
 
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
-
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
@@ -20,37 +18,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
-
-// RunnerFactory is the interface of sources of machine node runners.
-//
-// Runner factories can contain disposable state (for example, long-running SSH connections), and so can be closed.
-type RunnerFactory interface {
-	// MakeRunner creates a new Runner, representing a particular invoker session on a machine.
-	// It takes the plan in case the factory is waiting to get machine configuration from it.
-	MakeRunner(p *plan.Plan, obs ...copy2.Observer) (Runner, error)
-
-	// Runner spawners can be closed once no more runners are needed.
-	// For SSH runner spawners, this will close the SSH connection.
-	io.Closer
-}
-
-// Runner is the interface that the local and SSH runners have in common.
-type Runner interface {
-	// Send performs any copying and transformation needed for p to run.
-	// It returns a pointer to the plan to send to the machine runner, which may or may not be p.
-	Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
-
-	// Start starts the machine binary, returning a set of pipe readers and writers to use for communication with it.
-	Start(ctx context.Context, mi InvocationGetter) (*remote.Pipeset, error)
-
-	// Wait blocks waiting for the command to finish (or the context passed into Start to cancel).
-	Wait() error
-
-	// Recv merges the post-run plan runp into the original plan origp, copying back any files needed.
-	// It returns a pointer to the final 'merged', which may or may not be origp and runp.
-	// It may modify origp in place.
-	Recv(ctx context.Context, origp, runp *plan.Plan) (*plan.Plan, error)
-}
 
 // Run runs the machine binary.
 func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
@@ -85,6 +52,11 @@ func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	}
 
 	return runner.Recv(ctx, p, np)
+}
+
+// Close closes any persistent connections used by this invoker.
+func (m *Invoker) Close() error {
+	return m.rfac.Close()
 }
 
 func checkPlan(p *plan.Plan) error {

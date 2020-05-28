@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package rmach
+package runner
 
 import (
 	"context"
@@ -22,14 +22,14 @@ import (
 
 // Recv copies bits of remp into locp, including run information and any compiler failures.
 // It uses SFTP to transfer back any compile logs.
-func (r *SSHRunner) Recv(ctx context.Context, locp, remp *plan.Plan) (*plan.Plan, error) {
+func (r *RemoteRunner) Recv(ctx context.Context, locp, remp *plan.Plan) (*plan.Plan, error) {
 	err := locp.Corpus.Map(func(sn *subject.Named) error {
 		return r.recvSubject(ctx, sn, remp.Corpus)
 	})
 	return locp, err
 }
 
-func (r *SSHRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp corpus.Corpus) error {
+func (r *RemoteRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp corpus.Corpus) error {
 	norm := normaliser.New(path.Join(r.localRoot, ls.Name))
 	rs, ok := rcorp[ls.Name]
 	if !ok {
@@ -44,7 +44,7 @@ func (r *SSHRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp co
 	return r.recvMapping(ctx, norm.Mappings.RenamesMatching(filekind.Any, filekind.InCompile))
 }
 
-func (r *SSHRunner) recvMapping(ctx context.Context, ms map[string]string) error {
+func (r *RemoteRunner) recvMapping(ctx context.Context, ms map[string]string) error {
 	cli, err := r.runner.NewSFTP()
 	if err != nil {
 		return err

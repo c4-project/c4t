@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package rmach
+package runner
 
 import (
 	"context"
@@ -17,7 +17,7 @@ import (
 )
 
 // Send translates p to the remote host, using SFTP to copy over its harness files.
-func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+func (r *RemoteRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	n := normaliser.NewCorpus(r.runner.Config.DirCopy)
 	rp := *p
 	var err error
@@ -29,7 +29,7 @@ func (r *SSHRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) 
 	return &rp, r.sendMapping(ctx, n.Mappings.RenamesMatching(filekind.C, filekind.InHarness))
 }
 
-func (r *SSHRunner) sendMapping(ctx context.Context, ms map[string]string) error {
+func (r *RemoteRunner) sendMapping(ctx context.Context, ms map[string]string) error {
 	cli, err := r.runner.NewSFTP()
 	if err != nil {
 		return err

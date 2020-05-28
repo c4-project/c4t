@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package rmach
+package runner
 
 import (
 	"context"
@@ -19,15 +19,15 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// LocalRunnerFactory spawns local runners using the directory pointed to by interpreting itself as a path.
-type LocalRunnerFactory string
+// LocalFactory wraps a path to allow spawning of local runners using said path as the local directory.
+type LocalFactory string
 
-func (l LocalRunnerFactory) MakeRunner(*plan.Plan, ...copy2.Observer) (Runner, error) {
+func (l LocalFactory) MakeRunner(*plan.Plan, ...copy2.Observer) (Runner, error) {
 	return NewLocalRunner(string(l)), nil
 }
 
 // Close does nothing.
-func (l LocalRunnerFactory) Close() error { return nil }
+func (l LocalFactory) Close() error { return nil }
 
 // LocalRunner runs the machine-runner locally.
 type LocalRunner struct {

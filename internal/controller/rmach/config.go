@@ -8,6 +8,8 @@ package rmach
 import (
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/rmach/runner"
+
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -19,19 +21,6 @@ var (
 	// ErrObserverNil occurs when we try to pass a nil observer as an option.
 	ErrObserverNil = errors.New("observer nil")
 )
-
-// InvocationGetter is the interface of types that tell the remote-machine invoker how to invoke the local-machine binary.
-type InvocationGetter interface {
-	// MachBin retrieves the default binary name for 'act-tester-mach'.
-	MachBin() string
-	// MachArgs computes the argument set for invoking the 'act-tester-mach' binary,
-	MachArgs(dir string) []string
-}
-
-// Invocation gets the invocation for the local-machine binary as a string list.
-func Invocation(i InvocationGetter, dir string) []string {
-	return append([]string{i.MachBin()}, i.MachArgs(dir)...)
-}
 
 // Option is the type of options for the invoker.
 type Option func(*Invoker) error
@@ -87,9 +76,9 @@ func ObserveCorpusWith(obs ...builder.Observer) Option {
 func UsePlanSSH(gc *remote.Config) Option {
 	return func(r *Invoker) error {
 		return MakeRunnersWith(
-			&PlanRunnerFactory{
-				recvRoot: r.dirLocal,
-				gc:       gc,
+			&runner.FromPlanFactory{
+				LocalRoot: r.dirLocal,
+				Config:    gc,
 			},
 		)(r)
 	}
@@ -105,7 +94,7 @@ func UseSSH(gc *remote.Config, mc *remote.MachineConfig) Option {
 			return nil
 		}
 
-		sr, err := NewSSHRunnerFactory(r.dirLocal, gc, mc)
+		sr, err := runner.NewRemoteFactory(r.dirLocal, gc, mc)
 		if err != nil {
 			return err
 		}
@@ -114,7 +103,7 @@ func UseSSH(gc *remote.Config, mc *remote.MachineConfig) Option {
 }
 
 // MakeRunnersWith sets the invoker to use rf to build runners.
-func MakeRunnersWith(rf RunnerFactory) Option {
+func MakeRunnersWith(rf runner.Factory) Option {
 	return func(r *Invoker) error {
 		r.rfac = rf
 		return nil

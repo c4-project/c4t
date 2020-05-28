@@ -52,11 +52,11 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 		return err
 	}
 
-	rcfg, err := makeInvoker(ctx, cfg, iohelp.EnsureWriter(errw))
+	inv, err := makeInvoker(ctx, cfg, iohelp.EnsureWriter(errw))
 	if err != nil {
 		return err
 	}
-	return view.RunOnCliPlan(ctx, rcfg, outw)
+	return view.RunOnCliPlan(ctx, inv, outw)
 }
 
 func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*rmach.Invoker, error) {
