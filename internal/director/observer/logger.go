@@ -45,7 +45,13 @@ func NewLogger(w io.WriteCloser) (*Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Logger{out: w, aw: aw, anaCh: make(chan analysis.Sourced), compCh: make(chan compilerSet)}, nil
+	return &Logger{
+		out:    w,
+		aw:     aw,
+		anaCh:  make(chan analysis.Sourced),
+		compCh: make(chan compilerSet),
+		saveCh: make(chan archiveMessage),
+	}, nil
 }
 
 // Run runs the log observer.
@@ -87,7 +93,7 @@ func (j *Logger) OnMachines(m machine.Message) {
 
 // Instance creates an instance logger.
 func (j *Logger) Instance(id.ID) (Instance, error) {
-	return &InstanceLogger{anaCh: j.anaCh, compCh: j.compCh}, nil
+	return &InstanceLogger{anaCh: j.anaCh, compCh: j.compCh, saveCh: j.saveCh}, nil
 }
 
 // logAnalysis logs s to this logger's file.
