@@ -14,6 +14,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/require"
@@ -51,7 +53,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	harness := builder.HarnessRequest(
 		"foo",
 		id.ArchX8664,
-		subject.Harness{
+		recipe.Recipe{
 			Dir:   "harness",
 			Files: []string{"foo.c", "bar.c", "baz.c"},
 		})

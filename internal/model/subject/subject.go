@@ -12,6 +12,8 @@ package subject
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model"
@@ -38,7 +40,7 @@ type Subject struct {
 	// Harnesses contains information about this subject's test harnesses.
 	// It maps the string form of each harness's target architecture's ID.
 	// If nil, this subject hasn't had a harness generated.
-	Harnesses map[string]Harness `toml:"harnesses,omitempty" json:"harnesses,omitempty"`
+	Harnesses map[string]recipe.Recipe `toml:"harnesses,omitempty" json:"harnesses,omitempty"`
 
 	// Runs contains information about this subject's runs so far.
 	// It maps from the string form of each compiler's ID.
@@ -131,19 +133,19 @@ func (s *Subject) ensureCompileMap() {
 	}
 }
 
-// Harness gets the harness for the architecture with id arch.
-func (s *Subject) Harness(arch id.ID) (Harness, error) {
+// Recipe gets the harness for the architecture with id arch.
+func (s *Subject) Harness(arch id.ID) (recipe.Recipe, error) {
 	key := arch.String()
 	h, ok := s.Harnesses[key]
 	if !ok {
-		return Harness{}, fmt.Errorf("%w: arch=%q", ErrMissingHarness, key)
+		return recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingHarness, key)
 	}
 	return h, nil
 }
 
 // AddHarness sets the harness information for arch to h in this subject.
 // It fails if there already _is_ a harness for arch.
-func (s *Subject) AddHarness(arch id.ID, h Harness) error {
+func (s *Subject) AddHarness(arch id.ID, h recipe.Recipe) error {
 	s.ensureHarnessMap()
 	key := arch.String()
 	if _, ok := s.Harnesses[key]; ok {
@@ -156,7 +158,7 @@ func (s *Subject) AddHarness(arch id.ID, h Harness) error {
 // ensureHarnessMap makes sure this subject has a harness map.
 func (s *Subject) ensureHarnessMap() {
 	if s.Harnesses == nil {
-		s.Harnesses = make(map[string]Harness)
+		s.Harnesses = make(map[string]recipe.Recipe)
 	}
 }
 

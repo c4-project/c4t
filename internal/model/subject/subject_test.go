@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -54,9 +56,9 @@ func ExampleSubject_CompileResult() {
 	// clang: CompileFail a.out clang.log
 }
 
-// ExampleSubject_Harness is a testable example for Harness.
+// ExampleSubject_Harness is a testable example for Recipe.
 func ExampleSubject_Harness() {
-	s := subject.Subject{Harnesses: map[string]subject.Harness{
+	s := subject.Subject{Harnesses: map[string]recipe.Recipe{
 		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
@@ -145,7 +147,7 @@ func TestSubject_Harness_Missing(t *testing.T) {
 // TestSubject_AddHarness checks that AddHarness is working properly.
 func TestSubject_AddHarness(t *testing.T) {
 	var s subject.Subject
-	h := subject.Harness{
+	h := recipe.Recipe{
 		Dir:   "foo",
 		Files: []string{"bar", "baz"},
 	}
@@ -167,7 +169,7 @@ func TestSubject_AddHarness(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		err := s.AddHarness(march, subject.Harness{})
+		err := s.AddHarness(march, recipe.Recipe{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateHarness, "adding harness twice")
 	})
 }

@@ -8,6 +8,8 @@ package builder
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -24,7 +26,7 @@ type Request struct {
 	// Compile is populated if this request is a Compile.
 	Compile *Compile `json:"compile,omitempty"`
 
-	// Harness is populated if this request is a Harness.
+	// Recipe is populated if this request is a Recipe.
 	Harness *Harness `json:"harness,omitempty"`
 
 	// Run is populated if this request is a Run.
@@ -64,17 +66,17 @@ func CompileRequest(sname string, cid id.ID, r subject.CompileResult) Request {
 	return Request{Name: sname, Compile: &Compile{CompilerID: cid, Result: r}}
 }
 
-// Harness is a request to add the given harness to the named subject, under the named architecture.
+// Recipe is a request to add the given harness to the named subject, under the named architecture.
 type Harness struct {
 	// Arch is the ID of the architecture for which this lifting is occurring.
 	Arch id.ID
 
-	// Harness is the produced harness pathset.
-	Harness subject.Harness
+	// Recipe is the produced harness pathset.
+	Harness recipe.Recipe
 }
 
 // HarnessRequest constructs an add-harness request for the subject with name sname, arch ID arch, and harness h.
-func HarnessRequest(sname string, arch id.ID, h subject.Harness) Request {
+func HarnessRequest(sname string, arch id.ID, h recipe.Recipe) Request {
 	return Request{Name: sname, Harness: &Harness{Arch: arch, Harness: h}}
 }
 

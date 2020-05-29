@@ -9,6 +9,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/stretchr/testify/assert"
@@ -39,7 +41,7 @@ func TestJob_Compile(t *testing.T) {
 	names := []string{"foo", "bar", "baz"}
 	c := corpus.New(names...)
 	for n, cn := range c {
-		err := cn.AddHarness(id.ArchX86Skylake, subject.Harness{
+		err := cn.AddHarness(id.ArchX86Skylake, recipe.Recipe{
 			Dir:   n,
 			Files: []string{"main.c"},
 		})

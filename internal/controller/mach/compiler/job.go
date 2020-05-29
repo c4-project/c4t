@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
@@ -78,7 +80,7 @@ func (j *Job) compileSubject(ctx context.Context, s *subject.Named) error {
 	return j.sendResult(ctx, s.Name, res)
 }
 
-func (j *Job) runCompiler(ctx context.Context, sp subject.CompileFileset, h subject.Harness) (subject.CompileResult, error) {
+func (j *Job) runCompiler(ctx context.Context, sp subject.CompileFileset, h recipe.Recipe) (subject.CompileResult, error) {
 	logf, err := j.openLogFile(sp.Log)
 	if err != nil {
 		return subject.CompileResult{}, err
@@ -104,7 +106,7 @@ func (j *Job) openLogFile(l string) (io.WriteCloser, error) {
 	return os.Create(l)
 }
 
-func (j *Job) compileJob(h subject.Harness, sp subject.CompileFileset) job.Compile {
+func (j *Job) compileJob(h recipe.Recipe, sp subject.CompileFileset) job.Compile {
 	return job.Compile{
 		In:       filekind.CSrc.FilterFiles(h.Paths()),
 		Out:      sp.Bin,

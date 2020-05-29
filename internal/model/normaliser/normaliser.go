@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -64,19 +66,19 @@ func (n *Normaliser) fuzz(of *subject.Fuzz) *subject.Fuzz {
 	return &f
 }
 
-func (n *Normaliser) harnesses(hs map[string]subject.Harness) map[string]subject.Harness {
+func (n *Normaliser) harnesses(hs map[string]recipe.Recipe) map[string]recipe.Recipe {
 	if hs == nil {
 		return nil
 	}
 
-	nhs := make(map[string]subject.Harness, len(hs))
+	nhs := make(map[string]recipe.Recipe, len(hs))
 	for archstr, h := range hs {
 		nhs[archstr] = n.harness(archstr, h)
 	}
 	return nhs
 }
 
-func (n *Normaliser) harness(archstr string, h subject.Harness) subject.Harness {
+func (n *Normaliser) harness(archstr string, h recipe.Recipe) recipe.Recipe {
 	oldPaths := h.Paths()
 	h.Dir = HarnessDir(n.root, archstr)
 	for i, np := range h.Paths() {

@@ -9,6 +9,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model"
@@ -36,7 +38,7 @@ func MockFailedCompile(name string) subject.Subject {
 			Threads: 8,
 		},
 		OrigLitmus: name + ".litmus",
-		Harnesses: map[string]subject.Harness{
+		Harnesses: map[string]recipe.Recipe{
 			id.ArchArm.String(): {
 				Dir:   "arm",
 				Files: []string{"run.c", "aux.c", "aux.h"},
@@ -65,7 +67,7 @@ func MockFlaggedRun(name string) subject.Subject {
 	return subject.Subject{
 		Stats:      model.Statset{Threads: 2},
 		OrigLitmus: name + ".litmus",
-		Harnesses: map[string]subject.Harness{
+		Harnesses: map[string]recipe.Recipe{
 			id.ArchX8664.String(): MockHarness("x86"),
 		},
 		Compiles: map[string]subject.CompileResult{
@@ -84,7 +86,7 @@ func MockTimeoutRun(name string) subject.Subject {
 	return subject.Subject{
 		Stats:      model.Statset{Threads: 4},
 		OrigLitmus: "baz.litmus",
-		Harnesses: map[string]subject.Harness{
+		Harnesses: map[string]recipe.Recipe{
 			id.ArchX8664.String(): MockHarness("x86"),
 			id.ArchPPC.String():   MockHarness("ppc"),
 		},
@@ -112,8 +114,8 @@ func MockSuccessfulCompile(cstr string, sname string) subject.CompileResult {
 }
 
 // MockHarness constructs a mock harness at dir.
-func MockHarness(dir string) subject.Harness {
-	return subject.Harness{
+func MockHarness(dir string) recipe.Recipe {
+	return recipe.Recipe{
 		Dir:   dir,
 		Files: []string{"run.c", "aux.c", "aux.h"},
 	}

@@ -11,6 +11,8 @@ import (
 	"io"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
@@ -107,6 +109,6 @@ func (j *Job) makeBuilderReq(arch id.ID, dir string, files []string) builder.Req
 	return builder.HarnessRequest(
 		j.Subject.Name,
 		arch,
-		subject.Harness{Dir: dir, Files: files},
+		recipe.Recipe{Dir: dir, Files: files},
 	)
 }

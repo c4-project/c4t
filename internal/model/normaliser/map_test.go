@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
@@ -35,7 +37,7 @@ func ExampleMap_RenamesMatching() {
 				},
 			},
 		},
-		Harnesses: map[string]subject.Harness{
+		Harnesses: map[string]recipe.Recipe{
 			"arm": {
 				Dir:   path.Join("burble", "armv8"),
 				Files: []string{"inky.c", "pinky.c"},

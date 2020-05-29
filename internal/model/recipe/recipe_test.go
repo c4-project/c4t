@@ -3,13 +3,13 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package subject
+package recipe
 
 import "fmt"
 
-// ExampleHarness_Paths is a testable example for Paths.
-func ExampleHarness_Paths() {
-	h := Harness{Dir: "foo/bar", Files: []string{"baz", "barbaz", "foobar"}}
+// ExampleRecipe_Paths is a testable example for Paths.
+func ExampleRecipe_Paths() {
+	h := Recipe{Dir: "foo/bar", Files: []string{"baz", "barbaz", "foobar"}}
 	for _, f := range h.Paths() {
 		fmt.Println(f)
 	}
