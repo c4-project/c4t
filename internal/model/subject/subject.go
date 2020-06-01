@@ -134,7 +134,7 @@ func (s *Subject) ensureCompileMap() {
 }
 
 // Recipe gets the harness for the architecture with id arch.
-func (s *Subject) Harness(arch id.ID) (recipe.Recipe, error) {
+func (s *Subject) Recipe(arch id.ID) (recipe.Recipe, error) {
 	key := arch.String()
 	h, ok := s.Harnesses[key]
 	if !ok {

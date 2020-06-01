@@ -157,7 +157,7 @@ func lookupArch(arch id.ID) (string, error) {
 }
 
 // Args deduces the appropriate arguments for running Litmus on job j, with the merged run information r.
-func (l Litmus) Args(j job.Harness, r service.RunInfo) ([]string, error) {
+func (l Litmus) Args(j job.Lifter, r service.RunInfo) ([]string, error) {
 	larch, err := lookupArch(j.Arch)
 	if err != nil {
 		return nil, fmt.Errorf("when looking up -carch: %w", err)

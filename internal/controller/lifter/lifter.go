@@ -40,7 +40,7 @@ type HarnessMaker interface {
 	// MakeHarness asks the harness maker to make the test harness described by j.
 	// It returns a list outFiles of files created (C files, header files, etc.), and/or an error err.
 	// Any error output from child processes should be sent to errw, if it is non-nil.
-	MakeHarness(ctx context.Context, j job.Harness, errw io.Writer) (outFiles []string, err error)
+	MakeHarness(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error)
 }
 
 // Lifter holds the main configuration for the lifter part of the tester framework.

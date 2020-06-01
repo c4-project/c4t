@@ -90,7 +90,7 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 		return perr
 	}
 
-	spec := job.Harness{
+	spec := job.Lifter{
 		Backend: j.Backend,
 		Arch:    arch,
 		InFile:  path,

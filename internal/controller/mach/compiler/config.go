@@ -10,7 +10,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -27,8 +27,10 @@ import (
 type SingleRunner interface {
 	// RunCompiler runs the compiler job j.
 	// If applicable, errw will be connected to the compiler's standard error.
-	RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) error
+	RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error
 }
+
+//go:generate mockery -name SingleRunner
 
 // SubjectPather is the interface of types that can produce path sets for compilations.
 type SubjectPather interface {

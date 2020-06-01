@@ -62,8 +62,8 @@ func ExampleSubject_Harness() {
 		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
-	xs, _ := s.Harness(id.ArchX8664)
-	as, _ := s.Harness(id.ArchArm)
+	xs, _ := s.Recipe(id.ArchX8664)
+	as, _ := s.Recipe(id.ArchArm)
 
 	for _, r := range xs.Files {
 		fmt.Println(r)
@@ -140,7 +140,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 // the appropriate error.
 func TestSubject_Harness_Missing(t *testing.T) {
 	var s subject.Subject
-	_, err := s.Harness(id.FromString("x86.64"))
+	_, err := s.Recipe(id.FromString("x86.64"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingHarness, "missing harness path")
 }
 
@@ -160,7 +160,7 @@ func TestSubject_AddHarness(t *testing.T) {
 		}
 	})
 	t.Run("add-get", func(t *testing.T) {
-		h2, err := s.Harness(march)
+		h2, err := s.Recipe(march)
 		if err != nil {
 			t.Fatalf("err when getting added harness: %v", err)
 		}

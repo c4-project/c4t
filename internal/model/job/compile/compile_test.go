@@ -3,13 +3,14 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package job_test
+package compile_test
 
 import (
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
+
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,22 +20,22 @@ func TestCompile_CompilerRun(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		in    job.Compile
+		in    compile.Compile
 		out   service.RunInfo
 		isNil bool
 	}{
 		"no-compiler": {
-			in:    job.Compile{},
+			in:    compile.Compile{},
 			isNil: true,
 		},
 		"no-runinfo": {
-			in: job.Compile{
+			in: compile.Compile{
 				Compiler: &compiler.Compiler{},
 			},
 			isNil: true,
 		},
 		"present": {
-			in: job.Compile{
+			in: compile.Compile{
 				Compiler: &compiler.Compiler{
 					Config: compiler.Config{
 						Run: &service.RunInfo{

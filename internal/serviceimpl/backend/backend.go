@@ -55,7 +55,7 @@ type Resolver struct {
 }
 
 // MakeHarness delegates harness making to the appropriate maker for j.
-func (r *Resolver) MakeHarness(ctx context.Context, j job.Harness, errw io.Writer) (outFiles []string, err error) {
+func (r *Resolver) MakeHarness(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error) {
 	var bi Backend
 	if bi, err = r.Get(j.Backend); err != nil {
 		return nil, err

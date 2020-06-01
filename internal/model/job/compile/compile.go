@@ -3,7 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package job
+// Package compile describes compilation jobs.
+package compile
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/compiler"
@@ -19,6 +20,15 @@ type Compile struct {
 	In []string
 	// Out is the file to be received from the compiler.
 	Out string
+}
+
+// NewCompile is a convenience constructor for compiles.
+func NewCompile(c *compiler.Compiler, out string, in ...string) *Compile {
+	return &Compile{
+		Compiler: c,
+		In:       in,
+		Out:      out,
+	}
 }
 
 // CompilerRun gets the job's compiler run information if present; else, nil.

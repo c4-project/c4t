@@ -15,7 +15,7 @@ import (
 
 // ExampleLitmus_Args is a testable example for Args.
 func ExampleLitmus_Args() {
-	j := job.Harness{
+	j := job.Lifter{
 		Arch:   id.ArchX8664,
 		InFile: "in.litmus",
 		OutDir: "out",

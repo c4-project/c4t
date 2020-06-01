@@ -18,14 +18,14 @@ import (
 // MockHarnessMaker mocks HarnessMaker.
 type MockHarnessMaker struct {
 	// SeenSpecs collects the HarnessSpecs that the harness maker has seen.
-	SeenSpecs []job.Harness
+	SeenSpecs []job.Lifter
 
 	// Err is the error to return on calls to MakeHarness.
 	Err error
 }
 
 // MakeHarness mocks MakeHarness.
-func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec job.Harness, _ io.Writer) (outFiles []string, err error) {
+func (m *MockHarnessMaker) MakeHarness(_ context.Context, spec job.Lifter, _ io.Writer) (outFiles []string, err error) {
 	m.SeenSpecs = append(m.SeenSpecs, spec)
 	return []string{path.Join(spec.OutDir, "out.c")}, m.Err
 }

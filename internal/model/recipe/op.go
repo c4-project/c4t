@@ -17,7 +17,7 @@ type Op uint8
 const (
 	// No-operation.
 	Nop Op = iota
-	// Push all unconsumed inputs onto the stack.
+	// Push all unconsumed inputs (matching the filekind argument, if given) onto the stack.
 	PushInputs
 	// Push a specific input onto the stack, consuming it.
 	// Takes a file argument.

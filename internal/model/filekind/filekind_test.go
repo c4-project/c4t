@@ -6,11 +6,26 @@
 package filekind_test
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 	"github.com/stretchr/testify/assert"
 )
+
+// ExampleKind_Strings is a runnable example for Strings.
+func ExampleKind_Strings() {
+	for _, s := range (filekind.C | filekind.Litmus | filekind.Trace).Strings() {
+		fmt.Println(s)
+	}
+
+	// Unordered output:
+	// c
+	// litmus
+	// trace
+}
 
 // TestKind_Matches tests various combinations of kind matching.
 func TestKind_Matches(t *testing.T) {
@@ -59,6 +74,26 @@ func TestKind_Matches(t *testing.T) {
 
 			got := c.matchee.Matches(c.matcher)
 			assert.Equalf(t, c.want, got, "%d matching %d", c.matchee, c.matcher)
+		})
+	}
+}
+
+// TestKind_MarshalJSON_roundTrip tests the JSON marshalling of Kind by round-tripping.
+func TestKind_MarshalJSON_roundTrip(t *testing.T) {
+	t.Parallel()
+
+	cases := []filekind.Kind{
+		0,
+		filekind.Trace,
+		filekind.CHeader,
+		filekind.C,
+		filekind.Bin | filekind.Litmus,
+		filekind.C | filekind.Log,
+	}
+	for _, c := range cases {
+		c := c
+		t.Run(c.String(), func(t *testing.T) {
+			testhelp.TestJSONRoundTrip(t, c, "filekind")
 		})
 	}
 }

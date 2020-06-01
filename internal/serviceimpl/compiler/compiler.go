@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
@@ -19,8 +21,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
 
 	mdl "github.com/MattWindsor91/act-tester/internal/model/compiler"
-
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
@@ -44,6 +44,8 @@ type Compiler interface {
 	mdl.Inspector
 	compiler.SingleRunner
 }
+
+//go:generate mockery -name Compiler
 
 // Inspector maps compiler styles to compilers.
 type Resolver struct {
@@ -92,7 +94,7 @@ func (r *Resolver) DefaultMOpts(c *mdl.Config) (stringhelp.Set, error) {
 }
 
 // RunCompiler runs the compiler specified by nc on job j, using this resolver to map the style to a concrete compiler.
-func (r *Resolver) RunCompiler(ctx context.Context, j job.Compile, errw io.Writer) error {
+func (r *Resolver) RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error {
 	cp, err := r.Get(&j.Compiler.Config)
 	if err != nil {
 		return err

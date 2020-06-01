@@ -9,9 +9,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
+
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/stretchr/testify/assert"
 
@@ -20,8 +22,6 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
-
-	mx "github.com/MattWindsor91/act-tester/internal/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/stretchr/testify/require"
@@ -33,17 +33,18 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
 
-// TestJob_Compile tests running a compile job.
-func TestJob_Compile(t *testing.T) {
-	var mc mx.Compiler
+// TestInstance_Compile tests running a compile job.
+func TestInstance_Compile(t *testing.T) {
+	var mc mocks.SingleRunner
 	var mp compiler.MockSubjectPather
 
 	names := []string{"foo", "bar", "baz"}
 	c := corpus.New(names...)
 	for n, cn := range c {
 		err := cn.AddHarness(id.ArchX86Skylake, recipe.Recipe{
-			Dir:   n,
-			Files: []string{"main.c"},
+			Dir:          n,
+			Files:        []string{"main.c"},
+			Instructions: []recipe.Instruction{recipe.CompileBinInst()},
 		})
 		require.NoError(t, err, "setting up harness")
 		c[n] = cn
@@ -51,7 +52,7 @@ func TestJob_Compile(t *testing.T) {
 
 	rch := make(chan builder.Request, len(c))
 
-	j := compiler.Job{
+	j := compiler.Instance{
 		MachineID: id.FromString("localhost"),
 		Compiler: &mdl.Named{
 			ID: id.FromString("gcc"),
@@ -101,7 +102,7 @@ func TestJob_Compile(t *testing.T) {
 	}
 
 	// not necessarily the same context
-	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 job.Compile) bool {
+	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 compile.Single) bool {
 		return j2.SelectedOptName() == j.Compiler.SelectedOpt.Name && j2.SelectedMOptName() == j.Compiler.SelectedMOpt
 	}), mock.Anything).Return(nil)
 

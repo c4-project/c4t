@@ -143,8 +143,8 @@ func (c *Compiler) prepareDirs() error {
 // makeJob makes a job for the named compiler nc, outputting results to resCh.
 // It also takes in a read-only copy, rc, of the corpus; this is because the result handling thread will be modifying
 // the corpus proper.
-func (c *Compiler) makeJob(nc *compiler.Named, resCh chan<- builder.Request) *Job {
-	return &Job{
+func (c *Compiler) makeJob(nc *compiler.Named, resCh chan<- builder.Request) *Instance {
+	return &Instance{
 		MachineID: c.mid,
 		Compiler:  nc,
 		Corpus:    c.plan.Corpus,
