@@ -10,8 +10,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math"
 	"path"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
@@ -27,6 +30,8 @@ type Interpreter struct {
 
 	// nobjs is the number of object files created so far by the processor.
 	nobjs uint64
+	// maxobjs is the maximum permitted number of object files.
+	maxobjs uint64
 	// logw is the writer used for compiler outputs.
 	logw io.Writer
 	// inPool maps each input file to a Boolean that is true if it hasn't been consumed yet.
@@ -47,15 +52,40 @@ var (
 )
 
 // NewInterpreter creates a new recipe processor using the compiler driver d and job j.
-func NewInterpreter(d SingleRunner, j compile.Recipe, logw io.Writer) (*Interpreter, error) {
+func NewInterpreter(d SingleRunner, j compile.Recipe, os ...IOption) (*Interpreter, error) {
 	if d == nil {
 		return nil, ErrDriverNil
 	}
 	if j.Compiler == nil {
 		return nil, ErrCompilerConfigNil
 	}
-	p := Interpreter{driver: d, job: j, logw: logw}
+
+	p := Interpreter{driver: d, job: j, logw: ioutil.Discard, maxobjs: math.MaxUint64}
+	IOptions(os...)(&p)
+
 	return &p, nil
+}
+
+// IOption is the type of options to the interpreter.
+type IOption func(*Interpreter)
+
+// IOptions bundles the options os into one option.
+func IOptions(os ...IOption) IOption {
+	return func(i *Interpreter) {
+		for _, o := range os {
+			o(i)
+		}
+	}
+}
+
+// LogTo logs compiler output to w.
+func LogTo(w io.Writer) IOption {
+	return func(i *Interpreter) { i.logw = iohelp.EnsureWriter(w) }
+}
+
+// SetMaxObjs sets the maximum number of object files the interpreter can create.
+func SetMaxObjs(cap uint64) IOption {
+	return func(i *Interpreter) { i.maxobjs = cap }
 }
 
 // Interpret processes this processor's compilation recipe using ctx for timeout and cancellation.
@@ -82,9 +112,9 @@ func (p *Interpreter) processInstruction(ctx context.Context, i recipe.Instructi
 	case recipe.PushInputs:
 		return p.pushInputs(i.FileKind)
 	case recipe.CompileObj:
-		return p.compileObj(ctx)
+		return p.compileObj(ctx, i.NPops)
 	case recipe.CompileExe:
-		return p.compileBin(ctx)
+		return p.compileExe(ctx, i.NPops)
 	default:
 		return fmt.Errorf("%w: unknown instruction %s", ErrBadOp, i.Op)
 	}
@@ -112,12 +142,12 @@ func (p *Interpreter) pushInputRaw(file string) {
 	p.fileStack = append(p.fileStack, file)
 }
 
-func (p *Interpreter) compileObj(ctx context.Context) error {
+func (p *Interpreter) compileObj(ctx context.Context, npops int) error {
 	n, err := p.freshObj()
 	if err != nil {
 		return err
 	}
-	if err := p.compile(ctx, n, compile.Obj); err != nil {
+	if err := p.compile(ctx, n, compile.Obj, npops); err != nil {
 		return err
 	}
 	p.fileStack = append(p.fileStack, n)
@@ -125,7 +155,7 @@ func (p *Interpreter) compileObj(ctx context.Context) error {
 }
 
 func (p *Interpreter) freshObj() (string, error) {
-	if p.nobjs == math.MaxUint64 {
+	if p.nobjs == p.maxobjs {
 		return "", ErrObjOverflow
 	}
 	// TODO(@MattWindsor91): filepath?
@@ -134,25 +164,32 @@ func (p *Interpreter) freshObj() (string, error) {
 	return path.Join(p.job.Recipe.Dir, file), nil
 }
 
-func (p *Interpreter) compileBin(ctx context.Context) error {
-	return p.compile(ctx, p.job.Out, compile.Exe)
+func (p *Interpreter) compileExe(ctx context.Context, npops int) error {
+	return p.compile(ctx, p.job.Out, compile.Exe, npops)
 	// We don't push the binary onto the file stack.
 }
 
-func (p *Interpreter) compile(ctx context.Context, out string, kind compile.Kind) error {
-	if err := p.driver.RunCompiler(ctx, p.singleCompile(out, kind), p.logw); err != nil {
+func (p *Interpreter) compile(ctx context.Context, out string, kind compile.Kind, npops int) error {
+	if err := p.driver.RunCompiler(ctx, p.singleCompile(out, kind, npops), p.logw); err != nil {
 		return err
 	}
-	p.clearStack()
 	return nil
 }
 
-func (p *Interpreter) singleCompile(out string, kind compile.Kind) compile.Single {
-	return compile.New(p.job.Compiler, out, p.fileStack...).Single(kind)
+func (p *Interpreter) singleCompile(out string, kind compile.Kind, npops int) compile.Single {
+	return compile.New(p.job.Compiler, out, p.popStack(npops)...).Single(kind)
 }
 
-func (p *Interpreter) clearStack() {
-	p.fileStack = make([]string, 0, cap(p.fileStack))
+func (p *Interpreter) popStack(npops int) []string {
+	lfs := len(p.fileStack)
+	if npops <= 0 || lfs < npops {
+		npops = lfs
+	}
+	cut := lfs - npops
+
+	var fs []string
+	fs, p.fileStack = p.fileStack[cut:], p.fileStack[:cut]
+	return fs
 }
 
 // initPool creates a pool with each path in paths set as available.

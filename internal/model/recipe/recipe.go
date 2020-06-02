@@ -61,7 +61,7 @@ func AddInstructions(ins ...Instruction) Option {
 func CompileFileToObj(file string) Option {
 	return AddInstructions(
 		PushInputInst(file),
-		CompileObjInst(),
+		CompileObjInst(1),
 	)
 }
 
@@ -69,7 +69,7 @@ func CompileFileToObj(file string) Option {
 func CompileAllCToExe() Option {
 	return AddInstructions(
 		PushInputsInst(filekind.CSrc),
-		CompileExeInst(),
+		CompileExeInst(PopAll),
 	)
 }
 

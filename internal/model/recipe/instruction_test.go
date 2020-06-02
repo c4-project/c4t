@@ -13,12 +13,24 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 )
 
-// ExampleCompileBinInst is a runnable example for CompileExeInst.
-func ExampleCompileBinInst() {
-	fmt.Println(recipe.CompileExeInst())
+// ExampleCompileExeInst is a runnable example for CompileExeInst.
+func ExampleCompileExeInst() {
+	fmt.Println(recipe.CompileExeInst(recipe.PopAll))
+	fmt.Println(recipe.CompileExeInst(1))
 
 	// Output:
-	// CompileExe
+	// CompileExe ALL
+	// CompileExe 1
+}
+
+// ExampleCompileObjInst is a runnable example for CompileObjInst.
+func ExampleCompileObjInst() {
+	fmt.Println(recipe.CompileObjInst(recipe.PopAll))
+	fmt.Println(recipe.CompileObjInst(1))
+
+	// Output:
+	// CompileObj ALL
+	// CompileObj 1
 }
 
 // ExamplePushInputInst is a runnable example for PushInputInst.

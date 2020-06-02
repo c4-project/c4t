@@ -7,9 +7,13 @@ package recipe
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 )
+
+// PopAll is the value to pass to NPops to ask the instruction to pop all applicable files off the stack.
+const PopAll = 0
 
 // Instruction represents a single instruction in a recipe.
 //
@@ -23,28 +27,43 @@ type Instruction struct {
 
 	// FileKind is, if applicable, the file kind argument to the instruction.
 	FileKind filekind.Kind `json:"file_kind,omitempty"`
+
+	// npops is, if applicable and nonzero, the maximum number of items to pop off the file stack.
+	NPops int `json:"npops,omitempty"`
 }
 
 // String produces a human-readable string representation of this instruction.
 func (i Instruction) String() string {
 	switch i.Op {
+	case CompileExe:
+		fallthrough
+	case CompileObj:
+		return fmt.Sprintf("%s %s", i.Op, npopString(i.NPops))
 	case PushInput:
-		return fmt.Sprintf("%s %q", i.Op.String(), i.File)
+		return fmt.Sprintf("%s %q", i.Op, i.File)
 	case PushInputs:
-		return fmt.Sprintf("%s %q", i.Op.String(), i.FileKind)
+		return fmt.Sprintf("%s %q", i.Op, i.FileKind)
 	default:
 		return i.Op.String()
 	}
 }
 
+// npopString returns 'ALL' if npops requests popping all files, or npops as a string otherwise.
+func npopString(npops int) string {
+	if npops <= PopAll {
+		return "ALL"
+	}
+	return strconv.Itoa(npops)
+}
+
 // CompileExeInst produces a 'compile binary' instruction.
-func CompileExeInst() Instruction {
-	return Instruction{Op: CompileExe}
+func CompileExeInst(npops int) Instruction {
+	return Instruction{Op: CompileExe, NPops: npops}
 }
 
 // CompileObjInst produces a 'compile object' instruction.
-func CompileObjInst() Instruction {
-	return Instruction{Op: CompileObj}
+func CompileObjInst(npops int) Instruction {
+	return Instruction{Op: CompileObj, NPops: npops}
 }
 
 // PushInputInst produces a 'push input' instruction.
