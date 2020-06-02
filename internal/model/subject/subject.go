@@ -37,10 +37,10 @@ type Subject struct {
 	// If nil, this subject hasn't had any compilations.
 	Compiles map[string]CompileResult `toml:"compiles,omitempty" json:"compiles,omitempty"`
 
-	// Harnesses contains information about this subject's test harnesses.
-	// It maps the string form of each harness's target architecture's ID.
-	// If nil, this subject hasn't had a harness generated.
-	Harnesses map[string]recipe.Recipe `toml:"harnesses,omitempty" json:"harnesses,omitempty"`
+	// Recipes contains information about this subject's lifted test recipes.
+	// It maps the string form of each recipe's target architecture's ID.
+	// If nil, this subject hasn't had a recipe generated.
+	Recipes map[string]recipe.Recipe `toml:"recipes,omitempty" json:"recipes,omitempty"`
 
 	// Runs contains information about this subject's runs so far.
 	// It maps from the string form of each compiler's ID.
@@ -136,29 +136,29 @@ func (s *Subject) ensureCompileMap() {
 // Recipe gets the harness for the architecture with id arch.
 func (s *Subject) Recipe(arch id.ID) (recipe.Recipe, error) {
 	key := arch.String()
-	h, ok := s.Harnesses[key]
+	h, ok := s.Recipes[key]
 	if !ok {
 		return recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingHarness, key)
 	}
 	return h, nil
 }
 
-// AddHarness sets the harness information for arch to h in this subject.
+// AddRecipe sets the harness information for arch to h in this subject.
 // It fails if there already _is_ a harness for arch.
-func (s *Subject) AddHarness(arch id.ID, h recipe.Recipe) error {
+func (s *Subject) AddRecipe(arch id.ID, h recipe.Recipe) error {
 	s.ensureHarnessMap()
 	key := arch.String()
-	if _, ok := s.Harnesses[key]; ok {
+	if _, ok := s.Recipes[key]; ok {
 		return fmt.Errorf("%w: arch=%q", ErrDuplicateHarness, key)
 	}
-	s.Harnesses[key] = h
+	s.Recipes[key] = h
 	return nil
 }
 
 // ensureHarnessMap makes sure this subject has a harness map.
 func (s *Subject) ensureHarnessMap() {
-	if s.Harnesses == nil {
-		s.Harnesses = make(map[string]recipe.Recipe)
+	if s.Recipes == nil {
+		s.Recipes = make(map[string]recipe.Recipe)
 	}
 }
 

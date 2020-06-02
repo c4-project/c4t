@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
+	"path"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
@@ -18,10 +20,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 )
 
-type Processor struct {
+// Interpreter is an interpreter for compile recipes.
+type Interpreter struct {
 	driver SingleRunner
 	job    compile.Recipe
 
+	// nobjs is the number of object files created so far by the processor.
+	nobjs uint64
 	// logw is the writer used for compiler outputs.
 	logw io.Writer
 	// inPool maps each input file to a Boolean that is true if it hasn't been consumed yet.
@@ -37,27 +42,29 @@ var (
 	ErrBadOp = errors.New("bad opcode")
 	// ErrFileUnavailable occurs if an instruction specifies a file that has been consumed, or wasn't available.
 	ErrFileUnavailable = errors.New("file not available")
+	// ErrObjOverflow occurs if too many object files are created.
+	ErrObjOverflow = errors.New("object file count overflow")
 )
 
-// NewProcessor creates a new recipe processor using the compiler driver d and job j.
-func NewProcessor(d SingleRunner, j compile.Recipe, logw io.Writer) (*Processor, error) {
+// NewInterpreter creates a new recipe processor using the compiler driver d and job j.
+func NewInterpreter(d SingleRunner, j compile.Recipe, logw io.Writer) (*Interpreter, error) {
 	if d == nil {
 		return nil, ErrDriverNil
 	}
 	if j.Compiler == nil {
 		return nil, ErrCompilerConfigNil
 	}
-	p := Processor{driver: d, job: j, logw: logw}
+	p := Interpreter{driver: d, job: j, logw: logw}
 	return &p, nil
 }
 
-// Process processes this processor's compilation recipe using ctx for timeout and cancellation.
-func (p *Processor) Process(ctx context.Context) error {
+// Interpret processes this processor's compilation recipe using ctx for timeout and cancellation.
+func (p *Interpreter) Interpret(ctx context.Context) error {
 	p.inPool = initPool(p.job.In)
 	// Assuming that the usual case is that every file in the pool gets put in the stack.
 	p.fileStack = make([]string, 0, len(p.inPool))
 
-	for _, i := range p.job.Instructions {
+	for _, i := range p.job.Recipe.Instructions {
 		if err := p.processInstruction(ctx, i); err != nil {
 			return err
 		}
@@ -66,7 +73,7 @@ func (p *Processor) Process(ctx context.Context) error {
 	return nil
 }
 
-func (p *Processor) processInstruction(ctx context.Context, i recipe.Instruction) error {
+func (p *Interpreter) processInstruction(ctx context.Context, i recipe.Instruction) error {
 	switch i.Op {
 	case recipe.Nop:
 		return nil
@@ -75,15 +82,15 @@ func (p *Processor) processInstruction(ctx context.Context, i recipe.Instruction
 	case recipe.PushInputs:
 		return p.pushInputs(i.FileKind)
 	case recipe.CompileObj:
-		return p.compileObj()
-	case recipe.CompileBin:
+		return p.compileObj(ctx)
+	case recipe.CompileExe:
 		return p.compileBin(ctx)
 	default:
 		return fmt.Errorf("%w: unknown instruction %s", ErrBadOp, i.Op)
 	}
 }
 
-func (p *Processor) pushInput(file string) error {
+func (p *Interpreter) pushInput(file string) error {
 	if !p.inPool[file] {
 		return fmt.Errorf("%w: %q", ErrFileUnavailable, file)
 	}
@@ -91,7 +98,7 @@ func (p *Processor) pushInput(file string) error {
 	return nil
 }
 
-func (p *Processor) pushInputs(kind filekind.Kind) error {
+func (p *Interpreter) pushInputs(kind filekind.Kind) error {
 	for file, ok := range p.inPool {
 		if ok && filekind.GuessFromFile(file).Matches(kind) {
 			p.pushInputRaw(file)
@@ -100,26 +107,52 @@ func (p *Processor) pushInputs(kind filekind.Kind) error {
 	return nil
 }
 
-func (p *Processor) pushInputRaw(file string) {
+func (p *Interpreter) pushInputRaw(file string) {
 	p.inPool[file] = false
 	p.fileStack = append(p.fileStack, file)
 }
 
-func (p *Processor) compileObj() error {
-	// TODO(@MattWindsor91): implement this
-	return errors.New("compile to obj not yet implemented")
+func (p *Interpreter) compileObj(ctx context.Context) error {
+	n, err := p.freshObj()
+	if err != nil {
+		return err
+	}
+	if err := p.compile(ctx, n, compile.Obj); err != nil {
+		return err
+	}
+	p.fileStack = append(p.fileStack, n)
+	return nil
 }
 
-func (p *Processor) compileBin(ctx context.Context) error {
-	// TODO(@MattWindsor91): split these two different jobs up
-	return p.driver.RunCompiler(ctx, compile.Single{
-		Compile: compile.Compile{
-			Compiler: p.job.Compiler,
-			In:       p.fileStack,
-			Out:      p.job.Out,
-		},
-		Kind: compile.Exe,
-	}, p.logw)
+func (p *Interpreter) freshObj() (string, error) {
+	if p.nobjs == math.MaxUint64 {
+		return "", ErrObjOverflow
+	}
+	// TODO(@MattWindsor91): filepath?
+	file := fmt.Sprintf("obj_%d.o", p.nobjs)
+	p.nobjs++
+	return path.Join(p.job.Recipe.Dir, file), nil
+}
+
+func (p *Interpreter) compileBin(ctx context.Context) error {
+	return p.compile(ctx, p.job.Out, compile.Exe)
+	// We don't push the binary onto the file stack.
+}
+
+func (p *Interpreter) compile(ctx context.Context, out string, kind compile.Kind) error {
+	if err := p.driver.RunCompiler(ctx, p.singleCompile(out, kind), p.logw); err != nil {
+		return err
+	}
+	p.clearStack()
+	return nil
+}
+
+func (p *Interpreter) singleCompile(out string, kind compile.Kind) compile.Single {
+	return compile.New(p.job.Compiler, out, p.fileStack...).Single(kind)
+}
+
+func (p *Interpreter) clearStack() {
+	p.fileStack = make([]string, 0, cap(p.fileStack))
 }
 
 // initPool creates a pool with each path in paths set as available.
@@ -130,5 +163,3 @@ func initPool(paths []string) map[string]bool {
 	}
 	return pool
 }
-
-type ProcessorOption func(*Processor) error

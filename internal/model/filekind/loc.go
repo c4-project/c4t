@@ -15,8 +15,8 @@ const (
 	InFuzz
 	// InCompile marks that a mapping is part of a compile.
 	InCompile
-	// InHarness marks that a mapping is part of a harness.
-	InHarness
+	// InRecipe marks that a mapping is part of a harness.
+	InRecipe
 )
 
 // Matches checks whether this location is included in pat.

@@ -100,11 +100,11 @@ func (j *Instance) runCompiler(ctx context.Context, sp subject.CompileFileset, h
 }
 
 func (j *Instance) runCompilerJob(ctx context.Context, job compile.Recipe, logf io.Writer) error {
-	proc, perr := NewProcessor(j.Conf.Driver, job, logf)
+	proc, perr := NewInterpreter(j.Conf.Driver, job, logf)
 	if perr != nil {
 		return perr
 	}
-	return proc.Process(ctx)
+	return proc.Interpret(ctx)
 }
 
 func (j *Instance) openLogFile(l string) (io.WriteCloser, error) {

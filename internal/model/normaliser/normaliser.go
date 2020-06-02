@@ -51,7 +51,7 @@ func (n *Normaliser) Normalise(s subject.Subject) (*subject.Subject, error) {
 	s.OrigLitmus = n.replaceAndAdd(s.OrigLitmus, filekind.Litmus, filekind.InOrig, FileOrigLitmus)
 	s.Fuzz = n.fuzz(s.Fuzz)
 	s.Compiles = n.compiles(s.Compiles)
-	s.Harnesses = n.harnesses(s.Harnesses)
+	s.Recipes = n.recipes(s.Recipes)
 	// No need to normalise runs
 	return &s, n.err
 }
@@ -66,7 +66,7 @@ func (n *Normaliser) fuzz(of *subject.Fuzz) *subject.Fuzz {
 	return &f
 }
 
-func (n *Normaliser) harnesses(hs map[string]recipe.Recipe) map[string]recipe.Recipe {
+func (n *Normaliser) recipes(hs map[string]recipe.Recipe) map[string]recipe.Recipe {
 	if hs == nil {
 		return nil
 	}
@@ -82,7 +82,7 @@ func (n *Normaliser) harness(archstr string, h recipe.Recipe) recipe.Recipe {
 	oldPaths := h.Paths()
 	h.Dir = HarnessDir(n.root, archstr)
 	for i, np := range h.Paths() {
-		n.add(oldPaths[i], np, filekind.GuessFromFile(np), filekind.InHarness)
+		n.add(oldPaths[i], np, filekind.GuessFromFile(np), filekind.InRecipe)
 	}
 	return h
 }

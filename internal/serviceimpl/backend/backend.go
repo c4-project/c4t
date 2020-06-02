@@ -44,7 +44,7 @@ var (
 
 // Backend contains the various interfaces that a backend can implement.
 type Backend interface {
-	lifter.HarnessMaker
+	lifter.SingleLifter
 	runner.ObsParser
 }
 
@@ -54,13 +54,13 @@ type Resolver struct {
 	Backends map[string]Backend
 }
 
-// MakeHarness delegates harness making to the appropriate maker for j.
-func (r *Resolver) MakeHarness(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error) {
+// Lift delegates harness making to the appropriate maker for j.
+func (r *Resolver) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error) {
 	var bi Backend
 	if bi, err = r.Get(j.Backend); err != nil {
 		return nil, err
 	}
-	return bi.MakeHarness(ctx, j, errw)
+	return bi.Lift(ctx, j, errw)
 }
 
 // ParseObs delegates observation parsing to the appropriate implementation for the backend referenced by b.

@@ -12,10 +12,10 @@ func _() {
 	_ = x[PushInputs-1]
 	_ = x[PushInput-2]
 	_ = x[CompileObj-3]
-	_ = x[CompileBin-4]
+	_ = x[CompileExe-4]
 }
 
-const _Op_name = "NopPushInputsPushInputCompileObjCompileBin"
+const _Op_name = "NopPushInputsPushInputCompileObjCompileExe"
 
 var _Op_index = [...]uint8{0, 3, 13, 22, 32, 42}
 

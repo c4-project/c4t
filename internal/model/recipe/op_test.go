@@ -15,11 +15,11 @@ import (
 
 // ExampleOp_String is a runnable example for String.
 func ExampleOp_String() {
-	fmt.Println(recipe.CompileBin)
+	fmt.Println(recipe.CompileExe)
 	fmt.Println(recipe.Op(42))
 
 	// Output:
-	// CompileBin
+	// CompileExe
 	// Op(42)
 }
 

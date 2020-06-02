@@ -41,12 +41,12 @@ func TestInstance_Compile(t *testing.T) {
 	names := []string{"foo", "bar", "baz"}
 	c := corpus.New(names...)
 	for n, cn := range c {
-		err := cn.AddHarness(id.ArchX86Skylake, recipe.Recipe{
-			Dir:          n,
-			Files:        []string{"main.c"},
-			Instructions: []recipe.Instruction{recipe.CompileBinInst()},
-		})
-		require.NoError(t, err, "setting up harness")
+		err := cn.AddRecipe(id.ArchX86Skylake, recipe.New(
+			n,
+			recipe.AddFiles("main.c"),
+			recipe.CompileAllCToExe(),
+		))
+		require.NoError(t, err, "setting up recipe")
 		c[n] = cn
 	}
 

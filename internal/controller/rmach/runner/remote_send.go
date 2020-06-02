@@ -16,7 +16,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// Send translates p to the remote host, using SFTP to copy over its harness files.
+// Send translates p to the remote host, using SFTP to copy over any recipe files.
 func (r *RemoteRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	n := normaliser.NewCorpus(r.runner.Config.DirCopy)
 	rp := *p
@@ -25,8 +25,9 @@ func (r *RemoteRunner) Send(ctx context.Context, p *plan.Plan) (*plan.Plan, erro
 		return nil, err
 	}
 
-	// We only send the harness source code, to avoid wasting SFTP bandwidth.
-	return &rp, r.sendMapping(ctx, n.Mappings.RenamesMatching(filekind.C, filekind.InHarness))
+	// We only send the recipe source code, to avoid wasting SFTP bandwidth.
+	// TODO(@MattWindsor91): actually check which files are mentioned in recipe instructions?
+	return &rp, r.sendMapping(ctx, n.Mappings.RenamesMatching(filekind.C, filekind.InRecipe))
 }
 
 func (r *RemoteRunner) sendMapping(ctx context.Context, ms map[string]string) error {

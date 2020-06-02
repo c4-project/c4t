@@ -75,7 +75,7 @@ var testSubjects = map[string]func(root string) testCase{
 		h := func(arch, file string) string { return path.Join(root, normaliser.DirHarnesses, arch, file) }
 		return testCase{
 			in: subject.Subject{
-				Harnesses: map[string]recipe.Recipe{
+				Recipes: map[string]recipe.Recipe{
 					"arm": {
 						Dir:   path.Join("burble", "armv8"),
 						Files: []string{"inky.c", "pinky.c"},
@@ -87,7 +87,7 @@ var testSubjects = map[string]func(root string) testCase{
 				},
 			},
 			out: subject.Subject{
-				Harnesses: map[string]recipe.Recipe{
+				Recipes: map[string]recipe.Recipe{
 					"arm": {
 						Dir:   normaliser.HarnessDir(root, "arm"),
 						Files: []string{"inky.c", "pinky.c"},
@@ -99,10 +99,10 @@ var testSubjects = map[string]func(root string) testCase{
 				},
 			},
 			maps: normaliser.Map{
-				h("arm", "inky.c"):  normaliser.NewEntry(filekind.CSrc, filekind.InHarness, "burble", "armv8", "inky.c"),
-				h("arm", "pinky.c"): normaliser.NewEntry(filekind.CSrc, filekind.InHarness, "burble", "armv8", "pinky.c"),
-				h("x86", "inky.c"):  normaliser.NewEntry(filekind.CSrc, filekind.InHarness, "burble", "i386", "inky.c"),
-				h("x86", "pinky.c"): normaliser.NewEntry(filekind.CSrc, filekind.InHarness, "burble", "i386", "pinky.c"),
+				h("arm", "inky.c"):  normaliser.NewEntry(filekind.CSrc, filekind.InRecipe, "burble", "armv8", "inky.c"),
+				h("arm", "pinky.c"): normaliser.NewEntry(filekind.CSrc, filekind.InRecipe, "burble", "armv8", "pinky.c"),
+				h("x86", "inky.c"):  normaliser.NewEntry(filekind.CSrc, filekind.InRecipe, "burble", "i386", "inky.c"),
+				h("x86", "pinky.c"): normaliser.NewEntry(filekind.CSrc, filekind.InRecipe, "burble", "i386", "pinky.c"),
 			},
 		}
 	},

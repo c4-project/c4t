@@ -25,10 +25,12 @@ const (
 	// Pop all of the inputs off the stack, compile them to an object, and push the name of the object onto the stack.
 	CompileObj
 	// Pop all of the inputs off the stack, compile them, and output the results to the output binary.
-	CompileBin
+	CompileExe
 	// Last is the last operation defined.
-	Last = CompileBin
+	Last = CompileExe
 )
+
+//go:generate stringer -type Op
 
 // OpFromString tries to convert a string into an Op.
 func OpFromString(s string) (Op, error) {

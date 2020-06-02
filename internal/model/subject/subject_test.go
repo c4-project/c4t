@@ -58,7 +58,7 @@ func ExampleSubject_CompileResult() {
 
 // ExampleSubject_Harness is a testable example for Recipe.
 func ExampleSubject_Harness() {
-	s := subject.Subject{Harnesses: map[string]recipe.Recipe{
+	s := subject.Subject{Recipes: map[string]recipe.Recipe{
 		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
@@ -144,7 +144,7 @@ func TestSubject_Harness_Missing(t *testing.T) {
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingHarness, "missing harness path")
 }
 
-// TestSubject_AddHarness checks that AddHarness is working properly.
+// TestSubject_AddHarness checks that AddRecipe is working properly.
 func TestSubject_AddHarness(t *testing.T) {
 	var s subject.Subject
 	h := recipe.Recipe{
@@ -155,7 +155,7 @@ func TestSubject_AddHarness(t *testing.T) {
 	march := id.ArchX8664
 
 	t.Run("initial-add", func(t *testing.T) {
-		if err := s.AddHarness(march, h); err != nil {
+		if err := s.AddRecipe(march, h); err != nil {
 			t.Fatalf("err when adding harness to empty subject: %v", err)
 		}
 	})
@@ -169,7 +169,7 @@ func TestSubject_AddHarness(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		err := s.AddHarness(march, recipe.Recipe{})
+		err := s.AddRecipe(march, recipe.Recipe{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateHarness, "adding harness twice")
 	})
 }

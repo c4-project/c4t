@@ -127,7 +127,7 @@ func (b *Builder) addCompile(name string, cid id.ID, res subject.CompileResult) 
 
 func (b *Builder) addHarness(name string, arch id.ID, h recipe.Recipe) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
-		return s.AddHarness(arch, h)
+		return s.AddRecipe(arch, h)
 	})
 }
 

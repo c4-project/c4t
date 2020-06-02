@@ -22,8 +22,8 @@ type Compile struct {
 	Out string
 }
 
-// NewCompile is a convenience constructor for compiles.
-func NewCompile(c *compiler.Compiler, out string, in ...string) *Compile {
+// New is a convenience constructor for compiles.
+func New(c *compiler.Compiler, out string, in ...string) *Compile {
 	return &Compile{
 		Compiler: c,
 		In:       in,

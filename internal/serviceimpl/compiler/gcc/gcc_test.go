@@ -25,7 +25,7 @@ import (
 func ExampleArgs() {
 	args := gcc.Args(
 		*service.NewRunInfo("gcc7", "-funroll-loops"),
-		compile.NewCompile(nil, "a.out", "foo.c", "bar.c").Single(compile.Exe),
+		compile.New(nil, "a.out", "foo.c", "bar.c").Single(compile.Exe),
 	)
 	for _, arg := range args {
 		fmt.Println(arg)
@@ -43,7 +43,7 @@ func ExampleArgs() {
 func ExampleArgs_opt() {
 	args := gcc.Args(
 		*service.NewRunInfo("gcc7", "-funroll-loops"),
-		compile.NewCompile(
+		compile.New(
 			&compiler.Compiler{SelectedOpt: &optlevel.Named{Name: "size"}},
 			"a.out",
 			"foo.c", "bar.c",
@@ -72,7 +72,7 @@ func TestArgs(t *testing.T) {
 	}{
 		"default": {
 			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
-			job: compile.NewCompile(
+			job: compile.New(
 				nil,
 				"a.out",
 				"foo.c",
@@ -82,7 +82,7 @@ func TestArgs(t *testing.T) {
 		},
 		"obj": {
 			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
-			job: compile.NewCompile(
+			job: compile.New(
 				nil,
 				"foo.o",
 				"foo.c",
@@ -91,7 +91,7 @@ func TestArgs(t *testing.T) {
 		},
 		"with-mopt": {
 			run: *service.NewRunInfo("gcc8"),
-			job: compile.NewCompile(
+			job: compile.New(
 				&compiler.Compiler{
 					SelectedMOpt: "arch=nehalem",
 				},
@@ -103,7 +103,7 @@ func TestArgs(t *testing.T) {
 		},
 		"with-opt": {
 			run: *service.NewRunInfo("gcc8"),
-			job: compile.NewCompile(
+			job: compile.New(
 				&compiler.Compiler{
 					SelectedOpt: &optlevel.Named{
 						Name: "3",
@@ -122,7 +122,7 @@ func TestArgs(t *testing.T) {
 		},
 		"do-not-override-run": {
 			run: *service.NewRunInfo("gcc4", "-funroll-loops"),
-			job: compile.NewCompile(
+			job: compile.New(
 				&compiler.Compiler{
 					Config: compiler.Config{
 						Run: service.NewRunInfo("gcc8", "-pthread"),

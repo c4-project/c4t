@@ -28,19 +28,19 @@ var (
 	// ErrConfigNil occurs when we try to construct a lifter without config.
 	ErrConfigNil = errors.New("config nil")
 
-	// ErrMakerNil occurs when a lifter runs without a HarnessMaker set.
+	// ErrMakerNil occurs when a lifter runs without a SingleLifter set.
 	ErrMakerNil = errors.New("harness maker nil")
 
 	// ErrNoBackend occurs when backend information is missing.
 	ErrNoBackend = errors.New("no backend provided")
 )
 
-// HarnessMaker is an interface capturing the ability to make test harnesses.
-type HarnessMaker interface {
-	// MakeHarness asks the harness maker to make the test harness described by j.
+// SingleLifter is an interface capturing the ability to make test harnesses.
+type SingleLifter interface {
+	// Lift performs the lifting described by j.
 	// It returns a list outFiles of files created (C files, header files, etc.), and/or an error err.
 	// Any error output from child processes should be sent to errw, if it is non-nil.
-	MakeHarness(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error)
+	Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error)
 }
 
 // Lifter holds the main configuration for the lifter part of the tester framework.

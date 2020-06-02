@@ -128,7 +128,7 @@ type Env struct {
 	Fuzzer fuzzer.SingleFuzzer
 
 	// Lifter is a single-shot harness maker.
-	Lifter lifter.HarnessMaker
+	Lifter lifter.SingleLifter
 
 	// Planner instructs any planners built for this director as to how to acquire information about compilers, etc.
 	Planner planner.Source

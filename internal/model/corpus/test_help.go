@@ -38,7 +38,7 @@ func MockFailedCompile(name string) subject.Subject {
 			Threads: 8,
 		},
 		OrigLitmus: name + ".litmus",
-		Harnesses: map[string]recipe.Recipe{
+		Recipes: map[string]recipe.Recipe{
 			id.ArchArm.String(): {
 				Dir:   "arm",
 				Files: []string{"run.c", "aux.c", "aux.h"},
@@ -67,8 +67,8 @@ func MockFlaggedRun(name string) subject.Subject {
 	return subject.Subject{
 		Stats:      model.Statset{Threads: 2},
 		OrigLitmus: name + ".litmus",
-		Harnesses: map[string]recipe.Recipe{
-			id.ArchX8664.String(): MockHarness("x86"),
+		Recipes: map[string]recipe.Recipe{
+			id.ArchX8664.String(): MockRecipe("x86"),
 		},
 		Compiles: map[string]subject.CompileResult{
 			"gcc": MockSuccessfulCompile("gcc", name),
@@ -86,9 +86,9 @@ func MockTimeoutRun(name string) subject.Subject {
 	return subject.Subject{
 		Stats:      model.Statset{Threads: 4},
 		OrigLitmus: "baz.litmus",
-		Harnesses: map[string]recipe.Recipe{
-			id.ArchX8664.String(): MockHarness("x86"),
-			id.ArchPPC.String():   MockHarness("ppc"),
+		Recipes: map[string]recipe.Recipe{
+			id.ArchX8664.String(): MockRecipe("x86"),
+			id.ArchPPC.String():   MockRecipe("ppc"),
 		},
 		Compiles: map[string]subject.CompileResult{
 			"msvc": MockSuccessfulCompile("msvc", name),
@@ -113,10 +113,11 @@ func MockSuccessfulCompile(cstr string, sname string) subject.CompileResult {
 	}
 }
 
-// MockHarness constructs a mock harness at dir.
-func MockHarness(dir string) recipe.Recipe {
-	return recipe.Recipe{
-		Dir:   dir,
-		Files: []string{"run.c", "aux.c", "aux.h"},
-	}
+// MockRecipe constructs a mock recipe at dir.
+func MockRecipe(dir string) recipe.Recipe {
+	return recipe.New(
+		dir,
+		recipe.AddFiles("run.c", "aux.c", "aux.h"),
+		recipe.CompileAllCToExe(),
+	)
 }

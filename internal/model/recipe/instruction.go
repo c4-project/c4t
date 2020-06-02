@@ -11,8 +11,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 )
 
-//go:generate stringer -type Op
-
 // Instruction represents a single instruction in a recipe.
 //
 // Instructions target a stack machine in the machine node.
@@ -39,9 +37,14 @@ func (i Instruction) String() string {
 	}
 }
 
-// CompileBinInst produces a 'compile binary' instruction.
-func CompileBinInst() Instruction {
-	return Instruction{Op: CompileBin}
+// CompileExeInst produces a 'compile binary' instruction.
+func CompileExeInst() Instruction {
+	return Instruction{Op: CompileExe}
+}
+
+// CompileObjInst produces a 'compile object' instruction.
+func CompileObjInst() Instruction {
+	return Instruction{Op: CompileObj}
 }
 
 // PushInputInst produces a 'push input' instruction.

@@ -21,7 +21,7 @@ const (
 	// DirCompiles is the normalised directory for compile results.
 	DirCompiles = "compiles"
 	// DirHarnesses is the normalised directory for harness results.
-	DirHarnesses = "harnesses"
+	DirHarnesses = "recipes"
 )
 
 // HarnessDir gets the normalised harness directory under root and for architecture ID-string arch.

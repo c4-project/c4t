@@ -15,18 +15,19 @@ import (
 type Recipe struct {
 	Compile
 
-	// Instructions contains the instruction set for the compiler job, if the job kind is CompileRecipe.
-	Instructions []recipe.Instruction
+	// Recipe is the recipe to be compiled.
+	Recipe recipe.Recipe
 }
 
 // FromRecipe constructs a recipe compile from the recipe r, compiler c, and output file out.
 func FromRecipe(c *compiler.Compiler, r recipe.Recipe, out string) Recipe {
+	// TODO(@MattWindsor91): fix duplication in files?
 	return Recipe{
 		Compile: Compile{
 			Compiler: c,
 			In:       filekind.CSrc.FilterFiles(r.Paths()),
 			Out:      out,
 		},
-		Instructions: r.Instructions,
+		Recipe: r,
 	}
 }

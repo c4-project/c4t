@@ -20,7 +20,7 @@ import (
 // Config contains configuration used to run a lifter for a particular machine, perhaps across multiple plans.
 type Config struct {
 	// Maker is a harness maker.
-	Maker HarnessMaker
+	Maker SingleLifter
 
 	// Logger is the logger to use for this lifter.
 	// This may be nil, in which case the lifter will log silently.

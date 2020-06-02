@@ -27,6 +27,8 @@ import (
 type SingleRunner interface {
 	// RunCompiler runs the compiler job j.
 	// If applicable, errw will be connected to the compiler's standard error.
+	//
+	// Implementors should note that the paths in j are slash-paths, and will need converting to filepaths.
 	RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error
 }
 

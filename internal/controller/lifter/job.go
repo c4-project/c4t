@@ -33,7 +33,7 @@ type Job struct {
 	Backend *service.Backend
 
 	// Maker is the harness maker for this job.
-	Maker HarnessMaker
+	Maker SingleLifter
 
 	// Paths is the path resolver for this job.
 	Paths Pather
@@ -75,7 +75,7 @@ func (j *Job) check() error {
 	if j.Maker == nil {
 		return ErrMakerNil
 	}
-	// It's ok for j.Stderr to be nil, as the HarnessMaker is expected to deal with it.
+	// It's ok for j.Stderr to be nil, as the SingleLifter is expected to deal with it.
 	return nil
 }
 
@@ -97,7 +97,7 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 		OutDir:  dir,
 	}
 
-	files, err := j.Maker.MakeHarness(ctx, spec, j.Stderr)
+	files, err := j.Maker.Lift(ctx, spec, j.Stderr)
 	if err != nil {
 		return fmt.Errorf("when making harness for %s (arch %s): %w", j.Subject.Name, arch, err)
 	}

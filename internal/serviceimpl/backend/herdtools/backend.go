@@ -44,7 +44,7 @@ func (h Backend) ParseObs(_ context.Context, _ *service.Backend, r io.Reader, o 
 	return p.checkFinalState()
 }
 
-func (h Backend) MakeHarness(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error) {
+func (h Backend) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error) {
 	b := j.Backend
 	if b == nil {
 		return nil, fmt.Errorf("%w: backend in harness job", service.ErrNil)

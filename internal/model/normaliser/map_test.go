@@ -37,7 +37,7 @@ func ExampleMap_RenamesMatching() {
 				},
 			},
 		},
-		Harnesses: map[string]recipe.Recipe{
+		Recipes: map[string]recipe.Recipe{
 			"arm": {
 				Dir:   path.Join("burble", "armv8"),
 				Files: []string{"inky.c", "pinky.c"},
@@ -49,13 +49,13 @@ func ExampleMap_RenamesMatching() {
 		},
 	}
 	_, _ = n.Normalise(s)
-	for k, v := range n.Mappings.RenamesMatching(filekind.Any, filekind.InHarness) {
+	for k, v := range n.Mappings.RenamesMatching(filekind.Any, filekind.InRecipe) {
 		fmt.Println(k, "<-", v)
 	}
 
 	// Unordered output:
-	// root/harnesses/arm/inky.c <- burble/armv8/inky.c
-	// root/harnesses/arm/pinky.c <- burble/armv8/pinky.c
-	// root/harnesses/x86/inky.c <- burble/i386/inky.c
-	// root/harnesses/x86/pinky.c <- burble/i386/pinky.c
+	// root/recipes/arm/inky.c <- burble/armv8/inky.c
+	// root/recipes/arm/pinky.c <- burble/armv8/pinky.c
+	// root/recipes/x86/inky.c <- burble/i386/inky.c
+	// root/recipes/x86/pinky.c <- burble/i386/pinky.c
 }
