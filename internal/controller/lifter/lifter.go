@@ -28,14 +28,14 @@ var (
 	// ErrConfigNil occurs when we try to construct a lifter without config.
 	ErrConfigNil = errors.New("config nil")
 
-	// ErrMakerNil occurs when a lifter runs without a SingleLifter set.
-	ErrMakerNil = errors.New("harness maker nil")
+	// ErrDriverNil occurs when a lifter runs without a SingleLifter set.
+	ErrDriverNil = errors.New("driver nil")
 
 	// ErrNoBackend occurs when backend information is missing.
 	ErrNoBackend = errors.New("no backend provided")
 )
 
-// SingleLifter is an interface capturing the ability to make test harnesses.
+// SingleLifter is an interface capturing the ability to lift single jobs into recipes.
 type SingleLifter interface {
 	// Lift performs the lifting described by j.
 	// It returns a list outFiles of files created (C files, header files, etc.), and/or an error err.
@@ -89,7 +89,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-// Run runs a lifting job: taking every test subject in a plan and using a backend to lift each into a test harness.
+// Run runs a lifting job: taking every test subject in a plan and using a backend to lift each to a compilable recipe.
 func (l *Lifter) Run(ctx context.Context) (*plan.Plan, error) {
 	l.l.Println("preparing directories")
 	if err := l.conf.Paths.Prepare(l.plan.Arches(), l.plan.Corpus.Names()); err != nil {
@@ -128,7 +128,7 @@ func (l *Lifter) makeJob(s subject.Named, mrng *rand.Rand, resCh chan<- builder.
 		Arches:  l.plan.Arches(),
 		Backend: l.plan.Backend,
 		Paths:   l.conf.Paths,
-		Maker:   l.conf.Maker,
+		Driver:  l.conf.Driver,
 		Subject: s,
 		Rng:     rand.New(rand.NewSource(mrng.Int63())),
 		ResCh:   resCh,

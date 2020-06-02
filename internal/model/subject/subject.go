@@ -133,30 +133,30 @@ func (s *Subject) ensureCompileMap() {
 	}
 }
 
-// Recipe gets the harness for the architecture with id arch.
+// Recipe gets the recipe for the architecture with id arch.
 func (s *Subject) Recipe(arch id.ID) (recipe.Recipe, error) {
 	key := arch.String()
 	h, ok := s.Recipes[key]
 	if !ok {
-		return recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingHarness, key)
+		return recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingRecipe, key)
 	}
 	return h, nil
 }
 
-// AddRecipe sets the harness information for arch to h in this subject.
-// It fails if there already _is_ a harness for arch.
-func (s *Subject) AddRecipe(arch id.ID, h recipe.Recipe) error {
-	s.ensureHarnessMap()
+// AddRecipe sets the recipe information for arch to r in this subject.
+// It fails if there already _is_ a recipe for arch.
+func (s *Subject) AddRecipe(arch id.ID, r recipe.Recipe) error {
+	s.ensureRecipeMap()
 	key := arch.String()
 	if _, ok := s.Recipes[key]; ok {
-		return fmt.Errorf("%w: arch=%q", ErrDuplicateHarness, key)
+		return fmt.Errorf("%w: arch=%q", ErrDuplicateRecipe, key)
 	}
-	s.Recipes[key] = h
+	s.Recipes[key] = r
 	return nil
 }
 
-// ensureHarnessMap makes sure this subject has a harness map.
-func (s *Subject) ensureHarnessMap() {
+// ensureRecipeMap makes sure this subject has a recipe map.
+func (s *Subject) ensureRecipeMap() {
 	if s.Recipes == nil {
 		s.Recipes = make(map[string]recipe.Recipe)
 	}
@@ -184,7 +184,7 @@ func (s *Subject) AddRun(cid id.ID, r RunResult) error {
 	return nil
 }
 
-// ensureHarnessMap makes sure this subject has a harness map.
+// ensureRunMap makes sure this subject has a run map.
 func (s *Subject) ensureRunMap() {
 	if s.Runs == nil {
 		s.Runs = make(map[string]RunResult)

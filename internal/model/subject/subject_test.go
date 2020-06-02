@@ -8,8 +8,9 @@ package subject_test
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
@@ -56,8 +57,8 @@ func ExampleSubject_CompileResult() {
 	// clang: CompileFail a.out clang.log
 }
 
-// ExampleSubject_Harness is a testable example for Recipe.
-func ExampleSubject_Harness() {
+// ExampleSubject_Recipe is a testable example for Recipe.
+func ExampleSubject_Recipe() {
 	s := subject.Subject{Recipes: map[string]recipe.Recipe{
 		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
@@ -98,6 +99,8 @@ func ExampleSubject_RunOf() {
 // TestSubject_CompileResult_Missing checks that trying to get a compile for a missing compiler triggers
 // the appropriate error.
 func TestSubject_CompileResult_Missing(t *testing.T) {
+	t.Parallel()
+
 	var s subject.Subject
 	_, err := s.CompileResult(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompile, "missing compile result path")
@@ -105,6 +108,8 @@ func TestSubject_CompileResult_Missing(t *testing.T) {
 
 // TestSubject_AddCompileResult checks that AddCompileResult is working properly.
 func TestSubject_AddCompileResult(t *testing.T) {
+	t.Parallel()
+
 	var s subject.Subject
 	c := subject.CompileResult{
 		Result: subject.Result{Status: status.Ok},
@@ -117,17 +122,12 @@ func TestSubject_AddCompileResult(t *testing.T) {
 	mcomp := id.FromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
-		if err := s.AddCompileResult(mcomp, c); err != nil {
-			t.Fatalf("err when adding compile to empty subject: %v", err)
-		}
+		assert.NoError(t, s.AddCompileResult(mcomp, c), "err when adding compile to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
 		c2, err := s.CompileResult(mcomp)
-		if err != nil {
-			t.Fatalf("err when getting added compile: %v", err)
-		}
-		if !reflect.DeepEqual(c2, c) {
-			t.Fatalf("added compile (%v) came back wrong (%v)", c2, c)
+		if assert.NoError(t, err, "err when getting added compile") {
+			assert.Equalf(t, c, c2, "added compile (%v) came back wrong (%v)", c2, c)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
@@ -136,16 +136,18 @@ func TestSubject_AddCompileResult(t *testing.T) {
 	})
 }
 
-// TestSubject_Harness_Missing checks that trying to get a harness path for a missing arch triggers
+// TestSubject_Recipe_missing checks that trying to get a recipe for a missing arch triggers
 // the appropriate error.
-func TestSubject_Harness_Missing(t *testing.T) {
+func TestSubject_Recipe_missing(t *testing.T) {
 	var s subject.Subject
 	_, err := s.Recipe(id.FromString("x86.64"))
-	testhelp.ExpectErrorIs(t, err, subject.ErrMissingHarness, "missing harness path")
+	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRecipe, "missing recipe path")
 }
 
-// TestSubject_AddHarness checks that AddRecipe is working properly.
-func TestSubject_AddHarness(t *testing.T) {
+// TestSubject_AddRecipe checks that AddRecipe is working properly.
+func TestSubject_AddRecipe(t *testing.T) {
+	t.Parallel()
+
 	var s subject.Subject
 	h := recipe.Recipe{
 		Dir:   "foo",
@@ -155,28 +157,25 @@ func TestSubject_AddHarness(t *testing.T) {
 	march := id.ArchX8664
 
 	t.Run("initial-add", func(t *testing.T) {
-		if err := s.AddRecipe(march, h); err != nil {
-			t.Fatalf("err when adding harness to empty subject: %v", err)
-		}
+		assert.NoError(t, s.AddRecipe(march, h), "err when adding recipe to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
 		h2, err := s.Recipe(march)
-		if err != nil {
-			t.Fatalf("err when getting added harness: %v", err)
-		}
-		if !reflect.DeepEqual(h2, h) {
-			t.Fatalf("added harness (%v) came back wrong (%v)", h2, h)
+		if assert.NoError(t, err, "err when getting added recipe") {
+			assert.Equalf(t, h, h2, "added recipe (%v) came back wrong (%v)", h2, h)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
 		err := s.AddRecipe(march, recipe.Recipe{})
-		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateHarness, "adding harness twice")
+		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRecipe, "adding recipe twice")
 	})
 }
 
 // TestSubject_RunOf_Missing checks that trying to get a run for a missing compiler gives
 // the appropriate error.
 func TestSubject_RunOf_Missing(t *testing.T) {
+	t.Parallel()
+
 	var s subject.Subject
 	_, err := s.RunOf(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRun, "missing run result path")
@@ -184,23 +183,20 @@ func TestSubject_RunOf_Missing(t *testing.T) {
 
 // TestSubject_AddRun checks that AddRun is working properly.
 func TestSubject_AddRun(t *testing.T) {
+	t.Parallel()
+
 	var s subject.Subject
 	c := subject.RunResult{Result: subject.Result{Status: status.RunTimeout}}
 
 	mcomp := id.FromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
-		if err := s.AddRun(mcomp, c); err != nil {
-			t.Fatalf("err when adding run to empty subject: %v", err)
-		}
+		assert.NoError(t, s.AddRun(mcomp, c), "err when adding run to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
 		c2, err := s.RunOf(mcomp)
-		if err != nil {
-			t.Fatalf("err when getting added run: %v", err)
-		}
-		if !reflect.DeepEqual(c2, c) {
-			t.Fatalf("added run (%v) came back wrong (%v)", c2, c)
+		if assert.NoError(t, err, "err when getting added run") {
+			assert.Equalf(t, c, c2, "added run (%v) came back wrong (%v)", c2, c)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
@@ -212,6 +208,8 @@ func TestSubject_AddRun(t *testing.T) {
 // TestSubject_BestLitmus tests a few cases of BestLitmus.
 // It should be more comprehensive than the examples.
 func TestSubject_BestLitmus(t *testing.T) {
+	t.Parallel()
+
 	// Note that the presence of 'err' overrides 'want'.
 	cases := map[string]struct {
 		s    subject.Subject
@@ -225,7 +223,10 @@ func TestSubject_BestLitmus(t *testing.T) {
 		"fuzz":             {s: subject.Subject{OrigLitmus: "foo", Fuzz: &subject.Fuzz{Files: subject.FuzzFileset{Litmus: "bar"}}}, err: nil, want: "bar"},
 	}
 	for name, c := range cases {
+		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := c.s.BestLitmus()
 			switch {
 			case err != nil && c.err == nil:

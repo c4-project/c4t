@@ -35,7 +35,7 @@ var (
 	ErrDriverNil = errors.New("driver nil")
 )
 
-// Compiler contains the configuration required to compile the harnesses for a single test run.
+// Compiler contains the configuration required to compile the recipes for a single test run.
 type Compiler struct {
 	// l is the logger for this batch compiler.
 	l *log.Logger

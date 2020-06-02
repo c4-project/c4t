@@ -5,8 +5,6 @@
 
 // Package config describes the top-level tester configuration.
 
-// TODO(@MattWindsor91): slowly wrest control of the configuration from OCaml act.
-
 package config
 
 import (
@@ -25,7 +23,7 @@ import (
 
 // Config is a top-level tester config struct.
 type Config struct {
-	// Backend contains information about the backend being used to generate test harnesses.
+	// Backend contains information about the backend being used to generate recipes.
 	Backend *service.Backend `toml:"backend,omitempty"`
 
 	// Machines enumerates the machines available for testing.

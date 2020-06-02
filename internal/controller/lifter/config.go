@@ -19,8 +19,8 @@ import (
 
 // Config contains configuration used to run a lifter for a particular machine, perhaps across multiple plans.
 type Config struct {
-	// Maker is a harness maker.
-	Maker SingleLifter
+	// Driver is a single-job lifter.
+	Driver SingleLifter
 
 	// Logger is the logger to use for this lifter.
 	// This may be nil, in which case the lifter will log silently.
@@ -32,7 +32,7 @@ type Config struct {
 	// Paths does path resolution and preparation for the incoming lifter.
 	Paths Pather
 
-	// Stderr is the writer to which standard error (eg from the harness maker) should be sent.
+	// Stderr is the writer to which standard error (eg from the lifting backend) should be sent.
 	Stderr io.Writer
 }
 
@@ -41,8 +41,8 @@ func (c *Config) Check() error {
 	if c.Paths == nil {
 		return iohelp.ErrPathsetNil
 	}
-	if c.Maker == nil {
-		return ErrMakerNil
+	if c.Driver == nil {
+		return ErrDriverNil
 	}
 	return nil
 }

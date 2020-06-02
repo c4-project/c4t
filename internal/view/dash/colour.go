@@ -19,9 +19,9 @@ const (
 	colourOptNormal = cell.ColorMagenta
 	colourOptBreak  = cell.ColorRed
 
-	colourAdd     = cell.ColorBlue
-	colourHarness = cell.ColorCyan
-	colourRun     = cell.ColorGreen
+	colourAdd  = cell.ColorBlue
+	colourLift = cell.ColorCyan
+	colourRun  = cell.ColorGreen
 
 	colourUnknown        = cell.ColorWhite
 	colourOk             = cell.ColorGreen

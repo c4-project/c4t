@@ -106,8 +106,8 @@ func (b *Builder) runRequest(r Request) error {
 		return b.add(r.Name, subject.Subject(*r.Add))
 	case r.Compile != nil:
 		return b.addCompile(r.Name, r.Compile.CompilerID, r.Compile.Result)
-	case r.Harness != nil:
-		return b.addHarness(r.Name, r.Harness.Arch, r.Harness.Harness)
+	case r.Recipe != nil:
+		return b.addRecipe(r.Name, r.Recipe.Arch, r.Recipe.Recipe)
 	case r.Run != nil:
 		return b.addRun(r.Name, r.Run.CompilerID, r.Run.Result)
 	default:
@@ -125,9 +125,9 @@ func (b *Builder) addCompile(name string, cid id.ID, res subject.CompileResult) 
 	})
 }
 
-func (b *Builder) addHarness(name string, arch id.ID, h recipe.Recipe) error {
+func (b *Builder) addRecipe(name string, arch id.ID, r recipe.Recipe) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
-		return s.AddRecipe(arch, h)
+		return s.AddRecipe(arch, r)
 	})
 }
 

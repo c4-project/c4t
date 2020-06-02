@@ -15,9 +15,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// MockHarnessMaker mocks SingleLifter.
-type MockHarnessMaker struct {
-	// SeenSpecs collects the HarnessSpecs that the harness maker has seen.
+// MockSingleLifter mocks SingleLifter.
+type MockSingleLifter struct {
+	// SeenSpecs collects the lifter jobs that the lifter has seen.
 	SeenSpecs []job.Lifter
 
 	// Err is the error to return on calls to Lift.
@@ -25,7 +25,7 @@ type MockHarnessMaker struct {
 }
 
 // Lift mocks Lift.
-func (m *MockHarnessMaker) Lift(_ context.Context, spec job.Lifter, _ io.Writer) (outFiles []string, err error) {
+func (m *MockSingleLifter) Lift(_ context.Context, spec job.Lifter, _ io.Writer) (outFiles []string, err error) {
 	m.SeenSpecs = append(m.SeenSpecs, spec)
 	return []string{path.Join(spec.OutDir, "out.c")}, m.Err
 }

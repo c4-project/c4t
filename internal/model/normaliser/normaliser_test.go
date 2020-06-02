@@ -71,8 +71,8 @@ var testSubjects = map[string]func(root string) testCase{
 			},
 		}
 	},
-	"harness": func(root string) testCase {
-		h := func(arch, file string) string { return path.Join(root, normaliser.DirHarnesses, arch, file) }
+	"recipe": func(root string) testCase {
+		h := func(arch, file string) string { return path.Join(root, normaliser.DirRecipes, arch, file) }
 		return testCase{
 			in: subject.Subject{
 				Recipes: map[string]recipe.Recipe{
@@ -89,11 +89,11 @@ var testSubjects = map[string]func(root string) testCase{
 			out: subject.Subject{
 				Recipes: map[string]recipe.Recipe{
 					"arm": {
-						Dir:   normaliser.HarnessDir(root, "arm"),
+						Dir:   normaliser.RecipeDir(root, "arm"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 					"x86": {
-						Dir:   normaliser.HarnessDir(root, "x86"),
+						Dir:   normaliser.RecipeDir(root, "x86"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 				},

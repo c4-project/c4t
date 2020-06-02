@@ -26,7 +26,7 @@ func TestLoc_Matches(t *testing.T) {
 			matcher: filekind.Any,
 			want:    true,
 		},
-		"harness/harness": {
+		"recipe/recipe": {
 			matchee: filekind.InRecipe,
 			matcher: filekind.InRecipe,
 			want:    true,

@@ -15,7 +15,7 @@ const (
 	InFuzz
 	// InCompile marks that a mapping is part of a compile.
 	InCompile
-	// InRecipe marks that a mapping is part of a harness.
+	// InRecipe marks that a mapping is part of a recipe.
 	InRecipe
 )
 

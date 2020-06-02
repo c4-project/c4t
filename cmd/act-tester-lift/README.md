@@ -2,7 +2,7 @@
 
 # NAME
 
-act-tester-lift - runs the harness-lifter phase of an ACT test
+act-tester-lift - runs the lifter phase of an ACT test
 
 # SYNOPSIS
 

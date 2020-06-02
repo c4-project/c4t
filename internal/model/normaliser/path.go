@@ -20,11 +20,11 @@ const (
 	FileFuzzTrace = "fuzz.trace"
 	// DirCompiles is the normalised directory for compile results.
 	DirCompiles = "compiles"
-	// DirHarnesses is the normalised directory for harness results.
-	DirHarnesses = "recipes"
+	// DirRecipes is the normalised directory for recipe results.
+	DirRecipes = "recipes"
 )
 
-// HarnessDir gets the normalised harness directory under root and for architecture ID-string arch.
-func HarnessDir(root, arch string) string {
-	return path.Join(root, DirHarnesses, arch)
+// RecipeDir gets the normalised recipe directory under root and for architecture ID-string arch.
+func RecipeDir(root, arch string) string {
+	return path.Join(root, DirRecipes, arch)
 }

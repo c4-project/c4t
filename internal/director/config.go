@@ -127,7 +127,7 @@ type Env struct {
 	// Fuzzer is a single-shot fuzzing driver.
 	Fuzzer fuzzer.SingleFuzzer
 
-	// Lifter is a single-shot harness maker.
+	// Lifter is a single-shot recipe lifter.
 	Lifter lifter.SingleLifter
 
 	// Planner instructs any planners built for this director as to how to acquire information about compilers, etc.
@@ -140,7 +140,7 @@ func (e Env) Check() error {
 		return fuzzer.ErrDriverNil
 	}
 	if e.Lifter == nil {
-		return lifter.ErrMakerNil
+		return lifter.ErrDriverNil
 	}
 	// TODO(@MattWindsor): check source
 	return nil

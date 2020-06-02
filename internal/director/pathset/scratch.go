@@ -16,7 +16,7 @@ import (
 type Scratch struct {
 	// DirFuzz is the directory to which fuzzed subjects will be output.
 	DirFuzz string
-	// DirLift is the directory to which lifted harnesses will be output.
+	// DirLift is the directory to which lifter outputs will be written.
 	DirLift string
 	// DirPlan is the directory to which plans will be written.
 	DirPlan string

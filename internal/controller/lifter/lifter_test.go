@@ -19,7 +19,7 @@ import (
 // makeConfig makes a valid, but mocked-up, lifter config.
 func makeConfig() *lifter.Config {
 	return &lifter.Config{
-		Maker: &lifter.MockHarnessMaker{
+		Driver: &lifter.MockSingleLifter{
 			SeenSpecs: nil,
 			Err:       nil,
 		},
@@ -51,10 +51,10 @@ func TestNew_errors(t *testing.T) {
 		},
 		"nil-maker": {
 			cdelta: func(c *lifter.Config) *lifter.Config {
-				c.Maker = nil
+				c.Driver = nil
 				return c
 			},
-			err: lifter.ErrMakerNil,
+			err: lifter.ErrDriverNil,
 		},
 		"nil-paths": {
 			cdelta: func(c *lifter.Config) *lifter.Config {

@@ -13,12 +13,12 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// Lifter is a specification of how to lift a litmus test into a compilable 'test harness' and compile recipe.
+// Lifter is a specification of how to lift a test into a compilable recipe.
 type Lifter struct {
-	// Backend is the backend to use to make this harness.
+	// Backend is the backend to use to perform the lifting.
 	Backend *service.Backend
 
-	// Arch is the ID of the architecture for which a harness should be prepared.
+	// Arch is the ID of the architecture for which a recipe should be prepared.
 	Arch id.ID
 
 	// InFile is the path to the input litmus test file.
@@ -29,7 +29,7 @@ type Lifter struct {
 }
 
 // OutFiles reads s.OutDir as a directory and returns its contents as qualified paths.
-// This is useful for using a harness job to feed a compiler job.
+// This is useful for using a recipe job to feed a compiler job.
 func (s Lifter) OutFiles() ([]string, error) {
 	fs, err := ioutil.ReadDir(s.OutDir)
 	if err != nil {

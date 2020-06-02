@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package runner contains the part of act-tester that runs compiled harness binaries and interprets their output.
+// Package runner contains the part of act-tester that runs compiled test binaries and interprets their output.
 package runner
 
 import (

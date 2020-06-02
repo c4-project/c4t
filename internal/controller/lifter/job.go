@@ -32,13 +32,13 @@ type Job struct {
 	// Backend is the backend that this job will use.
 	Backend *service.Backend
 
-	// Maker is the harness maker for this job.
-	Maker SingleLifter
+	// Driver is the single-lift driver for this job.
+	Driver SingleLifter
 
 	// Paths is the path resolver for this job.
 	Paths Pather
 
-	// Stderr is the writer to which harness maker stderr should be redirected.
+	// Stderr is the writer to which lifter stderr should be redirected.
 	Stderr io.Writer
 
 	// Normalise is the subject that we are trying to lift.
@@ -72,8 +72,8 @@ func (j *Job) check() error {
 	if j.Backend == nil {
 		return ErrNoBackend
 	}
-	if j.Maker == nil {
-		return ErrMakerNil
+	if j.Driver == nil {
+		return ErrDriverNil
 	}
 	// It's ok for j.Stderr to be nil, as the SingleLifter is expected to deal with it.
 	return nil
@@ -97,16 +97,16 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 		OutDir:  dir,
 	}
 
-	files, err := j.Maker.Lift(ctx, spec, j.Stderr)
+	files, err := j.Driver.Lift(ctx, spec, j.Stderr)
 	if err != nil {
-		return fmt.Errorf("when making harness for %s (arch %s): %w", j.Subject.Name, arch, err)
+		return fmt.Errorf("when lifting %s (arch %s): %w", j.Subject.Name, arch, err)
 	}
 
 	return j.makeBuilderReq(arch, dir, files).SendTo(ctx, j.ResCh)
 }
 
 func (j *Job) makeBuilderReq(arch id.ID, dir string, files []string) builder.Request {
-	return builder.HarnessRequest(
+	return builder.RecipeRequest(
 		j.Subject.Name,
 		arch,
 		recipe.Recipe{Dir: dir, Files: files},

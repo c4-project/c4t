@@ -266,7 +266,7 @@ func (i *Instance) makeLifterConfig(obs []builder.Observer) (*lifter.Config, err
 	}
 
 	lc := lifter.Config{
-		Maker:     hm,
+		Driver:    hm,
 		Logger:    i.Logger,
 		Observers: obs,
 		Paths:     lifter.NewPathset(i.ScratchPaths.DirLift),

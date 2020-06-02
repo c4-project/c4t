@@ -29,7 +29,7 @@ const defaultOutDir = "lift_results"
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  "act-tester-lift",
-		Usage: "runs the harness-lifter phase of an ACT test",
+		Usage: "runs the lifter phase of an ACT test",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
@@ -57,7 +57,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 
 func makeConfig(ctx *c.Context, l *log.Logger, errw io.Writer) *lifter.Config {
 	return &lifter.Config{
-		Maker:     &backend.BResolve,
+		Driver:    &backend.BResolve,
 		Logger:    l,
 		Observers: singleobs.Builder(l),
 		Paths:     lifter.NewPathset(stdflag.OutDirFromCli(ctx)),

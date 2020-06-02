@@ -30,7 +30,8 @@ type Job struct {
 	// MachConfig points to the runner config.
 	Conf *Config
 
-	// Backend is the backend used to produce the harnesses being run.
+	// Backend is the backend used to produce the recipes being run.
+	// We retain the backend to be able to work out how to parse the run results.
 	Backend *service.Backend
 
 	// ResCh is the channel to which we're sending the run result.

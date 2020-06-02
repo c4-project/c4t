@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package obs concerns 'observations': the end result of running a test harness on a particular machine.
+// Package obs concerns 'observations': the end result of running a test on a particular machine.
 package obs
 
 import "github.com/MattWindsor91/act-tester/internal/model/status"

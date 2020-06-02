@@ -66,21 +66,21 @@ func (n *Normaliser) fuzz(of *subject.Fuzz) *subject.Fuzz {
 	return &f
 }
 
-func (n *Normaliser) recipes(hs map[string]recipe.Recipe) map[string]recipe.Recipe {
-	if hs == nil {
+func (n *Normaliser) recipes(rs map[string]recipe.Recipe) map[string]recipe.Recipe {
+	if rs == nil {
 		return nil
 	}
 
-	nhs := make(map[string]recipe.Recipe, len(hs))
-	for archstr, h := range hs {
-		nhs[archstr] = n.harness(archstr, h)
+	nrs := make(map[string]recipe.Recipe, len(rs))
+	for archstr, r := range rs {
+		nrs[archstr] = n.recipe(archstr, r)
 	}
-	return nhs
+	return nrs
 }
 
-func (n *Normaliser) harness(archstr string, h recipe.Recipe) recipe.Recipe {
+func (n *Normaliser) recipe(archstr string, h recipe.Recipe) recipe.Recipe {
 	oldPaths := h.Paths()
-	h.Dir = HarnessDir(n.root, archstr)
+	h.Dir = RecipeDir(n.root, archstr)
 	for i, np := range h.Paths() {
 		n.add(oldPaths[i], np, filekind.GuessFromFile(np), filekind.InRecipe)
 	}

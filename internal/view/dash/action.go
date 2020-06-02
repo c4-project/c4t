@@ -66,8 +66,8 @@ func (o *actionObserver) OnBuildRequest(r builder.Request) {
 		o.onAdd(r.Name)
 	case r.Compile != nil:
 		o.onCompile(r.Name, r.Compile)
-	case r.Harness != nil:
-		o.onHarness(r.Name, r.Harness)
+	case r.Recipe != nil:
+		o.onRecipe(r.Name, r.Recipe)
 	case r.Run != nil:
 		o.onRun(r.Name, r.Run)
 	}
@@ -94,9 +94,9 @@ func (o *actionObserver) onMachOp(sname, opname string, cid id.ID, r subject.Res
 	o.logAndStepGauge(opname, desc, statusColours[r.Status])
 }
 
-// onHarness acknowledges the addition of a harness to a action being built.
-func (o *actionObserver) onHarness(sname string, b *builder.Harness) {
-	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colourHarness)
+// onRecipe acknowledges the addition of a recipe to a action being built.
+func (o *actionObserver) onRecipe(sname string, b *builder.Recipe) {
+	o.logAndStepGauge("LIFT", idQualSubjectDesc(sname, b.Arch), colourLift)
 }
 
 func suffixOfStatus(s status.Status) string {

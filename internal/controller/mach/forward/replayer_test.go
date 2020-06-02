@@ -50,14 +50,14 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 			Name:    "foo",
 			Subject: subject.Subject{OrigLitmus: "foo.litmus"},
 		})
-	harness := builder.HarnessRequest(
+	rec := builder.RecipeRequest(
 		"foo",
 		id.ArchX8664,
-		recipe.Recipe{
-			Dir:   "harness",
-			Files: []string{"foo.c", "bar.c", "baz.c"},
-		})
-	compile := builder.CompileRequest(
+		recipe.New(
+			"recipe",
+			recipe.AddFiles("foo.c", "bar.c", "baz.c"),
+		))
+	com := builder.CompileRequest(
 		"foo",
 		id.CStyleGCC,
 		subject.CompileResult{
@@ -77,8 +77,8 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {
 		builder.OnBuildStart(m, obs)
 		builder.OnBuildRequest(add, obs)
-		builder.OnBuildRequest(harness, obs)
-		builder.OnBuildRequest(compile, obs)
+		builder.OnBuildRequest(rec, obs)
+		builder.OnBuildRequest(com, obs)
 		builder.OnBuildRequest(run, obs)
 		builder.OnBuildFinish(obs)
 	}, func(obs *mocks.Observer) {
@@ -91,11 +91,11 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 				m.Request.Add != nil
 		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
 			return m.Kind == builder.BuildRequest &&
-				m.Request.Name == harness.Name &&
-				m.Request.Harness != nil
+				m.Request.Name == rec.Name &&
+				m.Request.Recipe != nil
 		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
 			return m.Kind == builder.BuildRequest &&
-				m.Request.Name == compile.Name &&
+				m.Request.Name == com.Name &&
 				m.Request.Compile != nil
 		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
 			return m.Kind == builder.BuildRequest &&

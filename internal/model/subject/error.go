@@ -11,8 +11,8 @@ var (
 	// ErrDuplicateCompile occurs when one tries to insert a compile result that already exists.
 	ErrDuplicateCompile = errors.New("duplicate compile result")
 
-	// ErrDuplicateHarness occurs when one tries to insert a harness that already exists.
-	ErrDuplicateHarness = errors.New("duplicate harness")
+	// ErrDuplicateRecipe occurs when one tries to insert a recipe that already exists.
+	ErrDuplicateRecipe = errors.New("duplicate recipe")
 
 	// ErrDuplicateRun occurs when one tries to insert a run that already exists.
 	ErrDuplicateRun = errors.New("duplicate run")
@@ -20,8 +20,8 @@ var (
 	// ErrMissingCompile occurs on requests for compile results for a compiler that do not have them.
 	ErrMissingCompile = errors.New("no such compile result")
 
-	// ErrMissingHarness occurs on requests for harness paths for an arch that do not have them.
-	ErrMissingHarness = errors.New("no such harness")
+	// ErrMissingRecipe occurs on requests for recipe paths for an arch that do not have them.
+	ErrMissingRecipe = errors.New("no such recipe")
 
 	// ErrMissingRun occurs on requests for runs for a compiler that do not have them.
 	ErrMissingRun = errors.New("no such run")
