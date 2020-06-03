@@ -13,6 +13,8 @@ import (
 	"log"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
@@ -35,9 +37,9 @@ var (
 // SingleLifter is an interface capturing the ability to lift single jobs into recipes.
 type SingleLifter interface {
 	// Lift performs the lifting described by j.
-	// It returns a list outFiles of files created (C files, header files, etc.), and/or an error err.
+	// It returns a recipe describing the files (C files, header files, etc.) created and how to use them, or an error.
 	// Any error output from child processes should be sent to errw, if it is non-nil.
-	Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error)
+	Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error)
 }
 
 //go:generate mockery -name SingleLifter

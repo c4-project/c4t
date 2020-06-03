@@ -11,8 +11,6 @@ import (
 	"io"
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
-
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
@@ -97,18 +95,10 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 		OutDir:  dir,
 	}
 
-	files, err := j.Driver.Lift(ctx, spec, j.Stderr)
+	r, err := j.Driver.Lift(ctx, spec, j.Stderr)
 	if err != nil {
 		return fmt.Errorf("when lifting %s (arch %s): %w", j.Subject.Name, arch, err)
 	}
 
-	return j.makeBuilderReq(arch, dir, files).SendTo(ctx, j.ResCh)
-}
-
-func (j *Job) makeBuilderReq(arch id.ID, dir string, files []string) builder.Request {
-	return builder.RecipeRequest(
-		j.Subject.Name,
-		arch,
-		recipe.Recipe{Dir: dir, Files: files},
-	)
+	return builder.RecipeRequest(j.Subject.Name, arch, r).SendTo(ctx, j.ResCh)
 }

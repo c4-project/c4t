@@ -12,6 +12,8 @@ import (
 	"io"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
@@ -44,10 +46,11 @@ func (h Backend) ParseObs(_ context.Context, _ *service.Backend, r io.Reader, o 
 	return p.checkFinalState()
 }
 
-func (h Backend) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error) {
+func (h Backend) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error) {
 	b := j.Backend
+
 	if b == nil {
-		return nil, fmt.Errorf("%w: backend in harness job", service.ErrNil)
+		return recipe.Recipe{}, fmt.Errorf("%w: backend in harness job", service.ErrNil)
 	}
 
 	r := h.DefaultRun
@@ -56,16 +59,28 @@ func (h Backend) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFil
 	}
 	args, err := h.Impl.Args(j, r)
 	if err != nil {
-		return nil, err
+		return recipe.Recipe{}, err
 	}
 
 	cmd := exec.CommandContext(ctx, r.Cmd, args...)
 	cmd.Stderr = errw
 	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("running %s: %w", r.Cmd, err)
+		return recipe.Recipe{}, fmt.Errorf("running %s: %w", r.Cmd, err)
 	}
 
-	return j.OutFiles()
+	return h.makeRecipe(j)
+}
+
+func (h Backend) makeRecipe(j job.Lifter) (recipe.Recipe, error) {
+	fs, err := j.OutFiles()
+	if err != nil {
+		return recipe.Recipe{}, err
+	}
+	return recipe.New(j.OutDir,
+		recipe.AddFiles(fs...),
+		// TODO(@MattWindsor91): delitmus support
+		recipe.CompileAllCToExe(),
+	), nil
 }
 
 // BackendImpl describes the functionality that differs between Herdtools-style backends.

@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
@@ -55,10 +57,10 @@ type Resolver struct {
 }
 
 // Lift delegates lifting to the appropriate maker for j.
-func (r *Resolver) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error) {
-	var bi Backend
-	if bi, err = r.Get(j.Backend); err != nil {
-		return nil, err
+func (r *Resolver) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error) {
+	bi, err := r.Get(j.Backend)
+	if err != nil {
+		return recipe.Recipe{}, err
 	}
 	return bi.Lift(ctx, j, errw)
 }
