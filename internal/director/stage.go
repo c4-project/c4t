@@ -27,7 +27,7 @@ type StageConfig struct {
 	// Fuzz contains configuration for the instance's fuzz stage.
 	Fuzz *fuzzer.Config
 	// Lift contains configuration for the instance's lift stage.
-	Lift *lifter.Config
+	Lift *lifter.Lifter
 	// Invoke contains configuration for the instance's invoke stage.
 	Invoke *rmach.Invoker
 	// Analyse contains configuration for the instance's analysis stage.

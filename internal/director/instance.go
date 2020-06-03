@@ -12,8 +12,7 @@ import (
 	"log"
 	"time"
 
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
-
+	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
@@ -205,7 +204,7 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Fuzz, err = i.makeFuzzerConfig(bobs); err != nil {
 		return nil, fmt.Errorf("when making fuzzer config: %w", err)
 	}
-	if sc.Lift, err = i.makeLifterConfig(bobs); err != nil {
+	if sc.Lift, err = i.makeLifter(bobs); err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
 	if sc.Invoke, err = i.makeInvoker(cobs, bobs); err != nil {
@@ -259,23 +258,16 @@ func (i *Instance) makeFuzzerConfig(obs []builder.Observer) (*fuzzer.Config, err
 	return &fc, nil
 }
 
-func (i *Instance) makeLifterConfig(obs []builder.Observer) (*lifter.Config, error) {
-	hm := i.Env.Lifter
-	if hm == nil {
-		return nil, errors.New("no single lifter provided")
-	}
-
-	lc := lifter.Config{
-		Driver:    hm,
-		Logger:    i.Logger,
-		Observers: obs,
-		Paths:     lifter.NewPathset(i.ScratchPaths.DirLift),
-	}
-
-	return &lc, nil
+func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
+	return lifter.New(
+		i.Env.Lifter,
+		lifter.NewPathset(i.ScratchPaths.DirLift),
+		lifter.LogTo(i.Logger),
+		lifter.ObserveWith(obs...),
+	)
 }
 
-func (i *Instance) makeInvoker(cobs []copy2.Observer, bobs []builder.Observer) (*rmach.Invoker, error) {
+func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) (*rmach.Invoker, error) {
 	return rmach.New(i.ScratchPaths.DirRun,
 		stdflag.MachInvoker{
 			// TODO(@MattWindsor91): this is a bit messy.

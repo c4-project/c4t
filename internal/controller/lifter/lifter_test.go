@@ -15,7 +15,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
 // TestNew_errors tests the error result of New in various situations.
@@ -23,48 +22,27 @@ func TestNew_errors(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		// cdelta modifies the configuration from a known-working value.
-		cdelta func(*lifter.Config) *lifter.Config
-		// pdelta modifies the plan from a known-working value.
-		pdelta func(*plan.Plan) *plan.Plan
+		// ddelta modifies the driver from a known-working value.
+		ddelta func(*mocks.SingleLifter) lifter.SingleLifter
+		// padelta modifies the pather from a known-working value.
+		pdelta func(*mocks.Pather) lifter.Pather
 		// err is any error expected to occur on constructing with the modified plan and configuraiton.
 		err error
 	}{
 		"ok": {
 			err: nil,
 		},
-		"nil-config": {
-			cdelta: func(c *lifter.Config) *lifter.Config {
+		"nil-driver": {
+			ddelta: func(l *mocks.SingleLifter) lifter.SingleLifter {
 				return nil
-			},
-			err: lifter.ErrConfigNil,
-		},
-		"nil-maker": {
-			cdelta: func(c *lifter.Config) *lifter.Config {
-				c.Driver = nil
-				return c
 			},
 			err: lifter.ErrDriverNil,
 		},
 		"nil-paths": {
-			cdelta: func(c *lifter.Config) *lifter.Config {
-				c.Paths = nil
-				return c
-			},
-			err: iohelp.ErrPathsetNil,
-		},
-		"nil-plan": {
-			pdelta: func(p *plan.Plan) *plan.Plan {
+			pdelta: func(p *mocks.Pather) lifter.Pather {
 				return nil
 			},
-			err: plan.ErrNil,
-		},
-		"nil-backend": {
-			pdelta: func(p *plan.Plan) *plan.Plan {
-				p.Backend = nil
-				return p
-			},
-			err: lifter.ErrNoBackend,
+			err: iohelp.ErrPathsetNil,
 		},
 	}
 
@@ -75,23 +53,23 @@ func TestNew_errors(t *testing.T) {
 
 			var (
 				msl mocks.SingleLifter
+				sl  lifter.SingleLifter
 				mpl mocks.Pather
+				pl  lifter.Pather
 			)
-			cfg := &lifter.Config{
-				Driver: &msl,
-				Paths:  &mpl,
-				Stderr: nil,
-			}
-			if f := c.cdelta; f != nil {
-				cfg = f(cfg)
-			}
 
-			p := plan.Mock()
+			if f := c.ddelta; f != nil {
+				sl = f(&msl)
+			} else {
+				sl = &msl
+			}
 			if f := c.pdelta; f != nil {
-				p = f(p)
+				pl = f(&mpl)
+			} else {
+				pl = &mpl
 			}
 
-			_, err := lifter.New(cfg, p)
+			_, err := lifter.New(sl, pl)
 			testhelp.ExpectErrorIs(t, err, c.err, "in New()")
 			msl.AssertExpectations(t)
 		})

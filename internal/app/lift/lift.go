@@ -47,20 +47,23 @@ func flags() []c.Flag {
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
 	l := log.New(errw, "", 0)
-	cfg := makeConfig(ctx, l, errw)
+	lft, err := makeLifter(ctx, l, errw)
+	if err != nil {
+		return err
+	}
 	pf, err := stdflag.PlanFileFromCli(ctx)
 	if err != nil {
 		return err
 	}
-	return view.RunOnPlanFile(ctx.Context, cfg, pf, outw)
+	return view.RunOnPlanFile(ctx.Context, lft, pf, outw)
 }
 
-func makeConfig(ctx *c.Context, l *log.Logger, errw io.Writer) *lifter.Config {
-	return &lifter.Config{
-		Driver:    &backend.BResolve,
-		Logger:    l,
-		Observers: singleobs.Builder(l),
-		Paths:     lifter.NewPathset(stdflag.OutDirFromCli(ctx)),
-		Stderr:    errw,
-	}
+func makeLifter(ctx *c.Context, l *log.Logger, errw io.Writer) (*lifter.Lifter, error) {
+	return lifter.New(
+		&backend.BResolve,
+		lifter.NewPathset(stdflag.OutDirFromCli(ctx)),
+		lifter.LogTo(l),
+		lifter.ObserveWith(singleobs.Builder(l)...),
+		lifter.SendStderrTo(errw),
+	)
 }

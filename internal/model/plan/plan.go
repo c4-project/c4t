@@ -82,3 +82,8 @@ func (p *Plan) Arches() []id.ID {
 func (p *Plan) CompilerIDs() ([]id.ID, error) {
 	return id.MapKeys(p.Compilers)
 }
+
+// MaxNumRecipes counts the upper bound on the number of recipes that need producing for this plan.
+func (p *Plan) MaxNumRecipes() int {
+	return len(p.Arches()) * len(p.Corpus)
+}

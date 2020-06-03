@@ -25,9 +25,6 @@ import (
 )
 
 var (
-	// ErrConfigNil occurs when we try to construct a lifter without config.
-	ErrConfigNil = errors.New("config nil")
-
 	// ErrDriverNil occurs when a lifter runs without a SingleLifter set.
 	ErrDriverNil = errors.New("driver nil")
 
@@ -47,38 +44,61 @@ type SingleLifter interface {
 
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {
-	// conf is the configuration used for this lifter.
-	conf Config
-
-	// plan is the plan on which this lifter is operating.
-	plan plan.Plan
+	// driver is a single-job lifter.
+	driver SingleLifter
 
 	// l is the logger to use for this lifter.
 	l *log.Logger
+
+	// obs track the lifter's progress across a corpus.
+	obs []builder.Observer
+
+	// paths does path resolution and preparation for the incoming lifter.
+	paths Pather
+
+	// errw is the writer to which standard error (eg from the lifting backend) should be sent.
+	errw io.Writer
 }
 
-// New constructs a new Lifter given config c and plan p.
-func New(c *Config, p *plan.Plan) (*Lifter, error) {
-	if err := checkConfig(c); err != nil {
+// New constructs a new Lifter given driver d, path resolver p, and options os.
+func New(d SingleLifter, p Pather, os ...Option) (*Lifter, error) {
+	if err := checkConfig(d, p); err != nil {
 		return nil, err
 	}
-	if err := checkPlan(p); err != nil {
+	l := Lifter{driver: d, paths: p}
+	if err := Options(os...)(&l); err != nil {
 		return nil, err
-	}
-
-	l := Lifter{
-		conf: *c,
-		plan: *p,
-		l:    iohelp.EnsureLog(c.Logger),
 	}
 	return &l, nil
 }
 
-func checkConfig(c *Config) error {
-	if c == nil {
-		return ErrConfigNil
+func checkConfig(d SingleLifter, p Pather) error {
+	if d == nil {
+		return ErrDriverNil
 	}
-	return c.Check()
+	if p == nil {
+		return iohelp.ErrPathsetNil
+	}
+	return nil
+}
+
+// Run runs a lifting job: taking every test subject in p and using a backend to lift each to a compilable recipe.
+func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	if err := checkPlan(p); err != nil {
+		return nil, err
+	}
+
+	l.l.Println("preparing directories")
+	if err := l.prepareDirs(p); err != nil {
+		return nil, err
+	}
+
+	return l.lift(ctx, *p)
+}
+
+func (l *Lifter) prepareDirs(p *plan.Plan) error {
+	l.l.Println("preparing directories")
+	return l.paths.Prepare(p.Arches(), p.Corpus.Names())
 }
 
 func checkPlan(p *plan.Plan) error {
@@ -91,54 +111,38 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-// Run runs a lifting job: taking every test subject in a plan and using a backend to lift each to a compilable recipe.
-func (l *Lifter) Run(ctx context.Context) (*plan.Plan, error) {
-	l.l.Println("preparing directories")
-	if err := l.conf.Paths.Prepare(l.plan.Arches(), l.plan.Corpus.Names()); err != nil {
-		return nil, err
-	}
-
-	err := l.lift(ctx)
-	return &l.plan, err
-}
-
-func (l *Lifter) lift(ctx context.Context) error {
+func (l *Lifter) lift(ctx context.Context, p plan.Plan) (*plan.Plan, error) {
 	l.l.Println("now lifting")
 
 	cfg := builder.Config{
-		Init:      l.plan.Corpus,
-		Observers: l.conf.Observers,
+		Init:      p.Corpus,
+		Observers: l.obs,
 		Manifest: builder.Manifest{
 			Name:  "lift",
-			NReqs: l.count(),
+			NReqs: p.MaxNumRecipes(),
 		},
 	}
 
-	mrng := l.plan.Metadata.Rand()
+	mrng := p.Metadata.Rand()
 
 	var err error
 	// TODO(@MattWindsor91): extract this 20 into configuration.
-	l.plan.Corpus, err = builder.ParBuild(ctx, 20, l.plan.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
-		j := l.makeJob(s, mrng, rq)
+	p.Corpus, err = builder.ParBuild(ctx, 20, p.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
+		j := l.makeJob(&p, s, mrng, rq)
 		return j.Lift(ctx)
 	})
-	return err
+	return &p, err
 }
 
-func (l *Lifter) makeJob(s subject.Named, mrng *rand.Rand, resCh chan<- builder.Request) Job {
+func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, mrng *rand.Rand, resCh chan<- builder.Request) Job {
 	return Job{
-		Arches:  l.plan.Arches(),
-		Backend: l.plan.Backend,
-		Paths:   l.conf.Paths,
-		Driver:  l.conf.Driver,
+		Arches:  p.Arches(),
+		Backend: p.Backend,
+		Paths:   l.paths,
+		Driver:  l.driver,
 		Subject: s,
 		Rng:     rand.New(rand.NewSource(mrng.Int63())),
 		ResCh:   resCh,
-		Stderr:  l.conf.Stderr,
+		Stderr:  l.errw,
 	}
-}
-
-// count counts the number of liftings that need doing.
-func (l *Lifter) count() int {
-	return len(l.plan.Arches()) * len(l.plan.Corpus)
 }

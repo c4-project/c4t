@@ -6,52 +6,61 @@
 package lifter
 
 import (
-	"context"
+	"errors"
 	"io"
 	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// Config contains configuration used to run a lifter for a particular machine, perhaps across multiple plans.
-type Config struct {
-	// Driver is a single-job lifter.
-	Driver SingleLifter
+var (
+	// ErrObserverNil occurs when we try to pass a nil observer as an option.
+	ErrObserverNil = errors.New("observer nil")
+)
 
-	// Logger is the logger to use for this lifter.
-	// This may be nil, in which case the lifter will log silently.
-	Logger *log.Logger
+// Option is the type of options to pass to New.
+type Option func(*Lifter) error
 
-	// Observers track the lifter's progress across a corpus.
-	Observers []builder.Observer
-
-	// Paths does path resolution and preparation for the incoming lifter.
-	Paths Pather
-
-	// Stderr is the writer to which standard error (eg from the lifting backend) should be sent.
-	Stderr io.Writer
+// Options bundles up each option in os into a single option.
+func Options(os ...Option) Option {
+	return func(l *Lifter) error {
+		for _, o := range os {
+			if err := o(l); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 }
 
-// Check checks that various required parts of this config are present.
-func (c *Config) Check() error {
-	if c.Paths == nil {
-		return iohelp.ErrPathsetNil
+// LogTo makes the lifter log its progress to d.
+func LogTo(d *log.Logger) Option {
+	// TODO(@MattWindsor91): as in everywhere else, I'd rather deprecate logging in favour of observers.
+	return func(l *Lifter) error {
+		l.l = iohelp.EnsureLog(d)
+		return nil
 	}
-	if c.Driver == nil {
-		return ErrDriverNil
-	}
-	return nil
 }
 
-// Run is shorthand for constructing a Lifter using c, then running it with p.
-func (c *Config) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	l, err := New(c, p)
-	if err != nil {
-		return nil, err
+// SendStderrTo makes the lifter send any stderr output from its driver to w.
+func SendStderrTo(w io.Writer) Option {
+	return func(l *Lifter) error {
+		l.errw = iohelp.EnsureWriter(w)
+		return nil
 	}
-	return l.Run(ctx)
+}
+
+// ObserveWith adds each observer in obs to the lifter's observer list.
+func ObserveWith(obs ...builder.Observer) Option {
+	return func(l *Lifter) error {
+		for _, ob := range obs {
+			if ob == nil {
+				return ErrObserverNil
+			}
+		}
+		l.obs = append(l.obs, obs...)
+		return nil
+	}
 }
