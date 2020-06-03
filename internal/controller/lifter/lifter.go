@@ -43,6 +43,8 @@ type SingleLifter interface {
 	Lift(ctx context.Context, j job.Lifter, errw io.Writer) (outFiles []string, err error)
 }
 
+//go:generate mockery -name SingleLifter
+
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {
 	// conf is the configuration used for this lifter.

@@ -13,6 +13,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
+// Pathset contains the paths for a lifter.
 type Pathset struct {
 	// TODO(@MattWindsor91): can anything else be done here?
 	root string
@@ -29,6 +30,8 @@ type Pather interface {
 	// It fails if no such directory has been prepared.
 	Path(arch id.ID, subject string) (string, error)
 }
+
+//go:generate mockery -name Pather
 
 // NewPathset makes a pathset under root.
 func NewPathset(root string) *Pathset {

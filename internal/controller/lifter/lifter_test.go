@@ -8,6 +8,8 @@ package lifter_test
 import (
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/lifter/mocks"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
@@ -15,18 +17,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
-
-// makeConfig makes a valid, but mocked-up, lifter config.
-func makeConfig() *lifter.Config {
-	return &lifter.Config{
-		Driver: &lifter.MockSingleLifter{
-			SeenSpecs: nil,
-			Err:       nil,
-		},
-		Logger: nil,
-		Paths:  &lifter.MockPather{},
-	}
-}
 
 // TestNew_errors tests the error result of New in various situations.
 func TestNew_errors(t *testing.T) {
@@ -83,7 +73,15 @@ func TestNew_errors(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			cfg := makeConfig()
+			var (
+				msl mocks.SingleLifter
+				mpl mocks.Pather
+			)
+			cfg := &lifter.Config{
+				Driver: &msl,
+				Paths:  &mpl,
+				Stderr: nil,
+			}
 			if f := c.cdelta; f != nil {
 				cfg = f(cfg)
 			}
@@ -95,6 +93,7 @@ func TestNew_errors(t *testing.T) {
 
 			_, err := lifter.New(cfg, p)
 			testhelp.ExpectErrorIs(t, err, c.err, "in New()")
+			msl.AssertExpectations(t)
 		})
 	}
 }
