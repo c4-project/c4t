@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
@@ -24,15 +24,21 @@ import (
 type SubjectPather interface {
 	// Prepare sets up the directories ready to serve through SubjectPaths.
 	Prepare() error
-
-	// SubjectPaths gets the litmus and trace file paths for the subject/cycle pair sc.
-	SubjectPaths(sc SubjectCycle) subject.FuzzFileset
+	// SubjectLitmus gets the litmus file path for the subject/cycle pair sc.
+	SubjectLitmus(sc SubjectCycle) string
+	// SubjectTrace gets the trace file path for the subject/cycle pair sc.
+	SubjectTrace(sc SubjectCycle) string
 }
+
+//go:generate mockery -name SubjectPather
 
 // Config represents the configuration that goes into a batch fuzzer run.
 type Config struct {
 	// Driver holds the single-file fuzzer that the fuzzer is going to use.
 	Driver SingleFuzzer
+
+	// StatDumper tells the fuzzer how to scrape statistics from the fuzzed outputs.
+	StatDumper litmus.StatDumper
 
 	// Logger is the logger to use while fuzzing.  It may be nil, which silences logging.
 	Logger *log.Logger
@@ -51,6 +57,9 @@ type Config struct {
 func (c *Config) Check() error {
 	if c.Driver == nil {
 		return ErrDriverNil
+	}
+	if c.StatDumper == nil {
+		return ErrStatDumperNil
 	}
 	if c.Paths == nil {
 		return iohelp.ErrPathsetNil

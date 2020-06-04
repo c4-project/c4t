@@ -9,17 +9,17 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/job"
 )
 
 // BinActFuzz is the name of the ACT fuzzer binary.
 const BinActFuzz = "act-fuzz"
 
 // FuzzSingle wraps the ACT one-file fuzzer, supplying the given seed.
-func (a *Runner) FuzzSingle(ctx context.Context, seed int32, inPath string, outPaths subject.FuzzFileset) error {
+func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
 	sargs := StandardArgs{Verbose: false}
-	seedStr := strconv.Itoa(int(seed))
-	args := []string{"-seed", seedStr, "-o", outPaths.Litmus, "-trace-output", outPaths.Trace, inPath}
+	seedStr := strconv.Itoa(int(j.Seed))
+	args := []string{"-seed", seedStr, "-o", j.OutLitmus, "-trace-output", j.OutTrace, j.In}
 	cmd := a.CommandContext(ctx, BinActFuzz, "run", sargs, args...)
 	return cmd.Run()
 }

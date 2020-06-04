@@ -9,6 +9,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	mocks2 "github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
+
+	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer/mocks"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/mock"
@@ -26,16 +31,18 @@ import (
 )
 
 // makeConfig makes a 'valid' fuzzer config.
-func makeConfig() (*fuzzer.Config, *fuzzer.MockPathset) {
-	mp := new(fuzzer.MockPathset)
+func makeConfig() (*fuzzer.Config, *mocks.SubjectPather, *mocks2.StatDumper) {
+	mp := new(mocks.SubjectPather)
+	md := new(mocks2.StatDumper)
 	return &fuzzer.Config{
-		Driver: fuzzer.NopFuzzer{},
-		Paths:  mp,
+		Driver:     fuzzer.NopFuzzer{},
+		Paths:      mp,
+		StatDumper: md,
 		Quantities: fuzzer.QuantitySet{
 			CorpusSize:    0,
 			SubjectCycles: 10,
 		},
-	}, mp
+	}, mp, md
 }
 
 // makePlan makes a 'valid' plan.
@@ -43,9 +50,9 @@ func makePlan() *plan.Plan {
 	return &plan.Plan{
 		Metadata: plan.Header{Version: plan.CurrentVer},
 		Corpus: map[string]subject.Subject{
-			"foo": *subject.NewOrPanic("foo.litmus", subject.WithThreads(1)),
-			"bar": *subject.NewOrPanic("bar.litmus", subject.WithThreads(2)),
-			"baz": *subject.NewOrPanic("baz.litmus", subject.WithThreads(3)),
+			"foo": *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(1))),
+			"bar": *subject.NewOrPanic(litmus.New("bar.litmus", litmus.WithThreads(2))),
+			"baz": *subject.NewOrPanic(litmus.New("baz.litmus", litmus.WithThreads(3))),
 		},
 	}
 }
@@ -119,7 +126,7 @@ func TestNew_error(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			cfg, _ := makeConfig()
+			cfg, _, _ := makeConfig()
 
 			if f := c.cdelta; f != nil {
 				cfg = f(cfg)
@@ -140,12 +147,12 @@ func TestNew_error(t *testing.T) {
 func TestFuzzer_Fuzz_nop(t *testing.T) {
 	t.Parallel()
 
-	cfg, mp := makeConfig()
+	cfg, mp, md := makeConfig()
 	mp.On("Prepare").Return(nil).Once()
-	mp.On("SubjectPaths", mock.Anything).Return(subject.FuzzFileset{
-		Litmus: "fuzz.litmus",
-		Trace:  "fuzz.trace.txt",
-	})
+	mp.On("SubjectLitmus", mock.Anything).Return("fuzz.litmus")
+	mp.On("SubjectTrace", mock.Anything).Return("fuzz.trace.txt")
+	md.On("DumpStats", mock.Anything, mock.Anything, "fuzz.litmus").Return(nil)
+	// TODO(@MattWindsor91): md mocks
 
 	p := makePlan()
 
@@ -166,7 +173,10 @@ func TestFuzzer_Fuzz_nop(t *testing.T) {
 		require.Truef(t, ok, "subject %s in fuzzer output has no corresponding input", name)
 
 		// This isn't exhaustive, but should be enough to catch out issues.
-		assert.Equal(t, sf.Stats, s.Stats, "stats mismatch")
-		assert.Equal(t, sf.OrigLitmus, s.OrigLitmus, "litmus file mismatch")
+		//assert.Equal(t, sf.Stats, s.Stats, "stats mismatch")
+		assert.Equal(t, sf.Source, s.Source, "litmus file mismatch")
 	}
+
+	mp.AssertExpectations(t)
+	md.AssertExpectations(t)
 }

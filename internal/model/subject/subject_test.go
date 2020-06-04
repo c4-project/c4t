@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
@@ -25,15 +27,16 @@ import (
 
 // ExampleSubject_BestLitmus is a testable example for BestLitmus.
 func ExampleSubject_BestLitmus() {
-	s1 := subject.Subject{OrigLitmus: "foo.litmus"}
+	s1, _ := subject.New(litmus.New("foo.litmus"))
 	b1, _ := s1.BestLitmus()
 
 	// This subject has a fuzzed litmus file, which takes priority.
-	s2 := subject.Subject{OrigLitmus: "foo.litmus", Fuzz: &subject.Fuzz{Files: subject.FuzzFileset{Litmus: "bar.litmus"}}}
+	s2, _ := subject.New(litmus.New("foo.litmus"),
+		subject.WithFuzz(&subject.Fuzz{Litmus: *litmus.New("bar.litmus")}))
 	b2, _ := s2.BestLitmus()
 
-	fmt.Println("s1:", b1)
-	fmt.Println("s2:", b2)
+	fmt.Println("s1:", b1.Path)
+	fmt.Println("s2:", b2.Path)
 
 	// Output:
 	// s1: foo.litmus
@@ -218,9 +221,9 @@ func TestSubject_BestLitmus(t *testing.T) {
 	}{
 		"zero":             {s: subject.Subject{}, err: subject.ErrNoBestLitmus, want: ""},
 		"zero-fuzz":        {s: subject.Subject{Fuzz: &subject.Fuzz{}}, err: subject.ErrNoBestLitmus, want: ""},
-		"litmus-only":      {s: subject.Subject{OrigLitmus: "foo"}, err: nil, want: "foo"},
-		"litmus-only-fuzz": {s: subject.Subject{OrigLitmus: "foo", Fuzz: &subject.Fuzz{}}, err: nil, want: "foo"},
-		"fuzz":             {s: subject.Subject{OrigLitmus: "foo", Fuzz: &subject.Fuzz{Files: subject.FuzzFileset{Litmus: "bar"}}}, err: nil, want: "bar"},
+		"litmus-only":      {s: *subject.NewOrPanic(litmus.New("foo")), err: nil, want: "foo"},
+		"litmus-only-fuzz": {s: *subject.NewOrPanic(litmus.New("foo"), subject.WithFuzz(&subject.Fuzz{})), err: nil, want: "foo"},
+		"fuzz":             {s: *subject.NewOrPanic(litmus.New("foo"), subject.WithFuzz(&subject.Fuzz{Litmus: *litmus.New("bar")})), err: nil, want: "bar"},
 	}
 	for name, c := range cases {
 		c := c
@@ -235,8 +238,8 @@ func TestSubject_BestLitmus(t *testing.T) {
 				t.Errorf("wrong BestLitmus(%v) error: got %v; want %v", c.s, err, c.err)
 			case err == nil && c.err != nil:
 				t.Errorf("no BestLitmus(%v) error; want %v", c.s, err)
-			case err == nil && got != c.want:
-				t.Errorf("BestLitmus(%v)=%q; want %q", c.s, got, c.want)
+			case err == nil && got.Path != c.want:
+				t.Errorf("BestLitmus(%v)=%q; want %q", c.s, got.Path, c.want)
 			}
 		})
 	}

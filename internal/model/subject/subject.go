@@ -12,25 +12,20 @@ package subject
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
-
-	"github.com/1set/gut/ystring"
-
-	"github.com/MattWindsor91/act-tester/internal/model"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
 // Normalise represents a single test subject in a corpus.
 type Subject struct {
-	// Stats is the statistics set for this subject.
-	Stats model.Statset `toml:"stats,omitempty" json:"stats,omitempty"`
-
-	// Fuzz is the fuzzing pathset for this subject, if it has been fuzzed.
+	// Fuzz is the fuzzer output for this subject, if it has been fuzzed.
 	Fuzz *Fuzz `toml:"fuzz,omitempty" json:"fuzz,omitempty"`
 
-	// Litmus is the (slashed) path to this subject's original Litmus file.
-	OrigLitmus string `toml:"orig_litmus,omitempty" json:"orig_litmus,omitempty"`
+	// Source refers to the original litmus test for this subject.
+	Source litmus.Litmus `toml:"source,omitempty" json:"source,omitempty"`
 
 	// Compiles contains information about this subject's compilation attempts.
 	// It maps from the string form of each compiler's ID.
@@ -48,57 +43,25 @@ type Subject struct {
 	Runs map[string]RunResult `toml:"runs,omitempty" json:"runs,omitempty"`
 }
 
-// New is a convenience constructor for subjects.
-func New(origLitmus string, opt ...Option) (*Subject, error) {
-	s := Subject{OrigLitmus: origLitmus}
-	for _, c := range opt {
-		if err := c(&s); err != nil {
-			return nil, err
-		}
-	}
-	return &s, nil
-}
-
-// NewOrPanic is like New, but panics if there is an error.
-// Use in tests only.
-func NewOrPanic(origLitmus string, opt ...Option) *Subject {
-	n, err := New(origLitmus, opt...)
-	if err != nil {
-		panic(err)
-	}
-	return n
-}
-
-// Option is the type of (functional) options to the New constructor.
-type Option func(*Subject) error
-
-// WithThreads is an option that sets the subject's threads to threads.
-func WithThreads(threads int) Option {
-	return func(s *Subject) error {
-		s.Stats.Threads = threads
-		return nil
-	}
-}
-
-// BestLitmus tries to get the 'best' litmus test path for further development.
+// BestLitmus tries to get the 'best' litmus test for further development.
 //
 // When there is a fuzzing record for this subject, the fuzz output is the best path.
 // Otherwise, if there is a non-empty Litmus file for this subject, that file is the best path.
 // Else, BestLitmus returns an error.
-func (s *Subject) BestLitmus() (string, error) {
+func (s *Subject) BestLitmus() (*litmus.Litmus, error) {
 	switch {
 	case s.HasFuzzFile():
-		return s.Fuzz.Files.Litmus, nil
-	case s.OrigLitmus != "":
-		return s.OrigLitmus, nil
+		return &s.Fuzz.Litmus, nil
+	case s.Source.HasPath():
+		return &s.Source, nil
 	default:
-		return "", ErrNoBestLitmus
+		return nil, ErrNoBestLitmus
 	}
 }
 
 // HasFuzzFile gets whether this subject has a fuzzed testcase file.
 func (s *Subject) HasFuzzFile() bool {
-	return s.Fuzz != nil && ystring.IsNotBlank(s.Fuzz.Files.Litmus)
+	return s.Fuzz != nil && s.Fuzz.Litmus.HasPath()
 }
 
 // Note that all of these maps work in basically the same way; their being separate and duplicated is just a
@@ -189,9 +152,4 @@ func (s *Subject) ensureRunMap() {
 	if s.Runs == nil {
 		s.Runs = make(map[string]RunResult)
 	}
-}
-
-// AddName copies this subject into a new Named with the given name.
-func (s *Subject) AddName(name string) *Named {
-	return &Named{Name: name, Subject: *s}
 }

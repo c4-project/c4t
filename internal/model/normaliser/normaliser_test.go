@@ -9,6 +9,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
@@ -39,8 +41,8 @@ var testSubjects = map[string]func(root string) testCase{
 	"litmus": func(root string) testCase {
 		olit := path.Join(root, normaliser.FileOrigLitmus)
 		return testCase{
-			in:  subject.Subject{OrigLitmus: path.Join("foo", "bar", "baz.litmus")},
-			out: subject.Subject{OrigLitmus: olit},
+			in:  *subject.NewOrPanic(litmus.New(path.Join("foo", "bar", "baz.litmus"))),
+			out: *subject.NewOrPanic(litmus.New(olit)),
 			maps: normaliser.Map{
 				olit: normaliser.NewEntry(filekind.Litmus, filekind.InOrig, "foo", "bar", "baz.litmus"),
 			},
@@ -51,18 +53,14 @@ var testSubjects = map[string]func(root string) testCase{
 		return testCase{
 			in: subject.Subject{
 				Fuzz: &subject.Fuzz{
-					Files: subject.FuzzFileset{
-						Litmus: path.Join("barbaz", "baz.1.litmus"),
-						Trace:  path.Join("barbaz", "baz.1.trace"),
-					},
+					Litmus: *litmus.New(path.Join("barbaz", "baz.1.litmus")),
+					Trace:  path.Join("barbaz", "baz.1.trace"),
 				},
 			},
 			out: subject.Subject{
 				Fuzz: &subject.Fuzz{
-					Files: subject.FuzzFileset{
-						Litmus: r(normaliser.FileFuzzLitmus),
-						Trace:  r(normaliser.FileFuzzTrace),
-					},
+					Litmus: *litmus.New(r(normaliser.FileFuzzLitmus)),
+					Trace:  r(normaliser.FileFuzzTrace),
 				},
 			},
 			maps: normaliser.Map{

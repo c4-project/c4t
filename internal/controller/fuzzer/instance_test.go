@@ -8,7 +8,13 @@ package fuzzer_test
 import (
 	"context"
 	"math/rand"
+	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -21,13 +27,22 @@ import (
 func TestJob_Fuzz(t *testing.T) {
 	resCh := make(chan builder.Request)
 
-	j := fuzzer.Job{
+	var md mocks.StatDumper
+
+	j := fuzzer.Instance{
 		Subject:       subject.Named{Name: "foo"},
 		Driver:        fuzzer.NopFuzzer{},
+		StatDumper:    &md,
 		SubjectCycles: 10,
 		Pathset:       fuzzer.NewPathset("test"),
 		Rng:           rand.New(rand.NewSource(0)),
 		ResCh:         resCh,
+	}
+
+	for i := 0; i < 10; i++ {
+		i := i
+		wname := path.Join("test", "litmus", fuzzer.SubjectCycle{Name: "foo", Cycle: i}.String()+".litmus")
+		md.On("DumpStats", mock.Anything, mock.Anything, wname).Return(nil).Once()
 	}
 
 	eg, ectx := errgroup.WithContext(context.Background())
@@ -49,7 +64,7 @@ func TestJob_Fuzz(t *testing.T) {
 		}
 		return nil
 	})
-	if err := eg.Wait(); err != nil {
-		t.Fatalf("unexpected errgroup error: %v", err)
-	}
+	assert.NoError(t, eg.Wait(), "unexpected errgroup error")
+
+	md.AssertExpectations(t)
 }

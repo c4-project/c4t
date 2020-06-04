@@ -14,7 +14,7 @@ import (
 	"io"
 	"os/exec"
 
-	"github.com/MattWindsor91/act-tester/internal/model"
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 )
 
 var (
@@ -32,7 +32,7 @@ var (
 type Litmus struct {
 	// Stat extracts statistics from litmus files.
 	// These statistics then switch on various fixes.
-	Stat model.StatDumper
+	Stat litmus.StatDumper
 
 	// Err is the writer to which stderr output should be written.
 	Err io.Writer
@@ -85,7 +85,7 @@ func (l *Litmus) check() error {
 
 // probeFixes checks to see if there are any fixes needed for the input.
 func (l *Litmus) probeFixes(ctx context.Context) error {
-	var s model.Statset
+	var s litmus.Statset
 	if err := l.Stat.DumpStats(ctx, &s, l.Pathset.FileIn); err != nil {
 		return err
 	}

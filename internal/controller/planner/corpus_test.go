@@ -13,6 +13,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
@@ -26,18 +28,14 @@ type TestProber struct {
 }
 
 // ProbeSubject is a mock implementation of subject probing.
-func (t *TestProber) ProbeSubject(_ context.Context, litmus string) (subject.Named, error) {
-	t.probes.Store(litmus, struct{}{})
+func (t *TestProber) ProbeSubject(_ context.Context, path string) (*subject.Named, error) {
+	t.probes.Store(path, struct{}{})
 
-	s, err := subject.New(litmus, subject.WithThreads(2))
+	s, err := subject.New(litmus.New(path, litmus.WithThreads(2)))
 	if err != nil {
-		return subject.Named{}, err
+		return nil, err
 	}
-
-	return subject.Named{
-		Name:    iohelp.ExtlessFile(litmus),
-		Subject: *s,
-	}, t.err
+	return s.AddName(iohelp.ExtlessFile(path)), t.err
 }
 
 // TestCorpusPlanner_Plan tests the happy path of Plan using a mock SubjectProber.
@@ -60,8 +58,8 @@ func TestCorpusPlanner_Plan(t *testing.T) {
 			t.Errorf("unexpected corpus subject %q", n)
 		}
 
-		if s.OrigLitmus != f {
-			t.Errorf("subject %q file mismatch: got=%q, want=%q", n, s.OrigLitmus, f)
+		if s.Source.Path != f {
+			t.Errorf("subject %q file mismatch: got=%q, want=%q", n, s.Source.Path, f)
 		}
 
 		if _, ok := tp.probes.Load(f); !ok {

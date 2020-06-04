@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/model"
+	"github.com/MattWindsor91/act-tester/internal/act"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -46,11 +46,11 @@ mem-orders.statement.memory_order_release 7
 mem-orders.statement.memory_order_acq_rel 0
 mem-orders.statement.memory_order_seq_cst 0`)
 
-	want := model.Statset{
+	want := litmus.Statset{
 		Threads:      3,
 		Returns:      0,
 		LiteralBools: 14,
-		AtomicExpressions: model.AtomicStatset{
+		AtomicExpressions: litmus.AtomicStatset{
 			Types: map[string]int{
 				"cmpxchg": 0,
 				"fence":   0,
@@ -68,7 +68,7 @@ mem-orders.statement.memory_order_seq_cst 0`)
 				"memory_order_seq_cst": 6,
 			},
 		},
-		AtomicStatements: model.AtomicStatset{
+		AtomicStatements: litmus.AtomicStatset{
 			Types: map[string]int{
 				"cmpxchg": 0,
 				"fence":   1,
@@ -88,7 +88,7 @@ mem-orders.statement.memory_order_seq_cst 0`)
 		},
 	}
 
-	var got model.Statset
+	var got litmus.Statset
 	err := act.ParseStats(&got, r)
 	require.NoError(t, err)
 	assert.Equal(t, got, want)

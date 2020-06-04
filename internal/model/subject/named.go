@@ -13,3 +13,8 @@ type Named struct {
 	// Normalise embeds the subject itself.
 	Subject
 }
+
+// AddName copies this subject into a new Named with the given name.
+func (s *Subject) AddName(name string) *Named {
+	return &Named{Name: name, Subject: *s}
+}

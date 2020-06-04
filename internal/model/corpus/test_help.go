@@ -9,11 +9,11 @@ import (
 	"path"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
-
-	"github.com/MattWindsor91/act-tester/internal/model"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -24,79 +24,61 @@ import (
 // - a subject with a flagged observation.
 func Mock() Corpus {
 	return Corpus{
-		"foo":    subject.Subject{Stats: model.Statset{Threads: 1}, OrigLitmus: "foo.litmus"},
-		"bar":    MockFailedCompile("bar"),
-		"baz":    MockFlaggedRun("baz"),
-		"barbaz": MockTimeoutRun("barbaz"),
+		"foo":    *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(1))),
+		"bar":    *MockFailedCompile("bar"),
+		"baz":    *MockFlaggedRun("baz"),
+		"barbaz": *MockTimeoutRun("barbaz"),
 	}
 }
 
-// MockFailedCompile expands to a realistic looking Normalise that contains a failed compilation.
-func MockFailedCompile(name string) subject.Subject {
-	return subject.Subject{
-		Stats: model.Statset{
-			Threads: 8,
-		},
-		OrigLitmus: name + ".litmus",
-		Recipes: map[string]recipe.Recipe{
-			id.ArchArm.String(): {
+// MockFailedCompile expands to a realistic looking subject that contains a failed compilation.
+func MockFailedCompile(name string) *subject.Subject {
+	return subject.NewOrPanic(
+		litmus.New(name+".litmus", litmus.WithThreads(8)),
+		subject.WithRecipe(id.ArchArm,
+			recipe.Recipe{
 				Dir:   "arm",
 				Files: []string{"run.c", "aux.c", "aux.h"},
 			},
-		},
-		Compiles: map[string]subject.CompileResult{
-			"gcc": {
+		),
+		subject.WithCompile(id.FromString("gcc"),
+			subject.CompileResult{
 				Result: subject.Result{Status: status.CompileFail},
 				Files:  subject.CompileFileset{},
 			},
-			"clang": MockSuccessfulCompile("clang", name),
-		},
-		Runs: map[string]subject.RunResult{
-			"gcc": {
-				Result: subject.Result{Status: status.CompileFail},
-			},
-			"clang": {
-				Result: subject.Result{Status: status.Ok},
-			},
-		},
-	}
+		),
+		subject.WithCompile(id.FromString("clang"),
+			MockSuccessfulCompile("clang", name),
+		),
+		subject.WithRun(id.FromString("gcc"),
+			subject.RunResult{Result: subject.Result{Status: status.CompileFail}},
+		),
+		subject.WithRun(id.FromString("clang"),
+			subject.RunResult{Result: subject.Result{Status: status.Ok}},
+		),
+	)
 }
 
-// MockFlaggedRun expands to a realistic looking Normalise that contains some flagged runs.
-func MockFlaggedRun(name string) subject.Subject {
-	return subject.Subject{
-		Stats:      model.Statset{Threads: 2},
-		OrigLitmus: name + ".litmus",
-		Recipes: map[string]recipe.Recipe{
-			id.ArchX8664.String(): MockRecipe("x86"),
-		},
-		Compiles: map[string]subject.CompileResult{
-			"gcc": MockSuccessfulCompile("gcc", name),
-			"icc": MockSuccessfulCompile("icc", name),
-		},
-		Runs: map[string]subject.RunResult{
-			"gcc": {Result: subject.Result{Status: status.Flagged}},
-			"icc": {Result: subject.Result{Status: status.Flagged}},
-		},
-	}
+// MockFlaggedRun expands to a realistic looking subject that contains some flagged runs.
+func MockFlaggedRun(name string) *subject.Subject {
+	return subject.NewOrPanic(
+		litmus.New(name+".litmus", litmus.WithThreads(2)),
+		subject.WithRecipe(id.ArchX8664, MockRecipe("x86")),
+		subject.WithCompile(id.FromString("gcc"), MockSuccessfulCompile("gcc", name)),
+		subject.WithCompile(id.FromString("icc"), MockSuccessfulCompile("icc", name)),
+		subject.WithRun(id.FromString("gcc"), subject.RunResult{Result: subject.Result{Status: status.Flagged}}),
+		subject.WithRun(id.FromString("icc"), subject.RunResult{Result: subject.Result{Status: status.Flagged}}),
+	)
 }
 
-// MockTimeoutRun expands to a realistic looking Normalise that contains some timed-out runs.
-func MockTimeoutRun(name string) subject.Subject {
-	return subject.Subject{
-		Stats:      model.Statset{Threads: 4},
-		OrigLitmus: "baz.litmus",
-		Recipes: map[string]recipe.Recipe{
-			id.ArchX8664.String(): MockRecipe("x86"),
-			id.ArchPPC.String():   MockRecipe("ppc"),
-		},
-		Compiles: map[string]subject.CompileResult{
-			"msvc": MockSuccessfulCompile("msvc", name),
-		},
-		Runs: map[string]subject.RunResult{
-			"msvc": {Result: subject.Result{Status: status.RunTimeout}},
-		},
-	}
+// MockTimeoutRun expands to a realistic looking subject that contains some timed-out runs.
+func MockTimeoutRun(name string) *subject.Subject {
+	return subject.NewOrPanic(
+		litmus.New("baz.litmus", litmus.WithThreads(4)),
+		subject.WithRecipe(id.ArchPPC, MockRecipe("ppc")),
+		subject.WithCompile(id.FromString("msvc"), MockSuccessfulCompile("msvc", name)),
+		subject.WithRun(id.FromString("msvc"), subject.RunResult{Result: subject.Result{Status: status.RunTimeout}}),
+	)
 }
 
 // MockSuccessfulCompile generates a mock CompileResult for a successful compile of subject sname with compiler cstr.

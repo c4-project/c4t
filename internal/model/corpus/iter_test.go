@@ -47,7 +47,7 @@ func ExampleCorpus_Each() {
 func TestCorpus_Map(t *testing.T) {
 	c := corpus.New("foo", "bar", "baz", "barbaz")
 	err := c.Map(func(s *subject.Named) error {
-		s.OrigLitmus = s.Name + ".litmus"
+		s.Source.Path = s.Name + ".litmus"
 		return nil
 	})
 	if err != nil {
@@ -56,11 +56,11 @@ func TestCorpus_Map(t *testing.T) {
 
 	// Each subject should've been updated according to the function.
 	for n, s := range c {
-		got := s.OrigLitmus
+		got := s.Source
 		want := n + ".litmus"
 
-		if got != want {
-			t.Errorf("Map set OrigLitmus incorrectly: got=%s; want=%s", got, want)
+		if got.Path != want {
+			t.Errorf("Map set source path incorrectly: got=%s; want=%s", got.Path, want)
 		}
 	}
 }

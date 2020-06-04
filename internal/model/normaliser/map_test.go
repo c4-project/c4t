@@ -9,6 +9,9 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
@@ -20,35 +23,37 @@ import (
 // ExampleMap_RenamesMatching is a runnable example for RenamesMatching.
 func ExampleMap_RenamesMatching() {
 	n := normaliser.New("root")
-	s := subject.Subject{
-		OrigLitmus: path.Join("foo", "bar", "baz.litmus"),
-		Fuzz: &subject.Fuzz{
-			Files: subject.FuzzFileset{
-				Litmus: path.Join("barbaz", "baz.1.litmus"),
+	s, _ := subject.New(
+		litmus.New(path.Join("foo", "bar", "baz.litmus")),
+		subject.WithFuzz(
+			&subject.Fuzz{
+				Litmus: *litmus.New(path.Join("barbaz", "baz.1.litmus")),
 				Trace:  path.Join("barbaz", "baz.1.trace"),
 			},
-		},
-		Compiles: map[string]subject.CompileResult{
-			"clang": {
+		),
+		subject.WithCompile(id.FromString("clang"),
+			subject.CompileResult{
 				Result: subject.Result{Status: status.Ok},
 				Files: subject.CompileFileset{
 					Bin: path.Join("foobaz", "clang", "a.out"),
 					Log: path.Join("foobaz", "clang", "errors"),
 				},
 			},
-		},
-		Recipes: map[string]recipe.Recipe{
-			"arm": {
+		),
+		subject.WithRecipe(id.FromString("arm"),
+			recipe.Recipe{
 				Dir:   path.Join("burble", "armv8"),
 				Files: []string{"inky.c", "pinky.c"},
 			},
-			"x86": {
+		),
+		subject.WithRecipe(id.FromString("x86"),
+			recipe.Recipe{
 				Dir:   path.Join("burble", "i386"),
 				Files: []string{"inky.c", "pinky.c"},
 			},
-		},
-	}
-	_, _ = n.Normalise(s)
+		),
+	)
+	_, _ = n.Normalise(*s)
 	for k, v := range n.Mappings.RenamesMatching(filekind.Any, filekind.InRecipe) {
 		fmt.Println(k, "<-", v)
 	}

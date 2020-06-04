@@ -83,7 +83,7 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 		return fmt.Errorf("when getting subject dir: %w", derr)
 	}
 
-	path, perr := j.Subject.BestLitmus()
+	lit, perr := j.Subject.BestLitmus()
 	if perr != nil {
 		return perr
 	}
@@ -91,8 +91,9 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 	spec := job.Lifter{
 		Backend: j.Backend,
 		Arch:    arch,
-		InFile:  path,
-		OutDir:  dir,
+		// TODO(@MattWindsor91): pass entire litmus
+		InFile: lit.Path,
+		OutDir: dir,
 	}
 
 	r, err := j.Driver.Lift(ctx, spec, j.Stderr)

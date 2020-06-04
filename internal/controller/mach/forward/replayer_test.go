@@ -14,6 +14,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/stretchr/testify/mock"
@@ -45,11 +47,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 		NReqs: 3,
 	}
 
-	add := builder.AddRequest(
-		&subject.Named{
-			Name:    "foo",
-			Subject: subject.Subject{OrigLitmus: "foo.litmus"},
-		})
+	add := builder.AddRequest(subject.NewOrPanic(litmus.New("foo.litmus")).AddName("foo"))
 	rec := builder.RecipeRequest(
 		"foo",
 		id.ArchX8664,

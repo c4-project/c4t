@@ -9,7 +9,6 @@ package fuzzer
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -27,14 +26,6 @@ import (
 
 // DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
 const DefaultSubjectCycles = 10
-
-var (
-	// ErrConfigNil occurs when a fuzzer gets constructed using a nil config.
-	ErrConfigNil = errors.New("config nil")
-
-	// ErrDriverNil occurs when the fuzzer tries to use the nil pointer as its single-fuzz driver.
-	ErrDriverNil = errors.New("driver nil")
-)
 
 // Fuzzer holds the configuration required to fuzz a plan file.
 type Fuzzer struct {
@@ -153,9 +144,10 @@ func (f *Fuzzer) corpusSeeds(rng *rand.Rand) map[string]int64 {
 	return seeds
 }
 
-func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- builder.Request) *Job {
-	return &Job{
+func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- builder.Request) *Instance {
+	return &Instance{
 		Driver:        f.conf.Driver,
+		StatDumper:    f.conf.StatDumper,
 		Subject:       s,
 		SubjectCycles: f.conf.Quantities.SubjectCycles,
 		Pathset:       f.conf.Paths,

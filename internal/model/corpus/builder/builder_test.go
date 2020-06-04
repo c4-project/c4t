@@ -10,9 +10,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/model"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder/mocks"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -31,15 +32,15 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	adds := []subject.Named{
 		{
 			Name:    "foo",
-			Subject: subject.Subject{Stats: model.Statset{Threads: 2}, OrigLitmus: "foo.litmus"},
+			Subject: *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(2))),
 		},
 		{
 			Name:    "bar",
-			Subject: subject.Subject{Stats: model.Statset{Threads: 1}, OrigLitmus: "foo.litmus"},
+			Subject: *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(1))),
 		},
 		{
 			Name:    "baz",
-			Subject: subject.Subject{Stats: model.Statset{Threads: 4}, OrigLitmus: "foo.litmus"},
+			Subject: *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(4))),
 		},
 	}
 
@@ -71,7 +72,7 @@ func TestBuilder_Run_Adds(t *testing.T) {
 			return m.Kind == builder.BuildRequest &&
 				m.Request.Name == c.Name &&
 				m.Request.Add != nil &&
-				m.Request.Add.OrigLitmus == c.OrigLitmus
+				m.Request.Add.Source == c.Source
 		})).Return().Once()
 	}
 
@@ -142,7 +143,8 @@ func TestBuilderReq_SendTo(t *testing.T) {
 }
 
 func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan builder.Request) error {
-	want := builder.AddRequest(subject.NewOrPanic("blah", subject.WithThreads(5)).AddName("foo"))
+	want := builder.AddRequest(
+		subject.NewOrPanic(litmus.New("blah", litmus.WithThreads(5))).AddName("foo"))
 
 	eg.Go(func() error {
 		select {

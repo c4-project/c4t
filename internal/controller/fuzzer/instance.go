@@ -11,6 +11,9 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -18,13 +21,16 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Job contains state for a single fuzzer batch-Job.
-type Job struct {
-	// Normalise contains the subject for which this Job is responsible.
+// Instance contains state for a single fuzzer instance.
+type Instance struct {
+	// Normalise contains the subject for which this Instance is responsible.
 	Subject subject.Named
 
 	// Driver is the low-level fuzzer.
 	Driver SingleFuzzer
+
+	// StatDumper is the statistics dumper used for scraping statistics from fuzzer outputs.
+	StatDumper litmus.StatDumper
 
 	// SubjectCycles is the number of times each subject should be fuzzed.
 	SubjectCycles int
@@ -39,8 +45,8 @@ type Job struct {
 	ResCh chan<- builder.Request
 }
 
-// Fuzz performs a single fuzzing Job.
-func (j *Job) Fuzz(ctx context.Context) error {
+// Fuzz performs a single fuzzing instance.
+func (j *Instance) Fuzz(ctx context.Context) error {
 	if err := j.check(); err != nil {
 		return err
 	}
@@ -54,7 +60,13 @@ func (j *Job) Fuzz(ctx context.Context) error {
 }
 
 // check checks the health of the job before running it.
-func (j *Job) check() error {
+func (j *Instance) check() error {
+	if j.StatDumper == nil {
+		return errors.New("stat dumper nil")
+	}
+	if j.Driver == nil {
+		return ErrDriverNil
+	}
 	if j.Pathset == nil {
 		return iohelp.ErrPathsetNil
 	}
@@ -64,25 +76,43 @@ func (j *Job) check() error {
 	return nil
 }
 
-func (j *Job) fuzzCycle(ctx context.Context, cycle int) error {
+func (j *Instance) fuzzCycle(ctx context.Context, cycle int) error {
 	sc := SubjectCycle{Name: j.Subject.Name, Cycle: cycle}
-	spaths := j.Pathset.SubjectPaths(sc)
+	jb := j.makeJob(sc)
 
 	stime := time.Now()
-	if err := j.Driver.FuzzSingle(ctx, j.Rng.Int31(), j.Subject.OrigLitmus, spaths); err != nil {
+	if err := j.Driver.Fuzz(ctx, jb); err != nil {
 		return err
 	}
+	dur := time.Since(stime)
+
+	l, err := litmus.NewWithStats(ctx, jb.OutLitmus, j.StatDumper)
+	if err != nil {
+		return nil
+	}
+
 	fz := subject.Fuzz{
-		Duration: time.Since(stime),
-		Files:    spaths,
+		Duration: dur,
+		Litmus:   *l,
+		Trace:    jb.OutTrace,
 	}
 
 	nsub := j.fuzzedSubject(sc, &fz)
 	return builder.AddRequest(&nsub).SendTo(ctx, j.ResCh)
 }
 
-// fuzzedSubject makes a copy of this Job's subject with the cycled name sc and fuzz fileset spaths.
-func (j *Job) fuzzedSubject(sc SubjectCycle, fz *subject.Fuzz) subject.Named {
+func (j *Instance) makeJob(sc SubjectCycle) job.Fuzzer {
+	jb := job.Fuzzer{
+		Seed:      j.Rng.Int31(),
+		In:        j.Subject.Source.Path,
+		OutLitmus: j.Pathset.SubjectLitmus(sc),
+		OutTrace:  j.Pathset.SubjectTrace(sc),
+	}
+	return jb
+}
+
+// fuzzedSubject makes a copy of this Instance's subject with the cycled name sc and fuzz fz.
+func (j *Instance) fuzzedSubject(sc SubjectCycle, fz *subject.Fuzz) subject.Named {
 	nsub := j.Subject
 	nsub.Name = sc.String()
 	nsub.Fuzz = fz

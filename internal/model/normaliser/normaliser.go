@@ -48,7 +48,7 @@ func New(root string) *Normaliser {
 func (n *Normaliser) Normalise(s subject.Subject) (*subject.Subject, error) {
 	n.err = nil
 
-	s.OrigLitmus = n.replaceAndAdd(s.OrigLitmus, filekind.Litmus, filekind.InOrig, FileOrigLitmus)
+	s.Source.Path = n.replaceAndAdd(s.Source.Path, filekind.Litmus, filekind.InOrig, FileOrigLitmus)
 	s.Fuzz = n.fuzz(s.Fuzz)
 	s.Compiles = n.compiles(s.Compiles)
 	s.Recipes = n.recipes(s.Recipes)
@@ -61,8 +61,8 @@ func (n *Normaliser) fuzz(of *subject.Fuzz) *subject.Fuzz {
 		return nil
 	}
 	f := *of
-	f.Files.Litmus = n.replaceAndAdd(f.Files.Litmus, filekind.Litmus, filekind.InFuzz, FileFuzzLitmus)
-	f.Files.Trace = n.replaceAndAdd(f.Files.Trace, filekind.Trace, filekind.InFuzz, FileFuzzTrace)
+	f.Litmus.Path = n.replaceAndAdd(f.Litmus.Path, filekind.Litmus, filekind.InFuzz, FileFuzzLitmus)
+	f.Trace = n.replaceAndAdd(f.Trace, filekind.Trace, filekind.InFuzz, FileFuzzTrace)
 	return &f
 }
 

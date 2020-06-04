@@ -6,9 +6,7 @@
 package fuzzer
 
 import (
-	"path"
-
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"path/filepath"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
@@ -33,8 +31,8 @@ type Pathset struct {
 // NewPathset constructs a new pathset from the directory root.
 func NewPathset(root string) *Pathset {
 	return &Pathset{
-		DirLitmus: path.Join(root, segLitmus),
-		DirTrace:  path.Join(root, segTrace),
+		DirLitmus: filepath.Join(root, segLitmus),
+		DirTrace:  filepath.Join(root, segTrace),
 	}
 }
 
@@ -43,11 +41,12 @@ func (p *Pathset) Prepare() error {
 	return iohelp.Mkdirs(p.DirTrace, p.DirLitmus)
 }
 
-// SubjectPaths gets the litmus and trace file paths for the subject/cycle pair c.
-func (p *Pathset) SubjectPaths(c SubjectCycle) subject.FuzzFileset {
-	base := c.String()
-	return subject.FuzzFileset{
-		Litmus: path.Join(p.DirLitmus, base+".litmus"),
-		Trace:  path.Join(p.DirTrace, base+".trace"),
-	}
+// SubjectLitmus gets the litmus filepath for the subject/cycle pair c.
+func (p *Pathset) SubjectLitmus(c SubjectCycle) string {
+	return filepath.Join(p.DirLitmus, c.String()+".litmus")
+}
+
+// SubjectTrace gets the litmus filepath for the subject/cycle pair c.
+func (p *Pathset) SubjectTrace(c SubjectCycle) string {
+	return filepath.Join(p.DirTrace, c.String()+".trace")
 }

@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package model
+package litmus
 
 import (
 	"context"
@@ -16,6 +16,8 @@ type StatDumper interface {
 	// DumpStats populates s with statistics gleaned from the Litmus file at path.
 	DumpStats(ctx context.Context, s *Statset, path string) error
 }
+
+//go:generate mockery -name StatDumper
 
 // AtomicStatset contains a set of statistics about atomics (expressions or statements).
 type AtomicStatset struct {

@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -18,11 +20,11 @@ import (
 // ExampleCorpus_Add is a runnable example for Add.
 func ExampleCorpus_Add() {
 	c := make(corpus.Corpus)
-	_ = c.Add(subject.Named{Name: "foo", Subject: subject.Subject{OrigLitmus: "bar/baz.litmus"}})
-	fmt.Println(c["foo"].OrigLitmus)
+	_ = c.Add(*subject.NewOrPanic(litmus.New("bar/baz.litmus")).AddName("foo"))
+	fmt.Println(c["foo"].Source.Path)
 
 	// We can't add duplicates to a corpus.
-	err := c.Add(subject.Named{Name: "foo", Subject: subject.Subject{OrigLitmus: "bar/baz2.litmus"}})
+	err := c.Add(*subject.NewOrPanic(litmus.New("bar/baz2.litmus")).AddName("foo"))
 	fmt.Println(err)
 
 	// Output:

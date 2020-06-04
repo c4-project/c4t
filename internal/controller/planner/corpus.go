@@ -20,8 +20,8 @@ import (
 
 // SubjectProber is the interface of types that allow filling in of subject information.
 type SubjectProber interface {
-	// ProbeSubject probes the Litmus test at file litmus, producing a named subject record.
-	ProbeSubject(ctx context.Context, litmus string) (subject.Named, error)
+	// ProbeSubject probes the Litmus test at filepath litmus, producing a named subject record.
+	ProbeSubject(ctx context.Context, litmus string) (*subject.Named, error)
 }
 
 func (p *Planner) planCorpus(ctx context.Context) error {
@@ -122,7 +122,7 @@ func (p *CorpusPlanner) probeSubject(ctx context.Context, f string, ch chan<- bu
 	if err != nil {
 		return err
 	}
-	return builder.AddRequest(&s).SendTo(ctx, ch)
+	return builder.AddRequest(s).SendTo(ctx, ch)
 }
 
 func (p *CorpusPlanner) sample(c corpus.Corpus) (corpus.Corpus, error) {

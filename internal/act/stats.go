@@ -13,7 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/model"
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
@@ -33,7 +34,7 @@ const (
 
 // ParseStats parses a statistics set from r into statistics set s.
 // Each statistic should be in the form "name value\n".
-func ParseStats(s *model.Statset, r io.Reader) error {
+func ParseStats(s *litmus.Statset, r io.Reader) error {
 	sc := bufio.NewScanner(r)
 	for sc.Scan() {
 		if err := parseLine(s, sc.Text()); err != nil {
@@ -43,7 +44,7 @@ func ParseStats(s *model.Statset, r io.Reader) error {
 	return sc.Err()
 }
 
-func parseLine(s *model.Statset, l string) error {
+func parseLine(s *litmus.Statset, l string) error {
 	fs := strings.Fields(l)
 	if len(fs) != 2 {
 		return fmt.Errorf("%w: %d fields in %q; want 2", ErrStatsetParse, len(fs), fs)
@@ -69,7 +70,7 @@ func errEmptyId(cat string) error {
 	return fmt.Errorf("%w: empty %q sub-id", ErrStatsetParse, cat)
 }
 
-func setByID(s *model.Statset, nid id.ID, val int) error {
+func setByID(s *litmus.Statset, nid id.ID, val int) error {
 	ncat, nrest, ok := nid.Uncons()
 	if !ok {
 		return fmt.Errorf("%w: empty id", ErrStatsetParse)
@@ -95,7 +96,7 @@ func setByID(s *model.Statset, nid id.ID, val int) error {
 	return nil
 }
 
-func setLiteral(s *model.Statset, lid id.ID, val int) error {
+func setLiteral(s *litmus.Statset, lid id.ID, val int) error {
 	lcat, lrest, ok := lid.Uncons()
 	if !ok {
 		return errEmptyId(catLiterals)
@@ -110,11 +111,11 @@ func setLiteral(s *model.Statset, lid id.ID, val int) error {
 	return nil
 }
 
-func setAtomicType(s *model.Statset, tid id.ID, val int) error {
+func setAtomicType(s *litmus.Statset, tid id.ID, val int) error {
 	return setAtomicRelated(tid, val, catAtomics, s.AtomicExpressions.AddType, s.AtomicStatements.AddType)
 }
 
-func setMemOrder(s *model.Statset, mid id.ID, val int) error {
+func setMemOrder(s *litmus.Statset, mid id.ID, val int) error {
 	return setAtomicRelated(mid, val, catMemOrders, s.AtomicExpressions.AddMemOrder, s.AtomicStatements.AddMemOrder)
 }
 
