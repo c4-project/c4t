@@ -3,16 +3,16 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package herdtools
+package parser
 
 import "fmt"
 
-// parserState is the state of the parsing FSA.
-type parserState int
+// state is the state of the parsing FSA.
+type state int
 
 const (
 	// psEmpty states that we haven't read anything yet.
-	psEmpty parserState = iota
+	psEmpty state = iota
 	// psPreTest states that we haven't hit the actual test yet.
 	psPreTest
 	// psPreamble states that we're in the pre-state matter.
@@ -75,7 +75,7 @@ func (p *parser) afterSummary() error {
 
 // transition handles a simple state transition between from and to.
 // It returns an error if the current state isn't from.
-func (p *parser) transition(from, to parserState) error {
+func (p *parser) transition(from, to state) error {
 	err := p.checkState(from)
 	p.state = to
 	return err
@@ -102,7 +102,7 @@ func (p *parser) checkFinalState() error {
 }
 
 // checkState returns with an error if the current automaton state isn't want.
-func (p *parser) checkState(want parserState) error {
+func (p *parser) checkState(want state) error {
 	if p.state != want {
 		return fmt.Errorf("%w: got=%v, want=%v", ErrBadTransition, p.state, want)
 	}

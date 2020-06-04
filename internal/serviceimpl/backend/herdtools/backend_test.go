@@ -14,6 +14,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
+
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/herd"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools"
@@ -25,8 +29,8 @@ func TestBackend_ParseObs(t *testing.T) {
 	t.Parallel()
 
 	impls := map[string]herdtools.BackendImpl{
-		"herd":   herdtools.Herd{},
-		"litmus": herdtools.Litmus{},
+		"herd":   herd.Herd{},
+		"litmus": litmus.Litmus{},
 	}
 
 	for name, i := range impls {

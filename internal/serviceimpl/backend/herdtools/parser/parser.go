@@ -3,19 +3,39 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package herdtools
+// Package parser contains logic for parsing Herd and Litmus
+package parser
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
 )
 
+// Parse parses an observation from r into o using i.
+func Parse(i Impl, r io.Reader, o *obs.Obs) error {
+	p := parser{impl: i, o: o}
+	s := bufio.NewScanner(r)
+	lineno := 1
+	for s.Scan() {
+		if err := p.processLine(s.Text()); err != nil {
+			return fmt.Errorf("line %d: %w", lineno, err)
+		}
+		lineno++
+	}
+	if err := s.Err(); err != nil {
+		return err
+	}
+	return p.checkFinalState()
+}
+
 // parser holds the state for a Herdtools parser.
 type parser struct {
 	// impl tells us how to perform the Herd/Litmus-specific parts of the parsing set-up.
-	impl BackendImpl
+	impl Impl
 
 	// o is the observation we're creating.
 	o *obs.Obs
@@ -24,7 +44,7 @@ type parser struct {
 	tt TestType
 
 	// state is the current state of the parsing FSA.
-	state parserState
+	state state
 
 	// nstates is the number of states left to read if we're in psState.
 	nstates uint64

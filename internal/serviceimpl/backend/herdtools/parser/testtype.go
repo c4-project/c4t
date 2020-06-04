@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package herdtools
+package parser
 
 import "fmt"
 
@@ -11,22 +11,22 @@ import "fmt"
 type TestType int
 
 const (
-	// TTNone states that we haven't parsed a test type yet.
-	TTNone TestType = iota
-	// TTAllowed is the 'allowed' test type.
-	TTAllowed
-	// TTRequired is the 'required' test type.
-	TTRequired
+	// None states that we haven't parsed a test type yet.
+	None TestType = iota
+	// Allowed is the 'allowed' test type.
+	Allowed
+	// Required is the 'required' test type.
+	Required
 )
 
 // parseTestType tries to parse the test type from the word s.
 func parseTestType(s string) (TestType, error) {
 	switch s {
 	case "Allowed":
-		return TTAllowed, nil
+		return Allowed, nil
 	case "Required":
-		return TTRequired, nil
+		return Required, nil
 	default:
-		return TTNone, fmt.Errorf("%w: bad test type name %q", ErrBadTestType, s)
+		return None, fmt.Errorf("%w: bad test type name %q", ErrBadTestType, s)
 	}
 }

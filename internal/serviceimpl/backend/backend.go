@@ -12,6 +12,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
+
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/herd"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools"
@@ -35,11 +39,11 @@ var (
 	BResolve = Resolver{Backends: map[string]Backend{
 		"herd": herdtools.Backend{
 			DefaultRun: service.RunInfo{Cmd: "herd7"},
-			Impl:       herdtools.Herd{},
+			Impl:       herd.Herd{},
 		},
 		"litmus": herdtools.Backend{
 			DefaultRun: service.RunInfo{Cmd: "litmus7"},
-			Impl:       herdtools.Litmus{},
+			Impl:       litmus.Litmus{},
 		},
 	}}
 )
