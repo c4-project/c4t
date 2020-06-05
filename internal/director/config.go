@@ -125,7 +125,8 @@ func OutDir(dir string) Option {
 // Env groups together the bits of configuration that pertain to dealing with the environment.
 type Env struct {
 	// Fuzzer is a single-shot fuzzing driver.
-	Fuzzer fuzzer.SingleFuzzer
+	// TODO(@MattWindsor91): this overlaps nontrivially with Planner; both should use the same dumper!
+	Fuzzer fuzzer.Driver
 
 	// Lifter is a single-shot recipe lifter.
 	Lifter lifter.SingleLifter

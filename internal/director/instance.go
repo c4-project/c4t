@@ -201,7 +201,7 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Plan, err = i.makePlanner(observer.LowerToPlanner(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
-	if sc.Fuzz, err = i.makeFuzzerConfig(bobs); err != nil {
+	if sc.Fuzz, err = i.makeFuzzer(bobs); err != nil {
 		return nil, fmt.Errorf("when making fuzzer config: %w", err)
 	}
 	if sc.Lift, err = i.makeLifter(bobs); err != nil {
@@ -241,21 +241,14 @@ func (i *Instance) machineForPlan() machine.Named {
 	}
 }
 
-func (i *Instance) makeFuzzerConfig(obs []builder.Observer) (*fuzzer.Config, error) {
-	fz := i.Env.Fuzzer
-	if fz == nil {
-		return nil, errors.New("no single fuzzer provided")
-	}
-
-	fc := fuzzer.Config{
-		Driver:     fz,
-		Logger:     i.Logger,
-		Observers:  obs,
-		Paths:      fuzzer.NewPathset(i.ScratchPaths.DirFuzz),
-		Quantities: i.Quantities.Fuzz,
-	}
-
-	return &fc, nil
+func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {
+	return fuzzer.New(
+		i.Env.Fuzzer,
+		fuzzer.NewPathset(i.ScratchPaths.DirFuzz),
+		fuzzer.ObserveWith(obs...),
+		fuzzer.LogWith(i.Logger),
+		fuzzer.OverrideQuantities(i.Quantities.Fuzz),
+	)
 }
 
 func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {

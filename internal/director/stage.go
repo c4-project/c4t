@@ -25,7 +25,7 @@ type StageConfig struct {
 	// Plan contains configuration for the instance's plan stage.
 	Plan *planner.Planner
 	// Fuzz contains configuration for the instance's fuzz stage.
-	Fuzz *fuzzer.Config
+	Fuzz *fuzzer.Fuzzer
 	// Lift contains configuration for the instance's lift stage.
 	Lift *lifter.Lifter
 	// Invoke contains configuration for the instance's invoke stage.

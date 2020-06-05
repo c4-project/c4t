@@ -49,23 +49,25 @@ func flags() []c.Flag {
 func run(ctx *c.Context, outw, errw io.Writer) error {
 	a := stdflag.ActRunnerFromCli(ctx, errw)
 	l := log.New(errw, "", 0)
-	cfg := makeConfig(ctx, a, l)
-	return view.RunOnCliPlan(ctx, cfg, outw)
-}
-
-func makeConfig(ctx *c.Context, a fuzzer.SingleFuzzer, l *log.Logger) *fuzzer.Config {
-	cfg := fuzzer.Config{
-		Driver:     a,
-		Observers:  singleobs.Builder(l),
-		Logger:     l,
-		Paths:      fuzzer.NewPathset(stdflag.OutDirFromCli(ctx)),
-		Quantities: *setupQuantityFlags(ctx),
+	f, err := makeFuzzer(ctx, a, l)
+	if err != nil {
+		return err
 	}
-	return &cfg
+	return view.RunOnCliPlan(ctx, f, outw)
 }
 
-func setupQuantityFlags(ctx *c.Context) *fuzzer.QuantitySet {
-	return &fuzzer.QuantitySet{
+func makeFuzzer(ctx *c.Context, drv fuzzer.Driver, l *log.Logger) (*fuzzer.Fuzzer, error) {
+	return fuzzer.New(
+		drv,
+		fuzzer.NewPathset(stdflag.OutDirFromCli(ctx)),
+		fuzzer.LogWith(l),
+		fuzzer.ObserveWith(singleobs.Builder(l)...),
+		fuzzer.OverrideQuantities(setupQuantityFlags(ctx)),
+	)
+}
+
+func setupQuantityFlags(ctx *c.Context) fuzzer.QuantitySet {
+	return fuzzer.QuantitySet{
 		CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
 		SubjectCycles: stdflag.SubjectCyclesFromCli(ctx),
 		NWorkers:      stdflag.WorkerCountFromCli(ctx),

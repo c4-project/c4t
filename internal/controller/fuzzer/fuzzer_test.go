@@ -30,21 +30,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// makeConfig makes a 'valid' fuzzer config.
-func makeConfig() (*fuzzer.Config, *mocks.SubjectPather, *mocks2.StatDumper) {
-	mp := new(mocks.SubjectPather)
-	md := new(mocks2.StatDumper)
-	return &fuzzer.Config{
-		Driver:     fuzzer.NopFuzzer{},
-		Paths:      mp,
-		StatDumper: md,
-		Quantities: fuzzer.QuantitySet{
-			CorpusSize:    0,
-			SubjectCycles: 10,
-		},
-	}, mp, md
-}
-
 // makePlan makes a 'valid' plan.
 func makePlan() *plan.Plan {
 	return &plan.Plan{
@@ -61,37 +46,67 @@ func makePlan() *plan.Plan {
 func TestNew_error(t *testing.T) {
 	t.Parallel()
 
+	md := new(mocks2.StatDumper)
+	mp := new(mocks.SubjectPather)
+
 	cases := map[string]struct {
-		// cdelta modifies the configuration from a known-working value.
-		cdelta func(*fuzzer.Config) *fuzzer.Config
-		// pdelta modifies the plan from a known-working value.
-		pdelta func(*plan.Plan) *plan.Plan
+		// driver sets the driver for the constructor call.
+		driver fuzzer.Driver
+		// paths sets the pathset for the constructor call.
+		paths fuzzer.SubjectPather
+		// opts sets the options for the constructor call.
+		opts []fuzzer.Option
 		// err is any error expected to occur on constructing with the modified plan and configuraiton.
 		err error
 	}{
 		"ok": {
-			err: nil,
-		},
-		"nil-config": {
-			cdelta: func(c *fuzzer.Config) *fuzzer.Config {
-				return nil
-			},
-			err: fuzzer.ErrConfigNil,
+			driver: fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md},
+			paths:  mp,
+			err:    nil,
 		},
 		"nil-driver": {
-			cdelta: func(c *fuzzer.Config) *fuzzer.Config {
-				c.Driver = nil
-				return c
-			},
-			err: fuzzer.ErrDriverNil,
+			driver: nil,
+			paths:  mp,
+			err:    fuzzer.ErrDriverNil,
 		},
 		"nil-paths": {
-			cdelta: func(c *fuzzer.Config) *fuzzer.Config {
-				c.Paths = nil
-				return c
-			},
-			err: iohelp.ErrPathsetNil,
+			driver: fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md},
+			paths:  nil,
+			err:    iohelp.ErrPathsetNil,
 		},
+		"bad-cycles": {
+			driver: fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md},
+			paths:  mp,
+			opts: []fuzzer.Option{
+				fuzzer.OverrideQuantities(fuzzer.QuantitySet{SubjectCycles: -1}),
+			},
+			err: corpus.ErrSmall,
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			_, err := fuzzer.New(c.driver, c.paths, c.opts...)
+			testhelp.ExpectErrorIs(t, err, c.err, "unexpected error in New")
+		})
+	}
+}
+
+// TestFuzzer_Run_error tests various error cases on Run.
+func TestFuzzer_Run_error(t *testing.T) {
+	t.Parallel()
+
+	md := new(mocks2.StatDumper)
+	mp := new(mocks.SubjectPather)
+
+	cases := map[string]struct {
+		pdelta func(*plan.Plan) *plan.Plan
+		opts   []fuzzer.Option
+		err    error
+	}{
 		"nil-plan": {
 			pdelta: func(p *plan.Plan) *plan.Plan {
 				return nil
@@ -106,16 +121,10 @@ func TestNew_error(t *testing.T) {
 			err: corpus.ErrNone,
 		},
 		"small-corpus": {
-			cdelta: func(c *fuzzer.Config) *fuzzer.Config {
-				c.Quantities.CorpusSize = 255
-				return c
-			},
-			err: corpus.ErrSmall,
-		},
-		"bad-cycles": {
-			cdelta: func(c *fuzzer.Config) *fuzzer.Config {
-				c.Quantities.SubjectCycles = 0
-				return c
+			opts: []fuzzer.Option{
+				fuzzer.OverrideQuantities(
+					fuzzer.QuantitySet{CorpusSize: 255},
+				),
 			},
 			err: corpus.ErrSmall,
 		},
@@ -126,40 +135,40 @@ func TestNew_error(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			cfg, _, _ := makeConfig()
-
-			if f := c.cdelta; f != nil {
-				cfg = f(cfg)
-			}
+			f, err := fuzzer.New(fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md}, mp, c.opts...)
+			require.NoError(t, err, "there shouldn't be an error yet!")
 
 			p := makePlan()
 			if f := c.pdelta; f != nil {
 				p = f(p)
 			}
-
-			_, err := fuzzer.New(cfg, p)
-			testhelp.ExpectErrorIs(t, err, c.err, "in New()")
+			_, err = f.Run(context.Background(), p)
+			testhelp.ExpectErrorIs(t, err, c.err, "running fuzzer")
 		})
 	}
 }
 
-// TestFuzzer_Fuzz_nop tests the happy path of running the Fuzzer with a driver that doesn't do anything.
-func TestFuzzer_Fuzz_nop(t *testing.T) {
+// TestFuzzer_Run_nop tests the happy path of running the Fuzzer with a driver that doesn't do anything.
+func TestFuzzer_Run_nop(t *testing.T) {
 	t.Parallel()
 
-	cfg, mp, md := makeConfig()
+	md := new(mocks2.StatDumper)
+	mp := new(mocks.SubjectPather)
+	f, err := fuzzer.New(
+		fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md},
+		mp,
+	)
+	require.NoError(t, err, "unexpected error in New")
+
 	mp.On("Prepare").Return(nil).Once()
 	mp.On("SubjectLitmus", mock.Anything).Return("fuzz.litmus")
 	mp.On("SubjectTrace", mock.Anything).Return("fuzz.trace.txt")
 	md.On("DumpStats", mock.Anything, mock.Anything, "fuzz.litmus").Return(nil)
-	// TODO(@MattWindsor91): md mocks
 
 	p := makePlan()
 
-	f, err := fuzzer.New(cfg, p)
-	require.NoError(t, err, "unexpected error in New")
-	p2, err := f.Fuzz(context.Background())
-	require.NoError(t, err, "unexpected error in Fuzz")
+	p2, err := f.Run(context.Background(), p)
+	require.NoError(t, err, "unexpected error in Run")
 
 	for name, s := range p2.Corpus {
 		sc, err := fuzzer.ParseSubjectCycle(name)

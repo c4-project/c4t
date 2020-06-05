@@ -23,16 +23,15 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// TestJob_Fuzz tests various aspects of a job fuzz.
-func TestJob_Fuzz(t *testing.T) {
+// TestInstance_Fuzz tests various aspects of a job fuzz.
+func TestInstance_Fuzz(t *testing.T) {
 	resCh := make(chan builder.Request)
 
 	var md mocks.StatDumper
 
 	j := fuzzer.Instance{
 		Subject:       subject.Named{Name: "foo"},
-		Driver:        fuzzer.NopFuzzer{},
-		StatDumper:    &md,
+		Driver:        fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: &md},
 		SubjectCycles: 10,
 		Pathset:       fuzzer.NewPathset("test"),
 		Rng:           rand.New(rand.NewSource(0)),

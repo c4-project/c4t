@@ -26,11 +26,8 @@ type Instance struct {
 	// Normalise contains the subject for which this Instance is responsible.
 	Subject subject.Named
 
-	// Driver is the low-level fuzzer.
-	Driver SingleFuzzer
-
-	// StatDumper is the statistics dumper used for scraping statistics from fuzzer outputs.
-	StatDumper litmus.StatDumper
+	// Driver is the low-level fuzzer driver set.
+	Driver Driver
 
 	// SubjectCycles is the number of times each subject should be fuzzed.
 	SubjectCycles int
@@ -61,9 +58,6 @@ func (j *Instance) Fuzz(ctx context.Context) error {
 
 // check checks the health of the job before running it.
 func (j *Instance) check() error {
-	if j.StatDumper == nil {
-		return errors.New("stat dumper nil")
-	}
 	if j.Driver == nil {
 		return ErrDriverNil
 	}
@@ -86,7 +80,7 @@ func (j *Instance) fuzzCycle(ctx context.Context, cycle int) error {
 	}
 	dur := time.Since(stime)
 
-	l, err := litmus.NewWithStats(ctx, jb.OutLitmus, j.StatDumper)
+	l, err := litmus.NewWithStats(ctx, jb.OutLitmus, j.Driver)
 	if err != nil {
 		return nil
 	}
