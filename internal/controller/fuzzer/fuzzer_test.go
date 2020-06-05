@@ -7,6 +7,7 @@ package fuzzer_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
@@ -49,6 +50,8 @@ func TestNew_error(t *testing.T) {
 	md := new(mocks2.StatDumper)
 	mp := new(mocks.SubjectPather)
 
+	opterr := errors.New("sup")
+
 	cases := map[string]struct {
 		// driver sets the driver for the constructor call.
 		driver fuzzer.Driver
@@ -81,6 +84,16 @@ func TestNew_error(t *testing.T) {
 				fuzzer.OverrideQuantities(fuzzer.QuantitySet{SubjectCycles: -1}),
 			},
 			err: corpus.ErrSmall,
+		},
+		"err-option": {
+			driver: fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md},
+			paths:  mp,
+			opts: []fuzzer.Option{
+				func(*fuzzer.Fuzzer) error {
+					return opterr
+				},
+			},
+			err: opterr,
 		},
 	}
 
