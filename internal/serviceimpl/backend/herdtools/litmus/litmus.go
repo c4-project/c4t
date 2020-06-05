@@ -28,6 +28,6 @@ func (l Litmus) Args(j job.Lifter, r service.RunInfo) ([]string, error) {
 		"-c11", "true",
 	}
 	args = append(args, r.Args...)
-	args = append(args, j.InFile)
+	args = append(args, j.In.Path)
 	return args, nil
 }

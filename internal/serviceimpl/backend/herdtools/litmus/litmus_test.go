@@ -8,6 +8,8 @@ package litmus
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -17,7 +19,7 @@ import (
 func ExampleLitmus_Args() {
 	j := job.Lifter{
 		Arch:   id.ArchX8664,
-		InFile: "in.litmus",
+		In:     *litmus.New("in.litmus"),
 		OutDir: "out",
 	}
 	r := service.RunInfo{

@@ -91,9 +91,8 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 	spec := job.Lifter{
 		Backend: j.Backend,
 		Arch:    arch,
-		// TODO(@MattWindsor91): pass entire litmus
-		InFile: lit.Path,
-		OutDir: dir,
+		In:      *lit,
+		OutDir:  dir,
 	}
 
 	r, err := j.Driver.Lift(ctx, spec, j.Stderr)

@@ -8,6 +8,8 @@ package job
 import (
 	"io/ioutil"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -21,8 +23,8 @@ type Lifter struct {
 	// Arch is the ID of the architecture for which a recipe should be prepared.
 	Arch id.ID
 
-	// InFile is the path to the input litmus test file.
-	InFile string
+	// In is the input litmus test file and its associated data from fuzzing and/or planning.
+	In litmus.Litmus
 
 	// OutDir is the path to the output directory.
 	OutDir string
