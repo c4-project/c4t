@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/rmach"
+	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
@@ -29,7 +29,7 @@ type StageConfig struct {
 	// Lift contains configuration for the instance's lift stage.
 	Lift *lifter.Lifter
 	// Invoke contains configuration for the instance's invoke stage.
-	Invoke *rmach.Invoker
+	Invoke *invoker.Invoker
 	// Analyse contains configuration for the instance's analysis stage.
 	Analyse *analyse.Config
 }

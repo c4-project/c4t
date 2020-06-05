@@ -20,7 +20,7 @@ import (
 
 const BinMach = "act-tester-mach"
 
-// MachInvoker tells the various rmach runners how to talk to a mach binary,
+// MachInvoker tells the various invoker runners how to talk to a mach binary,
 // passing through a user config in the form of flags.
 type MachInvoker struct {
 	Config *mach.UserConfig
@@ -55,7 +55,7 @@ func (m MachInvoker) maybeOverrideDir(dir string) string {
 	return dir
 }
 
-// MachConfigCliFlags gets the cli flags for setting up the 'user config' part of a mach or rmach invocation.
+// MachConfigCliFlags gets the cli flags for setting up the 'user config' part of a mach or invoker invocation.
 func MachConfigCliFlags() []c.Flag {
 	return []c.Flag{
 		&c.BoolFlag{

@@ -38,7 +38,7 @@ type Config struct {
 }
 
 // UserConfig contains the part of the machine-stage configuration that can be set by the user,
-// either directly or through rmach.
+// either directly or through invoker.
 type UserConfig struct {
 	// OutDir is the path to the output directory.
 	OutDir string

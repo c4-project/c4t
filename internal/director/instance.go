@@ -35,7 +35,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/rmach"
+	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 
@@ -267,8 +267,8 @@ func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 	)
 }
 
-func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) (*rmach.Invoker, error) {
-	return rmach.New(i.ScratchPaths.DirRun,
+func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) (*invoker.Invoker, error) {
+	return invoker.New(i.ScratchPaths.DirRun,
 		stdflag.MachInvoker{
 			// TODO(@MattWindsor91): this is a bit messy.
 			Config: &mach.UserConfig{
@@ -276,9 +276,9 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) 
 				Quantities: i.Quantities.Mach,
 			},
 		},
-		rmach.ObserveCopiesWith(cobs...),
-		rmach.ObserveCorpusWith(bobs...),
-		rmach.UseSSH(i.SSHConfig, i.MachConfig.SSH),
+		invoker.ObserveCopiesWith(cobs...),
+		invoker.ObserveCorpusWith(bobs...),
+		invoker.UseSSH(i.SSHConfig, i.MachConfig.SSH),
 	)
 }
 

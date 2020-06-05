@@ -8,12 +8,12 @@ package main
 import (
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/app/rmach"
+	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
 func main() {
-	app := rmach.App(os.Stdout, os.Stderr)
+	app := invoke.App(os.Stdout, os.Stderr)
 	view.LogTopError(app.Run(os.Args))
 }

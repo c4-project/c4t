@@ -12,7 +12,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/app/rmach"
+	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -33,7 +33,7 @@ const (
    of a testing cycle that are specific to the machine-under-test.
 
    This command's target audience is a pipe, possibly over SSH, connected to an
-   instance of the ` + rmach.Name + ` command.  As such, it doesn't make many
+   instance of the ` + invoke.Name + ` command.  As such, it doesn't make many
    efforts to be user-friendly, and you probably want to use that command
    instead.
 `

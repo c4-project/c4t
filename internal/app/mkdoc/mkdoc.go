@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 
 	"github.com/MattWindsor91/act-tester/internal/app/fuzz"
+	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 	"github.com/MattWindsor91/act-tester/internal/app/lift"
-	"github.com/MattWindsor91/act-tester/internal/app/rmach"
 
 	"github.com/MattWindsor91/act-tester/internal/app/gccnt"
 	"github.com/MattWindsor91/act-tester/internal/app/litmus"
@@ -67,7 +67,7 @@ var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	mach.App,
 	plan.App,
 	analyse.App,
-	rmach.App,
+	invoke.App,
 }
 
 func appsToDocument(ctx *c.Context, outw io.Writer, errw io.Writer) []*c.App {

@@ -3,8 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package rmach contains the app definition for act-tester-rmach.
-package rmach
+// Package invoker contains the app definition for act-tester-invoke.
+package invoke
 
 import (
 	"io"
@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/rmach"
+	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
 
 	c "github.com/urfave/cli/v2"
 
@@ -24,9 +24,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/view"
 )
 
-const Name = "act-tester-rmach"
+const Name = "act-tester-invoke"
 
-// App creates the act-tester-rmach app.
+// App creates the act-tester-invoke app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  Name,
@@ -62,15 +62,15 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	return iohelp.FirstError(err, cerr)
 }
 
-func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*rmach.Invoker, error) {
-	l := log.New(errw, "[rmach] ", log.LstdFlags)
+func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.Invoker, error) {
+	l := log.New(errw, "[invoker] ", log.LstdFlags)
 	mcfg := stdflag.MachConfigFromCli(ctx, cfg.Quantities.Mach)
 
-	return rmach.New(stdflag.OutDirFromCli(ctx),
+	return invoker.New(stdflag.OutDirFromCli(ctx),
 		stdflag.MachInvoker{
 			Config: &mcfg,
 		},
-		rmach.ObserveWith(singleobs.RMach(l)...),
-		rmach.UsePlanSSH(cfg.SSH),
+		invoker.ObserveWith(singleobs.Invoker(l)...),
+		invoker.UsePlanSSH(cfg.SSH),
 	)
 }

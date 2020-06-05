@@ -3,14 +3,14 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package rmach
+package invoker
 
 import (
 	"errors"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/rmach/runner"
+	"github.com/MattWindsor91/act-tester/internal/controller/invoker/runner"
 
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -46,7 +46,7 @@ func ObserveWith(obs ...Observer) Option {
 }
 
 // ObserveCopiesWith adds each observer given to the invoker's copy observer pool.
-func ObserveCopiesWith(obs ...copy2.Observer) Option {
+func ObserveCopiesWith(obs ...copier.Observer) Option {
 	return func(r *Invoker) error {
 		for _, o := range obs {
 			if o == nil {

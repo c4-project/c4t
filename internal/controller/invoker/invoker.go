@@ -3,17 +3,17 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package rmach handles invoking the 'mach' controller in a network-transparent manner with the act-tester-mach binary.
-package rmach
+// Package invoker handles invoking the 'mach' controller in a network-transparent manner with the act-tester-mach binary.
+package invoker
 
 import (
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/controller/rmach/runner"
+	"github.com/MattWindsor91/act-tester/internal/controller/invoker/runner"
 )
 
 // Invoker runs the machine-runner, through SSH if needed.
 type Invoker struct {
-	// dirLocal is the filepath to the directory to which local outcomes from this rmach run will appear.
+	// dirLocal is the filepath to the directory to which local outcomes from this invoker run will appear.
 	dirLocal string
 	// invoker tells the remote-machine controller which arguments to send to the machine binary.
 	invoker runner.InvocationGetter
@@ -23,7 +23,7 @@ type Invoker struct {
 	rfac runner.Factory
 }
 
-// New constructs a new Mach with ssh configuration ssh (if any) and local directory ldir.
+// New constructs a new Invoker with local directory ldir, invocation getter inv, and options o.
 func New(ldir string, inv runner.InvocationGetter, o ...Option) (*Invoker, error) {
 	if err := check(ldir, inv); err != nil {
 		return nil, err
