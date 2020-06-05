@@ -157,13 +157,9 @@ func TestFuzzer_Fuzz_nop(t *testing.T) {
 	p := makePlan()
 
 	f, err := fuzzer.New(cfg, p)
-	if err != nil {
-		t.Fatal("unexpected error in New:", err)
-	}
+	require.NoError(t, err, "unexpected error in New")
 	p2, err := f.Fuzz(context.Background())
-	if err != nil {
-		t.Fatal("unexpected error in Fuzz:", err)
-	}
+	require.NoError(t, err, "unexpected error in Fuzz")
 
 	for name, s := range p2.Corpus {
 		sc, err := fuzzer.ParseSubjectCycle(name)
