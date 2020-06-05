@@ -131,7 +131,7 @@ func (f *Fuzzer) fuzzInner(ctx context.Context, rng *rand.Rand) (corpus.Corpus, 
 	m := builder.Manifest{Name: "fuzz", NReqs: nfuzzes}
 	bc := builder.Config{Manifest: m, Observers: f.conf.Observers}
 	return builder.ParBuild(ctx, f.conf.Quantities.NWorkers, f.plan.Corpus, bc, func(ctx context.Context, s subject.Named, ch chan<- builder.Request) error {
-		return f.makeJob(s, seeds[s.Name], ch).Fuzz(ctx)
+		return f.makeInstance(s, seeds[s.Name], ch).Fuzz(ctx)
 	})
 }
 
@@ -144,7 +144,7 @@ func (f *Fuzzer) corpusSeeds(rng *rand.Rand) map[string]int64 {
 	return seeds
 }
 
-func (f *Fuzzer) makeJob(s subject.Named, seed int64, resCh chan<- builder.Request) *Instance {
+func (f *Fuzzer) makeInstance(s subject.Named, seed int64, resCh chan<- builder.Request) *Instance {
 	return &Instance{
 		Driver:        f.conf.Driver,
 		StatDumper:    f.conf.StatDumper,
