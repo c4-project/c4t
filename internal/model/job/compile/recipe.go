@@ -6,9 +6,9 @@
 package compile
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
 // Recipe represents a request to compile a multi-stage recipe with a particular compiler.

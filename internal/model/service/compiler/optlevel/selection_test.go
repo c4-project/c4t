@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 )
 
 // ExampleSelection_Override is a testable example for Override.

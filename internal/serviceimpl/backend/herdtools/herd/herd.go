@@ -7,6 +7,7 @@
 package herd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -19,8 +20,8 @@ type Herd struct{}
 
 var ErrNotSupported = errors.New("service doesn't support action")
 
-// Args deduces the appropriate arguments for running Herd on job j, with the merged run information r.
-func (h Herd) Args(_ job.Lifter, _ service.RunInfo) ([]string, error) {
+// Run fails to run Herd (for now).
+func (h Herd) Run(_ context.Context, _ job.Lifter, _ service.RunInfo, _ service.Runner) error {
 	// TODO(@MattWindsor91): once we extend this to deal with non-harness jobs, add functionality here.
-	return nil, fmt.Errorf("%w: harness making", ErrNotSupported)
+	return fmt.Errorf("%w: harness making", ErrNotSupported)
 }

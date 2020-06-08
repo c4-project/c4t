@@ -11,6 +11,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -29,12 +30,12 @@ const (
 )
 
 // patch patches the Litmus files in p, which originated from a Litmus invocation in inFile.
-func (l *Litmus) patch() error {
+func (l *Instance) patch() error {
 	if !l.Fixset.NeedsPatch() {
 		return nil
 	}
 
-	rpath := l.Pathset.MainCFile()
+	rpath := l.mainCFile()
 	wpath, err := l.patchToTemp(rpath)
 	if err != nil {
 		return err
@@ -44,7 +45,13 @@ func (l *Litmus) patch() error {
 	return yos.MoveFile(wpath, rpath)
 }
 
-func (l *Litmus) patchToTemp(rpath string) (wpath string, err error) {
+// mainCFile guesses where Litmus is going to put the main file in its generated harness.
+func (l *Instance) mainCFile() string {
+	file := iohelp.ExtlessFile(l.Job.In.Path) + ".c"
+	return filepath.Join(l.Job.OutDir, file)
+}
+
+func (l *Instance) patchToTemp(rpath string) (wpath string, err error) {
 	r, rerr := os.Open(rpath)
 	if rerr != nil {
 		return "", fmt.Errorf("can't open C file for reading: %w", rerr)
@@ -54,7 +61,7 @@ func (l *Litmus) patchToTemp(rpath string) (wpath string, err error) {
 	return wpath, iohelp.FirstError(werr, cerr)
 }
 
-func (l *Litmus) patchReaderToTemp(r io.Reader) (string, error) {
+func (l *Instance) patchReaderToTemp(r io.Reader) (string, error) {
 	w, werr := ioutil.TempFile("", "*.c")
 	if werr != nil {
 		return "", fmt.Errorf("can't open temp file for reading: %w", werr)

@@ -7,8 +7,8 @@
 package compile
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
 // Compile represents a request to compile a list of files to an executable given a particular compiler.

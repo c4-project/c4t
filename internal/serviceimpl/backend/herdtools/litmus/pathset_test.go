@@ -9,14 +9,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	litmus2 "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/tool/litmus"
+	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 )
 
 // ExamplePathset_Args is a runnable example for Args.
 func ExamplePathset_Args() {
-	for _, arg := range (&litmus.Pathset{
+	for _, arg := range (&litmus2.Pathset{
 		FileIn: "/home/foo/bar/baz.litmus",
 		DirOut: "/tmp/scratch/",
 	}).Args() {
@@ -31,7 +31,7 @@ func ExamplePathset_Args() {
 
 // ExamplePathset_MainCFile is a runnable example for MainCFile.
 func ExamplePathset_MainCFile() {
-	fmt.Println((&litmus.Pathset{
+	fmt.Println((&litmus2.Pathset{
 		FileIn: "/home/foo/bar/baz.litmus",
 		DirOut: "/tmp/scratch/",
 	}).MainCFile())
@@ -45,19 +45,19 @@ func TestPathset_Check(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		in  litmus.Pathset
+		in  litmus2.Pathset
 		err error
 	}{
 		"no-file": {
-			in:  litmus.Pathset{DirOut: "/tmp/scratch"},
-			err: litmus.ErrNoFileIn,
+			in:  litmus2.Pathset{DirOut: "/tmp/scratch"},
+			err: litmus2.ErrNoFileIn,
 		},
 		"no-dir": {
-			in:  litmus.Pathset{FileIn: "/home/foo/bar/baz.litmus"},
-			err: litmus.ErrNoDirOut,
+			in:  litmus2.Pathset{FileIn: "/home/foo/bar/baz.litmus"},
+			err: litmus2.ErrNoDirOut,
 		},
 		"ok": {
-			in: litmus.Pathset{
+			in: litmus2.Pathset{
 				FileIn: "/home/foo/bar/baz.litmus",
 				DirOut: "/tmp/scratch/",
 			},

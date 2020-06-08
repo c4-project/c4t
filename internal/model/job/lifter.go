@@ -6,13 +6,23 @@
 package job
 
 import (
+	"errors"
 	"io/ioutil"
+
+	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
+)
+
+var (
+	// ErrInLitmusBlank occurs when the input file of al ifter job is checked and found to be blank.
+	ErrInLitmusBlank = errors.New("input litmus file path blank")
+	// ErrOutDirBlank occurs when the output directory of a lifter job is checked and found to be blank.
+	ErrOutDirBlank = errors.New("output directory path blank")
 )
 
 // Lifter is a specification of how to lift a test into a compilable recipe.
@@ -30,10 +40,21 @@ type Lifter struct {
 	OutDir string
 }
 
+// Check performs several in-flight checks on a lifter job.
+func (l *Lifter) Check() error {
+	if !l.In.HasPath() {
+		return ErrInLitmusBlank
+	}
+	if ystring.IsBlank(l.OutDir) {
+		return ErrOutDirBlank
+	}
+	return nil
+}
+
 // OutFiles reads s.OutDir as a directory and returns its contents as qualified paths.
 // This is useful for using a recipe job to feed a compiler job.
-func (s Lifter) OutFiles() ([]string, error) {
-	fs, err := ioutil.ReadDir(s.OutDir)
+func (l *Lifter) OutFiles() ([]string, error) {
+	fs, err := ioutil.ReadDir(l.OutDir)
 	if err != nil {
 		return nil, err
 	}

@@ -6,7 +6,7 @@
 package machine
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
 // Config is a config record for a particular machine.

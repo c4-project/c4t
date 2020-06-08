@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	compiler "github.com/MattWindsor91/act-tester/internal/model/compiler"
+	compiler "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	mock "github.com/stretchr/testify/mock"
 )
 

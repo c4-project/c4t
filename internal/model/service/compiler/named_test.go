@@ -11,8 +11,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
 // ExampleCompiler_AddName is a runnable example for AddName.

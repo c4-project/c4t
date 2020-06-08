@@ -13,8 +13,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
 

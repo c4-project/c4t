@@ -21,7 +21,7 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 

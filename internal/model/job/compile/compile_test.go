@@ -10,8 +10,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,47 +3,40 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package litmus
+package litmus_test
 
 import (
-	"fmt"
+	"context"
+	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
+
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/job"
+	mdl "github.com/MattWindsor91/act-tester/internal/model/litmus"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
 
-// ExampleLitmus_Args is a testable example for Args.
-func ExampleLitmus_Args() {
-	j := job.Lifter{
-		Arch:   id.ArchX8664,
-		In:     *litmus.New("in.litmus"),
-		OutDir: "out",
-	}
-	r := service.RunInfo{
-		Cmd:  "litmus7",
-		Args: []string{"-v"},
+// ExampleInstance_Run is a testable example for Run.
+func ExampleInstance_Run() {
+	i := litmus.Instance{
+		Job: job.Lifter{
+			Arch:   id.ArchX8664,
+			In:     *mdl.New("in.litmus"),
+			OutDir: "out",
+		},
+		RunInfo: service.RunInfo{
+			Cmd:  "litmus7",
+			Args: []string{"-v"},
+		},
+		Runner: srvrun.DryRunner{Writer: os.Stdout},
 	}
 
-	args64, _ := Litmus{}.Args(j, r)
-	fmt.Print("64-bit:")
-	for _, arg := range args64 {
-		fmt.Printf(" %s", arg)
-	}
-	fmt.Println()
-
-	// 32-bit x86 maps to a different Litmus architecture:
-	j.Arch = id.ArchX86
-	args32, _ := Litmus{}.Args(j, r)
-	fmt.Print("32-bit:")
-	for _, arg := range args32 {
-		fmt.Printf(" %s", arg)
-	}
-	fmt.Println()
+	// We don't ask for a fixset, so we won't have any patching.
+	_ = i.Run(context.Background())
 
 	// Output:
-	// 64-bit: -o out -carch X86_64 -c11 true -v in.litmus
-	// 32-bit: -o out -carch X86 -c11 true -v in.litmus
+	// litmus7 -v -o out -carch X86_64 -c11 true in.litmus
 }

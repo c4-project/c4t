@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	compiler "github.com/MattWindsor91/act-tester/internal/model/compiler"
 	compile "github.com/MattWindsor91/act-tester/internal/model/job/compile"
+	compiler "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	context "context"
 
@@ -12,7 +12,7 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	optlevel "github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+	optlevel "github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 
 	stringhelp "github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 )

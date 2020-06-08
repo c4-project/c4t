@@ -17,7 +17,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/mocks"
 	"github.com/stretchr/testify/require"
 
-	mdl "github.com/MattWindsor91/act-tester/internal/model/compiler"
+	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
 // TestResolver_RunCompiler tests that RunCompiler delegates properly.

@@ -37,6 +37,10 @@ func (f *Fixset) Args() []string {
 
 // PopulateFromStats switches various fixes on according to the statistics in s.
 func (f *Fixset) PopulateFromStats(s *litmus.Statset) {
+	if s == nil {
+		return
+	}
+
 	// TODO(@MattWindsor91): this should only be turned on if atomic integers are present.
 	// Even then, it should only appear when we're using `gcc`, but I'm unsure how to enforce that.
 	f.RemoveAtomicCasts = true

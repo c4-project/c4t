@@ -5,7 +5,16 @@
 
 package service
 
-import "strings"
+import (
+	"context"
+	"strings"
+)
+
+// Runner is the interface of things that can run, or pretend to run, services.
+type Runner interface {
+	// Run runs r using context ctx.
+	Run(ctx context.Context, r RunInfo) error
+}
 
 // RunInfo gives hints as to how to run a service.
 type RunInfo struct {

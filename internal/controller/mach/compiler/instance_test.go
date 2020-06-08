@@ -27,10 +27,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
-	mdl "github.com/MattWindsor91/act-tester/internal/model/compiler"
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
+	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 )
 
 // TestInstance_Compile tests running a compile job.

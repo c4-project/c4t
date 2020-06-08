@@ -12,9 +12,9 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 )
 
 // Config collects the part of a compiler's specification that comes from the act-tester configuration.

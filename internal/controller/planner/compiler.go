@@ -12,9 +12,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )

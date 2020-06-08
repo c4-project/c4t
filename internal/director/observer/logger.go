@@ -17,7 +17,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"

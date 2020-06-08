@@ -9,7 +9,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/parser"
 
@@ -46,14 +47,9 @@ func (h Backend) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe
 	if b.Run != nil {
 		r.Override(*b.Run)
 	}
-	args, err := h.Impl.Args(j, r)
-	if err != nil {
-		return recipe.Recipe{}, err
-	}
 
-	cmd := exec.CommandContext(ctx, r.Cmd, args...)
-	cmd.Stderr = errw
-	if err := cmd.Run(); err != nil {
+	sr := srvrun.NewExecRunner(srvrun.StderrTo(errw))
+	if err := h.Impl.Run(ctx, j, r, sr); err != nil {
 		return recipe.Recipe{}, fmt.Errorf("running %s: %w", r.Cmd, err)
 	}
 
@@ -74,9 +70,8 @@ func (h Backend) makeRecipe(j job.Lifter) (recipe.Recipe, error) {
 
 // BackendImpl describes the functionality that differs between Herdtools-style backends.
 type BackendImpl interface {
-	// Args tries to deduce the arguments needed to run the harness job j according to merged run information r.
-	// It can fail if the job is not runnable by the backend.
-	Args(j job.Lifter, r service.RunInfo) ([]string, error)
+	// Run runs the lifter job j using x and the run information in r.
+	Run(ctx context.Context, j job.Lifter, r service.RunInfo, x service.Runner) error
 
 	parser.Impl
 }

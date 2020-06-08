@@ -16,11 +16,11 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
 
-	mdl "github.com/MattWindsor91/act-tester/internal/model/compiler"
+	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 

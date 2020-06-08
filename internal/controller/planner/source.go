@@ -5,7 +5,7 @@
 
 package planner
 
-import "github.com/MattWindsor91/act-tester/internal/model/compiler"
+import "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 // Source contains all of the various sources for a Planner's information.
 type Source struct {

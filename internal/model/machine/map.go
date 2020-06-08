@@ -10,8 +10,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
 // ErrNoMachine occurs when we try to look up the compilers of a missing machine.

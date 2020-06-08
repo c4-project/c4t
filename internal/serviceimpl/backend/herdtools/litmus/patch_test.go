@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/tool/litmus"
+	litmus2 "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
 )
 
 const mainFileExample = `// File example
@@ -30,15 +30,15 @@ func TestFixset_PatchMainFile(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		fixset litmus.Fixset
+		fixset litmus2.Fixset
 		want   string
 	}{
 		"no-fixes": {
-			fixset: litmus.Fixset{},
+			fixset: litmus2.Fixset{},
 			want:   mainFileExample,
 		},
 		"stdbool": {
-			fixset: litmus.Fixset{InjectStdbool: true},
+			fixset: litmus2.Fixset{InjectStdbool: true},
 			want: `// File example
 
 /* Includes */
@@ -54,7 +54,7 @@ main(int argc, char **argv)
 `,
 		},
 		"casts": {
-			fixset: litmus.Fixset{RemoveAtomicCasts: true},
+			fixset: litmus2.Fixset{RemoveAtomicCasts: true},
 			want: `// File example
 
 /* Includes */

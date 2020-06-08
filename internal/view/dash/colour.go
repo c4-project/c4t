@@ -6,8 +6,8 @@
 package dash
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/compiler/optlevel"
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/mum4k/termdash/cell"
 )

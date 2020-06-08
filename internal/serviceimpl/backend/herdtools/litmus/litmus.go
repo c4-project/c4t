@@ -7,7 +7,7 @@
 package litmus
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -16,18 +16,12 @@ import (
 // Litmus describes the parts of a Litmus invocation that are specific to Herd.
 type Litmus struct{}
 
-// Args deduces the appropriate arguments for running Litmus on job j, with the merged run information r.
-func (l Litmus) Args(j job.Lifter, r service.RunInfo) ([]string, error) {
-	larch, err := lookupArch(j.Arch)
-	if err != nil {
-		return nil, fmt.Errorf("when looking up -carch: %w", err)
+func (l Litmus) Run(ctx context.Context, j job.Lifter, r service.RunInfo, x service.Runner) error {
+	i := Instance{
+		Job:     j,
+		RunInfo: r,
+		Runner:  x,
+		Verbose: false,
 	}
-	args := []string{
-		"-o", j.OutDir,
-		"-carch", larch,
-		"-c11", "true",
-	}
-	args = append(args, r.Args...)
-	args = append(args, j.In.Path)
-	return args, nil
+	return i.Run(ctx)
 }

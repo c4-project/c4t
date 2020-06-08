@@ -19,8 +19,8 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
-	mdl "github.com/MattWindsor91/act-tester/internal/model/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
+	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
