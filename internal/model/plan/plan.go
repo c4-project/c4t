@@ -27,20 +27,20 @@ var ErrNil = errors.New("plan nil")
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
 type Plan struct {
-	Metadata Metadata `toml:"metadata" json:"metadata"`
+	Metadata Metadata `json:"metadata"`
 
 	// Machine represents the machine targeted by this plan.
-	Machine machine.Named `toml:"machine" json:"machine"`
+	Machine machine.Named `json:"machine"`
 
 	// Backend represents the backend targeted by this plan.
-	Backend *service.Backend `toml:"backend,omitempty" json:"backend,omitempty"`
+	Backend *service.Backend `json:"backend,omitempty"`
 
 	// Compilers represents the compilers to be targeted by this plan.
 	// Each compiler's key is a stringified form of its machine CompilerID.
-	Compilers map[string]compiler.Compiler `toml:"compilers" json:"compilers"`
+	Compilers map[string]compiler.Compiler `json:"compilers"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
-	Corpus corpus.Corpus `toml:"corpus" json:"corpus"`
+	Corpus corpus.Corpus `json:"corpus"`
 }
 
 // Check checks various basic properties on a plan.
