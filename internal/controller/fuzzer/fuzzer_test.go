@@ -9,6 +9,9 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 	mocks2 "github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
@@ -133,6 +136,20 @@ func TestFuzzer_Run_error(t *testing.T) {
 			},
 			err: corpus.ErrNone,
 		},
+		"bad-version": {
+			pdelta: func(p *plan.Plan) *plan.Plan {
+				p.Metadata.Version = 0
+				return p
+			},
+			err: plan.ErrVersionMismatch,
+		},
+		"no-stage": {
+			pdelta: func(p *plan.Plan) *plan.Plan {
+				p.Metadata.Stages = []stage.Record{}
+				return p
+			},
+			err: plan.ErrMissingStage,
+		},
 		"small-corpus": {
 			opts: []fuzzer.Option{
 				fuzzer.OverrideQuantities(
@@ -152,6 +169,7 @@ func TestFuzzer_Run_error(t *testing.T) {
 			require.NoError(t, err, "there shouldn't be an error yet!")
 
 			p := makePlan()
+			p.Metadata.ConfirmStage(stage.Plan, time.Now(), time.Now())
 			if f := c.pdelta; f != nil {
 				p = f(p)
 			}
@@ -179,6 +197,7 @@ func TestFuzzer_Run_nop(t *testing.T) {
 	md.On("DumpStats", mock.Anything, mock.Anything, "fuzz.litmus").Return(nil)
 
 	p := makePlan()
+	p.Metadata.ConfirmStage(stage.Plan, time.Now(), time.Now())
 
 	p2, err := f.Run(context.Background(), p)
 	require.NoError(t, err, "unexpected error in Run")

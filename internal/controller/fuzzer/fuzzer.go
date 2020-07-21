@@ -12,6 +12,9 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -39,7 +42,7 @@ type SubjectPather interface {
 
 //go:generate mockery -name SubjectPather
 
-// Fuzzer holds the configuration required to fuzz a plan file.
+// Fuzzer holds the state required for the fuzzing stage of the tester.
 type Fuzzer struct {
 	// l is the logger for this fuzzer.
 	l *log.Logger
@@ -89,6 +92,18 @@ func (f *Fuzzer) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, err
 	}
 
+	start := time.Now()
+
+	outp, err := f.fuzz(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+
+	outp.Metadata.ConfirmStage(stage.Fuzz, start, time.Now())
+	return outp, nil
+}
+
+func (f *Fuzzer) fuzz(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	f.l.Println("preparing directories")
 	if err := f.paths.Prepare(); err != nil {
 		return nil, err
@@ -114,7 +129,8 @@ func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand, p plan.P
 
 	f.l.Println("updating plan")
 	p.Corpus = scs
-	p.Metadata = *plan.NewMetadata(plan.UseDateSeed)
+	// Previously, we reset the plan creation date and seed here.  This seems a little arbitrary in hindsight,
+	// so we no longer do so.
 	return &p, nil
 }
 
@@ -164,6 +180,9 @@ func (f *Fuzzer) checkPlan(p *plan.Plan) error {
 		return plan.ErrNil
 	}
 	if err := p.Check(); err != nil {
+		return err
+	}
+	if err := p.Metadata.RequireStage(stage.Plan); err != nil {
 		return err
 	}
 	return f.checkCount(p.Corpus)
