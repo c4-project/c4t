@@ -69,7 +69,10 @@ func checkPlan(p *plan.Plan) error {
 	if p == nil {
 		return plan.ErrNil
 	}
-	return p.Check()
+	if err := p.Check(); err != nil {
+		return err
+	}
+	return p.Metadata.RequireStage(stage.Plan, stage.Lift)
 }
 
 // runPipework runs the various parallel processes that read to and write from the machine binary via ps.
