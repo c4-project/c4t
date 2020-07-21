@@ -67,7 +67,7 @@ func checkConfig(c *Config) error {
 
 // Plan runs the test planner p.
 func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
-	hd := plan.NewHeader(p.seed)
+	hd := plan.NewMetadata(p.seed)
 	p.plan.Metadata = *hd
 
 	if p.rng == nil {

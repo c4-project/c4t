@@ -89,19 +89,19 @@ func TestPlan_Check(t *testing.T) {
 			err: plan.ErrVersionMismatch,
 		},
 		"version too low": {
-			in: plan.Plan{Metadata: plan.Header{
+			in: plan.Plan{Metadata: plan.Metadata{
 				Version: plan.CurrentVer - 1,
 			}},
 			err: plan.ErrVersionMismatch,
 		},
 		"version too high": {
-			in: plan.Plan{Metadata: plan.Header{
+			in: plan.Plan{Metadata: plan.Metadata{
 				Version: plan.CurrentVer + 1,
 			}},
 			err: plan.ErrVersionMismatch,
 		},
 		"no corpus": {
-			in: plan.Plan{Metadata: plan.Header{
+			in: plan.Plan{Metadata: plan.Metadata{
 				Version: plan.CurrentVer,
 			}},
 			err: corpus.ErrNone,

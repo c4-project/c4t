@@ -34,7 +34,7 @@ import (
 // makePlan makes a 'valid' plan.
 func makePlan() *plan.Plan {
 	return &plan.Plan{
-		Metadata: plan.Header{Version: plan.CurrentVer},
+		Metadata: plan.Metadata{Version: plan.CurrentVer},
 		Corpus: map[string]subject.Subject{
 			"foo": *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(1))),
 			"bar": *subject.NewOrPanic(litmus.New("bar.litmus", litmus.WithThreads(2))),

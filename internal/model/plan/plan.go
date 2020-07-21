@@ -27,7 +27,7 @@ var ErrNil = errors.New("plan nil")
 // Plan represents a test plan.
 // A plan covers an entire campaign of testing.
 type Plan struct {
-	Metadata Header `toml:"metadata" json:"metadata"`
+	Metadata Metadata `toml:"metadata" json:"metadata"`
 
 	// Machine represents the machine targeted by this plan.
 	Machine machine.Named `toml:"machine" json:"machine"`

@@ -18,8 +18,8 @@ const UseDateSeed int64 = -1
 // ErrVersionMismatch occurs when the version of a plan loaded into part of a tester doesn't equal CurrentVer.
 var ErrVersionMismatch = errors.New("bad plan version")
 
-// Header is a grouping of plan metadata.
-type Header struct {
+// Metadata is a grouping of plan metadata.
+type Metadata struct {
 	// Creation marks the time at which the plan was created.
 	Creation time.Time `toml:"created,omitzero" json:"created,omitempty"`
 
@@ -30,18 +30,18 @@ type Header struct {
 	Version Version `toml:"version,omitzero" json:"version,omitempty"`
 }
 
-// NewHeader produces a new header with a seed and creation time initialised from the current time.
+// NewMetadata produces a new header with a seed and creation time initialised from the current time.
 // If seed is set to anything other than UseDateSeed, the seed will be set from the creation time.
-func NewHeader(seed int64) *Header {
+func NewMetadata(seed int64) *Metadata {
 	now := time.Now()
 	if seed == UseDateSeed {
 		seed = now.UnixNano()
 	}
-	return &Header{Creation: now, Seed: seed, Version: CurrentVer}
+	return &Metadata{Creation: now, Seed: seed, Version: CurrentVer}
 }
 
 // CheckVersion checks to see if this header's plan version is compatible with this tool's version.
-func (h Header) CheckVersion() error {
+func (h Metadata) CheckVersion() error {
 	if !h.Version.IsCurrent() {
 		return fmt.Errorf("%w: plan version: %d; tool version: %d", ErrVersionMismatch, h.Version, CurrentVer)
 	}
@@ -49,6 +49,6 @@ func (h Header) CheckVersion() error {
 }
 
 // Rand creates a random number generator using this Metadata's seed.
-func (h *Header) Rand() *rand.Rand {
+func (h *Metadata) Rand() *rand.Rand {
 	return rand.New(rand.NewSource(h.Seed))
 }
