@@ -64,15 +64,24 @@ func (m *Metadata) ConfirmStage(s stage.Stage, start, end time.Time) {
 	m.Stages = append(m.Stages, stage.NewRecord(s, start, end))
 }
 
-// RequireStage checks to see if this metadata has had the stage s marked completed at least once.
-// It returns ErrMissingStage if not.
-func (m *Metadata) RequireStage(s stage.Stage) error {
+func (m *Metadata) requireOneStage(s stage.Stage) error {
 	for _, r := range m.Stages {
 		if r.Stage == s {
 			return nil
 		}
 	}
 	return fmt.Errorf("%w: %s", ErrMissingStage, s)
+}
+
+// RequireStage checks to see if this metadata has had each given stage marked completed at least once.
+// It returns ErrMissingStage if not.
+func (m *Metadata) RequireStage(stages ...stage.Stage) error {
+	for _, s := range stages {
+		if err := m.requireOneStage(s); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Rand creates a random number generator using this Metadata's seed.
