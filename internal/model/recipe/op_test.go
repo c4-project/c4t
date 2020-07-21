@@ -23,6 +23,15 @@ func ExampleOp_String() {
 	// Op(42)
 }
 
+// ExampleOp_MarshalJSON is a runnable example for MarshalJSON.
+func ExampleOp_MarshalJSON() {
+	bs, _ := recipe.CompileExe.MarshalJSON()
+	fmt.Println(string(bs))
+
+	// Output:
+	// "CompileExe"
+}
+
 // TestOp_MarshalJSON_roundTrip tests Op's marshalling and unmarshalling by round-trip.
 func TestOp_MarshalJSON_roundTrip(t *testing.T) {
 	t.Parallel()
