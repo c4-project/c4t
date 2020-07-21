@@ -12,25 +12,11 @@ import (
 	"time"
 )
 
-const (
-	// UseDateSeed is a value for the header constructor's seed parameter that ensures its RNG will be seeded by run date.
-	UseDateSeed int64 = -1
+// UseDateSeed is a value for the header constructor's seed parameter that ensures its RNG will be seeded by run date.
+const UseDateSeed int64 = -1
 
-	// CurrentVer is the current plan version.
-	// It changes when the interface between various bits of the tester (generally manifested within the plan version)
-	// changes.
-	CurrentVer uint32 = 2020_07_21
-
-	// Version history since 2020_05_29:
-	//
-	// 2020_07_21: Added stage information.
-	// 2020_05_29: Initial version for which this comment was maintained.
-)
-
-var (
-	// ErrVersionMismatch occurs when the version of a plan loaded into part of a tester doesn't equal CurrentVer.
-	ErrVersionMismatch = errors.New("bad plan version")
-)
+// ErrVersionMismatch occurs when the version of a plan loaded into part of a tester doesn't equal CurrentVer.
+var ErrVersionMismatch = errors.New("bad plan version")
 
 // Header is a grouping of plan metadata.
 type Header struct {
@@ -41,7 +27,7 @@ type Header struct {
 	Seed int64 `toml:"seed" json:"seed"`
 
 	// Version is a version identifier of the form YYYYMMDD, used to check whether the plan format has changed.
-	Version uint32 `toml:"version,omitzero" json:"version,omitempty"`
+	Version Version `toml:"version,omitzero" json:"version,omitempty"`
 }
 
 // NewHeader produces a new header with a seed and creation time initialised from the current time.
@@ -56,7 +42,7 @@ func NewHeader(seed int64) *Header {
 
 // CheckVersion checks to see if this header's plan version is compatible with this tool's version.
 func (h Header) CheckVersion() error {
-	if h.Version != CurrentVer {
+	if !h.Version.IsCurrent() {
 		return fmt.Errorf("%w: plan version: %d; tool version: %d", ErrVersionMismatch, h.Version, CurrentVer)
 	}
 	return nil
