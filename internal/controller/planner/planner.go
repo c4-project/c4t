@@ -11,6 +11,9 @@ import (
 	"errors"
 	"log"
 	"math/rand"
+	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
@@ -74,22 +77,30 @@ func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 		p.rng = hd.Rand()
 	}
 
-	var err error
+	start := time.Now()
 
-	p.l.Println("Planning backend...")
-	if err = p.planBackend(ctx); err != nil {
+	if err := p.planContent(ctx); err != nil {
 		return nil, err
+	}
+
+	p.plan.Metadata.ConfirmStage(stage.Plan, start, time.Now())
+	return &p.plan, nil
+}
+
+func (p *Planner) planContent(ctx context.Context) error {
+	p.l.Println("Planning backend...")
+	if err := p.planBackend(ctx); err != nil {
+		return err
 	}
 
 	p.l.Println("Planning compilers...")
-	if err = p.planCompilers(ctx); err != nil {
-		return nil, err
+	if err := p.planCompilers(ctx); err != nil {
+		return err
 	}
 
 	p.l.Println("Planning corpus...")
-	if err = p.planCorpus(ctx); err != nil {
-		return nil, err
+	if err := p.planCorpus(ctx); err != nil {
+		return err
 	}
-
-	return &p.plan, nil
+	return nil
 }
