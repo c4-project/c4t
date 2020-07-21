@@ -7,8 +7,12 @@
 package plan
 
 import (
+	"context"
 	"errors"
 	"sort"
+	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
@@ -53,6 +57,17 @@ func (p *Plan) Check() error {
 	}
 	// TODO(@MattWindsor91): make sure compilers exist
 	return nil
+}
+
+// RunStage runs f with ctx and this plan, timing it using wall-clock, and marks s as completed on the resulting plan.
+func (p *Plan) RunStage(ctx context.Context, s stage.Stage, f func(context.Context, *Plan) (*Plan, error)) (*Plan, error) {
+	start := time.Now()
+	np, err := f(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+	np.Metadata.ConfirmStage(s, start, time.Now())
+	return np, nil
 }
 
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.

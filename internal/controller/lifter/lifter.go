@@ -13,6 +13,10 @@ import (
 	"log"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -89,13 +93,7 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
-
-	l.l.Println("preparing directories")
-	if err := l.prepareDirs(p); err != nil {
-		return nil, err
-	}
-
-	return l.lift(ctx, *p)
+	return p.RunStage(ctx, stage.Lift, l.lift)
 }
 
 func (l *Lifter) prepareDirs(p *plan.Plan) error {
@@ -107,15 +105,29 @@ func checkPlan(p *plan.Plan) error {
 	if p == nil {
 		return plan.ErrNil
 	}
+	if err := p.Check(); err != nil {
+		return err
+	}
 	if p.Backend == nil {
 		return ErrNoBackend
 	}
-	return p.Check()
+	return p.Metadata.RequireStage(stage.Plan)
 }
 
-func (l *Lifter) lift(ctx context.Context, p plan.Plan) (*plan.Plan, error) {
-	l.l.Println("now lifting")
+func (l *Lifter) lift(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	l.l.Println("preparing directories")
+	if err := l.prepareDirs(p); err != nil {
+		return nil, err
+	}
 
+	var err error
+	outp := *p
+	outp.Corpus, err = l.liftCorpus(ctx, p)
+	return &outp, err
+}
+
+func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, error) {
+	l.l.Println("now lifting")
 	cfg := builder.Config{
 		Init:      p.Corpus,
 		Observers: l.obs,
@@ -124,16 +136,12 @@ func (l *Lifter) lift(ctx context.Context, p plan.Plan) (*plan.Plan, error) {
 			NReqs: p.MaxNumRecipes(),
 		},
 	}
-
 	mrng := p.Metadata.Rand()
-
-	var err error
 	// TODO(@MattWindsor91): extract this 20 into configuration.
-	p.Corpus, err = builder.ParBuild(ctx, 20, p.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
-		j := l.makeJob(&p, s, mrng, rq)
+	return builder.ParBuild(ctx, 20, p.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
+		j := l.makeJob(p, s, mrng, rq)
 		return j.Lift(ctx)
 	})
-	return &p, err
 }
 
 func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, mrng *rand.Rand, resCh chan<- builder.Request) Job {

@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"
@@ -19,12 +21,16 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// Run runs the machine binary.
+// Run runs the machine invoker stage.
 func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
+	return p.RunStage(ctx, stage.Invoke, m.invoke)
+}
 
+// invoke runs the machine binary.
+func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	runner, err := m.rfac.MakeRunner(p, m.observers.Copy...)
 	if err != nil {
 		return nil, fmt.Errorf("while spawning runner: %w", err)

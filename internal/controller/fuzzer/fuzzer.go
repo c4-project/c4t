@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
 
@@ -91,16 +90,7 @@ func (f *Fuzzer) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := f.checkPlan(p); err != nil {
 		return nil, err
 	}
-
-	start := time.Now()
-
-	outp, err := f.fuzz(ctx, p)
-	if err != nil {
-		return nil, err
-	}
-
-	outp.Metadata.ConfirmStage(stage.Fuzz, start, time.Now())
-	return outp, nil
+	return p.RunStage(ctx, stage.Fuzz, f.fuzz)
 }
 
 func (f *Fuzzer) fuzz(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
