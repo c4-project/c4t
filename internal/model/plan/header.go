@@ -19,7 +19,12 @@ const (
 	// CurrentVer is the current plan version.
 	// It changes when the interface between various bits of the tester (generally manifested within the plan version)
 	// changes.
-	CurrentVer uint32 = 20200529
+	CurrentVer uint32 = 2020_07_21
+
+	// Version history since 2020_05_29:
+	//
+	// 2020_07_21: Added stage information.
+	// 2020_05_29: Initial version for which this comment was maintained.
 )
 
 var (
@@ -27,7 +32,7 @@ var (
 	ErrVersionMismatch = errors.New("bad plan version")
 )
 
-// Metadata is a grouping of plan metadata.
+// Header is a grouping of plan metadata.
 type Header struct {
 	// Creation marks the time at which the plan was created.
 	Creation time.Time `toml:"created,omitzero" json:"created,omitempty"`
