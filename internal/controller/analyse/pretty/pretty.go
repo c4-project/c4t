@@ -17,52 +17,52 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
 )
 
-// AnalysisWriter provides the ability to output human-readable summaries of analyses to a writer.
-type AnalysisWriter struct {
+// Printer provides the ability to output human-readable summaries of analyses to a writer.
+type Printer struct {
 	w    io.Writer
 	tmpl *template.Template
 	ctx  WriteContext
 }
 
-// NewAnalysisWriter constructs an analysis writer using options o.
-func NewAnalysisWriter(o ...Option) (*AnalysisWriter, error) {
+// NewPrinter constructs a pretty-printer using options o.
+func NewPrinter(o ...Option) (*Printer, error) {
 	t, err := getTemplate()
 	if err != nil {
 		return nil, err
 	}
 
-	aw := &AnalysisWriter{w: os.Stdout, tmpl: t}
+	aw := &Printer{w: os.Stdout, tmpl: t}
 	Options(o...)(aw)
 
 	return aw, nil
 }
 
-// Write writes an unsourced analysis an to this writer.
-func (a *AnalysisWriter) Write(an analysis.Analysis) error {
-	c := a.ctx
-	c.Analysis = &an
-	return a.tmpl.ExecuteTemplate(a.w, "root", c)
+// Write writes an unsourced analysis a to this writer.
+func (p *Printer) Write(a analysis.Analysis) error {
+	c := p.ctx
+	c.Analysis = &a
+	return p.tmpl.ExecuteTemplate(p.w, "root", c)
 }
 
-// OnAnalysis writes an unsourced analysis an to this writer; if an error occurs, it tries to rescue.
-func (a *AnalysisWriter) OnAnalysis(an analysis.Analysis) {
-	if err := a.Write(an); err != nil {
-		a.handleError(err)
+// OnAnalysis writes an unsourced analysis a to this printer; if an error occurs, it tries to rescue.
+func (p *Printer) OnAnalysis(a analysis.Analysis) {
+	if err := p.Write(a); err != nil {
+		p.handleError(err)
 	}
 }
 
 // OnArchive does nothing (for now).
-func (a *AnalysisWriter) OnArchive(observer.ArchiveMessage) {
+func (p *Printer) OnArchive(observer.ArchiveMessage) {
 }
 
-// WriteSourced writes a sourced analysis an to this writer.
-func (a *AnalysisWriter) WriteSourced(an analysis.Sourced) error {
-	if _, err := fmt.Fprintf(a.w, "# %s #\n\n", &an.Run); err != nil {
+// WriteSourced writes a sourced analysis a to this printer.
+func (p *Printer) WriteSourced(a analysis.Sourced) error {
+	if _, err := fmt.Fprintf(p.w, "# %s #\n\n", &a.Run); err != nil {
 		return err
 	}
-	return a.Write(an.Analysis)
+	return p.Write(a.Analysis)
 }
 
-func (a *AnalysisWriter) handleError(err error) {
-	_, _ = fmt.Fprintf(a.w, "ERROR OUTPUTTING ANALYSIS: %s\n", err)
+func (p *Printer) handleError(err error) {
+	_, _ = fmt.Fprintf(p.w, "ERROR OUTPUTTING ANALYSIS: %s\n", err)
 }

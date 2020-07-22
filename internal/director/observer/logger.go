@@ -32,7 +32,7 @@ type Logger struct {
 	// It will be closed by the director.
 	out io.WriteCloser
 	// aw is the analysis writer used for outputting sourced analyses.
-	aw *pretty.AnalysisWriter
+	aw *pretty.Printer
 	// anaCh is used to send sourced analyses for logging.
 	anaCh chan analysis.Sourced
 	// compCh is used to send compilers for logging.
@@ -43,7 +43,7 @@ type Logger struct {
 
 // NewLogger constructs a new Logger writing into w, ranging over machine IDs ids.
 func NewLogger(w io.WriteCloser) (*Logger, error) {
-	aw, err := pretty.NewAnalysisWriter(pretty.WriteTo(w))
+	aw, err := pretty.NewPrinter(pretty.WriteTo(w))
 	if err != nil {
 		return nil, err
 	}

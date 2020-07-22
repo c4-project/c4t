@@ -62,7 +62,7 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
-	obs, err := pretty.NewAnalysisWriter(
+	obs, err := pretty.NewPrinter(
 		pretty.WriteTo(outw),
 		pretty.ShowOk(ctx.Bool(flagShowOk)),
 	)

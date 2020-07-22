@@ -12,11 +12,11 @@ import (
 )
 
 // Option is the type of options for a pretty-printer.
-type Option func(*AnalysisWriter)
+type Option func(*Printer)
 
 // Options combines the options os into a single option.
 func Options(os ...Option) Option {
-	return func(aw *AnalysisWriter) {
+	return func(aw *Printer) {
 		for _, o := range os {
 			o(aw)
 		}
@@ -25,14 +25,14 @@ func Options(os ...Option) Option {
 
 // WriteTo sets the printer's output to w.
 func WriteTo(w io.Writer) Option {
-	return func(aw *AnalysisWriter) {
+	return func(aw *Printer) {
 		aw.w = iohelp.EnsureWriter(w)
 	}
 }
 
 // ShowOk sets whether the printer should show subjects in the 'ok' category, according to show..
 func ShowOk(show bool) Option {
-	return func(aw *AnalysisWriter) {
+	return func(aw *Printer) {
 		aw.ctx.ShowOk = show
 	}
 }
