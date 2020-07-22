@@ -16,6 +16,9 @@ type WriteContext struct {
 	// The analysis to write.
 	Analysis *analysis.Analysis
 
+	// ShowCompilers is true if compiler breakdowns should be shown.
+	ShowCompilers bool
+
 	// ShowOk is true if subjects with the 'ok' status should be shown.
 	ShowOk bool
 }
@@ -70,8 +73,11 @@ const (
 {{- end -}}
 `
 
-	tmplRoot = `# Compilers
+	tmplRoot = `
+{{- if .ShowCompilers -}}
+# Compilers
 {{ template "compilers" . }}
+{{- end }}
 # Subject Outcomes
 {{ template "byStatus" . }}
 `

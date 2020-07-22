@@ -25,11 +25,14 @@ import (
 )
 
 const (
-	flagShowOk  = "show-ok"
-	usageShowOk = "show subjects that did not have compile or run issues"
-
-	flagSaveDir  = "save-dir"
-	usageSaveDir = "if present, save failing corpora to this `directory`"
+	flagShowCompilers      = "show-compilers"
+	flagShowCompilersShort = "C"
+	usageShowCompilers     = "show breakdown of compilers and their run times"
+	flagShowOk             = "show-ok"
+	flagShowOkShort        = "O"
+	usageShowOk            = "show subjects that did not have compile or run issues"
+	flagSaveDir            = "save-dir"
+	usageSaveDir           = "if present, save failing corpora to this `directory`"
 )
 
 func App(outw, errw io.Writer) *c.App {
@@ -47,10 +50,8 @@ func App(outw, errw io.Writer) *c.App {
 func flags() []c.Flag {
 	return []c.Flag{
 		stdflag.WorkerCountCliFlag(),
-		&c.BoolFlag{
-			Name:  flagShowOk,
-			Usage: usageShowOk,
-		},
+		&c.BoolFlag{Name: flagShowCompilers, Aliases: []string{flagShowCompilersShort}, Usage: usageShowCompilers},
+		&c.BoolFlag{Name: flagShowOk, Aliases: []string{flagShowOkShort}, Usage: usageShowOk},
 		&c.PathFlag{
 			Name:        flagSaveDir,
 			Aliases:     []string{stdflag.FlagOutDir},
@@ -64,6 +65,7 @@ func flags() []c.Flag {
 func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 	obs, err := pretty.NewPrinter(
 		pretty.WriteTo(outw),
+		pretty.ShowCompilers(ctx.Bool(flagShowCompilers)),
 		pretty.ShowOk(ctx.Bool(flagShowOk)),
 	)
 	if err != nil {

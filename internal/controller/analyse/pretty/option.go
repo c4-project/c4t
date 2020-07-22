@@ -30,9 +30,16 @@ func WriteTo(w io.Writer) Option {
 	}
 }
 
-// ShowOk sets whether the printer should show subjects in the 'ok' category, according to show..
+// ShowOk sets whether the printer should show subjects in the 'ok' category, according to show.
 func ShowOk(show bool) Option {
 	return func(aw *Printer) {
 		aw.ctx.ShowOk = show
+	}
+}
+
+// ShowOk sets whether the printer should show compiler information, according to show.
+func ShowCompilers(show bool) Option {
+	return func(aw *Printer) {
+		aw.ctx.ShowCompilers = show
 	}
 }
