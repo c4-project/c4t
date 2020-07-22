@@ -21,9 +21,19 @@ type WriteContext struct {
 
 	// ShowOk is true if subjects with the 'ok' status should be shown.
 	ShowOk bool
+
+	// ShowPlanInfo is true if plan metadata should be shown.
+	ShowPlanInfo bool
+
+	// ShowSubjects is true if subject information should be shown.
+	ShowSubjects bool
 }
 
 const (
+	tmplStages = `TODO`
+
+	tmplPlanInfo = `TODO`
+
 	tmplStateset = `{{ range . }}          {{ range $k, $v := . }}  {{ $k }} = {{ $v }}{{- end }}
 {{ end -}}`
 
@@ -74,12 +84,18 @@ const (
 `
 
 	tmplRoot = `
+{{- if .ShowPlanInfo -}}
+# Plan
+{{ template "planInfo" . }}
+{{ end -}}
 {{- if .ShowCompilers -}}
 # Compilers
 {{ template "compilers" . }}
-{{- end }}
+{{ end -}}
+{{- if .ShowSubjects -}}
 # Subject Outcomes
 {{ template "byStatus" . }}
+{{ end -}}
 `
 )
 
@@ -96,6 +112,8 @@ func getTemplate() (*template.Template, error) {
 		"compilerCounts": tmplCompilerCounts,
 		"compilerInfo":   tmplCompilerInfo,
 		"obs":            tmplObs,
+		"planInfo":       tmplPlanInfo,
+		"stages":         tmplStages,
 	} {
 		t, err = t.New(n).Parse(ts)
 		if err != nil {

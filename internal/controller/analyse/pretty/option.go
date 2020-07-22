@@ -37,9 +37,23 @@ func ShowOk(show bool) Option {
 	}
 }
 
-// ShowOk sets whether the printer should show compiler information, according to show.
+// ShowCompilers sets whether the printer should show compiler information, according to show.
 func ShowCompilers(show bool) Option {
 	return func(aw *Printer) {
 		aw.ctx.ShowCompilers = show
+	}
+}
+
+// ShowSubjects sets whether the printer should show subject breakdowns, according to show.
+func ShowSubjects(show bool) Option {
+	return func(aw *Printer) {
+		aw.ctx.ShowSubjects = show
+	}
+}
+
+// ShowPlanInfo sets whether the printer should show plan metadata, according to show.
+func ShowPlanInfo(show bool) Option {
+	return func(aw *Printer) {
+		aw.ctx.ShowPlanInfo = show
 	}
 }

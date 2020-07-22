@@ -43,7 +43,11 @@ type Logger struct {
 
 // NewLogger constructs a new Logger writing into w, ranging over machine IDs ids.
 func NewLogger(w io.WriteCloser) (*Logger, error) {
-	aw, err := pretty.NewPrinter(pretty.WriteTo(w), pretty.ShowCompilers(true))
+	aw, err := pretty.NewPrinter(
+		pretty.WriteTo(w),
+		pretty.ShowCompilers(true),
+		pretty.ShowSubjects(true),
+	)
 	if err != nil {
 		return nil, err
 	}
