@@ -30,9 +30,17 @@ type WriteContext struct {
 }
 
 const (
-	tmplStages = `TODO`
+	tmplStages = `  ## Stages
+{{- range . }}
+    - {{ .Stage }}: completed {{ .CompletedOn }}, took {{ .Duration.Seconds }} sec(s)
+{{- end -}}
+`
 
-	tmplPlanInfo = `TODO`
+	tmplPlanInfo = `  - created at: {{ .Analysis.Plan.Metadata.Creation }}
+  - seed: {{ .Analysis.Plan.Metadata.Seed }}
+  - version: {{ .Analysis.Plan.Metadata.Version }}
+{{ template "stages" .Analysis.Plan.Metadata.Stages -}}
+`
 
 	tmplStateset = `{{ range . }}          {{ range $k, $v := . }}  {{ $k }} = {{ $v }}{{- end }}
 {{ end -}}`
@@ -51,7 +59,7 @@ const (
 
 	tmplCompilerInfo = `    - style: {{ .Style }}
     - arch: {{ .Arch }}
-    - opt: {{ if .SelectedOpt -}}{{if .SelectedOpt.Name}}{{ .SelectedOpt.Name }}{{ else }}none{{ end -}}{{ else }}none{{- end }}
+    - opt: {{ if .SelectedOpt -}}{{ if .SelectedOpt.Name }}{{ .SelectedOpt.Name }}{{ else }}none{{ end -}}{{ else }}none{{- end }}
     - mopt: {{ if .SelectedMOpt }}{{ .SelectedMOpt }}{{ else }}none{{ end }}`
 
 	tmplCompilers = `
