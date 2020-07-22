@@ -287,5 +287,6 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) 
 
 // dump dumps a plan p to its expected plan file given the stage s.
 func (i *Instance) dump(s stage.Stage, p *plan.Plan) error {
-	return p.WriteFile(i.ScratchPaths.PlanForStage(s))
+	// TODO(@MattWindsor91): is this really necessary anymore?
+	return p.WriteFile(i.ScratchPaths.PlanForStage(s), plan.WriteHuman)
 }

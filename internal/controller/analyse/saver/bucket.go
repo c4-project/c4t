@@ -34,7 +34,7 @@ func (b *bucketSaver) save(c corpus.Corpus) error {
 }
 
 func (b *bucketSaver) writePlan() error {
-	return b.plan.WriteFile(b.paths.FilePlan)
+	return b.plan.WriteFile(b.paths.FilePlan, plan.WriteCompress|plan.WriteHuman)
 }
 
 func (b *bucketSaver) archiveSubjects(corp corpus.Corpus) error {

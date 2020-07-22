@@ -24,19 +24,33 @@ import (
 func TestPlan_Write_roundTrip(t *testing.T) {
 	t.Parallel()
 
-	p := plan.Mock()
-
-	var b bytes.Buffer
-	if err := p.Write(&b); err != nil {
-		t.Fatal("error dumping:", err)
+	cases := map[string]plan.WriteFlag{
+		"mach":     plan.WriteNone,
+		"mach+gz":  plan.WriteCompress,
+		"human":    plan.WriteHuman,
+		"human+gz": plan.WriteHuman | plan.WriteCompress,
 	}
 
-	var p2 plan.Plan
-	if err := plan.Read(&b, &p2); err != nil {
-		t.Fatal("error un-dumping:", err)
-	}
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 
-	assertPlansSimilar(t, p, &p2)
+			p := plan.Mock()
+			var b bytes.Buffer
+			if err := p.Write(&b, c); err != nil {
+				t.Fatal("error dumping:", err)
+			}
+
+			r := bytes.NewReader(b.Bytes())
+			var p2 plan.Plan
+			if err := plan.ReadMagic(r, &p2); err != nil {
+				t.Fatal("error un-dumping:", err)
+			}
+
+			assertPlansSimilar(t, p, &p2)
+		})
+	}
 }
 
 // TestPlan_WriteFile_roundTrip exercises WriteFile by doing a round trip into a temporary file, then checking if
@@ -50,14 +64,29 @@ func TestPlan_WriteFile_roundTrip(t *testing.T) {
 	defer func() { _ = os.RemoveAll(dir) }()
 
 	tmpfn := filepath.Join(dir, "plan.json")
-	p1 := plan.Mock()
 
-	require.NoErrorf(t, p1.WriteFile(tmpfn), "writing to temp plan file %q", tmpfn)
+	cases := map[string]plan.WriteFlag{
+		"mach":     plan.WriteNone,
+		"mach+gz":  plan.WriteCompress,
+		"human":    plan.WriteHuman,
+		"human+gz": plan.WriteHuman | plan.WriteCompress,
+	}
 
-	var p2 plan.Plan
-	require.NoErrorf(t, plan.ReadFile(tmpfn, &p2), "reading from temp plan file %q", tmpfn)
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			// See above in re parallel.
 
-	assertPlansSimilar(t, p1, &p2)
+			p1 := plan.Mock()
+
+			require.NoErrorf(t, p1.WriteFile(tmpfn, c), "writing to temp plan file %q", tmpfn)
+
+			var p2 plan.Plan
+			require.NoErrorf(t, plan.ReadFile(tmpfn, &p2), "reading from temp plan file %q", tmpfn)
+
+			assertPlansSimilar(t, p1, &p2)
+		})
+	}
 }
 
 func assertPlansSimilar(t *testing.T, p1, p2 *plan.Plan) {

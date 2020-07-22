@@ -51,7 +51,7 @@ func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string, outw io.Write
 		return nil
 	}
 
-	return q.Write(outw)
+	return q.Write(outw, plan.WriteHuman)
 }
 
 // RunOnCliPlan runs r on the plan pointed to by the arguments of ctx, dumping the resulting plan to outw.

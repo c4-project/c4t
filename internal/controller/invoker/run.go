@@ -109,7 +109,7 @@ func (m *Invoker) runReplayer(ctx context.Context, r io.Reader) error {
 
 // sendPlan sends p to w, then closes w, reporting any relevant errors.
 func sendPlan(p *plan.Plan, w io.WriteCloser) error {
-	terr := p.Write(w)
+	terr := p.Write(w, plan.WriteNone) // for now
 	ierr := w.Close()
 	if terr != nil {
 		return fmt.Errorf("while sending input plan: %w", terr)

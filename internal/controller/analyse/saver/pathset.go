@@ -62,7 +62,7 @@ func (s *Pathset) run(root string, time time.Time) *RunPathset {
 	rroot := runRoot(root, time)
 	return &RunPathset{
 		DirRoot:  rroot,
-		FilePlan: filepath.Join(rroot, planBasename+plan.Ext),
+		FilePlan: filepath.Join(rroot, planBasename+plan.ExtCompress),
 	}
 }
 
