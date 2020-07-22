@@ -29,3 +29,10 @@ func WriteTo(w io.Writer) Option {
 		aw.w = iohelp.EnsureWriter(w)
 	}
 }
+
+// ShowOk sets whether the printer should show subjects in the 'ok' category, according to show..
+func ShowOk(show bool) Option {
+	return func(aw *AnalysisWriter) {
+		aw.ctx.ShowOk = show
+	}
+}
