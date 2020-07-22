@@ -8,6 +8,9 @@ package pathset
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
+
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
@@ -34,9 +37,9 @@ func NewScratch(root string) *Scratch {
 	}
 }
 
-// PlanForStage gets the path to the plan file for stage stage.
+// PlanForStage gets the path to the plan file for stage s.
 // Note that neither Prepare nor this method create or otherwise access the plan file.
-func (p *Scratch) PlanForStage(stage string) string {
-	file := fmt.Sprintf("plan.%s%s", stage, plan.Ext)
+func (p *Scratch) PlanForStage(s stage.Stage) string {
+	file := fmt.Sprintf("plan.%s%s", strings.ToLower(s.String()), plan.Ext)
 	return filepath.Join(p.DirPlan, file)
 }

@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
@@ -39,67 +41,59 @@ var ErrStageConfigMissing = errors.New("stage config missing")
 // Check makes sure the StageConfig has all configuration elements present.
 func (c *StageConfig) Check() error {
 	if c.Plan == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stagePlan)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Plan)
 	}
 	if c.Fuzz == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageFuzz)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Fuzz)
 	}
 	if c.Lift == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageLift)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Lift)
 	}
 	if c.Invoke == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageInvoke)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Invoke)
 	}
 	if c.Analyse == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stageAnalyse)
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Analyse)
 	}
 	return nil
 }
 
-// Stage is the type of encapsulated director stages.
-type stage struct {
-	// Name is the name of the stage, which appears in logging and errors.
-	Name string
+// stageRunner is the type of encapsulated director stages.
+type stageRunner struct {
+	// Stage is the ID of the stage, which appears in logging and errors.
+	Stage stage.Stage
 	// Run is the function to use to run the stage.
 	Run func(*StageConfig, context.Context, *plan.Plan) (*plan.Plan, error)
 }
 
-const (
-	stagePlan    = "plan"
-	stageFuzz    = "fuzz"
-	stageLift    = "lift"
-	stageInvoke  = "invoke"
-	stageAnalyse = "analyse"
-)
-
 // Stages is the list of director stages.
-var Stages = []stage{
+var Stages = []stageRunner{
 	{
-		Name: stagePlan,
+		Stage: stage.Plan,
 		Run: func(c *StageConfig, ctx context.Context, _ *plan.Plan) (*plan.Plan, error) {
 			return c.Plan.Plan(ctx)
 		},
 	},
 	{
-		Name: stageFuzz,
+		Stage: stage.Fuzz,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Fuzz.Run(ctx, p)
 		},
 	},
 	{
-		Name: stageLift,
+		Stage: stage.Lift,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Lift.Run(ctx, p)
 		},
 	},
 	{
-		Name: stageInvoke,
+		Stage: stage.Invoke,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Invoke.Run(ctx, p)
 		},
 	},
 	{
-		Name: stageAnalyse,
+		Stage: stage.Analyse,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 			return c.Analyse.Run(ctx, p)
 		},

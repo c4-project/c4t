@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+
 	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
@@ -177,15 +179,23 @@ func (i *Instance) iterate(ctx context.Context, iter uint64, sc *StageConfig) er
 	observer.OnIteration(r, i.Observers...)
 
 	for _, s := range Stages {
-		if p, err = s.Run(sc, ctx, p); err != nil {
-			return fmt.Errorf("in %s stage: %w", s.Name, err)
-		}
-		if err = i.dump(s.Name, p); err != nil {
-			return fmt.Errorf("when dumping after %s stage: %w", s.Name, err)
+		p, err = i.runStage(ctx, sc, s, p)
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
+}
+
+func (i *Instance) runStage(ctx context.Context, sc *StageConfig, s stageRunner, p *plan.Plan) (*plan.Plan, error) {
+	var err error
+	if p, err = s.Run(sc, ctx, p); err != nil {
+		return nil, fmt.Errorf("in %s stage: %w", s.Stage, err)
+	}
+	if err = i.dump(s.Stage, p); err != nil {
+		return nil, fmt.Errorf("when dumping after %s stage: %w", s.Stage, err)
+	}
+	return p, nil
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
@@ -275,7 +285,7 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) 
 	)
 }
 
-// dump dumps a plan p to its expected plan file given the stage name name.
-func (i *Instance) dump(name string, p *plan.Plan) error {
-	return p.WriteFile(i.ScratchPaths.PlanForStage(name))
+// dump dumps a plan p to its expected plan file given the stage s.
+func (i *Instance) dump(s stage.Stage, p *plan.Plan) error {
+	return p.WriteFile(i.ScratchPaths.PlanForStage(s))
 }
