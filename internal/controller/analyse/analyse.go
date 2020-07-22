@@ -76,13 +76,18 @@ func (q *Analyse) Run(ctx context.Context) (*plan.Plan, error) {
 
 	observer.OnAnalysis(*a, q.cfg.Observers...)
 
-	if q.save != nil {
-		if err := q.save.Run(*a); err != nil {
-			return nil, err
-		}
+	if err := q.maybeSave(a); err != nil {
+		return nil, err
 	}
 
 	return q.plan, nil
+}
+
+func (q *Analyse) maybeSave(a *analysis.Analysis) error {
+	if q.save == nil {
+		return nil
+	}
+	return q.save.Run(*a)
 }
 
 func (q *Analyse) analyse(ctx context.Context) (*analysis.Analysis, error) {

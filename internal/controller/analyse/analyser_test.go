@@ -7,8 +7,9 @@ package analyse_test
 
 import (
 	"context"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
 
@@ -56,9 +57,7 @@ func TestAnalyser_Analyse_mock(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			got := crp.ByStatus[c.subc].Names()
-			if !reflect.DeepEqual(got, c.wantSubjects) {
-				t.Errorf("wrong subjects: got=%v; want=%v", got, c.wantSubjects)
-			}
+			assert.Equal(t, c.wantSubjects, got, "wrong subjects")
 		})
 	}
 }

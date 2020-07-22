@@ -40,6 +40,7 @@ type Analyser struct {
 	nworkers int
 }
 
+// Analyse runs the analyser with context ctx.
 func (a *Analyser) Analyse(ctx context.Context) (*analysis.Analysis, error) {
 	l := len(a.corpus)
 	if l == 0 {
@@ -89,15 +90,8 @@ func NewAnalyser(p *plan.Plan, nworkers int) (*Analyser, error) {
 		runTimes:      make(map[string][]time.Duration, lc),
 		nworkers:      nworkers,
 	}
-	a.initCorpora(len(p.Corpus))
 	a.initCompilers(p.Compilers)
 	return &a, nil
-}
-
-func (a *Analyser) initCorpora(size int) {
-	for i := status.Ok; i <= status.Last; i++ {
-		a.analysis.ByStatus[i] = make(corpus.Corpus, size)
-	}
 }
 
 func (a *Analyser) initCompilers(cs map[string]compiler.Compiler) {
@@ -128,20 +122,8 @@ func (a *Analyser) Apply(r classification) {
 	a.analysis.Flags |= r.flags
 	for i := status.Ok; i <= status.Last; i++ {
 		sf := i.Flag()
-
-		if r.flags.Matches(sf) {
-			a.analysis.ByStatus[i][r.sub.Name] = r.sub.Subject
-		}
-
-		for cstr, f := range r.cflags {
-			if _, ok := a.analysis.Compilers[cstr]; !ok {
-				continue
-			}
-
-			if f.Matches(sf) {
-				a.analysis.Compilers[cstr].Counts[i]++
-			}
-		}
+		a.applyByStatus(i, sf, r)
+		a.applyCompilers(i, sf, r)
 		for cstr, ts := range r.ctimes {
 			a.compilerTimes[cstr] = append(a.compilerTimes[cstr], ts...)
 		}
@@ -149,4 +131,30 @@ func (a *Analyser) Apply(r classification) {
 			a.runTimes[cstr] = append(a.runTimes[cstr], ts...)
 		}
 	}
+}
+
+func (a *Analyser) applyByStatus(s status.Status, sf status.Flag, r classification) {
+	if !r.flags.Matches(sf) {
+		return
+	}
+	if _, ok := a.analysis.ByStatus[s]; !ok {
+		a.analysis.ByStatus[s] = make(corpus.Corpus)
+	}
+	a.analysis.ByStatus[s][r.sub.Name] = r.sub.Subject
+}
+
+func (a *Analyser) applyCompilers(s status.Status, sf status.Flag, r classification) {
+	for cstr, f := range r.cflags {
+		a.applyCompiler(s, sf, f, cstr)
+	}
+}
+
+func (a *Analyser) applyCompiler(s status.Status, sf, cf status.Flag, cstr string) {
+	if !cf.Matches(sf) {
+		return
+	}
+	if _, ok := a.analysis.Compilers[cstr]; !ok {
+		return
+	}
+	a.analysis.Compilers[cstr].Counts[s]++
 }

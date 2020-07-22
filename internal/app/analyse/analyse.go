@@ -9,6 +9,8 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/MattWindsor91/act-tester/internal/controller/analyse/pretty"
+
 	"github.com/1set/gut/ystring"
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
@@ -53,7 +55,7 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
-	obs, err := observer.NewAnalysisWriter(outw)
+	obs, err := pretty.NewAnalysisWriter(pretty.WriteTo(outw))
 	if err != nil {
 		return err
 	}
