@@ -3,6 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
+// Package saver contains the part of the analyser that uses the analysis to save failing tests.
 package saver
 
 import (
@@ -53,28 +54,8 @@ func New(paths *Pathset, archiveMaker func(path string) (Archiver, error), ops .
 	if s.archiveMaker == nil {
 		return nil, ErrArchiveMakerNil
 	}
-	for _, o := range ops {
-		if err := o(&s); err != nil {
-			return nil, err
-		}
-	}
-	return &s, nil
-}
-
-// Option is the type of options to New.
-type Option func(*Saver) error
-
-// WithObservers appends obs to the observer list for this saver.
-func WithObservers(obs ...observer.Observer) Option {
-	return func(s *Saver) error {
-		for _, o := range obs {
-			if o == nil {
-				return ErrObserverNil
-			}
-			s.observers = append(s.observers, o)
-		}
-		return nil
-	}
+	err := Options(ops...)(&s)
+	return &s, err
 }
 
 // Run runs the saving stage over the analysis a.

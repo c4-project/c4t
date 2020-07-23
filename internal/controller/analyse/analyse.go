@@ -50,7 +50,7 @@ func maybeNewSave(c *Config) (*saver.Saver, error) {
 		func(path string) (saver.Archiver, error) {
 			return saver.CreateTGZ(path)
 		},
-		saver.WithObservers(c.Observers...))
+		saver.ObserveWith(c.Observers...))
 }
 
 func checkConfig(c *Config) error {
