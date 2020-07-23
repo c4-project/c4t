@@ -44,7 +44,7 @@ func ExamplePathset_SubjectRun() {
 
 	// Output:
 	// root: saved/compile_fail/2015/10/21/07_28_00
-	// plan: saved/compile_fail/2015/10/21/07_28_00/plan.json
+	// plan: saved/compile_fail/2015/10/21/07_28_00/plan.json.gz
 }
 
 // ExampleRunPathset_SubjectTarFile is a runnable example for SubjectTarFile.
