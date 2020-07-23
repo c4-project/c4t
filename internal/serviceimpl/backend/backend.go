@@ -24,9 +24,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/runner"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
 )
 
 var (

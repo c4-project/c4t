@@ -10,7 +10,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 

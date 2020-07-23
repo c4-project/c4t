@@ -10,8 +10,8 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 

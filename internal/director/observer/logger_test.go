@@ -9,10 +9,10 @@ import (
 	"context"
 	"os"
 
-	observer2 "github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
+	observer2 "github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
 )
 
 // ExampleInstanceLogger_OnArchive is a runnable example for OnArchive.

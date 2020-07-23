@@ -14,11 +14,11 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"

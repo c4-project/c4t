@@ -10,10 +10,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/config"
+
 	// It's 2020, and tools _still_ can't understand the use of 'v2' unless you do silly hacks like this.
 	c "github.com/urfave/cli/v2"
 )

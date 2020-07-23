@@ -15,10 +15,10 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
 	c "github.com/urfave/cli/v2"

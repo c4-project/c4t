@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
+	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
 
 	c "github.com/urfave/cli/v2"
 

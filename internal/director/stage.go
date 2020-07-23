@@ -12,14 +12,14 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
+	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
-	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 )
 
 // StageConfig groups together the stage configuration for of a director instance.

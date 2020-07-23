@@ -6,9 +6,9 @@
 package dash
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 

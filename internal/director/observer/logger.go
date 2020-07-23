@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/pretty"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/pretty"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 

@@ -24,7 +24,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
 )
 
 var (

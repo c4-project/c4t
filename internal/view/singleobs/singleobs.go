@@ -9,10 +9,10 @@ package singleobs
 import (
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
+	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 )
 
 // Planner builds a list of observers suitable for single-shot act-tester planner binaries.

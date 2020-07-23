@@ -8,9 +8,9 @@ package config
 import (
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
-	"github.com/MattWindsor91/act-tester/internal/controller/mach"
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 )
 
 // QuantitySet is a set of tunable quantities for the director's stages.

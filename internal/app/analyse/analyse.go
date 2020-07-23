@@ -9,12 +9,12 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/pretty"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/pretty"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
 

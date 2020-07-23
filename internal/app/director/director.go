@@ -18,16 +18,16 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/director"
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 	"github.com/MattWindsor91/act-tester/internal/view/dash"
 	"github.com/mitchellh/go-homedir"
 

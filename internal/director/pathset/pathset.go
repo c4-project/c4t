@@ -10,7 +10,7 @@ package pathset
 import (
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )

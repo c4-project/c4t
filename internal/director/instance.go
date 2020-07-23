@@ -17,12 +17,12 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse"
 
-	aobserver "github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
+	aobserver "github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/mach"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
@@ -37,14 +37,14 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/invoker"
+	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
+	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"

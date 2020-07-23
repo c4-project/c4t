@@ -11,10 +11,10 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/mach"
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/runner"
-	"github.com/MattWindsor91/act-tester/internal/controller/mach/timeout"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
 	c "github.com/urfave/cli/v2"
 )
 

@@ -19,13 +19,13 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
+	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/planner"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
 )
