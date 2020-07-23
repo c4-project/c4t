@@ -5,7 +5,9 @@
 
 package corpus
 
-import "strings"
+import (
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+)
 
 // Merge merges corpora into a single corpus.
 // If corpora is empty or nil, it returns nil.
@@ -37,5 +39,5 @@ func actuallyMerge(corpora map[string]Corpus) (Corpus, error) {
 
 // MergedName is the name that sname will appear under in a merged corpus where the original corpus name was cname.
 func MergedName(cname, sname string) string {
-	return strings.Join([]string{cname, sname}, "/")
+	return stringhelp.JoinNonEmpty("/", cname, sname)
 }
