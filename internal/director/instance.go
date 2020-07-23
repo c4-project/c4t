@@ -199,7 +199,6 @@ func (i *Instance) runStage(ctx context.Context, sc *StageConfig, s stageRunner,
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
-	aobs := observer.LowerToAnalyse(i.Observers)
 	bobs := observer.LowerToBuilder(i.Observers)
 	cobs := observer.LowerToCopy(i.Observers)
 
@@ -220,16 +219,18 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Invoke, err = i.makeInvoker(cobs, bobs); err != nil {
 		return nil, fmt.Errorf("when making machine invoker: %w", err)
 	}
-	sc.Analyse = i.makeAnalyseConfig(aobs)
+	if sc.Analyse, err = i.makeAnalyser(observer.LowerToAnalyse(i.Observers)); err != nil {
+		return nil, fmt.Errorf("when making analyser: %w", err)
+	}
 	return &sc, nil
 }
 
-func (i *Instance) makeAnalyseConfig(aobs []aobserver.Observer) *analyse.Config {
-	return &analyse.Config{
-		Observers:  aobs,
-		NWorkers:   10, // TODO(@MattWindsor91): get this from somewhere
-		SavedPaths: i.SavedPaths,
-	}
+func (i *Instance) makeAnalyser(aobs []aobserver.Observer) (*analyse.Analyse, error) {
+	return analyse.New(
+		analyse.ObserveWith(aobs...),
+		analyse.ParWorkers(10), // TODO(@MattWindsor91): get this from somewhere
+		analyse.SaveToPathset(i.SavedPaths),
+	)
 }
 
 func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error) {

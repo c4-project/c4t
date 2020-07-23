@@ -9,7 +9,6 @@ package analyse
 
 import (
 	"context"
-	"errors"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
@@ -21,43 +20,50 @@ import (
 
 // Analyse represents the state of the plan analyse stage.
 type Analyse struct {
-	cfg  *Config
-	plan *plan.Plan
-	save *saver.Saver
+	savePaths *saver.Pathset
+	// nworkers is the number of parallel workers to use when performing subject analysis.
+	nworkers int
+	// observers is the list of observers to which analyses are sent.
+	observers []observer.Observer
 }
 
-// New constructs a new query runner on config c and plan p.
-func New(c *Config, p *plan.Plan) (*Analyse, error) {
-	if err := checkConfig(c); err != nil {
-		return nil, err
-	}
-	if err := checkPlan(p); err != nil {
-		return nil, err
-	}
-	s, err := maybeNewSave(c)
-	if err != nil {
-		return nil, err
-	}
-	return &Analyse{cfg: c, plan: p, save: s}, nil
+// New constructs a new analyse stage on plan p, with options opts.
+func New(opts ...Option) (*Analyse, error) {
+	an := new(Analyse)
+	err := Options(opts...)(an)
+	return an, err
 }
 
-func maybeNewSave(c *Config) (*saver.Saver, error) {
-	if c.SavedPaths == nil {
+func (a *Analyse) newSaver() (*saver.Saver, error) {
+	if a.savePaths == nil {
 		return nil, nil
 	}
 	return saver.New(
-		c.SavedPaths,
+		a.savePaths,
 		func(path string) (saver.Archiver, error) {
 			return saver.CreateTGZ(path)
 		},
-		saver.ObserveWith(c.Observers...))
+		saver.ObserveWith(a.observers...))
 }
 
-func checkConfig(c *Config) error {
-	if c == nil {
-		return errors.New("config nil")
+// Run runs the analyser on the plan p, outputting to the configured output writer.
+func (a *Analyse) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	if err := checkPlan(p); err != nil {
+		return nil, err
 	}
-	return nil
+
+	an, err := a.analyse(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+
+	observer.OnAnalysis(*an, a.observers...)
+
+	if err := a.maybeSave(an); err != nil {
+		return nil, err
+	}
+
+	return an.Plan, nil
 }
 
 func checkPlan(p *plan.Plan) error {
@@ -67,31 +73,17 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-// Run runs the query, outputting to the configured output writer.
-func (q *Analyse) Run(ctx context.Context) (*plan.Plan, error) {
-	a, err := q.analyse(ctx)
-	if err != nil {
-		return nil, err
+func (a *Analyse) maybeSave(an *analysis.Analysis) error {
+	save, err := a.newSaver()
+	// save can be nil if we're not supposed to be saving.
+	if err != nil || save == nil {
+		return err
 	}
-
-	observer.OnAnalysis(*a, q.cfg.Observers...)
-
-	if err := q.maybeSave(a); err != nil {
-		return nil, err
-	}
-
-	return q.plan, nil
+	return save.Run(*an)
 }
 
-func (q *Analyse) maybeSave(a *analysis.Analysis) error {
-	if q.save == nil {
-		return nil
-	}
-	return q.save.Run(*a)
-}
-
-func (q *Analyse) analyse(ctx context.Context) (*analysis.Analysis, error) {
-	ar, err := NewAnalyser(q.plan, q.cfg.NWorkers)
+func (a *Analyse) analyse(ctx context.Context, p *plan.Plan) (*analysis.Analysis, error) {
+	ar, err := NewAnalyser(p, a.nworkers)
 	if err != nil {
 		return nil, err
 	}

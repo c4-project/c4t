@@ -6,30 +6,58 @@
 package analyse
 
 import (
-	"context"
+	"errors"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
-
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
 )
 
-// Config is the configuration for the plan analyse controller.
-type Config struct {
-	// NWorkers is the number of parallel workers to use when performing subject analysis.
-	NWorkers int
-	// Observers is the list of observers to which analyses are sent.
-	Observers []observer.Observer
-	// SavedPaths, if present, is the pathset to which failing corpora should be sent.
-	SavedPaths *saver.Pathset
+// ErrObserverNil occurs if we pass a nil Observer to ObserveWith.
+var ErrObserverNil = errors.New("observer nil")
+
+// Option is the type of options to the analyse stage constructor.
+type Option func(*Analyse) error
+
+// Options applies each option in opts in turn.
+func Options(opts ...Option) Option {
+	return func(a *Analyse) error {
+		for _, o := range opts {
+			if err := o(a); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 }
 
-// Run constructs a query controller from this config, then runs it.
-func (c *Config) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	q, err := New(c, p)
-	if err != nil {
-		return nil, err
+// ParWorkers sets the number of parallel analyser workers to n.
+func ParWorkers(n int) Option {
+	return func(a *Analyse) error {
+		a.nworkers = n
+		return nil
 	}
-	return q.Run(ctx)
+}
+
+// ObserveWith adds each observer in obs to the observer set.
+func ObserveWith(obs ...observer.Observer) Option {
+	return func(a *Analyse) error {
+		for _, o := range obs {
+			if o == nil {
+				return ErrObserverNil
+			}
+		}
+		a.observers = append(a.observers, obs...)
+		return nil
+	}
+}
+
+// SaveToPathset makes this analyse stage save to the given pathset.
+// This can be nil, in which case saving is disabled.
+func SaveToPathset(ps *saver.Pathset) Option {
+	return func(a *Analyse) error {
+		// ps can be nil
+		a.savePaths = ps
+		return nil
+	}
 }

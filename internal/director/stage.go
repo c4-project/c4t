@@ -33,7 +33,7 @@ type StageConfig struct {
 	// Invoke contains configuration for the instance's invoke stage.
 	Invoke *invoker.Invoker
 	// Analyse contains configuration for the instance's analysis stage.
-	Analyse *analyse.Config
+	Analyse *analyse.Analyse
 }
 
 var ErrStageConfigMissing = errors.New("stage config missing")

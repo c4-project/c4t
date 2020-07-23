@@ -14,8 +14,6 @@ import (
 	"github.com/1set/gut/ystring"
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
-
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
@@ -98,11 +96,15 @@ func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 		return err
 	}
 
-	q := analyse.Config{Observers: []observer.Observer{obs},
-		NWorkers:   stdflag.WorkerCountFromCli(ctx),
-		SavedPaths: savedPaths(ctx),
+	a, err := analyse.New(
+		analyse.ObserveWith(obs),
+		analyse.ParWorkers(stdflag.WorkerCountFromCli(ctx)),
+		analyse.SaveToPathset(savedPaths(ctx)),
+	)
+	if err != nil {
+		return err
 	}
-	return view.RunOnCliPlan(ctx, &q, ioutil.Discard)
+	return view.RunOnCliPlan(ctx, a, ioutil.Discard)
 }
 
 func savedPaths(ctx *c.Context) *saver.Pathset {
