@@ -125,12 +125,7 @@ func (a *Analyser) apply(r classification) {
 		sf := i.Flag()
 		a.applyByStatus(i, sf, r)
 		a.applyCompilers(i, sf, r)
-		for cstr, ts := range r.ctimes {
-			a.compilerTimes[cstr] = append(a.compilerTimes[cstr], ts...)
-		}
-		for cstr, ts := range r.rtimes {
-			a.runTimes[cstr] = append(a.runTimes[cstr], ts...)
-		}
+		a.applyTimes(r)
 	}
 }
 
@@ -158,4 +153,13 @@ func (a *Analyser) applyCompiler(s status.Status, sf, cf status.Flag, cstr strin
 		return
 	}
 	a.analysis.Compilers[cstr].Counts[s]++
+}
+
+func (a *Analyser) applyTimes(r classification) {
+	for cstr, ts := range r.ctimes {
+		a.compilerTimes[cstr] = append(a.compilerTimes[cstr], ts...)
+	}
+	for cstr, ts := range r.rtimes {
+		a.runTimes[cstr] = append(a.runTimes[cstr], ts...)
+	}
 }
