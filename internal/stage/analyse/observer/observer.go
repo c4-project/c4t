@@ -5,12 +5,12 @@
 
 package observer
 
-import "github.com/MattWindsor91/act-tester/internal/plan/analysis"
+import "github.com/MattWindsor91/act-tester/internal/plan/analyser"
 
 // Observer represents the observer interface for the analyse stage.
 type Observer interface {
 	// OnAnalysis lets the observer know that the current plan has been analysed and the results are in a.
-	OnAnalysis(a analysis.Analysis)
+	OnAnalysis(a analyser.Analysis)
 
 	// OnArchive lets the observer know that an archive action has occurred.
 	OnArchive(s ArchiveMessage)
@@ -19,7 +19,7 @@ type Observer interface {
 //go:generate mockery -name=Observer
 
 // OnAnalysis sends OnAnalysis to every instance observer in obs.
-func OnAnalysis(a analysis.Analysis, obs ...Observer) {
+func OnAnalysis(a analyser.Analysis, obs ...Observer) {
 	for _, o := range obs {
 		o.OnAnalysis(a)
 	}

@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package saver contains the part of the analyser that uses the analysis to save failing tests.
+// Package saver contains the part of the analyser that uses the analyser to save failing tests.
 package saver
 
 import (
@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -58,12 +58,12 @@ func New(paths *Pathset, archiveMaker func(path string) (Archiver, error), ops .
 	return &s, err
 }
 
-// Run runs the saving stage over the analysis a.
+// Run runs the saving stage over the analyser a.
 // It returns p unchanged; this is for signature compatibility with the other director stages.
-func (s *Saver) Run(a analysis.Analysis) error {
+func (s *Saver) Run(a analyser.Analysis) error {
 	p := a.Plan
 	if p == nil {
-		return fmt.Errorf("when saving analysis: %w", plan.ErrNil)
+		return fmt.Errorf("when saving analyser: %w", plan.ErrNil)
 	}
 	creation := p.Metadata.Creation
 

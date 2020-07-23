@@ -32,7 +32,7 @@ type StageConfig struct {
 	Lift *lifter.Lifter
 	// Invoke contains configuration for the instance's invoke stage.
 	Invoke *invoker.Invoker
-	// Analyse contains configuration for the instance's analysis stage.
+	// Analyse contains configuration for the instance's analyser stage.
 	Analyse *analyse.Analyse
 }
 

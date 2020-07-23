@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis
+package analyser
 
 import (
 	"fmt"
@@ -18,22 +18,22 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 )
 
-// Analysis represents an analysis of a plan.
+// Analysis represents an analyser of a plan.
 type Analysis struct {
-	// Plan points to the plan that created this analysis.
+	// Plan points to the plan that created this analyser.
 	Plan *plan.Plan
 
 	// ByStatus maps each status to the corpus of subjects that fall into it.
 	ByStatus map[status.Status]corpus.Corpus
 
-	// Compilers maps each compiler ID to an analysis of that compiler.
+	// Compilers maps each compiler ID to an analyser of that compiler.
 	Compilers map[string]Compiler
 
-	// Flags aggregates all flags found during the analysis.
+	// Flags aggregates all flags found during the analyser.
 	Flags status.Flag
 }
 
-// Compiler represents information about a compiler in a corpus analysis.
+// Compiler represents information about a compiler in a corpus analyser.
 type Compiler struct {
 	// Info contains the compiler's plan record.
 	Info compiler.Compiler
@@ -48,6 +48,14 @@ type Compiler struct {
 	// RunTime gathers statistics about how long, on average, this compiler's compiled subjects took to run.
 	// It doesn't contain information about failed compilations or runs (flagged runs are counted).
 	RunTime *TimeSet
+}
+
+func newAnalysis(p *plan.Plan) *Analysis {
+	return &Analysis{
+		Plan:      p,
+		ByStatus:  make(map[status.Status]corpus.Corpus, status.Last),
+		Compilers: make(map[string]Compiler, len(p.Compilers)),
+	}
 }
 
 // String summarises this collation as a string.

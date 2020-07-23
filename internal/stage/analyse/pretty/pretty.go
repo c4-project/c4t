@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 )
 
 // Printer provides the ability to output human-readable summaries of analyses to a writer.
@@ -37,15 +37,15 @@ func NewPrinter(o ...Option) (*Printer, error) {
 	return aw, nil
 }
 
-// Write writes an unsourced analysis a to this writer.
-func (p *Printer) Write(a analysis.Analysis) error {
+// Write writes an unsourced analyser a to this writer.
+func (p *Printer) Write(a analyser.Analysis) error {
 	c := p.ctx
 	c.Analysis = &a
 	return p.tmpl.ExecuteTemplate(p.w, "root", c)
 }
 
-// OnAnalysis writes an unsourced analysis a to this printer; if an error occurs, it tries to rescue.
-func (p *Printer) OnAnalysis(a analysis.Analysis) {
+// OnAnalysis writes an unsourced analyser a to this printer; if an error occurs, it tries to rescue.
+func (p *Printer) OnAnalysis(a analyser.Analysis) {
 	if err := p.Write(a); err != nil {
 		p.handleError(err)
 	}
@@ -55,8 +55,8 @@ func (p *Printer) OnAnalysis(a analysis.Analysis) {
 func (p *Printer) OnArchive(observer.ArchiveMessage) {
 }
 
-// WriteSourced writes a sourced analysis a to this printer.
-func (p *Printer) WriteSourced(a analysis.Sourced) error {
+// WriteSourced writes a sourced analyser a to this printer.
+func (p *Printer) WriteSourced(a analyser.AnalysisWithRun) error {
 	if _, err := fmt.Fprintf(p.w, "# %s #\n\n", &a.Run); err != nil {
 		return err
 	}

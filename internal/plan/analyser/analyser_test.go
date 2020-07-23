@@ -3,17 +3,17 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analyse_test
+package analyser_test
 
 import (
 	"context"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -27,7 +27,7 @@ import (
 func TestNewAnalyser_empty(t *testing.T) {
 	t.Parallel()
 
-	_, err := analyse.NewAnalyser(&plan.Plan{Metadata: plan.Metadata{Version: plan.CurrentVer}}, 10)
+	_, err := analyser.New(&plan.Plan{Metadata: plan.Metadata{Version: plan.CurrentVer}}, 10)
 	testhelp.ExpectErrorIs(t, err, corpus.ErrNone, "analysing empty plan")
 }
 
@@ -36,7 +36,7 @@ func TestAnalyser_Analyse_mock(t *testing.T) {
 	t.Parallel()
 
 	m := plan.Mock()
-	a, err := analyse.NewAnalyser(m, 10)
+	a, err := analyser.New(m, 10)
 	require.NoError(t, err, "unexpected error initialising analyser")
 	crp, err := a.Analyse(context.Background())
 	require.NoError(t, err, "unexpected error analysing")

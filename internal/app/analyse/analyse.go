@@ -27,13 +27,13 @@ const (
 	usage = "analyses a plan file"
 
 	readme = `
-   This program performs analysis on a plan file, and acts upon it.
+   This program performs analyser on a plan file, and acts upon it.
    Analysis includes, at time of writing:
 
    - computing basic statistics on compile and run times per compiler;
    - categorising subjects by their final status.
 
-   The program can act on its analysis in various ways, depending on the given
+   The program can act on its analyser in various ways, depending on the given
    flags.  By passing one or more -show flags, one can receive a human-readable
    summary of the plan file.  By passing -` + flagSaveDir + `, one can
    archive failing corpora to a directory for later experimentation.`

@@ -3,18 +3,18 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis_test
+package analyser_test
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 )
 
 // ExampleNewTimeSet is a runnable example for NewTimeSet.
 func ExampleNewTimeSet() {
-	ts := analysis.NewTimeSet(1*time.Second, 1*time.Second, 2*time.Second, 4*time.Second)
+	ts := analyser.NewTimeSet(1*time.Second, 1*time.Second, 2*time.Second, 4*time.Second)
 	fmt.Println("min", ts.Min)
 	fmt.Println("avg", ts.Mean())
 	fmt.Println("max", ts.Max)

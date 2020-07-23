@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis_test
+package analyser_test
 
 import (
 	"fmt"
@@ -15,18 +15,18 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 )
 
-// ExampleSourced_String is a runnable example for String.
-func ExampleSourced_String() {
-	sc := analysis.Sourced{
+// ExampleAnalysisWithRun_String is a runnable example for String.
+func ExampleAnalysisWithRun_String() {
+	sc := analyser.AnalysisWithRun{
 		Run: run.Run{
 			MachineID: id.FromString("foo.bar.baz"),
 			Iter:      42,
 			Start:     time.Date(1997, time.May, 1, 10, 0, 0, 0, time.FixedZone("BST", 60*60)),
 		},
-		Analysis: analysis.Analysis{
+		Analysis: analyser.Analysis{
 			ByStatus: map[status.Status]corpus.Corpus{
 				status.Ok:             corpus.New("a", "b", "c", "ch"),
 				status.Flagged:        corpus.New("barbaz"),

@@ -10,7 +10,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
@@ -123,8 +123,8 @@ func (o *Observer) OnIteration(r run.Run) {
 	o.action.reset()
 }
 
-// OnAnalysis observes an analysis by adding failure/timeout/flag rates to the sparklines.
-func (o *Observer) OnAnalysis(a analysis.Analysis) {
+// OnAnalysis observes an analyser by adding failure/timeout/flag rates to the sparklines.
+func (o *Observer) OnAnalysis(a analyser.Analysis) {
 	for i := status.Ok; i <= status.Last; i++ {
 		o.sendStatusCount(i, len(a.ByStatus[i]))
 	}
@@ -147,8 +147,8 @@ func (o *Observer) sendStatusCount(i status.Status, n int) {
 	}
 }
 
-func (o *Observer) logAnalysis(a analysis.Analysis) error {
-	sc := analysis.Sourced{
+func (o *Observer) logAnalysis(a analyser.Analysis) error {
+	sc := analyser.AnalysisWithRun{
 		Run:      o.run.last,
 		Analysis: a,
 	}

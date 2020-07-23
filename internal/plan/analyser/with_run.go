@@ -3,14 +3,14 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis
+package analyser
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 )
 
-// Sourced contains a corpus collation and its parent run.
-type Sourced struct {
+// AnalysisWithRun contains a corpus collation and its parent run.
+type AnalysisWithRun struct {
 	// Run contains information about the run that produced this collation.
 	Run run.Run
 
@@ -19,6 +19,6 @@ type Sourced struct {
 }
 
 // String formats a log header for this sourced collation.
-func (s *Sourced) String() string {
+func (s *AnalysisWithRun) String() string {
 	return s.Run.String() + " " + s.Analysis.String()
 }
