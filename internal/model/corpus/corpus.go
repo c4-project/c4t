@@ -4,7 +4,6 @@
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package corpus concerns test corpora (collections of named subjects).
-
 package corpus
 
 import (
