@@ -12,7 +12,7 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 )

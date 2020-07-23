@@ -3,23 +3,23 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package analyse represents the stage of the tester that takes a plan, performs various statistics on it, and outputs
+// Package analyser represents the stage of the tester that takes a plan, performs various statistics on it, and outputs
 // reports.
-package analyse
+package analyser
 
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
-// Analyse represents the state of the plan analyse stage.
-type Analyse struct {
+// Analyser represents the state of the plan analyser stage.
+type Analyser struct {
 	savePaths *saver.Pathset
 	// nworkers is the number of parallel workers to use when performing subject analyser.
 	nworkers int
@@ -27,14 +27,14 @@ type Analyse struct {
 	observers []observer.Observer
 }
 
-// New constructs a new analyse stage on plan p, with options opts.
-func New(opts ...Option) (*Analyse, error) {
-	an := new(Analyse)
+// New constructs a new analyser stage on plan p, with options opts.
+func New(opts ...Option) (*Analyser, error) {
+	an := new(Analyser)
 	err := Options(opts...)(an)
 	return an, err
 }
 
-func (a *Analyse) newSaver() (*saver.Saver, error) {
+func (a *Analyser) newSaver() (*saver.Saver, error) {
 	if a.savePaths == nil {
 		return nil, nil
 	}
@@ -47,7 +47,7 @@ func (a *Analyse) newSaver() (*saver.Saver, error) {
 }
 
 // Run runs the analyser on the plan p, outputting to the configured output writer.
-func (a *Analyse) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+func (a *Analyser) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (a *Analyse) maybeSave(an *analyser.Analysis) error {
+func (a *Analyser) maybeSave(an *analyser.Analysis) error {
 	save, err := a.newSaver()
 	// save can be nil if we're not supposed to be saving.
 	if err != nil || save == nil {
@@ -82,7 +82,7 @@ func (a *Analyse) maybeSave(an *analyser.Analysis) error {
 	return save.Run(*an)
 }
 
-func (a *Analyse) analyse(ctx context.Context, p *plan.Plan) (*analyser.Analysis, error) {
+func (a *Analyser) analyse(ctx context.Context, p *plan.Plan) (*analyser.Analysis, error) {
 	ar, err := analyser.New(p, a.nworkers)
 	if err != nil {
 		return nil, err

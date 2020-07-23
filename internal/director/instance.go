@@ -17,10 +17,10 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
 
-	aobserver "github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
+	aobserver "github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
@@ -219,17 +219,17 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Invoke, err = i.makeInvoker(cobs, bobs); err != nil {
 		return nil, fmt.Errorf("when making machine invoker: %w", err)
 	}
-	if sc.Analyse, err = i.makeAnalyser(observer.LowerToAnalyse(i.Observers)); err != nil {
+	if sc.Analyser, err = i.makeAnalyser(observer.LowerToAnalyse(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making analyser: %w", err)
 	}
 	return &sc, nil
 }
 
-func (i *Instance) makeAnalyser(aobs []aobserver.Observer) (*analyse.Analyse, error) {
-	return analyse.New(
-		analyse.ObserveWith(aobs...),
-		analyse.ParWorkers(10), // TODO(@MattWindsor91): get this from somewhere
-		analyse.SaveToPathset(i.SavedPaths),
+func (i *Instance) makeAnalyser(aobs []aobserver.Observer) (*analyser.Analyser, error) {
+	return analyser.New(
+		analyser.ObserveWith(aobs...),
+		analyser.ParWorkers(10), // TODO(@MattWindsor91): get this from somewhere
+		analyser.SaveToPathset(i.SavedPaths),
 	)
 }
 

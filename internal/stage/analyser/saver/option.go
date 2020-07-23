@@ -5,7 +5,7 @@
 
 package saver
 
-import "github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
+import "github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 
 // Option is the type of options to New.
 type Option func(*Saver) error

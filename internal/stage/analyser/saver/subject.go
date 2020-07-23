@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 )
 
 // Archiver is the interface of types that can archive subject files.

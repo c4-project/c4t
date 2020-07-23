@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
 
@@ -32,8 +32,8 @@ type StageConfig struct {
 	Lift *lifter.Lifter
 	// Invoke contains configuration for the instance's invoke stage.
 	Invoke *invoker.Invoker
-	// Analyse contains configuration for the instance's analyser stage.
-	Analyse *analyse.Analyse
+	// Analyser contains configuration for the instance's analyser stage.
+	Analyser *analyser.Analyser
 }
 
 var ErrStageConfigMissing = errors.New("stage config missing")
@@ -52,7 +52,7 @@ func (c *StageConfig) Check() error {
 	if c.Invoke == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Invoke)
 	}
-	if c.Analyse == nil {
+	if c.Analyser == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Analyse)
 	}
 	return nil
@@ -95,7 +95,7 @@ var Stages = []stageRunner{
 	{
 		Stage: stage.Analyse,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-			return c.Analyse.Run(ctx, p)
+			return c.Analyser.Run(ctx, p)
 		},
 	},
 }

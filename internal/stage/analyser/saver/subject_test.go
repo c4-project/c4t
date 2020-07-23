@@ -12,12 +12,12 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 	"github.com/stretchr/testify/require"
 
-	omocks "github.com/MattWindsor91/act-tester/internal/stage/analyse/observer/mocks"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver/mocks"
+	omocks "github.com/MattWindsor91/act-tester/internal/stage/analyser/observer/mocks"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver/mocks"
 )
 
 func TestArchiveSubject(t *testing.T) {

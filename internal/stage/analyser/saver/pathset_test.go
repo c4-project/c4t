@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 )

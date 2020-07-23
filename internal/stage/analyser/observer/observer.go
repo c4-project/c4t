@@ -7,7 +7,7 @@ package observer
 
 import "github.com/MattWindsor91/act-tester/internal/plan/analyser"
 
-// Observer represents the observer interface for the analyse stage.
+// Observer represents the observer interface for the analyser stage.
 type Observer interface {
 	// OnAnalysis lets the observer know that the current plan has been analysed and the results are in a.
 	OnAnalysis(a analyser.Analysis)

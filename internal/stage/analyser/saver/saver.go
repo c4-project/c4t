@@ -17,7 +17,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"

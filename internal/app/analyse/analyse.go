@@ -9,12 +9,12 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/pretty"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyse"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
 
 	"github.com/MattWindsor91/act-tester/internal/view"
 
@@ -96,10 +96,10 @@ func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 		return err
 	}
 
-	a, err := analyse.New(
-		analyse.ObserveWith(obs),
-		analyse.ParWorkers(stdflag.WorkerCountFromCli(ctx)),
-		analyse.SaveToPathset(savedPaths(ctx)),
+	a, err := analyser.New(
+		analyser.ObserveWith(obs),
+		analyser.ParWorkers(stdflag.WorkerCountFromCli(ctx)),
+		analyser.SaveToPathset(savedPaths(ctx)),
 	)
 	if err != nil {
 		return err
