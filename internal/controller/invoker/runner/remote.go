@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 
 	"golang.org/x/sync/errgroup"
 

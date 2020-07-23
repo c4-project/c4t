@@ -14,8 +14,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Runner contains information necessary to run a plan's compiled test cases.

@@ -23,7 +23,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // Logger is a director observer that emits logs to a writer when runs finish up.

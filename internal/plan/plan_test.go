@@ -19,7 +19,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // ExamplePlan_CompilerIDs is a runnable example for CompilerIDs.

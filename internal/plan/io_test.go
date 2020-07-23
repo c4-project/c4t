@@ -17,7 +17,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // TestPlan_Write_roundTrip exercises Write by doing a round-trip and checking if the reconstituted plan is similar.

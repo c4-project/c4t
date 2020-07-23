@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Scratch contains the pre-computed paths for a machine run.

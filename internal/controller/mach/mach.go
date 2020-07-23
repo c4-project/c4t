@@ -12,7 +12,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/compiler"
 	"github.com/MattWindsor91/act-tester/internal/controller/mach/forward"

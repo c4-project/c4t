@@ -8,7 +8,7 @@ package analysis_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 

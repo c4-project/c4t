@@ -15,7 +15,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // ExampleSourced_String is a runnable example for String.

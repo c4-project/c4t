@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse"
 
@@ -19,7 +19,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/controller/lifter"
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // StageConfig groups together the stage configuration for of a director instance.

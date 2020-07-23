@@ -13,9 +13,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"
 	"github.com/MattWindsor91/act-tester/internal/controller/analyse/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Analyse represents the state of the plan analyse stage.

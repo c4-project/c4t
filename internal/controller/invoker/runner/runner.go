@@ -9,7 +9,7 @@ package runner
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/remote"
 )
 

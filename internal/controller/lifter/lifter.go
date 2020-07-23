@@ -15,7 +15,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
@@ -27,7 +27,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 var (

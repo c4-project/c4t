@@ -20,7 +20,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // SingleRunner is the interface of things that can run compilers.

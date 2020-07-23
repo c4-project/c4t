@@ -16,8 +16,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Recv copies bits of remp into locp, including run information and any compiler failures.

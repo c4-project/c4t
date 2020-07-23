@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 	mocks2 "github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
@@ -31,7 +31,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // makePlan makes a 'valid' plan.

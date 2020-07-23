@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 )
 
 // UseDateSeed is a value for the header constructor's seed parameter that ensures its RNG will be seeded by run date.

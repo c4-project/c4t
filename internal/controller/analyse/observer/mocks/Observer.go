@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	analysis "github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	analysis "github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	mock "github.com/stretchr/testify/mock"
 
 	observer "github.com/MattWindsor91/act-tester/internal/controller/analyse/observer"

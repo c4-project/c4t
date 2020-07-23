@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 )
 
 // ExampleStage_String is a testable example for String.

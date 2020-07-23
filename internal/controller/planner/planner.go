@@ -13,7 +13,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
@@ -21,7 +21,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Planner holds all configuration for the test planner.

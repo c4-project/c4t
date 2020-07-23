@@ -12,7 +12,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
@@ -44,7 +44,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/controller/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/controller/planner"
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"

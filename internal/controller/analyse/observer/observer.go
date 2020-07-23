@@ -5,7 +5,7 @@
 
 package observer
 
-import "github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+import "github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 // Observer represents the observer interface for the analyse controller.
 type Observer interface {

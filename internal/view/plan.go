@@ -13,7 +13,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // StdinFile is the special file path that the plan loader treats as a request to load from stdin instead.

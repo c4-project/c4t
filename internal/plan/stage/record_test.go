@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/stage"
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 )
 
 // ExampleNewRecord is a testable example for NewRecord.

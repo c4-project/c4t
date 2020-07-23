@@ -8,7 +8,7 @@ package pretty
 import (
 	"text/template"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // WriteContext is the type of roots sent to the template engine.

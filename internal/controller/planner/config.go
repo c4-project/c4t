@@ -11,7 +11,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Config contains planner configuration that can persist across multiple plans on multiple machines.

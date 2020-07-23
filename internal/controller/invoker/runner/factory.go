@@ -9,7 +9,7 @@ import (
 	"io"
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Factory is the interface of factories for machine node runners.

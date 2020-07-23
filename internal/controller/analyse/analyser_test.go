@@ -20,7 +20,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan"
+	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // TestNewAnalyser_empty tests that analysing an empty corpus gives an error.

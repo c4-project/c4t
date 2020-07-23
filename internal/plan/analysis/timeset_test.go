@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // ExampleNewTimeSet is a runnable example for NewTimeSet.
