@@ -3,9 +3,17 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package observer
+package saver
 
 type ArchiveMessageKind uint8
+
+// Observer represents the observer interface for savers.
+type Observer interface {
+	// OnArchive lets the observer know that an archive action has occurred.
+	OnArchive(s ArchiveMessage)
+}
+
+//go:generate mockery --name=Observer
 
 const (
 	// ArchiveStart denotes the start of an archival run.

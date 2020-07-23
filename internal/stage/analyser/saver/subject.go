@@ -12,7 +12,6 @@ import (
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 )
 
 // Archiver is the interface of types that can archive subject files.
@@ -24,12 +23,12 @@ type Archiver interface {
 	io.Closer
 }
 
-//go:generate mockery -name=Archiver
+//go:generate mockery --name=Archiver
 
 type subjectArchiver struct {
 	nameMap     normaliser.Map
 	sname, dest string
-	observers   []observer.Observer
+	observers   []Observer
 	archiver    Archiver
 }
 
@@ -39,7 +38,7 @@ var (
 )
 
 // ArchiveSubject archives the subject defined by sname and nameMap to dest via ar, announcing progress to obs.
-func ArchiveSubject(ar Archiver, sname, dest string, nameMap normaliser.Map, obs ...observer.Observer) error {
+func ArchiveSubject(ar Archiver, sname, dest string, nameMap normaliser.Map, obs ...Observer) error {
 	if ar == nil {
 		return ErrArchiverNil
 	}
@@ -57,7 +56,7 @@ func ArchiveSubject(ar Archiver, sname, dest string, nameMap normaliser.Map, obs
 }
 
 func (s *subjectArchiver) archive() error {
-	observer.OnArchiveStart(s.sname, s.dest, len(s.nameMap), s.observers...)
+	OnArchiveStart(s.sname, s.dest, len(s.nameMap), s.observers...)
 
 	i := 0
 	for wpath, norm := range s.nameMap {
@@ -67,7 +66,7 @@ func (s *subjectArchiver) archive() error {
 		i++
 	}
 
-	observer.OnArchiveFinish(s.sname, s.observers...)
+	OnArchiveFinish(s.sname, s.observers...)
 	return nil
 }
 
@@ -78,7 +77,7 @@ func (s *subjectArchiver) archiveFile(i int, wpath string, norm normaliser.Entry
 	if err != nil {
 		return s.rescueNotExistError(err, rpath, i)
 	}
-	observer.OnArchiveFileAdded(s.sname, rpath, i, s.observers...)
+	OnArchiveFileAdded(s.sname, rpath, i, s.observers...)
 	return nil
 }
 
@@ -86,6 +85,6 @@ func (s *subjectArchiver) rescueNotExistError(err error, rpath string, i int) er
 	if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
-	observer.OnArchiveFileMissing(s.sname, rpath, i, s.observers...)
+	OnArchiveFileMissing(s.sname, rpath, i, s.observers...)
 	return nil
 }

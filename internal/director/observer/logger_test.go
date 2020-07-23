@@ -9,10 +9,11 @@ import (
 	"context"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	observer2 "github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 )
 
 // ExampleInstanceLogger_OnArchive is a runnable example for OnArchive.
@@ -22,10 +23,10 @@ func ExampleInstanceLogger_OnArchive() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		observer2.OnArchiveStart("subj", "subj.tar.gz", 2, i)
-		observer2.OnArchiveFileAdded("subj", "a.out", 0, i)
-		observer2.OnArchiveFileMissing("subj", "compile.log", 1, i)
-		observer2.OnArchiveFinish("subj", i)
+		saver.OnArchiveStart("subj", "subj.tar.gz", 2, i)
+		saver.OnArchiveFileAdded("subj", "a.out", 0, i)
+		saver.OnArchiveFileMissing("subj", "compile.log", 1, i)
+		saver.OnArchiveFinish("subj", i)
 		cancel()
 	}()
 	_ = l.Run(ctx, cancel)

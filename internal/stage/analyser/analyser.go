@@ -10,7 +10,6 @@ package analyser
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
@@ -24,7 +23,9 @@ type Analyser struct {
 	// nworkers is the number of parallel workers to use when performing subject analyser.
 	nworkers int
 	// observers is the list of observers to which analyses are sent.
-	observers []observer.Observer
+	observers []Observer
+	// saveObservers is the list of observers to which archival operations are sent.
+	saveObservers []saver.Observer
 }
 
 // New constructs a new analyser stage on plan p, with options opts.
@@ -43,7 +44,7 @@ func (a *Analyser) newSaver() (*saver.Saver, error) {
 		func(path string) (saver.Archiver, error) {
 			return saver.CreateTGZ(path)
 		},
-		saver.ObserveWith(a.observers...))
+		saver.ObserveWith(a.saveObservers...))
 }
 
 // Run runs the analyser on the plan p, outputting to the configured output writer.
@@ -57,7 +58,7 @@ func (a *Analyser) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, err
 	}
 
-	observer.OnAnalysis(*an, a.observers...)
+	OnAnalysis(*an, a.observers...)
 
 	if err := a.maybeSave(an); err != nil {
 		return nil, err

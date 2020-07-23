@@ -17,8 +17,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/plan"
@@ -31,7 +29,7 @@ type Saver struct {
 	// norm is a normaliser used to translate a corpus's paths to the ones used in its archival.
 	norm *normaliser.Corpus
 	// observers is the list of observers.
-	observers []observer.Observer
+	observers []Observer
 	// paths contains the pathset used to save subjects for a particular machine.
 	paths *Pathset
 }

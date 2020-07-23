@@ -12,8 +12,6 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
-
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 )
 
@@ -49,10 +47,6 @@ func (p *Printer) OnAnalysis(a analyser.Analysis) {
 	if err := p.Write(a); err != nil {
 		p.handleError(err)
 	}
-}
-
-// OnArchive does nothing (for now).
-func (p *Printer) OnArchive(observer.ArchiveMessage) {
 }
 
 // WriteSourced writes a sourced analyser a to this printer.

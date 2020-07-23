@@ -9,8 +9,6 @@ import (
 	"errors"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 )
 
 // ErrObserverNil occurs if we pass a nil Observer to ObserveWith.
@@ -39,8 +37,8 @@ func ParWorkers(n int) Option {
 	}
 }
 
-// ObserveWith adds each observer in obs to the observer set.
-func ObserveWith(obs ...observer.Observer) Option {
+// ObserveWith adds each observer in obs to the observer set for analysing.
+func ObserveWith(obs ...Observer) Option {
 	return func(a *Analyser) error {
 		for _, o := range obs {
 			if o == nil {
@@ -48,6 +46,19 @@ func ObserveWith(obs ...observer.Observer) Option {
 			}
 		}
 		a.observers = append(a.observers, obs...)
+		return nil
+	}
+}
+
+// ObserveWith adds each observer in obs to the observer set for saving.
+func ObserveSaveWith(obs ...saver.Observer) Option {
+	return func(a *Analyser) error {
+		for _, o := range obs {
+			if o == nil {
+				return ErrObserverNil
+			}
+			a.saveObservers = append(a.saveObservers, o)
+		}
 		return nil
 	}
 }

@@ -8,7 +8,7 @@ package dash
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 
@@ -134,7 +134,7 @@ func (o *Observer) OnAnalysis(a analyser.Analysis) {
 }
 
 // OnArchive currently ignores a save observation.
-func (o *Observer) OnArchive(observer.ArchiveMessage) {
+func (o *Observer) OnArchive(saver.ArchiveMessage) {
 	// TODO(@MattWindsor91): do something with this?
 }
 

@@ -10,11 +10,13 @@ import (
 	"context"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
+
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
@@ -52,7 +54,10 @@ type Instance interface {
 	OnIteration(run run.Run)
 
 	// Instance observers can observe plan analyses.
-	observer.Observer
+	analyser.Observer
+
+	// Instance observers can observe plan saves.
+	saver.Observer
 
 	// Instance observers can observe planner operations.
 	planner.Observer
@@ -77,9 +82,9 @@ func LowerToMachine(obs []Observer) []machine.Observer {
 	return cos
 }
 
-// LowerToAnalyse lowers a slice of instance observers to a slice of builder observers.
-func LowerToAnalyse(obs []Instance) []observer.Observer {
-	cos := make([]observer.Observer, len(obs))
+// LowerToAnalyser lowers a slice of instance observers to a slice of analyser observers.
+func LowerToAnalyser(obs []Instance) []analyser.Observer {
+	cos := make([]analyser.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}
@@ -89,6 +94,15 @@ func LowerToAnalyse(obs []Instance) []observer.Observer {
 // LowerToPlanner lowers a slice of instance observers to a slice of planner observers.
 func LowerToPlanner(obs []Instance) []planner.Observer {
 	cos := make([]planner.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
+}
+
+// LowerToSave lowers a slice of instance observers to a slice of saver observers.
+func LowerToSaver(obs []Instance) []saver.Observer {
+	cos := make([]saver.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}

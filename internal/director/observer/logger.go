@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
@@ -111,9 +111,9 @@ func (j *Logger) logAnalysis(s analyser.AnalysisWithRun) error {
 func (j *Logger) logSaving(s archiveMessage) error {
 	var err error
 	switch s.body.Kind {
-	case observer.ArchiveStart:
+	case saver.ArchiveStart:
 		_, err = fmt.Fprintf(j.out, "saving (run %s) %s to %s\n", s.run, s.body.SubjectName, s.body.File)
-	case observer.ArchiveFileMissing:
+	case saver.ArchiveFileMissing:
 		_, err = fmt.Fprintf(j.out, "when saving (run %s) %s: missing file %s\n", s.run, s.body.SubjectName, s.body.File)
 	}
 	return err
@@ -158,7 +158,7 @@ type compilerSet struct {
 
 type archiveMessage struct {
 	run  run.Run
-	body observer.ArchiveMessage
+	body saver.ArchiveMessage
 }
 
 func (l *InstanceLogger) OnCompilerPlanStart(ncompilers int) {
@@ -198,7 +198,7 @@ func (l *InstanceLogger) OnAnalysis(c analyser.Analysis) {
 	}
 }
 
-func (l *InstanceLogger) OnArchive(s observer.ArchiveMessage) {
+func (l *InstanceLogger) OnArchive(s saver.ArchiveMessage) {
 	msg := archiveMessage{
 		run:  l.run,
 		body: s,
