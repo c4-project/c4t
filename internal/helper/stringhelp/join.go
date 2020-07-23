@@ -13,8 +13,8 @@ import (
 
 // JoinNonEmpty joins the non-empty strings in xs using sep.
 func JoinNonEmpty(sep string, xs ...string) string {
-	nxs := make([]string, len(xs))
-	for _, x := range nxs {
+	nxs := make([]string, 0, len(xs))
+	for _, x := range xs {
 		if ystring.IsNotEmpty(x) {
 			nxs = append(nxs, x)
 		}
