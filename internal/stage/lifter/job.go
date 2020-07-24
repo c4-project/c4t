@@ -55,8 +55,7 @@ func (j *Job) Lift(ctx context.Context) error {
 		return err
 	}
 
-	// TODO(@MattWindsor91): this used to be a parallel loop, but was causing file exhaustion.
-	// Ideally, we'd have a means of parallelism that doesn't inadvertently scale up like this.
+	// This used to be a parallel loop, but was contributing file exhaustion.  It might be safe to re-parallelise.
 	for _, a := range j.Arches {
 		if err := j.liftArch(ctx, a); err != nil {
 			return err

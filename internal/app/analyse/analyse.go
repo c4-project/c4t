@@ -86,7 +86,6 @@ func flags() []c.Flag {
 			Usage:       usageSaveDir,
 			DefaultText: "do not save",
 		},
-		// TODO(@MattWindsor91): template stuff
 	}
 }
 
