@@ -15,7 +15,8 @@ import (
 	acsv "github.com/MattWindsor91/act-tester/internal/stage/analyser/csv"
 )
 
-// TODO(@MattWindsor91): add things to the plan mock so that the below analysis gets populated.
+// NB: the below CSV is likely to change as the plan mock changes.
+// At time of writing, the mock referred to compilers not in the plan, for instance.
 
 // ExampleCompilerWriter_OnAnalysis is a testable example for OnAnalysis.
 func ExampleCompilerWriter_OnAnalysis() {
@@ -28,4 +29,6 @@ func ExampleCompilerWriter_OnAnalysis() {
 
 	// Output:
 	// CompilerID,StyleID,ArchID,Opt,MOpt,MinCompile,AvgCompile,MaxCompile,MinRun,AvgRun,MaxRun,Ok,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
+	// gcc,gcc,ppc.64le.power9,,,200,200,200,0,0,0,0,1,1,0,0,0
+	// clang,gcc,x86,,,200,200,200,0,0,0,1,0,0,0,0,0
 }
