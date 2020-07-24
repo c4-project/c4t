@@ -43,6 +43,8 @@ const (
 
 	flagCsvCompilers       = "csv-compilers"
 	usageCsvCompilers      = "dump CSV of compilers and their run times"
+	flagCsvStages          = "csv-stages"
+	usageCsvStages         = "dump CSV of stages and their run times"
 	flagShowCompilers      = "show-compilers"
 	flagShowCompilersShort = "C"
 	usageShowCompilers     = "show breakdown of compilers and their run times"
@@ -76,6 +78,7 @@ func flags() []c.Flag {
 	return []c.Flag{
 		stdflag.WorkerCountCliFlag(),
 		&c.BoolFlag{Name: flagCsvCompilers, Usage: usageCsvCompilers},
+		&c.BoolFlag{Name: flagCsvStages, Usage: usageCsvStages},
 		&c.BoolFlag{Name: flagShowCompilers, Aliases: []string{flagShowCompilersShort}, Usage: usageShowCompilers},
 		&c.BoolFlag{Name: flagShowOk, Aliases: []string{flagShowOkShort}, Usage: usageShowOk},
 		&c.BoolFlag{Name: flagShowSubjects, Aliases: []string{flagShowSubjectsShort}, Usage: usageShowSubjects},
@@ -135,9 +138,12 @@ func prettyObserver(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error)
 
 func csvObserver(ctx *c.Context, outw io.Writer, obs []analyser.Observer) ([]analyser.Observer, error) {
 	showCsvCompilers := ctx.Bool(flagCsvCompilers)
-
 	if showCsvCompilers {
-		return append(obs, (*csv2.CompilerWriter)(csv.NewWriter(outw))), nil
+		obs = append(obs, (*csv2.CompilerWriter)(csv.NewWriter(outw)))
+	}
+	showCsvStages := ctx.Bool(flagCsvStages)
+	if showCsvStages {
+		obs = append(obs, (*csv2.StageWriter)(csv.NewWriter(outw)))
 	}
 	return obs, nil
 }
