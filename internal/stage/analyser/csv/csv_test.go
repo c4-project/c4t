@@ -27,5 +27,5 @@ func ExampleCompilerWriter_OnAnalysis() {
 	cw.OnAnalysis(*an)
 
 	// Output:
-	// compilerID,styleID,archID,opt,mopt,minCompile,avgCompile,maxCompile,minRun,avgRun,maxRun,Ok,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
+	// CompilerID,StyleID,ArchID,Opt,MOpt,MinCompile,AvgCompile,MaxCompile,MinRun,AvgRun,MaxRun,Ok,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
 }

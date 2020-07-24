@@ -30,11 +30,11 @@ func (c *CompilerWriter) OnAnalysis(a analyser.Analysis) {
 }
 
 var staticColumnHeaders = [...]string{
-	"compilerID",
-	"styleID",
-	"archID",
-	"opt",
-	"mopt",
+	"CompilerID",
+	"StyleID",
+	"ArchID",
+	"Opt",
+	"MOpt",
 }
 
 func (c *CompilerWriter) writeHeader() {
@@ -48,7 +48,7 @@ func (c *CompilerWriter) writeHeader() {
 }
 
 func timesetHeader(name string) []string {
-	return []string{"min" + name, "avg" + name, "max" + name}
+	return []string{"Min" + name, "Avg" + name, "Max" + name}
 }
 
 func (c *CompilerWriter) writeCompiler(cname string, can analyser.Compiler) {
@@ -75,9 +75,9 @@ func (c *CompilerWriter) staticColumnsForCompiler(cname string, can analyser.Com
 }
 
 func counts(cs map[status.Status]int) []string {
-	result := make([]string, status.Last+1)
+	result := make([]string, status.Last)
 	for i := status.Ok; i <= status.Last; i++ {
-		result[i] = strconv.Itoa(cs[i])
+		result[i-1] = strconv.Itoa(cs[i])
 	}
 	return result
 }
