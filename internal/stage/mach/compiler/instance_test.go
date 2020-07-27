@@ -36,7 +36,7 @@ import (
 // TestInstance_Compile tests running a compile job.
 func TestInstance_Compile(t *testing.T) {
 	var mc mocks.SingleRunner
-	var mp compiler.MockSubjectPather
+	var mp mocks.SubjectPather
 
 	names := []string{"foo", "bar", "baz"}
 	c := corpus.New(names...)

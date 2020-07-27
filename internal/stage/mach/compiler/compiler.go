@@ -45,7 +45,7 @@ type SingleRunner interface {
 	RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error
 }
 
-//go:generate mockery -name SingleRunner
+//go:generate mockery --name=SingleRunner
 
 // SubjectPather is the interface of types that can produce path sets for compilations.
 type SubjectPather interface {
@@ -56,6 +56,8 @@ type SubjectPather interface {
 	// SubjectPaths gets the binary and log file paths for the subject/compiler pair sc.
 	SubjectPaths(sc SubjectCompile) subject.CompileFileset
 }
+
+//go:generate mockery --name=SubjectPather
 
 // Compiler contains the configuration required to compile the recipes for a single test run.
 type Compiler struct {
