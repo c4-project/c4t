@@ -6,13 +6,10 @@
 package mach
 
 import (
-	"context"
 	"io"
 	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
-
-	"github.com/MattWindsor91/act-tester/internal/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
@@ -85,13 +82,4 @@ func (c *Config) makeRunner() (*runner.Runner, error) {
 		runner.ObserveWith(c.Observers...),
 		runner.OverrideQuantities(c.User.Quantities.Runner),
 	)
-}
-
-// Run creates a new machine-dependent phase runner from this config, then runs it on p using ctx.
-func (c *Config) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	m, err := New(c, p)
-	if err != nil {
-		return nil, err
-	}
-	return m.Run(ctx)
 }

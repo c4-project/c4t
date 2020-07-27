@@ -58,11 +58,14 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
-	cfg := makeConfig(ctx, outw, errw)
-	return view.RunOnCliPlan(ctx, cfg, outw)
+	m, err := makeMach(ctx, outw, errw)
+	if err != nil {
+		return err
+	}
+	return view.RunOnCliPlan(ctx, m, outw)
 }
 
-func makeConfig(ctx *c.Context, outw, errw io.Writer) *mach.Config {
+func makeMach(ctx *c.Context, outw, errw io.Writer) (*mach.Mach, error) {
 	cfg := mach.Config{
 		CDriver: &cimpl.CResolve,
 		RDriver: &bimpl.BResolve,
@@ -70,7 +73,7 @@ func makeConfig(ctx *c.Context, outw, errw io.Writer) *mach.Config {
 		User:    stdflag.MachConfigFromCli(ctx, mach.QuantitySet{}),
 	}
 	setLoggerAndObservers(&cfg, errw, ctx.Bool(stdflag.FlagUseJSONLong))
-	return &cfg
+	return mach.New(&cfg)
 }
 
 func setLoggerAndObservers(c *mach.Config, errw io.Writer, jsonStatus bool) {

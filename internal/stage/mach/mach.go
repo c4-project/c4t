@@ -23,8 +23,6 @@ import (
 type Mach struct {
 	// compiler is, if non-nil, the configured compiler substage.
 	compiler *compiler.Compiler
-	// plan is the plan to use when running the machine-dependent stage.
-	plan *plan.Plan
 	// runner is, if non-nil, the configured runner substage.
 	runner *runner.Runner
 	// json is, if non-nil, a JSON observer;
@@ -32,11 +30,8 @@ type Mach struct {
 	json *forward.Observer
 }
 
-func New(cfg *Config, p *plan.Plan) (*Mach, error) {
+func New(cfg *Config) (*Mach, error) {
 	if err := checkConfig(cfg); err != nil {
-		return nil, err
-	}
-	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
 
@@ -52,7 +47,6 @@ func New(cfg *Config, p *plan.Plan) (*Mach, error) {
 	m := Mach{
 		compiler: c,
 		runner:   r,
-		plan:     p,
 		json:     cfg.Json,
 	}
 
@@ -85,13 +79,16 @@ func (m *Mach) trap(err error) error {
 	return err
 }
 
-func (m *Mach) Run(ctx context.Context) (*plan.Plan, error) {
-	p, err := m.runInner(ctx)
+func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	if err := checkPlan(p); err != nil {
+		return nil, err
+	}
+	p, err := m.runInner(ctx, p)
 	return p, m.trap(err)
 }
 
-func (m *Mach) runInner(ctx context.Context) (*plan.Plan, error) {
-	cp, err := m.runCompiler(ctx, m.plan)
+func (m *Mach) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	cp, err := m.runCompiler(ctx, p)
 	if err != nil {
 		return nil, fmt.Errorf("while running compiler: %w", err)
 	}
