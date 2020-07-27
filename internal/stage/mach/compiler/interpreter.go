@@ -78,8 +78,8 @@ func IOptions(os ...IOption) IOption {
 	}
 }
 
-// LogTo logs compiler output to w.
-func LogTo(w io.Writer) IOption {
+// ILogTo logs compiler output to w.
+func ILogTo(w io.Writer) IOption {
 	return func(i *Interpreter) { i.logw = iohelp.EnsureWriter(w) }
 }
 

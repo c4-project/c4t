@@ -60,18 +60,18 @@ func (c *Config) Check() error {
 	return nil
 }
 
-func (c *Config) makeCompilerConfig() *compiler.Config {
+func (c *Config) makeCompiler() (*compiler.Compiler, error) {
 	if c.User.SkipCompiler {
-		return nil
+		return nil, nil
 	}
 
-	return &compiler.Config{
-		Driver:     c.CDriver,
-		Logger:     c.Logger,
-		Paths:      compiler.NewPathset(c.User.OutDir),
-		Observers:  c.Observers,
-		Quantities: c.User.Quantities.Compiler,
-	}
+	return compiler.New(
+		c.CDriver,
+		compiler.NewPathset(c.User.OutDir),
+		compiler.LogTo(c.Logger),
+		compiler.ObserveWith(c.Observers...),
+		compiler.OverrideQuantities(c.User.Quantities.Compiler),
+	)
 }
 
 func (c *Config) makeRunner() (*runner.Runner, error) {

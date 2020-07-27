@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package runner
+package compiler
 
 import (
 	"log"
@@ -11,14 +11,14 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
 
-// Option is the type of functional options for the machine node.
-type Option func(*Runner) error
+// Option is the type of options to the compiler sub-stage constructor.
+type Option func(*Compiler) error
 
 // Options applies each option in opts in turn.
 func Options(opts ...Option) Option {
-	return func(m *Runner) error {
+	return func(c *Compiler) error {
 		for _, o := range opts {
-			if err := o(m); err != nil {
+			if err := o(c); err != nil {
 				return err
 			}
 		}
@@ -29,26 +29,26 @@ func Options(opts ...Option) Option {
 // LogTo sets the runner's logger to l.
 func LogTo(l *log.Logger) Option {
 	// TODO(@MattWindsor91): as elsewhere, logging should be replaced with observing
-	return func(r *Runner) error {
+	return func(c *Compiler) error {
 		// Logger ensuring is done after all options are processed
-		r.l = l
+		c.l = l
 		return nil
 	}
 }
 
 // ObserveWith adds each observer in obs to the runner's observer list.
 func ObserveWith(obs ...builder.Observer) Option {
-	return func(r *Runner) error {
+	return func(c *Compiler) error {
 		var err error
-		r.observers, err = builder.AppendObservers(r.observers, obs...)
+		c.observers, err = builder.AppendObservers(c.observers, obs...)
 		return err
 	}
 }
 
 // OverrideQuantities overrides this runner's quantities with qs.
 func OverrideQuantities(qs QuantitySet) Option {
-	return func(r *Runner) error {
-		r.quantities.Override(qs)
+	return func(c *Compiler) error {
+		c.quantities.Override(qs)
 		return nil
 	}
 }

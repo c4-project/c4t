@@ -8,7 +8,11 @@ package runner
 
 import (
 	"context"
+	"io"
 	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/model/obs"
+	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
@@ -19,6 +23,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
+
+// ObsParser is the interface of things that can parse test outcomes.
+type ObsParser interface {
+	// ParseObs parses the observation in reader r into o according to the backend configuration in b.
+	// The backend described by b must have been used to produce the testcase outputting r.
+	ParseObs(ctx context.Context, b *service.Backend, r io.Reader, o *obs.Obs) error
+}
 
 // Runner contains information necessary to run a plan's compiled test cases.
 type Runner struct {
@@ -73,7 +84,7 @@ func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
 	bcfg := r.builderConfig(p)
 	c, err := builder.ParBuild(ctx, r.quantities.NWorkers, p.Corpus, bcfg,
 		func(ctx context.Context, named subject.Named, requests chan<- builder.Request) error {
-			return r.makeJob(requests, named, p).Run(ctx)
+			return r.instance(requests, named, p).Run(ctx)
 		})
 	if err != nil {
 		return nil, err
@@ -100,10 +111,13 @@ func checkPlan(p *plan.Plan) error {
 	if p == nil {
 		return plan.ErrNil
 	}
-	return p.Check()
+	if err := p.Check(); err != nil {
+		return err
+	}
+	return p.Metadata.RequireStage(stage.Compile)
 }
 
-func (r *Runner) makeJob(requests chan<- builder.Request, named subject.Named, p *plan.Plan) *Instance {
+func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, p *plan.Plan) *Instance {
 	return &Instance{
 		backend:    p.Backend,
 		parser:     r.parser,

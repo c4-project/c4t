@@ -42,8 +42,14 @@ type Instance struct {
 	// Compiler points to the compiler to run.
 	Compiler *compiler.Named
 
-	// Conf is the configuration with which this batch compiler was configured.
-	Conf *Config
+	// Driver tells the instance how to run the compiler.
+	Driver SingleRunner
+
+	// Paths tells the instance which paths to use.
+	Paths SubjectPather
+
+	// Quantities is the quantity set for this instance.
+	Quantities QuantitySet
 
 	// ResCh is the channel to which the compile run should send compiled subject records.
 	ResCh chan<- builder.Request
@@ -53,7 +59,7 @@ type Instance struct {
 }
 
 func (j *Instance) Compile(ctx context.Context) error {
-	if j.Conf.Paths == nil {
+	if j.Paths == nil {
 		return fmt.Errorf("in job: %w", iohelp.ErrPathsetNil)
 	}
 
@@ -68,7 +74,7 @@ func (j *Instance) compileSubject(ctx context.Context, s *subject.Named) error {
 		return herr
 	}
 
-	sp := j.Conf.Paths.SubjectPaths(SubjectCompile{CompilerID: j.Compiler.ID, Name: s.Name})
+	sp := j.Paths.SubjectPaths(SubjectCompile{CompilerID: j.Compiler.ID, Name: s.Name})
 
 	res, rerr := j.runCompiler(ctx, sp, h)
 	if rerr != nil {
@@ -84,7 +90,7 @@ func (j *Instance) runCompiler(ctx context.Context, sp subject.CompileFileset, h
 		return subject.CompileResult{}, err
 	}
 
-	tctx, cancel := j.Conf.Quantities.Timeout.OnContext(ctx)
+	tctx, cancel := j.Quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
 	start := time.Now()
@@ -100,7 +106,7 @@ func (j *Instance) runCompiler(ctx context.Context, sp subject.CompileFileset, h
 }
 
 func (j *Instance) runCompilerJob(ctx context.Context, job compile.Recipe, logf io.Writer) error {
-	i, err := NewInterpreter(j.Conf.Driver, job, LogTo(logf))
+	i, err := NewInterpreter(j.Driver, job, ILogTo(logf))
 	if err != nil {
 		return err
 	}

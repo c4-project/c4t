@@ -21,8 +21,8 @@ import (
 
 // Mach encapsulates the state needed for the machine-dependent stage.
 type Mach struct {
-	// compiler is, if non-nil, the configured compiler substage config.
-	compiler *compiler.Config
+	// compiler is, if non-nil, the configured compiler substage.
+	compiler *compiler.Compiler
 	// plan is the plan to use when running the machine-dependent stage.
 	plan *plan.Plan
 	// runner is, if non-nil, the configured runner substage.
@@ -32,24 +32,28 @@ type Mach struct {
 	json *forward.Observer
 }
 
-func New(c *Config, p *plan.Plan) (*Mach, error) {
-	if err := checkConfig(c); err != nil {
+func New(cfg *Config, p *plan.Plan) (*Mach, error) {
+	if err := checkConfig(cfg); err != nil {
 		return nil, err
 	}
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
 
-	r, err := c.makeRunner()
+	c, err := cfg.makeCompiler()
+	if err != nil {
+		return nil, err
+	}
+	r, err := cfg.makeRunner()
 	if err != nil {
 		return nil, err
 	}
 
 	m := Mach{
-		compiler: c.makeCompilerConfig(),
+		compiler: c,
 		runner:   r,
 		plan:     p,
-		json:     c.Json,
+		json:     cfg.Json,
 	}
 
 	return &m, nil

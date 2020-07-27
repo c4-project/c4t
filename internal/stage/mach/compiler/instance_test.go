@@ -76,14 +76,10 @@ func TestInstance_Compile(t *testing.T) {
 				},
 			},
 		},
-		Conf: &compiler.Config{
-			Driver:    &mc,
-			Observers: nil,
-			Logger:    nil,
-			Paths:     &mp,
-			Quantities: compiler.QuantitySet{
-				Timeout: 0,
-			},
+		Driver: &mc,
+		Paths:  &mp,
+		Quantities: compiler.QuantitySet{
+			Timeout: 0,
 		},
 		ResCh:  rch,
 		Corpus: c,
