@@ -10,6 +10,8 @@ import (
 	"context"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -62,18 +64,13 @@ func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
+	return p.RunStage(ctx, stage.Run, r.runInner)
+}
 
-	bcfg := builder.Config{
-		Init:      p.Corpus,
-		Observers: r.observers,
-		Manifest: builder.Manifest{
-			Name:  "run",
-			NReqs: p.NumExpCompilations(),
-		},
-	}
-
+func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	r.quantities.Log(r.l)
 
+	bcfg := r.builderConfig(p)
 	c, err := builder.ParBuild(ctx, r.quantities.NWorkers, p.Corpus, bcfg,
 		func(ctx context.Context, named subject.Named, requests chan<- builder.Request) error {
 			return r.makeJob(requests, named, p).Run(ctx)
@@ -85,6 +82,17 @@ func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	np := *p
 	np.Corpus = c
 	return &np, nil
+}
+
+func (r *Runner) builderConfig(p *plan.Plan) builder.Config {
+	return builder.Config{
+		Init:      p.Corpus,
+		Observers: r.observers,
+		Manifest: builder.Manifest{
+			Name:  "run",
+			NReqs: p.NumExpCompilations(),
+		},
+	}
 }
 
 func checkPlan(p *plan.Plan) error {
