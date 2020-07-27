@@ -3,16 +3,16 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package csv_test
+package csvdump_test
 
 import (
 	"context"
-	"encoding/csv"
 	"os"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/csvdump"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
-	acsv "github.com/MattWindsor91/act-tester/internal/stage/analyser/csv"
 )
 
 // NB: the below CSV is likely to change as the plan mock changes.
@@ -25,8 +25,7 @@ func ExampleStageWriter_OnAnalysis() {
 	az, _ := analyser.New(plan.Mock(), 1)
 	an, _ := az.Analyse(context.Background())
 
-	w := csv.NewWriter(os.Stdout)
-	sw := (*acsv.StageWriter)(w)
+	sw := csvdump.NewStageWriter(os.Stdout)
 	sw.OnAnalysis(*an)
 
 	// Output:

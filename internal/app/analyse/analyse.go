@@ -6,12 +6,10 @@
 package analyse
 
 import (
-	"encoding/csv"
 	"io"
 	"io/ioutil"
 
-	csv2 "github.com/MattWindsor91/act-tester/internal/stage/analyser/csv"
-
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/csvdump"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
 
 	"github.com/1set/gut/ystring"
@@ -139,11 +137,11 @@ func prettyObserver(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error)
 func csvObserver(ctx *c.Context, outw io.Writer, obs []analyser.Observer) ([]analyser.Observer, error) {
 	showCsvCompilers := ctx.Bool(flagCsvCompilers)
 	if showCsvCompilers {
-		obs = append(obs, (*csv2.CompilerWriter)(csv.NewWriter(outw)))
+		obs = append(obs, csvdump.NewCompilerWriter(outw))
 	}
 	showCsvStages := ctx.Bool(flagCsvStages)
 	if showCsvStages {
-		obs = append(obs, (*csv2.StageWriter)(csv.NewWriter(outw)))
+		obs = append(obs, csvdump.NewStageWriter(outw))
 	}
 	return obs, nil
 }

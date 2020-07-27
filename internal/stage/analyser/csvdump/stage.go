@@ -3,11 +3,12 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package csv
+package csvdump
 
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -17,6 +18,11 @@ import (
 
 // StageWriter wraps a CSV writer and makes it output stage analyses.
 type StageWriter csv.Writer
+
+// NewStageWriter creates a new stage writer over w.
+func NewStageWriter(w io.Writer) *StageWriter {
+	return (*StageWriter)(csv.NewWriter(w))
+}
 
 // OnAnalysis observes an analysis by emitting a CSV with stage information.
 func (s *StageWriter) OnAnalysis(a analyser.Analysis) {

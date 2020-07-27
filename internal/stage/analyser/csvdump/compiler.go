@@ -3,11 +3,12 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package csv
+package csvdump
 
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
@@ -18,6 +19,11 @@ import (
 
 // CompilerWriter wraps a CSV writer and makes it output compiler analyses.
 type CompilerWriter csv.Writer
+
+// NewCompilerWriter creates a new compiler writer over w.
+func NewCompilerWriter(w io.Writer) *CompilerWriter {
+	return (*CompilerWriter)(csv.NewWriter(w))
+}
 
 // OnAnalysis observes an analysis by emitting a CSV with compiler information.
 func (c *CompilerWriter) OnAnalysis(a analyser.Analysis) {
