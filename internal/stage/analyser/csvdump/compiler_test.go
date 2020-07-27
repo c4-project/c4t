@@ -22,10 +22,11 @@ func ExampleCompilerWriter_OnAnalysis() {
 	az, _ := analyser.New(plan.Mock(), 1)
 	an, _ := az.Analyse(context.Background())
 
+	// nb: aside from the header, the actual order of compilers is not deterministic
 	cw := csvdump.NewCompilerWriter(os.Stdout)
 	cw.OnAnalysis(*an)
 
-	// Output:
+	// Unordered output:
 	// CompilerID,StyleID,ArchID,Opt,MOpt,MinCompile,AvgCompile,MaxCompile,MinRun,AvgRun,MaxRun,Ok,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
 	// gcc,gcc,ppc.64le.power9,,,200,200,200,0,0,0,0,1,1,0,0,0
 	// clang,gcc,x86,,,200,200,200,0,0,0,1,0,0,0,0,0
