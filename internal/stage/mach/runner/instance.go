@@ -25,8 +25,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Job contains all state required to perform a runner operation for a given subject.
-type Job struct {
+// Instance contains all state required to perform a runner operation for a given subject.
+type Instance struct {
 	// backend is the backend used to produce the recipes being run.
 	// We retain the backend to be able to work out how to parse the run results.
 	backend *service.Backend
@@ -44,26 +44,26 @@ type Job struct {
 	quantities QuantitySet
 }
 
-// Run runs the job with context ctx.
-func (j *Job) Run(ctx context.Context) error {
-	for cidstr, c := range j.subject.Compiles {
+// Run runs the instance with context ctx.
+func (n *Instance) Run(ctx context.Context) error {
+	for cidstr, c := range n.subject.Compiles {
 		cid := id.FromString(cidstr)
-		if err := j.runCompile(ctx, cid, &c); err != nil {
+		if err := n.runCompile(ctx, cid, &c); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (j *Job) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResult) error {
-	run, err := j.runCompileInner(ctx, cid, c)
+func (n *Instance) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResult) error {
+	run, err := n.runCompileInner(ctx, cid, c)
 	if err != nil {
 		return err
 	}
-	return j.makeBuilderReq(cid, run).SendTo(ctx, j.resCh)
+	return n.makeBuilderReq(cid, run).SendTo(ctx, n.resCh)
 }
 
-func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.RunResult, error) {
+func (n *Instance) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.RunResult, error) {
 	if !c.Status.IsOk() {
 		return subject.RunResult{Result: subject.Result{Status: c.Status}}, nil
 	}
@@ -72,17 +72,17 @@ func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.Compile
 	if bin == "" {
 		return subject.RunResult{
 			Result: subject.Result{Status: status.Unknown},
-		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.subject.Name, cid.String())
+		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, n.subject.Name, cid.String())
 	}
 
 	start := time.Now()
-	o, runErr := j.runAndParseBin(ctx, cid, bin)
+	o, runErr := n.runAndParseBin(ctx, cid, bin)
 	s, err := statusOfRun(o, runErr)
 
-	return j.makeResult(start, s, o), err
+	return n.makeResult(start, s, o), err
 }
 
-func (j *Job) makeResult(start time.Time, s status.Status, o *obs.Obs) subject.RunResult {
+func (n *Instance) makeResult(start time.Time, s status.Status, o *obs.Obs) subject.RunResult {
 	return subject.RunResult{
 		Result: subject.Result{
 			Time:     start,
@@ -101,21 +101,21 @@ func statusOfRun(o *obs.Obs, runErr error) (status.Status, error) {
 }
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
-func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.Obs, error) {
-	tctx, cancel := j.quantities.Timeout.OnContext(ctx)
+func (n *Instance) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.Obs, error) {
+	tctx, cancel := n.quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
 	cmd := exec.CommandContext(tctx, bin)
 	obsr, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, j.liftError(cid, "opening pipe for", err)
+		return nil, n.liftError(cid, "opening pipe for", err)
 	}
 	if err := cmd.Start(); err != nil {
-		return nil, j.liftError(cid, "starting", err)
+		return nil, n.liftError(cid, "starting", err)
 	}
 
 	var o obs.Obs
-	perr := j.parser.ParseObs(tctx, j.backend, obsr, &o)
+	perr := n.parser.ParseObs(tctx, n.backend, obsr, &o)
 	werr := cmd.Wait()
 
 	return &o, mostRelevantError(werr, perr, tctx.Err())
@@ -141,19 +141,19 @@ func mostRelevantError(r, p, c error) error {
 	}
 }
 
-func (j *Job) makeBuilderReq(cid id.ID, run subject.RunResult) builder.Request {
-	return builder.RunRequest(j.subject.Name, cid, run)
+func (n *Instance) makeBuilderReq(cid id.ID, run subject.RunResult) builder.Request {
+	return builder.RunRequest(n.subject.Name, cid, run)
 }
 
 // liftError wraps err with context about where it occurred.
-func (j *Job) liftError(cid id.ID, stage string, err error) error {
+func (n *Instance) liftError(cid id.ID, stage string, err error) error {
 	if err == nil {
 		return nil
 	}
 	return Error{
 		Stage:    stage,
 		Compiler: cid,
-		Subject:  j.subject.Name,
+		Subject:  n.subject.Name,
 		Inner:    err,
 	}
 }

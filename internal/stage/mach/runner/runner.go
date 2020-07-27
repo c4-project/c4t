@@ -95,8 +95,8 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (r *Runner) makeJob(requests chan<- builder.Request, named subject.Named, p *plan.Plan) *Job {
-	return &Job{
+func (r *Runner) makeJob(requests chan<- builder.Request, named subject.Named, p *plan.Plan) *Instance {
+	return &Instance{
 		backend:    p.Backend,
 		parser:     r.parser,
 		quantities: r.quantities,
