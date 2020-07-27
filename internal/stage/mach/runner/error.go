@@ -16,9 +16,6 @@ var (
 	// ErrNoBin occurs when a successful compile result	has no binary path attached.
 	ErrNoBin = errors.New("no binary in compile result")
 
-	// ErrConfigNil occurs when we try to construct a Runner using a nil config.
-	ErrConfigNil = errors.New("config nil")
-
 	// ErrParserNil occurs when a runner config doesn't specify an observation parser.
 	ErrParserNil = errors.New("obs-parser nil")
 )

@@ -5,6 +5,8 @@
 
 package builder
 
+import "errors"
+
 // Observer is the interface for things that observe a builder.
 type Observer interface {
 	// OnBuild sends a builder observation message.
@@ -24,6 +26,19 @@ const (
 	// BuildFinish signifies the end of a corpus build.
 	BuildFinish
 )
+
+// ErrObserverNil is the error returned when AppendObservers receives a nil observer.
+var ErrObserverNil = errors.New("observer nil")
+
+// AppendObservers behaves as append(dst, src...), but checks the observers are non-nil.
+func AppendObservers(dst []Observer, src ...Observer) ([]Observer, error) {
+	for _, o := range src {
+		if o == nil {
+			return nil, ErrObserverNil
+		}
+	}
+	return append(dst, src...), nil
+}
 
 // Message is the type of builder observation messages.
 type Message struct {

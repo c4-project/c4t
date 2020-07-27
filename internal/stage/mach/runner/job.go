@@ -27,23 +27,26 @@ import (
 
 // Job contains all state required to perform a runner operation for a given subject.
 type Job struct {
-	// MachConfig points to the runner config.
-	Conf *Config
-
-	// Backend is the backend used to produce the recipes being run.
+	// backend is the backend used to produce the recipes being run.
 	// We retain the backend to be able to work out how to parse the run results.
-	Backend *service.Backend
+	backend *service.Backend
 
-	// ResCh is the channel to which we're sending the run result.
-	ResCh chan<- builder.Request
+	// parser is the observation parser used to interpret the results of a run.
+	parser ObsParser
 
-	// Normalise is a pointer to the subject being run.
-	Subject *subject.Named
+	// resCh is the channel to which we're sending the run result.
+	resCh chan<- builder.Request
+
+	// subject is a pointer to the subject being run.
+	subject *subject.Named
+
+	// quantities is the set of quantities used to parametrise the running job.
+	quantities QuantitySet
 }
 
 // Run runs the job with context ctx.
 func (j *Job) Run(ctx context.Context) error {
-	for cidstr, c := range j.Subject.Compiles {
+	for cidstr, c := range j.subject.Compiles {
 		cid := id.FromString(cidstr)
 		if err := j.runCompile(ctx, cid, &c); err != nil {
 			return err
@@ -57,7 +60,7 @@ func (j *Job) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResul
 	if err != nil {
 		return err
 	}
-	return j.makeBuilderReq(cid, run).SendTo(ctx, j.ResCh)
+	return j.makeBuilderReq(cid, run).SendTo(ctx, j.resCh)
 }
 
 func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.RunResult, error) {
@@ -69,7 +72,7 @@ func (j *Job) runCompileInner(ctx context.Context, cid id.ID, c *subject.Compile
 	if bin == "" {
 		return subject.RunResult{
 			Result: subject.Result{Status: status.Unknown},
-		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.Subject.Name, cid.String())
+		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, j.subject.Name, cid.String())
 	}
 
 	start := time.Now()
@@ -99,7 +102,7 @@ func statusOfRun(o *obs.Obs, runErr error) (status.Status, error) {
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
 func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.Obs, error) {
-	tctx, cancel := j.Conf.Quantities.Timeout.OnContext(ctx)
+	tctx, cancel := j.quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
 	cmd := exec.CommandContext(tctx, bin)
@@ -112,7 +115,7 @@ func (j *Job) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.O
 	}
 
 	var o obs.Obs
-	perr := j.Conf.Parser.ParseObs(tctx, j.Backend, obsr, &o)
+	perr := j.parser.ParseObs(tctx, j.backend, obsr, &o)
 	werr := cmd.Wait()
 
 	return &o, mostRelevantError(werr, perr, tctx.Err())
@@ -139,7 +142,7 @@ func mostRelevantError(r, p, c error) error {
 }
 
 func (j *Job) makeBuilderReq(cid id.ID, run subject.RunResult) builder.Request {
-	return builder.RunRequest(j.Subject.Name, cid, run)
+	return builder.RunRequest(j.subject.Name, cid, run)
 }
 
 // liftError wraps err with context about where it occurred.
@@ -150,7 +153,7 @@ func (j *Job) liftError(cid id.ID, stage string, err error) error {
 	return Error{
 		Stage:    stage,
 		Compiler: cid,
-		Subject:  j.Subject.Name,
+		Subject:  j.subject.Name,
 		Inner:    err,
 	}
 }

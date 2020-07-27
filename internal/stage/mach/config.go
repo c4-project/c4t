@@ -74,18 +74,17 @@ func (c *Config) makeCompilerConfig() *compiler.Config {
 	}
 }
 
-func (c *Config) makeRunnerConfig() *runner.Config {
+func (c *Config) makeRunner() (*runner.Runner, error) {
 	if c.User.SkipRunner {
-		return nil
+		return nil, nil
 	}
-
-	return &runner.Config{
-		Logger:     c.Logger,
-		Parser:     c.RDriver,
-		Paths:      runner.NewPathset(c.User.OutDir),
-		Observers:  c.Observers,
-		Quantities: c.User.Quantities.Runner,
-	}
+	return runner.New(
+		c.RDriver,
+		runner.NewPathset(c.User.OutDir),
+		runner.LogTo(c.Logger),
+		runner.ObserveWith(c.Observers...),
+		runner.OverrideQuantities(c.User.Quantities.Runner),
+	)
 }
 
 // Run creates a new machine-dependent phase runner from this config, then runs it on p using ctx.

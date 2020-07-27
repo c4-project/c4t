@@ -23,85 +23,84 @@ type Runner struct {
 	// l is the logger for this runner.
 	l *log.Logger
 
-	// plan is the plan on which this runner is operating.
-	plan plan.Plan
+	// observers observe the runner's progress across a corpus.
+	observers []builder.Observer
 
-	// conf is the configuration used to build this runner.
-	conf Config
+	// parser handles the parsing of observations.
+	parser ObsParser
+
+	// paths contains the pathset used for this runner's outputs.
+	paths *Pathset
+
+	// quantities contains quantity configuration for this runner.
+	quantities QuantitySet
 }
 
 // New creates a new batch compiler instance using the config c and plan p.
 // It can fail if various safety checks fail on the config,
 // or if there is no obvious machine that the compiler can target.
-func New(c *Config, p *plan.Plan) (*Runner, error) {
-	if c == nil {
-		return nil, ErrConfigNil
+func New(parser ObsParser, paths *Pathset, opts ...Option) (*Runner, error) {
+	if parser == nil {
+		return nil, ErrParserNil
 	}
-	if err := c.Check(); err != nil {
+	if paths == nil {
+		return nil, iohelp.ErrPathsetNil
+	}
+	r := &Runner{
+		parser: parser,
+		paths:  paths,
+	}
+	if err := Options(opts...)(r); err != nil {
+		return nil, err
+	}
+	r.l = iohelp.EnsureLog(r.l)
+	return r, nil
+}
+
+// Run runs the runner on the plan p.
+func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
 
-	if p == nil {
-		return nil, plan.ErrNil
-	}
-
-	r := Runner{
-		conf: *c,
-		plan: *p,
-		l:    iohelp.EnsureLog(c.Logger),
-	}
-
-	if err := r.check(); err != nil {
-		return nil, err
-	}
-
-	return &r, nil
-}
-
-func (r *Runner) check() error {
-	return r.plan.Check()
-}
-
-// Run runs the runner.
-func (r *Runner) Run(ctx context.Context) (*plan.Plan, error) {
 	bcfg := builder.Config{
-		Init:      r.plan.Corpus,
-		Observers: r.conf.Observers,
+		Init:      p.Corpus,
+		Observers: r.observers,
 		Manifest: builder.Manifest{
 			Name:  "run",
-			NReqs: r.count(),
+			NReqs: p.NumExpCompilations(),
 		},
 	}
-	b, berr := builder.New(bcfg)
-	if berr != nil {
-		return nil, berr
+
+	r.quantities.Log(r.l)
+
+	c, err := builder.ParBuild(ctx, r.quantities.NWorkers, p.Corpus, bcfg,
+		func(ctx context.Context, named subject.Named, requests chan<- builder.Request) error {
+			return r.makeJob(requests, named, p).Run(ctx)
+		})
+	if err != nil {
+		return nil, err
 	}
 
-	r.conf.Quantities.Log(r.l)
-
-	err := r.plan.Corpus.Par(ctx, r.conf.Quantities.NWorkers,
-		func(ctx context.Context, named subject.Named) error {
-			return r.makeJob(b, named).Run(ctx)
-		},
-		func(ctx context.Context) error {
-			var err error
-			r.plan.Corpus, err = b.Run(ctx)
-			return err
-		},
-	)
-	return &r.plan, err
+	np := *p
+	np.Corpus = c
+	return &np, nil
 }
 
-func (r *Runner) makeJob(b *builder.Builder, named subject.Named) *Job {
+func checkPlan(p *plan.Plan) error {
+	// TODO(@MattWindsor91): require compile stage
+	if p == nil {
+		return plan.ErrNil
+	}
+	return p.Check()
+}
+
+func (r *Runner) makeJob(requests chan<- builder.Request, named subject.Named, p *plan.Plan) *Job {
 	return &Job{
-		Backend: r.plan.Backend,
-		Conf:    &r.conf,
-		ResCh:   b.SendCh,
-		Subject: &named,
+		backend:    p.Backend,
+		parser:     r.parser,
+		quantities: r.quantities,
+		resCh:      requests,
+		subject:    &named,
 	}
-}
-
-// count returns the number of individual runs this runner will do.
-func (r *Runner) count() int {
-	return len(r.plan.Corpus) * len(r.plan.Compilers)
 }

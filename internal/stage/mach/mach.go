@@ -25,8 +25,8 @@ type Mach struct {
 	compiler *compiler.Config
 	// plan is the plan to use when running the machine-dependent stage.
 	plan *plan.Plan
-	// runner is, if non-nil, the configured runner substage config.
-	runner *runner.Config
+	// runner is, if non-nil, the configured runner substage.
+	runner *runner.Runner
 	// json is, if non-nil, a JSON observer;
 	// it exists here so that, if we're using JSON mode, errors get trapped and sent over as JSON.
 	json *forward.Observer
@@ -40,9 +40,14 @@ func New(c *Config, p *plan.Plan) (*Mach, error) {
 		return nil, err
 	}
 
+	r, err := c.makeRunner()
+	if err != nil {
+		return nil, err
+	}
+
 	m := Mach{
 		compiler: c.makeCompilerConfig(),
-		runner:   c.makeRunnerConfig(),
+		runner:   r,
 		plan:     p,
 		json:     c.Json,
 	}
