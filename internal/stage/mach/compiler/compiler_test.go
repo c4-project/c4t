@@ -9,6 +9,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler/mocks"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
@@ -16,8 +19,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
 	"github.com/stretchr/testify/mock"
 
@@ -33,8 +34,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
 )
 
-// TestInstance_Compile tests running a compile job.
-func TestInstance_Compile(t *testing.T) {
+// TestCompiler_Run tests running a compile job.
+func TestCompiler_Run(t *testing.T) {
 	var mc mocks.SingleRunner
 	var mp mocks.SubjectPather
 
@@ -50,38 +51,37 @@ func TestInstance_Compile(t *testing.T) {
 		c[n] = cn
 	}
 
-	rch := make(chan builder.Request, len(c))
-
-	j := compiler.Instance{
-		MachineID: id.FromString("localhost"),
-		Compiler: &mdl.Named{
-			ID: id.FromString("gcc"),
-			Compiler: mdl.Compiler{
-				SelectedMOpt: "arch=skylake",
-				SelectedOpt: &optlevel.Named{
-					Name: "3",
-					Level: optlevel.Level{
-						Optimises:       true,
-						Bias:            optlevel.BiasSpeed,
-						BreaksStandards: false,
-					},
-				},
-				Config: mdl.Config{
-					Style: id.CStyleGCC,
-					Arch:  id.ArchX86Skylake,
-					Run: &service.RunInfo{
-						Cmd:  "gcc",
-						Args: nil,
-					},
-				},
+	cmp := mdl.Compiler{
+		SelectedMOpt: "arch=skylake",
+		SelectedOpt: &optlevel.Named{
+			Name: "3",
+			Level: optlevel.Level{
+				Optimises:       true,
+				Bias:            optlevel.BiasSpeed,
+				BreaksStandards: false,
 			},
 		},
-		Driver: &mc,
-		Paths:  &mp,
-		Quantities: compiler.QuantitySet{
-			Timeout: 0,
+		Config: mdl.Config{
+			Style: id.CStyleGCC,
+			Arch:  id.ArchX86Skylake,
+			Run: &service.RunInfo{
+				Cmd:  "gcc",
+				Args: nil,
+			},
 		},
-		ResCh:  rch,
+	}
+
+	p := plan.Plan{
+		Metadata: *plan.NewMetadata(0),
+		Machine: machine.Named{
+			ID: id.FromString("localhost"),
+			Machine: machine.Machine{
+				Cores: 4,
+			},
+		},
+		Compilers: map[string]mdl.Compiler{
+			"gcc": cmp,
+		},
 		Corpus: c,
 	}
 
@@ -99,17 +99,21 @@ func TestInstance_Compile(t *testing.T) {
 
 	// not necessarily the same context
 	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 compile.Single) bool {
-		return j2.SelectedOptName() == j.Compiler.SelectedOpt.Name && j2.SelectedMOptName() == j.Compiler.SelectedMOpt
+		return j2.SelectedOptName() == cmp.SelectedOpt.Name && j2.SelectedMOptName() == cmp.SelectedMOpt
 	}), mock.Anything).Return(nil)
+	mp.On("Prepare", mock.MatchedBy(func(is []id.ID) bool {
+		return len(is) == 1 && is[0].String() == "gcc"
+	})).Return(nil)
 
-	err := j.Compile(ctx)
+	stage, serr := compiler.New(&mc, &mp)
+	require.NoError(t, serr, "constructing compile job")
+	p2, err := stage.Run(ctx, &p)
 	require.NoError(t, err, "running compile job")
 
 	mp.AssertExpectations(t)
 	mc.AssertExpectations(t)
 
-	for range names {
-		r := <-rch
-		assert.Contains(t, names, r.Name, "builder request has weird name")
+	for got := range p2.Corpus {
+		assert.Contains(t, names, got, "corpus got an extra subject name")
 	}
 }
