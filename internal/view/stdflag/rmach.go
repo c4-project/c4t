@@ -32,8 +32,8 @@ func (m MachInvoker) MachBin() string {
 
 // MachArgs is the arguments for an invocation of act-tester-mach, given directory dir and the config in this invoker.
 func (m MachInvoker) MachArgs(dir string) []string {
+	// We assume that any shell escaping is done elsewhere.
 	args := []string{
-		"-" + FlagUseJSON,
 		"-" + FlagOutDir, m.maybeOverrideDir(dir),
 		"-" + FlagCompilerTimeoutLong, m.Config.Quantities.Compiler.Timeout.String(),
 		"-" + FlagRunTimeoutLong, m.Config.Quantities.Runner.Timeout.String(),
@@ -55,8 +55,8 @@ func (m MachInvoker) maybeOverrideDir(dir string) string {
 	return dir
 }
 
-// MachConfigCliFlags gets the cli flags for setting up the 'user config' part of a mach or invoker invocation.
-func MachConfigCliFlags() []c.Flag {
+// MachCliFlags gets the cli flags for setting up the 'user config' part of a mach or invoker invocation.
+func MachCliFlags() []c.Flag {
 	return []c.Flag{
 		&c.BoolFlag{
 			Name:  FlagSkipCompiler,
@@ -85,18 +85,6 @@ func MachConfigCliFlags() []c.Flag {
 }
 
 const defaultOutDir = "mach_results"
-
-// MachCliFlags is MachConfigCliFlags plus the dir and JSON flags.
-func MachCliFlags() []c.Flag {
-	return append(
-		MachConfigCliFlags(),
-		&c.BoolFlag{
-			Name:    FlagUseJSONLong,
-			Aliases: []string{FlagUseJSON},
-			Usage:   "emit progress reports in JSON form on stderr",
-		},
-	)
-}
 
 // MachConfigFromCli creates a machine configuration using the flags in ctx and the default quantities in defq.
 func MachConfigFromCli(ctx *c.Context, defq mach.QuantitySet) mach.UserConfig {

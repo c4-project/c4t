@@ -9,18 +9,17 @@ package mach
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+
+	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
 	"github.com/MattWindsor91/act-tester/internal/view"
-	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
 	c "github.com/urfave/cli/v2"
 )
@@ -66,27 +65,16 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 }
 
 func makeMach(ctx *c.Context, outw, errw io.Writer) (*mach.Mach, error) {
-	cfg := mach.Config{
-		CDriver: &cimpl.CResolve,
-		RDriver: &bimpl.BResolve,
-		Stdout:  outw,
-		User:    stdflag.MachConfigFromCli(ctx, mach.QuantitySet{}),
-	}
-	setLoggerAndObservers(&cfg, errw, ctx.Bool(stdflag.FlagUseJSONLong))
-	return mach.New(&cfg)
-}
-
-func setLoggerAndObservers(c *mach.Config, errw io.Writer, jsonStatus bool) {
 	errw = iohelp.EnsureWriter(errw)
-
-	if jsonStatus {
-		c.Logger = nil
-		c.Observers = makeJsonObserver(errw)
-		return
+	cfg := mach.Config{
+		CDriver:   &cimpl.CResolve,
+		RDriver:   &bimpl.BResolve,
+		Observers: makeJsonObserver(errw),
+		Logger:    nil,
+		Stdout:    outw,
+		User:      stdflag.MachConfigFromCli(ctx, mach.QuantitySet{}),
 	}
-
-	c.Logger = log.New(errw, "[mach] ", log.LstdFlags)
-	c.Observers = singleobs.Builder(c.Logger)
+	return mach.New(&cfg)
 }
 
 func makeJsonObserver(errw io.Writer) []builder.Observer {

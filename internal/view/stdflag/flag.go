@@ -10,8 +10,6 @@ const (
 	FlagRunTimeout  = "T"
 	flagActConfFile = "A"
 	flagConfFile    = "C"
-	// FlagUseJSON is a short flag for enabling JSON output where available.
-	FlagUseJSON = "J"
 	// FlagOutDir is a short flag for specifying an output directory.
 	FlagOutDir = "d"
 	// FlagWorkerCount is a standard flag for arguments that set a worker count.
@@ -35,8 +33,6 @@ const (
 	FlagCompilerTimeoutLong = "compiler-timeout"
 	// FlagRunTimeoutLong is a long flag for run timeout.
 	FlagRunTimeoutLong = "run-timeout"
-	// FlagUseJSONLong is a long flag for JSON emission.
-	FlagUseJSONLong = "emit-json"
 	// FlagWorkerCountLong is a long flag for arguments that set a worker count.
 	FlagWorkerCountLong = "num-workers"
 

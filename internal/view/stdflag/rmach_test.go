@@ -6,9 +6,13 @@
 package stdflag_test
 
 import (
+	"fmt"
 	"io/ioutil"
+	"strings"
 	"testing"
 	"time"
+
+	runner2 "github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
@@ -18,6 +22,33 @@ import (
 	"github.com/stretchr/testify/assert"
 	c "github.com/urfave/cli/v2"
 )
+
+// ExampleMachInvoker_MachArgs is a testable example for MachArgs.
+func ExampleMachInvoker_MachArgs() {
+	mempty := stdflag.MachInvoker{Config: &mach.UserConfig{}}
+	fmt.Println(strings.Join(mempty.MachArgs(""), ", "))
+
+	mi := stdflag.MachInvoker{Config: &mach.UserConfig{
+		OutDir:       "foo",
+		SkipCompiler: true,
+		SkipRunner:   false,
+		Quantities: mach.QuantitySet{
+			Compiler: compiler.QuantitySet{
+				Timeout: timeout.Timeout(10 * time.Second),
+			},
+			Runner: runner.QuantitySet{
+				Timeout:  timeout.Timeout(5 * time.Minute),
+				NWorkers: 20,
+			},
+		},
+	}}
+
+	fmt.Println(strings.Join(mi.MachArgs(""), ", "))
+
+	// Output:
+	// -d, , -compiler-timeout, 0s, -run-timeout, 0s, -num-workers, 0
+	// -d, foo, -compiler-timeout, 10s, -run-timeout, 5m0s, -num-workers, 20, -skip-compiler
+}
 
 // TestMachConfigFromCli_roundTrip tests that sending a local config through CLI flags works properly.
 func TestMachConfigFromCli_roundTrip(t *testing.T) {
@@ -50,7 +81,7 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			args := stdflag.MachInvoker{Config: &in}.MachArgs("")
+			args := runner2.Invocation(stdflag.MachInvoker{Config: &in}, "")
 			a := testApp(
 				func(ctx *c.Context) error {
 					t.Helper()
