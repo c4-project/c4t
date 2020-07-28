@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
 	c "github.com/urfave/cli/v2"
 )
@@ -37,7 +37,8 @@ func (m MachInvoker) MachArgs(dir string) []string {
 		"-" + FlagOutDir, m.maybeOverrideDir(dir),
 		"-" + FlagCompilerTimeoutLong, m.Config.Quantities.Compiler.Timeout.String(),
 		"-" + FlagRunTimeoutLong, m.Config.Quantities.Runner.Timeout.String(),
-		"-" + FlagWorkerCountLong, strconv.Itoa(m.Config.Quantities.Runner.NWorkers),
+		"-" + FlagCompilerWorkerCountLong, strconv.Itoa(m.Config.Quantities.Compiler.NWorkers),
+		"-" + FlagRunWorkerCountLong, strconv.Itoa(m.Config.Quantities.Runner.NWorkers),
 	}
 	if m.Config.SkipCompiler {
 		args = append(args, "-"+FlagSkipCompiler)
@@ -78,8 +79,18 @@ func MachCliFlags() []c.Flag {
 			Value:   1 * time.Minute,
 			Usage:   "a `timeout` to apply to each run",
 		},
-		// TODO(@MattWindsor91): split into compile worker and run worker
-		WorkerCountCliFlag(),
+		&c.IntFlag{
+			Name:    FlagCompilerWorkerCountLong,
+			Aliases: []string{FlagWorkerCount},
+			Value:   1,
+			Usage:   "number of compiler `workers` to run in parallel",
+		},
+		&c.IntFlag{
+			Name:    FlagRunWorkerCountLong,
+			Aliases: []string{FlagAltWorkerCount},
+			Value:   1,
+			Usage:   "number of runner `workers` to run in parallel (not recommended except on manycore machines)",
+		},
 		OutDirCliFlag(defaultOutDir),
 	}
 }
@@ -87,7 +98,7 @@ func MachCliFlags() []c.Flag {
 const defaultOutDir = "mach_results"
 
 // MachConfigFromCli creates a machine configuration using the flags in ctx and the default quantities in defq.
-func MachConfigFromCli(ctx *c.Context, defq mach.QuantitySet) mach.UserConfig {
+func MachConfigFromCli(ctx *c.Context, defq quantity.Set) mach.UserConfig {
 	defq.Override(makeQuantitySet(ctx))
 
 	return mach.UserConfig{
@@ -98,14 +109,15 @@ func MachConfigFromCli(ctx *c.Context, defq mach.QuantitySet) mach.UserConfig {
 	}
 }
 
-func makeQuantitySet(ctx *c.Context) mach.QuantitySet {
-	return mach.QuantitySet{
-		Compiler: compiler.QuantitySet{
-			Timeout: timeout.Timeout(ctx.Duration(FlagCompilerTimeoutLong)),
+func makeQuantitySet(ctx *c.Context) quantity.Set {
+	return quantity.Set{
+		Compiler: quantity.SingleSet{
+			Timeout:  timeout.Timeout(ctx.Duration(FlagCompilerTimeoutLong)),
+			NWorkers: ctx.Int(FlagCompilerWorkerCountLong),
 		},
-		Runner: runner.QuantitySet{
+		Runner: quantity.SingleSet{
 			Timeout:  timeout.Timeout(ctx.Duration(FlagRunTimeoutLong)),
-			NWorkers: ctx.Int(FlagWorkerCountLong),
+			NWorkers: ctx.Int(FlagRunWorkerCountLong),
 		},
 	}
 }

@@ -11,7 +11,8 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
@@ -61,9 +62,6 @@ type SubjectPather interface {
 
 // Compiler contains the configuration required to compile the recipes for a single test run.
 type Compiler struct {
-	// l is the logger for this batch compiler.
-	l *log.Logger
-
 	// driver is what the compiler should use to run single compiler jobs.
 	driver Driver
 
@@ -74,7 +72,7 @@ type Compiler struct {
 	paths SubjectPather
 
 	// quantities is this compiler stage's quantity set.
-	quantities QuantitySet
+	quantities quantity.SingleSet
 }
 
 // New creates a new batch compiler instance using the config c and plan p.
@@ -92,7 +90,6 @@ func New(driver Driver, paths SubjectPather, opts ...Option) (*Compiler, error) 
 	if err := Options(opts...)(c); err != nil {
 		return nil, err
 	}
-	c.l = iohelp.EnsureLog(c.l)
 	return c, nil
 }
 
@@ -117,7 +114,8 @@ func (c *Compiler) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, erro
 		return nil, err
 	}
 
-	c.quantities.Log(c.l)
+	// TODO(@MattWindsor91): port this to observers
+	// c.quantities.Log(c.l)
 
 	for ids, cc := range p.Compilers {
 		nc, err := cc.AddNameString(ids)
@@ -167,7 +165,8 @@ func (c *Compiler) makeBuilder(p *plan.Plan) (*builder.Builder, error) {
 }
 
 func (c *Compiler) prepareDirs(p *plan.Plan) error {
-	c.l.Println("preparing directories")
+	// TODO(@MattWindsor91): port this to observers
+	//c.l.Println("preparing directories")
 	cids, err := p.CompilerIDs()
 	if err != nil {
 		return err

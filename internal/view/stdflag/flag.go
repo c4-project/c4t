@@ -13,8 +13,10 @@ const (
 	// FlagOutDir is a short flag for specifying an output directory.
 	FlagOutDir = "d"
 	// FlagWorkerCount is a standard flag for arguments that set a worker count.
-	FlagWorkerCount   = "j"
-	flagSubjectCycles = "k"
+	FlagWorkerCount = "j"
+	// FlagAltWorkerCount is a flag for arguments that set a secondary worker count.
+	FlagAltWorkerCount = "J"
+	flagSubjectCycles  = "k"
 	// FlagMachine is a standard flag for machine selection arguments.
 	FlagMachine = "m"
 	// FlagNum is a standard flag for 'number of' arguments.
@@ -35,6 +37,10 @@ const (
 	FlagRunTimeoutLong = "run-timeout"
 	// FlagWorkerCountLong is a long flag for arguments that set a worker count.
 	FlagWorkerCountLong = "num-workers"
+	// FlagCompilerWorkerCountLong is a long flag for arguments that set a compiler worker count.
+	FlagCompilerWorkerCountLong = "num-compiler-workers"
+	// FlagRunWorkerCountLong is a long flag for arguments that set a runner worker count.
+	FlagRunWorkerCountLong = "num-run-workers"
 
 	usageActConfFile = "read ACT config from this `file`"
 	usageCorpusSize  = "`number` of corpus files to select for this test plan;\n" +

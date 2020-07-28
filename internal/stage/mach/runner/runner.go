@@ -9,7 +9,8 @@ package runner
 import (
 	"context"
 	"io"
-	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -33,9 +34,6 @@ type ObsParser interface {
 
 // Runner contains information necessary to run a plan's compiled test cases.
 type Runner struct {
-	// l is the logger for this runner.
-	l *log.Logger
-
 	// observers observe the runner's progress across a corpus.
 	observers []builder.Observer
 
@@ -46,7 +44,7 @@ type Runner struct {
 	paths *Pathset
 
 	// quantities contains quantity configuration for this runner.
-	quantities QuantitySet
+	quantities quantity.SingleSet
 }
 
 // New creates a new batch compiler instance using the config c and plan p.
@@ -66,7 +64,6 @@ func New(parser ObsParser, paths *Pathset, opts ...Option) (*Runner, error) {
 	if err := Options(opts...)(r); err != nil {
 		return nil, err
 	}
-	r.l = iohelp.EnsureLog(r.l)
 	return r, nil
 }
 
@@ -79,7 +76,8 @@ func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	r.quantities.Log(r.l)
+	// TODO(@MattWindsor91): port to observers
+	// r.quantities.Log(r.l)
 
 	bcfg := r.builderConfig(p)
 	c, err := builder.ParBuild(ctx, r.quantities.NWorkers, p.Corpus, bcfg,

@@ -8,6 +8,8 @@ package mach
 import (
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
@@ -29,16 +31,6 @@ func Options(opts ...Option) Option {
 	}
 }
 
-// WithUserConfig applies all of the settings specified in uc.
-func WithUserConfig(uc UserConfig) Option {
-	return Options(
-		OutputDir(uc.OutDir),
-		OverrideQuantities(uc.Quantities),
-		SkipCompiler(uc.SkipCompiler),
-		SkipRunner(uc.SkipRunner),
-	)
-}
-
 // SkipCompiler sets whether to skip the compiler.
 func SkipCompiler(skip bool) Option {
 	return func(mach *Mach) error {
@@ -56,7 +48,7 @@ func SkipRunner(skip bool) Option {
 }
 
 // OverrideQuantities overrides the compiler and runner quantities with qs.
-func OverrideQuantities(qs QuantitySet) Option {
+func OverrideQuantities(qs quantity.Set) Option {
 	return Options(
 		WithCompilerOptions(compiler.OverrideQuantities(qs.Compiler)),
 		WithRunnerOptions(runner.OverrideQuantities(qs.Runner)),
@@ -114,5 +106,15 @@ type UserConfig struct {
 	// SkipRunner tells the machine-runner to skip running.
 	SkipRunner bool
 	// Quantities contains various tunable quantities for the machine-dependent stage.
-	Quantities QuantitySet
+	Quantities quantity.Set
+}
+
+// WithUserConfig applies all of the settings specified in uc.
+func WithUserConfig(uc UserConfig) Option {
+	return Options(
+		OutputDir(uc.OutDir),
+		OverrideQuantities(uc.Quantities),
+		SkipCompiler(uc.SkipCompiler),
+		SkipRunner(uc.SkipRunner),
+	)
 }

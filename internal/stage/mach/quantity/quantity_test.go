@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package mach_test
+package quantity_test
 
 import (
 	"log"
@@ -11,22 +11,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 )
 
 // ExampleQuantitySet_Log is a testable example for Log.
 func ExampleQuantitySet_Log() {
-	qs := mach.QuantitySet{
-		Compiler: compiler.QuantitySet{
-			Timeout: timeout.Timeout(1 * time.Minute),
+	qs := quantity.Set{
+		Compiler: quantity.SingleSet{
+			Timeout:  timeout.Timeout(1 * time.Minute),
+			NWorkers: 2,
 		},
-		Runner: runner.QuantitySet{
+		Runner: quantity.SingleSet{
 			Timeout:  timeout.Timeout(2 * time.Minute),
 			NWorkers: 1,
 		},
@@ -37,6 +36,7 @@ func ExampleQuantitySet_Log() {
 
 	// Output:
 	// [Compiler]
+	// running across 2 workers
 	// timeout at 1m0s
 	// [Runner]
 	// running across 1 worker
@@ -48,45 +48,49 @@ func TestQuantitySet_Override(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		old, new, want mach.QuantitySet
+		old, new, want quantity.Set
 	}{
 		"all-old": {
-			new: mach.QuantitySet{
-				Compiler: compiler.QuantitySet{
-					Timeout: timeout.Timeout(4 * time.Second),
+			new: quantity.Set{
+				Compiler: quantity.SingleSet{
+					Timeout:  timeout.Timeout(4 * time.Second),
+					NWorkers: 53,
 				},
-				Runner: runner.QuantitySet{
+				Runner: quantity.SingleSet{
 					Timeout:  timeout.Timeout(98 * time.Minute),
 					NWorkers: 27,
 				},
 			},
-			old: mach.QuantitySet{},
-			want: mach.QuantitySet{
-				Compiler: compiler.QuantitySet{
-					Timeout: timeout.Timeout(4 * time.Second),
+			old: quantity.Set{},
+			want: quantity.Set{
+				Compiler: quantity.SingleSet{
+					Timeout:  timeout.Timeout(4 * time.Second),
+					NWorkers: 53,
 				},
-				Runner: runner.QuantitySet{
+				Runner: quantity.SingleSet{
 					Timeout:  timeout.Timeout(98 * time.Minute),
 					NWorkers: 27,
 				},
 			},
 		},
 		"all-new": {
-			old: mach.QuantitySet{},
-			new: mach.QuantitySet{
-				Compiler: compiler.QuantitySet{
-					Timeout: timeout.Timeout(42 * time.Second),
+			old: quantity.Set{},
+			new: quantity.Set{
+				Compiler: quantity.SingleSet{
+					Timeout:  timeout.Timeout(42 * time.Second),
+					NWorkers: 27,
 				},
-				Runner: runner.QuantitySet{
+				Runner: quantity.SingleSet{
 					Timeout:  timeout.Timeout(1 * time.Minute),
 					NWorkers: 42,
 				},
 			},
-			want: mach.QuantitySet{
-				Compiler: compiler.QuantitySet{
-					Timeout: timeout.Timeout(42 * time.Second),
+			want: quantity.Set{
+				Compiler: quantity.SingleSet{
+					Timeout:  timeout.Timeout(42 * time.Second),
+					NWorkers: 27,
 				},
-				Runner: runner.QuantitySet{
+				Runner: quantity.SingleSet{
 					Timeout:  timeout.Timeout(1 * time.Minute),
 					NWorkers: 42,
 				},

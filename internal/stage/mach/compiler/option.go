@@ -6,7 +6,7 @@
 package compiler
 
 import (
-	"log"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
@@ -26,16 +26,6 @@ func Options(opts ...Option) Option {
 	}
 }
 
-// LogTo sets the runner's logger to l.
-func LogTo(l *log.Logger) Option {
-	// TODO(@MattWindsor91): as elsewhere, logging should be replaced with observing
-	return func(c *Compiler) error {
-		// Logger ensuring is done after all options are processed
-		c.l = l
-		return nil
-	}
-}
-
 // ObserveWith adds each observer in obs to the runner's observer list.
 func ObserveWith(obs ...builder.Observer) Option {
 	return func(c *Compiler) error {
@@ -46,7 +36,7 @@ func ObserveWith(obs ...builder.Observer) Option {
 }
 
 // OverrideQuantities overrides this runner's quantities with qs.
-func OverrideQuantities(qs QuantitySet) Option {
+func OverrideQuantities(qs quantity.SingleSet) Option {
 	return func(c *Compiler) error {
 		c.quantities.Override(qs)
 		return nil

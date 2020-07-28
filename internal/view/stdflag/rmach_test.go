@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+
 	runner2 "github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
 	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
 	"github.com/stretchr/testify/assert"
@@ -32,11 +32,12 @@ func ExampleMachInvoker_MachArgs() {
 		OutDir:       "foo",
 		SkipCompiler: true,
 		SkipRunner:   false,
-		Quantities: mach.QuantitySet{
-			Compiler: compiler.QuantitySet{
-				Timeout: timeout.Timeout(10 * time.Second),
+		Quantities: quantity.Set{
+			Compiler: quantity.SingleSet{
+				Timeout:  timeout.Timeout(10 * time.Second),
+				NWorkers: 10,
 			},
-			Runner: runner.QuantitySet{
+			Runner: quantity.SingleSet{
 				Timeout:  timeout.Timeout(5 * time.Minute),
 				NWorkers: 20,
 			},
@@ -46,8 +47,8 @@ func ExampleMachInvoker_MachArgs() {
 	fmt.Println(strings.Join(mi.MachArgs(""), ", "))
 
 	// Output:
-	// -d, , -compiler-timeout, 0s, -run-timeout, 0s, -num-workers, 0
-	// -d, foo, -compiler-timeout, 10s, -run-timeout, 5m0s, -num-workers, 20, -skip-compiler
+	// -d, , -compiler-timeout, 0s, -run-timeout, 0s, -num-compiler-workers, 0, -num-run-workers, 0
+	// -d, foo, -compiler-timeout, 10s, -run-timeout, 5m0s, -num-compiler-workers, 10, -num-run-workers, 20, -skip-compiler
 }
 
 // TestMachConfigFromCli_roundTrip tests that sending a local config through CLI flags works properly.
@@ -64,11 +65,12 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 		},
 		"quantities": {
 			OutDir: "foo",
-			Quantities: mach.QuantitySet{
-				Compiler: compiler.QuantitySet{
-					Timeout: timeout.Timeout(27 * time.Second),
+			Quantities: quantity.Set{
+				Compiler: quantity.SingleSet{
+					Timeout:  timeout.Timeout(27 * time.Second),
+					NWorkers: 64,
 				},
-				Runner: runner.QuantitySet{
+				Runner: quantity.SingleSet{
 					Timeout:  timeout.Timeout(53 * time.Second),
 					NWorkers: 42,
 				},
@@ -85,7 +87,7 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 			a := testApp(
 				func(ctx *c.Context) error {
 					t.Helper()
-					out := stdflag.MachConfigFromCli(ctx, mach.QuantitySet{})
+					out := stdflag.MachConfigFromCli(ctx, quantity.Set{})
 					assert.Equal(t, in, out, "user config didn't match")
 
 					return nil

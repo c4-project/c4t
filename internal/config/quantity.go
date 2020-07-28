@@ -8,8 +8,9 @@ package config
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 )
 
@@ -18,7 +19,7 @@ type QuantitySet struct {
 	// Fuzz is the quantity set for the fuzz stage.
 	Fuzz fuzzer.QuantitySet `toml:"fuzz,omitzero"`
 	// Mach is the quantity set for the machine-local stage, as well as any machine-local stages run remotely.
-	Mach mach.QuantitySet `toml:"mach,omitzero"`
+	Mach quantity.Set `toml:"mach,omitzero"`
 	// Plan is the quantity set for the planner stage.
 	Plan planner.QuantitySet `toml:"plan,omitzero"`
 }
