@@ -36,45 +36,45 @@ import (
 
 // Instance represents the state of a single per-compiler instance of the batch compiler.
 type Instance struct {
-	// MachineID is the ID of the machine.
-	MachineID id.ID
+	// machineID is the ID of the machine.
+	machineID id.ID
 
-	// Compiler points to the compiler to run.
-	Compiler *compiler.Named
+	// compiler points to the compiler to run.
+	compiler *compiler.Named
 
-	// Driver tells the instance how to run the compiler.
-	Driver SingleRunner
+	// driver tells the instance how to run the compiler.
+	driver SingleRunner
 
-	// Paths tells the instance which paths to use.
-	Paths SubjectPather
+	// paths tells the instance which paths to use.
+	paths SubjectPather
 
-	// Quantities is the quantity set for this instance.
-	Quantities QuantitySet
+	// quantities is the quantity set for this instance.
+	quantities QuantitySet
 
-	// ResCh is the channel to which the compile run should send compiled subject records.
-	ResCh chan<- builder.Request
+	// resCh is the channel to which the compile run should send compiled subject records.
+	resCh chan<- builder.Request
 
 	// Corpus is the corpus to compile.
-	Corpus corpus.Corpus
+	corpus corpus.Corpus
 }
 
 func (j *Instance) Compile(ctx context.Context) error {
-	if j.Paths == nil {
+	if j.paths == nil {
 		return fmt.Errorf("in job: %w", iohelp.ErrPathsetNil)
 	}
 
-	return j.Corpus.Each(func(s subject.Named) error {
+	return j.corpus.Each(func(s subject.Named) error {
 		return j.compileSubject(ctx, &s)
 	})
 }
 
 func (j *Instance) compileSubject(ctx context.Context, s *subject.Named) error {
-	h, herr := s.Recipe(j.Compiler.Arch)
+	h, herr := s.Recipe(j.compiler.Arch)
 	if herr != nil {
 		return herr
 	}
 
-	sp := j.Paths.SubjectPaths(SubjectCompile{CompilerID: j.Compiler.ID, Name: s.Name})
+	sp := j.paths.SubjectPaths(SubjectCompile{CompilerID: j.compiler.ID, Name: s.Name})
 
 	res, rerr := j.runCompiler(ctx, sp, h)
 	if rerr != nil {
@@ -90,7 +90,7 @@ func (j *Instance) runCompiler(ctx context.Context, sp subject.CompileFileset, h
 		return subject.CompileResult{}, err
 	}
 
-	tctx, cancel := j.Quantities.Timeout.OnContext(ctx)
+	tctx, cancel := j.quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
 	start := time.Now()
@@ -106,7 +106,7 @@ func (j *Instance) runCompiler(ctx context.Context, sp subject.CompileFileset, h
 }
 
 func (j *Instance) runCompilerJob(ctx context.Context, job compile.Recipe, logf io.Writer) error {
-	i, err := NewInterpreter(j.Driver, job, ILogTo(logf))
+	i, err := NewInterpreter(j.driver, job, ILogTo(logf))
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (j *Instance) openLogFile(l string) (io.WriteCloser, error) {
 }
 
 func (j *Instance) compileJob(r recipe.Recipe, sp subject.CompileFileset) compile.Recipe {
-	return compile.FromRecipe(&j.Compiler.Compiler, r, sp.Bin)
+	return compile.FromRecipe(&j.compiler.Compiler, r, sp.Bin)
 }
 
 // makeCompileResult makes a compile result given a possible err and fileset sp.
@@ -143,7 +143,7 @@ func (j *Instance) makeCompileResult(sp subject.CompileFileset, start time.Time,
 // sendResult tries to send a compile job result to the result channel.
 // If the context ctx has been cancelled, it will fail and instead terminate the job.
 func (j *Instance) sendResult(ctx context.Context, name string, r subject.CompileResult) error {
-	return builder.CompileRequest(name, j.Compiler.ID, r).SendTo(ctx, j.ResCh)
+	return builder.CompileRequest(name, j.compiler.ID, r).SendTo(ctx, j.resCh)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and

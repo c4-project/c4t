@@ -175,16 +175,16 @@ func (c *Compiler) prepareDirs(p *plan.Plan) error {
 	return c.paths.Prepare(cids)
 }
 
-// makeJob makes a job for the named compiler nc, outputting results to resCh.
+// instance makes an instance for the named compiler nc, outputting results to resCh.
 // It also takes in a read-only copy, rc, of the corpus; this is because the result handling thread will be modifying
 // the corpus proper.
 func (c *Compiler) instance(requests chan<- builder.Request, nc *compiler.Named, p *plan.Plan) *Instance {
 	return &Instance{
-		MachineID: p.Machine.ID,
-		Compiler:  nc,
-		Corpus:    p.Corpus,
-		Driver:    c.driver,
-		Paths:     c.paths,
-		ResCh:     requests,
+		machineID: p.Machine.ID,
+		compiler:  nc,
+		corpus:    p.Corpus,
+		driver:    c.driver,
+		paths:     c.paths,
+		resCh:     requests,
 	}
 }
