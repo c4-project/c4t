@@ -19,15 +19,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-
-	"golang.org/x/sync/errgroup"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
@@ -107,36 +101,18 @@ func (c *Compiler) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, erro
 		return nil, err
 	}
 
-	eg, ectx := errgroup.WithContext(ctx)
-
-	b, err := c.makeBuilder(p)
-	if err != nil {
-		return nil, err
-	}
-
 	// TODO(@MattWindsor91): port this to observers
 	// c.quantities.Log(c.l)
 
-	for ids, cc := range p.Compilers {
-		nc, err := cc.AddNameString(ids)
-		if err != nil {
-			return nil, err
-		}
-		cr := c.instance(b.SendCh, nc, p)
-		eg.Go(func() error {
-			return cr.Compile(ectx)
+	newc, err := builder.ParBuild(
+		ctx,
+		c.quantities.NWorkers,
+		p.Corpus,
+		c.builderConfig(p),
+		func(ctx context.Context, s subject.Named, requests chan<- builder.Request) error {
+			return c.instance(requests, s, p).Compile(ctx)
 		})
-	}
-
-	var newc corpus.Corpus
-	eg.Go(func() error {
-		var err error
-		newc, err = b.Run(ectx)
-		return err
-	})
-
-	// Need to wait until there are no goroutines accessing the corpus before we copy it over.
-	if err := eg.Wait(); err != nil {
+	if err != nil {
 		return nil, err
 	}
 
@@ -152,8 +128,8 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (c *Compiler) makeBuilder(p *plan.Plan) (*builder.Builder, error) {
-	bc := builder.Config{
+func (c *Compiler) builderConfig(p *plan.Plan) builder.Config {
+	return builder.Config{
 		Init:      p.Corpus,
 		Observers: c.observers,
 		Manifest: builder.Manifest{
@@ -161,7 +137,6 @@ func (c *Compiler) makeBuilder(p *plan.Plan) (*builder.Builder, error) {
 			NReqs: p.NumExpCompilations(),
 		},
 	}
-	return builder.New(bc)
 }
 
 func (c *Compiler) prepareDirs(p *plan.Plan) error {
@@ -177,11 +152,11 @@ func (c *Compiler) prepareDirs(p *plan.Plan) error {
 // instance makes an instance for the named compiler nc, outputting results to resCh.
 // It also takes in a read-only copy, rc, of the corpus; this is because the result handling thread will be modifying
 // the corpus proper.
-func (c *Compiler) instance(requests chan<- builder.Request, nc *compiler.Named, p *plan.Plan) *Instance {
+func (c *Compiler) instance(requests chan<- builder.Request, s subject.Named, p *plan.Plan) *Instance {
 	return &Instance{
 		machineID: p.Machine.ID,
-		compiler:  nc,
-		corpus:    p.Corpus,
+		subject:   s,
+		compilers: p.Compilers,
 		driver:    c.driver,
 		paths:     c.paths,
 		resCh:     requests,

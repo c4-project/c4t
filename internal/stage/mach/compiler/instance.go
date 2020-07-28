@@ -36,13 +36,16 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Instance represents the state of a single per-compiler instance of the batch compiler.
+// Instance represents the state of a single per-subject instance of the batch compiler.
 type Instance struct {
 	// machineID is the ID of the machine.
 	machineID id.ID
 
-	// compiler points to the compiler to run.
-	compiler *compiler.Named
+	// subject is the subject to compile.
+	subject subject.Named
+
+	// compilers points to the compilers to run.
+	compilers map[string]compiler.Compiler
 
 	// driver tells the instance how to run the compiler.
 	driver Driver
@@ -65,28 +68,36 @@ func (j *Instance) Compile(ctx context.Context) error {
 		return fmt.Errorf("in job: %w", iohelp.ErrPathsetNil)
 	}
 
-	return j.corpus.Each(func(s subject.Named) error {
-		return j.compileSubject(ctx, &s)
-	})
+	for n, c := range j.compilers {
+		nc, err := c.AddNameString(n)
+		if err != nil {
+			return err
+		}
+		if err := j.compileOnCompiler(ctx, nc); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (j *Instance) compileSubject(ctx context.Context, s *subject.Named) error {
-	h, herr := s.Recipe(j.compiler.Arch)
+func (j *Instance) compileOnCompiler(ctx context.Context, nc *compiler.Named) error {
+	h, herr := j.subject.Recipe(nc.Arch)
 	if herr != nil {
 		return herr
 	}
 
-	sp := j.paths.SubjectPaths(SubjectCompile{CompilerID: j.compiler.ID, Name: s.Name})
+	sc := SubjectCompile{CompilerID: nc.ID, Name: j.subject.Name}
+	sp := j.paths.SubjectPaths(sc)
 
-	res, rerr := j.runCompiler(ctx, sp, h)
+	res, rerr := j.runCompiler(ctx, nc, sp, h)
 	if rerr != nil {
 		return rerr
 	}
 
-	return j.sendResult(ctx, s.Name, res)
+	return j.sendResult(ctx, sc, res)
 }
 
-func (j *Instance) runCompiler(ctx context.Context, sp subject.CompileFileset, h recipe.Recipe) (subject.CompileResult, error) {
+func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp subject.CompileFileset, h recipe.Recipe) (subject.CompileResult, error) {
 	logf, err := j.openLogFile(sp.Log)
 	if err != nil {
 		return subject.CompileResult{}, err
@@ -97,7 +108,7 @@ func (j *Instance) runCompiler(ctx context.Context, sp subject.CompileFileset, h
 
 	start := time.Now()
 
-	job := j.compileJob(h, sp)
+	job := j.compileJob(h, nc, sp)
 	// Some compiler errors are recoverable, so we don't immediately bail on them.
 	rerr := j.runCompilerJob(tctx, job, logf)
 
@@ -122,8 +133,8 @@ func (j *Instance) openLogFile(l string) (io.WriteCloser, error) {
 	return os.Create(l)
 }
 
-func (j *Instance) compileJob(r recipe.Recipe, sp subject.CompileFileset) compile.Recipe {
-	return compile.FromRecipe(&j.compiler.Compiler, r, sp.Bin)
+func (j *Instance) compileJob(r recipe.Recipe, nc *compiler.Named, sp subject.CompileFileset) compile.Recipe {
+	return compile.FromRecipe(&nc.Compiler, r, sp.Bin)
 }
 
 // makeCompileResult makes a compile result given a possible err and fileset sp.
@@ -144,8 +155,9 @@ func (j *Instance) makeCompileResult(sp subject.CompileFileset, start time.Time,
 
 // sendResult tries to send a compile job result to the result channel.
 // If the context ctx has been cancelled, it will fail and instead terminate the job.
-func (j *Instance) sendResult(ctx context.Context, name string, r subject.CompileResult) error {
-	return builder.CompileRequest(name, j.compiler.ID, r).SendTo(ctx, j.resCh)
+func (j *Instance) sendResult(ctx context.Context, sc SubjectCompile, r subject.CompileResult) error {
+	// TODO(@MattWindsor91): propagate sc further?
+	return builder.CompileRequest(sc.Name, sc.CompilerID, r).SendTo(ctx, j.resCh)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and
