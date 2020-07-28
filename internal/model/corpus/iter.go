@@ -28,7 +28,7 @@ func (c Corpus) Each(f func(subject.Named) error) error {
 // Map sequentially maps f over the subjects in this corpus.
 // It passes each invocation of f a pointer to a copy of a subject, but propagates any changes made to that copy back to
 // the corpus.
-// It does not permit making change to the name.
+// It does not permit making changes to the name.
 func (c Corpus) Map(f func(*subject.Named) error) error {
 	return c.Each(func(sn subject.Named) error {
 		n := sn.Name
