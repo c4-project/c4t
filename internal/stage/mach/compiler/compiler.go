@@ -36,8 +36,8 @@ import (
 // ErrDriverNil occurs when the compiler tries to use the nil pointer as its single-compile driver.
 var ErrDriverNil = errors.New("driver nil")
 
-// SingleRunner is the interface of things that can run compilers.
-type SingleRunner interface {
+// Driver is the interface of things that can run compilers.
+type Driver interface {
 	// RunCompiler runs the compiler job j.
 	// If applicable, errw will be connected to the compiler's standard error.
 	//
@@ -45,7 +45,7 @@ type SingleRunner interface {
 	RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error
 }
 
-//go:generate mockery --name=SingleRunner
+//go:generate mockery --name=Driver
 
 // SubjectPather is the interface of types that can produce path sets for compilations.
 type SubjectPather interface {
@@ -65,7 +65,7 @@ type Compiler struct {
 	l *log.Logger
 
 	// driver is what the compiler should use to run single compiler jobs.
-	driver SingleRunner
+	driver Driver
 
 	// observers observe the compiler's progress across a corpus.
 	observers []builder.Observer
@@ -80,7 +80,7 @@ type Compiler struct {
 // New creates a new batch compiler instance using the config c and plan p.
 // It can fail if various safety checks fail on the config,
 // or if there is no obvious machine that the compiler can target.
-func New(driver SingleRunner, paths SubjectPather, opts ...Option) (*Compiler, error) {
+func New(driver Driver, paths SubjectPather, opts ...Option) (*Compiler, error) {
 	if driver == nil {
 		return nil, ErrDriverNil
 	}

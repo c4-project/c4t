@@ -42,7 +42,7 @@ var (
 // Compiler contains the various interfaces that a compiler can implement.
 type Compiler interface {
 	mdl.Inspector
-	compiler.SingleRunner
+	compiler.Driver
 }
 
 //go:generate mockery -name Compiler

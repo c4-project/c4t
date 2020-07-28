@@ -192,7 +192,7 @@ func TestNewInterpreter_errors(t *testing.T) {
 	cmp := mdl.Compiler{}
 
 	cases := map[string]struct {
-		d   compiler.SingleRunner
+		d   compiler.Driver
 		j   compile.Recipe
 		err error
 	}{

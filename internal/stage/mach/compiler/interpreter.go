@@ -25,7 +25,7 @@ import (
 
 // Interpreter is an interpreter for compile recipes.
 type Interpreter struct {
-	driver SingleRunner
+	driver Driver
 	job    compile.Recipe
 
 	// nobjs is the number of object files created so far by the processor.
@@ -52,7 +52,7 @@ var (
 )
 
 // NewInterpreter creates a new recipe processor using the compiler driver d and job j.
-func NewInterpreter(d SingleRunner, j compile.Recipe, os ...IOption) (*Interpreter, error) {
+func NewInterpreter(d Driver, j compile.Recipe, os ...IOption) (*Interpreter, error) {
 	if d == nil {
 		return nil, ErrDriverNil
 	}

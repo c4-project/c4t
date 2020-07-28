@@ -36,7 +36,7 @@ import (
 
 // TestCompiler_Run tests running a compile job.
 func TestCompiler_Run(t *testing.T) {
-	var mc mocks.SingleRunner
+	var mc mocks.Driver
 	var mp mocks.SubjectPather
 
 	names := []string{"foo", "bar", "baz"}

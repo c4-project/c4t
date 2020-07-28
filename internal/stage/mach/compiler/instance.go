@@ -43,7 +43,7 @@ type Instance struct {
 	compiler *compiler.Named
 
 	// driver tells the instance how to run the compiler.
-	driver SingleRunner
+	driver Driver
 
 	// paths tells the instance which paths to use.
 	paths SubjectPather

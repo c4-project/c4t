@@ -40,7 +40,7 @@ type Mach struct {
 	fwd *forward.Observer
 }
 
-func New(cdriver compiler.SingleRunner, rdriver runner.ObsParser, opts ...Option) (*Mach, error) {
+func New(cdriver compiler.Driver, rdriver runner.ObsParser, opts ...Option) (*Mach, error) {
 	// The respective constructors will check that cdriver and rdriver are ok.
 
 	m := &Mach{}
@@ -51,14 +51,14 @@ func New(cdriver compiler.SingleRunner, rdriver runner.ObsParser, opts ...Option
 	return m, m.makeCompilerAndRunner(cdriver, rdriver)
 }
 
-func (m *Mach) makeCompilerAndRunner(cdriver compiler.SingleRunner, rdriver runner.ObsParser) error {
+func (m *Mach) makeCompilerAndRunner(cdriver compiler.Driver, rdriver runner.ObsParser) error {
 	if err := m.makeCompiler(cdriver); err != nil {
 		return err
 	}
 	return m.makeRunner(rdriver)
 }
 
-func (m *Mach) makeCompiler(driver compiler.SingleRunner) error {
+func (m *Mach) makeCompiler(driver compiler.Driver) error {
 	if m.skipCompiler {
 		return nil
 	}
