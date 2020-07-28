@@ -9,7 +9,6 @@ package mach
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
@@ -21,43 +20,62 @@ import (
 
 // Mach encapsulates the state needed for the machine-dependent stage.
 type Mach struct {
+	// coptions is the set of options used to configure the compiler.
+	coptions []compiler.Option
+	// roptions is the set of options used to configure the runner.
+	roptions []runner.Option
+	// skipCompiler is true if the compiler should be skipped.
+	skipCompiler bool
+	// skipRunner is true if the runner should be skipped.
+	skipRunner bool
+	// path is the output directory path for both substages.
+	path string
+
 	// compiler is, if non-nil, the configured compiler substage.
 	compiler *compiler.Compiler
 	// runner is, if non-nil, the configured runner substage.
 	runner *runner.Runner
 	// json is, if non-nil, a JSON observer;
 	// it exists here so that, if we're using JSON mode, errors get trapped and sent over as JSON.
-	json *forward.Observer
+	fwd *forward.Observer
 }
 
-func New(cfg *Config) (*Mach, error) {
-	if err := checkConfig(cfg); err != nil {
+func New(cdriver compiler.SingleRunner, rdriver runner.ObsParser, opts ...Option) (*Mach, error) {
+	// The respective constructors will check that cdriver and rdriver are ok.
+
+	m := &Mach{}
+	// Options can introduce compiler and runner options, so they need to run before the compiler/runner constructors.
+	if err := Options(opts...)(m); err != nil {
 		return nil, err
 	}
-
-	c, err := cfg.makeCompiler()
-	if err != nil {
-		return nil, err
-	}
-	r, err := cfg.makeRunner()
-	if err != nil {
-		return nil, err
-	}
-
-	m := Mach{
-		compiler: c,
-		runner:   r,
-		json:     cfg.Json,
-	}
-
-	return &m, nil
+	return m, m.makeCompilerAndRunner(cdriver, rdriver)
 }
 
-func checkConfig(c *Config) error {
-	if c == nil {
-		return errors.New("config nil")
+func (m *Mach) makeCompilerAndRunner(cdriver compiler.SingleRunner, rdriver runner.ObsParser) error {
+	if err := m.makeCompiler(cdriver); err != nil {
+		return err
 	}
-	return c.Check()
+	return m.makeRunner(rdriver)
+}
+
+func (m *Mach) makeCompiler(driver compiler.SingleRunner) error {
+	if m.skipCompiler {
+		return nil
+	}
+	var err error
+	ps := compiler.NewPathset(m.path)
+	m.compiler, err = compiler.New(driver, ps, m.coptions...)
+	return err
+}
+
+func (m *Mach) makeRunner(driver runner.ObsParser) error {
+	if m.skipRunner {
+		return nil
+	}
+	var err error
+	ps := runner.NewPathset(m.path)
+	m.runner, err = runner.New(driver, ps, m.roptions...)
+	return err
 }
 
 func checkPlan(p *plan.Plan) error {
@@ -72,8 +90,8 @@ func (m *Mach) trap(err error) error {
 	if err == nil {
 		return nil
 	}
-	if m.json != nil {
-		m.json.Error(err)
+	if m.fwd != nil {
+		m.fwd.Error(err)
 		return nil
 	}
 	return err

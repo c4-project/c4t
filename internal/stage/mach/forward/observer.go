@@ -7,6 +7,7 @@ package forward
 
 import (
 	"encoding/json"
+	"io"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
@@ -14,6 +15,11 @@ import (
 // Observer wraps a JSON encoder, lifting it to an Observer that sends JSON-encoded Forwards.
 type Observer struct {
 	*json.Encoder
+}
+
+// NewObserver creates a forwarding observer over w.
+func NewObserver(w io.Writer) *Observer {
+	return &Observer{json.NewEncoder(w)}
 }
 
 // OnBuildStart sends a build message through this Observer's encoder.

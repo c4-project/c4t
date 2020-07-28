@@ -7,14 +7,12 @@
 package mach
 
 import (
-	"encoding/json"
 	"io"
 	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/app/invoke"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
@@ -57,26 +55,20 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
-	m, err := makeMach(ctx, outw, errw)
+	m, err := makeMach(ctx, errw)
 	if err != nil {
 		return err
 	}
 	return view.RunOnCliPlan(ctx, m, outw)
 }
 
-func makeMach(ctx *c.Context, outw, errw io.Writer) (*mach.Mach, error) {
+func makeMach(ctx *c.Context, errw io.Writer) (*mach.Mach, error) {
 	errw = iohelp.EnsureWriter(errw)
-	cfg := mach.Config{
-		CDriver:   &cimpl.CResolve,
-		RDriver:   &bimpl.BResolve,
-		Observers: makeJsonObserver(errw),
-		Logger:    nil,
-		Stdout:    outw,
-		User:      stdflag.MachConfigFromCli(ctx, mach.QuantitySet{}),
-	}
-	return mach.New(&cfg)
-}
-
-func makeJsonObserver(errw io.Writer) []builder.Observer {
-	return []builder.Observer{&forward.Observer{Encoder: json.NewEncoder(errw)}}
+	fwd := forward.NewObserver(errw)
+	return mach.New(
+		&cimpl.CResolve,
+		&bimpl.BResolve,
+		mach.WithUserConfig(stdflag.MachConfigFromCli(ctx, mach.QuantitySet{})),
+		mach.ForwardTo(fwd),
+	)
 }
