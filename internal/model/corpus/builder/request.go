@@ -63,9 +63,9 @@ type Compile struct {
 	Result compilation.CompileResult
 }
 
-// CompileRequest constructs an add-compile request for the subject with name sname, compiler ID cid, and result r.
-func CompileRequest(sname string, cid id.ID, r compilation.CompileResult) Request {
-	return Request{Name: sname, Compile: &Compile{CompilerID: cid, Result: r}}
+// CompileRequest constructs an add-compile request for the compilation with name name and result r.
+func CompileRequest(name compilation.Name, r compilation.CompileResult) Request {
+	return Request{Name: name.SubjectName, Compile: &Compile{CompilerID: name.CompilerID, Result: r}}
 }
 
 // Recipe is a request to add the given recipe to the named subject, under the named architecture.
@@ -91,7 +91,7 @@ type Run struct {
 	Result compilation.RunResult
 }
 
-// RunRequest constructs an add-run request for the subject with name sname, compiler ID cid, and result r.
-func RunRequest(sname string, cid id.ID, r compilation.RunResult) Request {
-	return Request{Name: sname, Run: &Run{CompilerID: cid, Result: r}}
+// RunRequest constructs an add-run request for the compilation with name name and result r.
+func RunRequest(name compilation.Name, r compilation.RunResult) Request {
+	return Request{Name: name.SubjectName, Run: &Run{CompilerID: name.CompilerID, Result: r}}
 }

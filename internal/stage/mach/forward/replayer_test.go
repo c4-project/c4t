@@ -58,8 +58,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 			recipe.AddFiles("foo.c", "bar.c", "baz.c"),
 		))
 	com := builder.CompileRequest(
-		"foo",
-		id.CStyleGCC,
+		compilation.Name{SubjectName: "foo", CompilerID: id.CStyleGCC},
 		compilation.CompileResult{
 			Result: compilation.Result{Status: status.Ok},
 			Files: compilation.CompileFileset{
@@ -68,8 +67,7 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 			},
 		})
 	run := builder.RunRequest(
-		"foo",
-		id.CStyleGCC,
+		compilation.Name{SubjectName: "foo", CompilerID: id.CStyleGCC},
 		compilation.RunResult{
 			Result: compilation.Result{Status: status.Flagged},
 		})

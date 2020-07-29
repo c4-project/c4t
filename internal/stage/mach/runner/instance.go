@@ -52,22 +52,23 @@ type Instance struct {
 func (n *Instance) Run(ctx context.Context) error {
 	for cidstr, c := range n.subject.Compiles {
 		cid := id.FromString(cidstr)
-		if err := n.runCompile(ctx, cid, &c); err != nil {
+		name := compilation.Name{CompilerID: cid, SubjectName: n.subject.Name}
+		if err := n.runCompile(ctx, name, &c); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (n *Instance) runCompile(ctx context.Context, cid id.ID, c *compilation.CompileResult) error {
-	run, err := n.runCompileInner(ctx, cid, c)
+func (n *Instance) runCompile(ctx context.Context, name compilation.Name, c *compilation.CompileResult) error {
+	run, err := n.runCompileInner(ctx, name, c)
 	if err != nil {
 		return err
 	}
-	return n.makeBuilderReq(cid, run).SendTo(ctx, n.resCh)
+	return builder.RunRequest(name, run).SendTo(ctx, n.resCh)
 }
 
-func (n *Instance) runCompileInner(ctx context.Context, cid id.ID, c *compilation.CompileResult) (compilation.RunResult, error) {
+func (n *Instance) runCompileInner(ctx context.Context, name compilation.Name, c *compilation.CompileResult) (compilation.RunResult, error) {
 	if !c.Status.IsOk() {
 		return compilation.RunResult{Result: compilation.Result{Status: c.Status}}, nil
 	}
@@ -76,11 +77,11 @@ func (n *Instance) runCompileInner(ctx context.Context, cid id.ID, c *compilatio
 	if bin == "" {
 		return compilation.RunResult{
 			Result: compilation.Result{Status: status.Unknown},
-		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, n.subject.Name, cid.String())
+		}, fmt.Errorf("%w: %s", ErrNoBin, name)
 	}
 
 	start := time.Now()
-	o, runErr := n.runAndParseBin(ctx, cid, bin)
+	o, runErr := n.runAndParseBin(ctx, name.CompilerID, bin)
 	s, err := statusOfRun(o, runErr)
 
 	return n.makeResult(start, s, o), err
@@ -143,10 +144,6 @@ func mostRelevantError(r, p, c error) error {
 	default:
 		return p
 	}
-}
-
-func (n *Instance) makeBuilderReq(cid id.ID, run compilation.RunResult) builder.Request {
-	return builder.RunRequest(n.subject.Name, cid, run)
 }
 
 // liftError wraps err with context about where it occurred.

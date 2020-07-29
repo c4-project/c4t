@@ -91,7 +91,7 @@ func (j *Instance) compileOnCompiler(ctx context.Context, nc *compiler.Named) er
 		return rerr
 	}
 
-	return j.sendResult(ctx, sc, res)
+	return builder.CompileRequest(sc, res).SendTo(ctx, j.resCh)
 }
 
 func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp compilation.CompileFileset, h recipe.Recipe) (compilation.CompileResult, error) {
@@ -148,13 +148,6 @@ func (j *Instance) makeCompileResult(sp compilation.CompileFileset, start time.T
 
 	cr.Status, err = status.FromCompileError(err)
 	return cr, err
-}
-
-// sendResult tries to send a compile job result to the result channel.
-// If the context ctx has been cancelled, it will fail and instead terminate the job.
-func (j *Instance) sendResult(ctx context.Context, sc compilation.Name, r compilation.CompileResult) error {
-	// TODO(@MattWindsor91): propagate sc further?
-	return builder.CompileRequest(sc.SubjectName, sc.CompilerID, r).SendTo(ctx, j.resCh)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and

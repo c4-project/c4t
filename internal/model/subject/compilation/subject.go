@@ -6,6 +6,8 @@
 package compilation
 
 import (
+	"fmt"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
@@ -16,4 +18,9 @@ type Name struct {
 
 	// CompilerID is the ID of the compiler.
 	CompilerID id.ID
+}
+
+// String gets a stringified version of the name.
+func (n Name) String() string {
+	return fmt.Sprintf("%s@%s", n.SubjectName, n.CompilerID)
 }
