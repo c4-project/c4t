@@ -8,7 +8,6 @@ package runner
 import (
 	"context"
 	"fmt"
-	"path"
 
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
@@ -25,25 +24,32 @@ import (
 func (r *RemoteRunner) Recv(ctx context.Context, locp, remp *plan.Plan) (*plan.Plan, error) {
 	locp.Metadata.Stages = remp.Metadata.Stages
 
-	err := locp.Corpus.Map(func(sn *subject.Named) error {
-		return r.recvSubject(ctx, sn, remp.Corpus)
-	})
-	return locp, err
+	norm := normaliser.NewCorpus(r.localRoot)
+	ncorp, err := norm.Normalise(remp.Corpus)
+	if err != nil {
+		return nil, fmt.Errorf("can't normalise corpus: %w", err)
+	}
+
+	if err := r.mergeSubjects(locp, ncorp); err != nil {
+		return nil, err
+	}
+	return locp, r.recvMapping(ctx, norm.Mappings.RenamesMatching(filekind.Any, filekind.InCompile))
 }
 
-func (r *RemoteRunner) recvSubject(ctx context.Context, ls *subject.Named, rcorp corpus.Corpus) error {
-	norm := normaliser.New(path.Join(r.localRoot, ls.Name))
+func (r *RemoteRunner) mergeSubjects(locp *plan.Plan, rcorp corpus.Corpus) error {
+	return locp.Corpus.Map(func(sn *subject.Named) error {
+		return r.mergeSubject(sn, rcorp)
+	})
+}
+
+func (r *RemoteRunner) mergeSubject(ls *subject.Named, rcorp corpus.Corpus) error {
 	rs, ok := rcorp[ls.Name]
 	if !ok {
 		return fmt.Errorf("subject not in remote corpus: %s", ls.Name)
 	}
-	ns, err := norm.Normalise(rs)
-	if err != nil {
-		return fmt.Errorf("can't normalise subject: %w", err)
-	}
-	ls.Runs = ns.Runs
-	ls.Compiles = ns.Compiles
-	return r.recvMapping(ctx, norm.Mappings.RenamesMatching(filekind.Any, filekind.InCompile))
+	ls.Runs = rs.Runs
+	ls.Compiles = rs.Compiles
+	return nil
 }
 
 func (r *RemoteRunner) recvMapping(ctx context.Context, ms map[string]string) error {
