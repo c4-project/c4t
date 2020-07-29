@@ -23,6 +23,8 @@ import (
 // Recv copies bits of remp into locp, including run information and any compiler failures.
 // It uses SFTP to transfer back any compile logs.
 func (r *RemoteRunner) Recv(ctx context.Context, locp, remp *plan.Plan) (*plan.Plan, error) {
+	locp.Metadata.Stages = remp.Metadata.Stages
+
 	err := locp.Corpus.Map(func(sn *subject.Named) error {
 		return r.recvSubject(ctx, sn, remp.Corpus)
 	})
