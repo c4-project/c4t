@@ -237,13 +237,14 @@ func (i *Instance) makeAnalyser(aobs []analyser.Observer, sobs []saver.Observer)
 
 func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error) {
 	// TODO(@MattWindsor91): move planner config outside of instance
-	c := planner.Config{
-		Source:     i.Env.Planner,
-		Logger:     i.Logger,
-		Observers:  planner.NewObserverSet(obs...),
-		Quantities: i.Quantities.Plan,
-	}
-	return planner.New(&c, i.machineForPlan(), i.InFiles, plan.UseDateSeed)
+	return planner.New(
+		i.Env.Planner,
+		i.machineForPlan(),
+		i.InFiles,
+		planner.LogWith(i.Logger),
+		planner.ObserveWith(obs...),
+		planner.OverrideQuantities(i.Quantities.Plan),
+	)
 }
 
 // machineForPlan massages this instance's machine config into a form with which the planner is comfortable.

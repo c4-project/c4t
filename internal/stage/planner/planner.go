@@ -8,7 +8,6 @@ package planner
 
 import (
 	"context"
-	"errors"
 	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -24,20 +23,24 @@ import (
 
 // Planner holds all configuration for the test planner.
 type Planner struct {
-	conf Config
-	fs   []string
-	l    *log.Logger
-	mach machine.Named
-	seed int64
+	// source contains all of the various sources for a Planner's information.
+	source Source
+	// filter is the compiler filter to use to select compilers to test.
+	filter string
+	// l is the logger used by the planner.
+	l *log.Logger
+	// observers contains the set of observers used to get feedback on the planning action as it completes.
+	observers ObserverSet
+	// quantities contains quantity information for this planner.
+	quantities QuantitySet
+	fs         []string
+	mach       machine.Named
+	seed       int64
 }
 
-// ErrConfigNil occurs when we pass a nil config when creating a planner.
-var ErrConfigNil = errors.New("config nil")
-
-// New constructs a new planner with the given config, machine information, files, and seed override.
-// If seed is UseDateSeed, it will be ignored and a date-specific seed generated at runtime.
-func New(c *Config, mach machine.Named, fs []string, seed int64) (*Planner, error) {
-	if err := checkConfig(c); err != nil {
+// New constructs a new planner with the given config, machine information, files, and options.
+func New(src Source, mach machine.Named, fs []string, opts ...Option) (*Planner, error) {
+	if err := src.Check(); err != nil {
 		return nil, err
 	}
 	// Early out to prevent us from doing any planning if we received no files.
@@ -45,22 +48,17 @@ func New(c *Config, mach machine.Named, fs []string, seed int64) (*Planner, erro
 		return nil, corpus.ErrNone
 	}
 
-	p := Planner{
-		conf: *c,
-		fs:   fs,
-		l:    iohelp.EnsureLog(c.Logger),
-		mach: mach,
-		seed: seed,
+	p := &Planner{
+		source: src,
+		fs:     fs,
+		mach:   mach,
+		seed:   plan.UseDateSeed,
 	}
-
-	return &p, nil
-}
-
-func checkConfig(c *Config) error {
-	if c == nil {
-		return ErrConfigNil
+	if err := Options(opts...)(p); err != nil {
+		return nil, err
 	}
-	return c.Check()
+	p.l = iohelp.EnsureLog(p.l)
+	return p, nil
 }
 
 // Plan runs the test planner p.

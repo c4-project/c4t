@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/act"
+
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
@@ -33,6 +35,9 @@ const (
 	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
 		"if positive, the planner will use all viable provided corpus files"
 	usageMach = "ID of machine to use for this test plan"
+
+	flagCompilerFilter  = "filter-compiler"
+	usageCompilerFilter = "`glob` to use to filter compilers to enable"
 )
 
 // App creates the act-tester-plan app.
@@ -62,6 +67,10 @@ func flags() []c.Flag {
 			Name:  stdflag.FlagMachine,
 			Usage: usageMach,
 		},
+		&c.StringFlag{
+			Name:  flagCompilerFilter,
+			Usage: usageCompilerFilter,
+		},
 		&c.IntFlag{
 			Name:    flagCorpusSize,
 			Aliases: []string{stdflag.FlagNum},
@@ -73,31 +82,65 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
-	a := stdflag.ActRunnerFromCli(ctx, errw)
-
-	cfg, err := stdflag.ConfFileFromCli(ctx)
+	pr, err := makePlanner(ctx, errw)
 	if err != nil {
 		return err
 	}
 
-	pc, err := makePlanConfig(cfg, errw, a, ctx.Int(flagCorpusSize), stdflag.WorkerCountFromCli(ctx))
-	if err != nil {
-		return err
-	}
-
-	midstr := ctx.String(stdflag.FlagMachine)
-	mach, err := getMachine(cfg, midstr)
-	if err != nil {
-		return err
-	}
-
-	fs := ctx.Args().Slice()
-	p, err := pc.Plan(ctx.Context, mach, fs, ctx.Int64(flagSeed))
+	p, err := pr.Plan(ctx.Context)
 	if err != nil {
 		return err
 	}
 
 	return p.Write(outw, plan.WriteHuman)
+}
+
+func makePlanner(ctx *c.Context, errw io.Writer) (*planner.Planner, error) {
+	a := stdflag.ActRunnerFromCli(ctx, errw)
+
+	cfg, err := stdflag.ConfFileFromCli(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	qs := quantities(ctx)
+	src := source(a, cfg)
+	fs := ctx.Args().Slice()
+
+	midstr := ctx.String(stdflag.FlagMachine)
+	mach, err := getMachine(cfg, midstr)
+	if err != nil {
+		return nil, err
+	}
+
+	l := log.New(errw, "", 0)
+
+	return planner.New(
+		src,
+		mach,
+		fs,
+		planner.LogWith(l),
+		planner.ObserveWith(singleobs.Planner(l)...),
+		planner.OverrideQuantities(qs),
+		planner.FilterCompilers(ctx.String(flagCompilerFilter)),
+		planner.UseSeed(ctx.Int64(flagSeed)),
+	)
+}
+
+func source(a *act.Runner, cfg *config.Config) planner.Source {
+	return planner.Source{
+		BProbe:     cfg,
+		CLister:    cfg.Machines,
+		CInspector: &compiler.CResolve,
+		SProbe:     a,
+	}
+}
+
+func quantities(ctx *c.Context) planner.QuantitySet {
+	return planner.QuantitySet{
+		CorpusSize: ctx.Int(flagCorpusSize),
+		NWorkers:   stdflag.WorkerCountFromCli(ctx),
+	}
 }
 
 func getMachine(cfg *config.Config, midstr string) (machine.Named, error) {
@@ -115,27 +158,4 @@ func getMachine(cfg *config.Config, midstr string) (machine.Named, error) {
 		Machine: mach.Machine,
 	}
 	return m, nil
-}
-
-func makePlanConfig(c *config.Config, errw io.Writer, a planner.SubjectProber, cs, nw int) (*planner.Config, error) {
-	l := log.New(errw, "", 0)
-	cfg := planner.Config{
-		Quantities: planner.QuantitySet{
-			CorpusSize: cs,
-			NWorkers:   nw,
-		},
-		Source: planner.Source{
-			BProbe:     c,
-			CLister:    c.Machines,
-			CInspector: &compiler.CResolve,
-			SProbe:     a,
-		},
-		Logger:    l,
-		Observers: observers(l),
-	}
-	return &cfg, nil
-}
-
-func observers(l *log.Logger) planner.ObserverSet {
-	return planner.NewObserverSet(singleobs.Planner(l)...)
 }

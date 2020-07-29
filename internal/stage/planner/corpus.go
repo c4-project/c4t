@@ -33,10 +33,10 @@ func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, pn *plan.Plan)
 	}
 	c := CorpusPlanner{
 		Files:      files,
-		Prober:     p.conf.Source.SProbe,
-		Observers:  p.conf.Observers.Corpus,
+		Prober:     p.source.SProbe,
+		Observers:  p.observers.Corpus,
 		Rng:        rng,
-		Quantities: p.conf.Quantities,
+		Quantities: p.quantities,
 	}
 	pn.Corpus, err = c.Plan(ctx)
 	return err

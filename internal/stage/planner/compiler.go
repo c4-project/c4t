@@ -66,6 +66,8 @@ type CompilerPlanner struct {
 	Lister CompilerLister
 	// Inspector resolves configuration pertaining to a particular compiler.
 	Inspector compiler.Inspector
+	// Filter is the filtering glob to use on compiler names.
+	Filter id.ID
 	// Observers contains observers for the CompilerPlanner.
 	Observers []CompilerObserver
 	// MachineID is the identifier of the machine for which we are making a plan.
@@ -76,9 +78,10 @@ type CompilerPlanner struct {
 
 func (p *Planner) planCompilers(ctx context.Context, rng *rand.Rand, pn *plan.Plan) error {
 	c := CompilerPlanner{
-		Lister:    p.conf.Source.CLister,
-		Inspector: p.conf.Source.CInspector,
-		Observers: p.conf.Observers.Compiler,
+		Filter:    id.FromString(p.filter),
+		Lister:    p.source.CLister,
+		Inspector: p.source.CInspector,
+		Observers: p.observers.Compiler,
 		MachineID: pn.Machine.ID,
 		Rng:       rng,
 	}
@@ -92,6 +95,10 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compile
 	cfgs, err := c.Lister.ListCompilers(ctx, c.MachineID)
 	if err != nil {
 		return nil, fmt.Errorf("listing compilers: %w", err)
+	}
+
+	if cfgs, err = c.filterCompilers(cfgs); err != nil {
+		return nil, fmt.Errorf("filtering compilers: %w", err)
 	}
 
 	nenabled := resolveDisabled(cfgs)
@@ -111,6 +118,17 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compile
 	OnCompilerPlanFinish(c.Observers...)
 
 	return cmps, nil
+}
+
+func (c *CompilerPlanner) filterCompilers(in map[string]compiler.Config) (map[string]compiler.Config, error) {
+	if c.Filter.IsEmpty() {
+		return in, nil
+	}
+	out, err := id.MapGlob(in, c.Filter)
+	if err != nil {
+		return nil, err
+	}
+	return out.(map[string]compiler.Config), nil
 }
 
 func resolveDisabled(cfgs map[string]compiler.Config) (nenabled int) {

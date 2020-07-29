@@ -143,8 +143,7 @@ func (e Env) Check() error {
 	if e.Lifter == nil {
 		return lifter.ErrDriverNil
 	}
-	// TODO(@MattWindsor): check source
-	return nil
+	return e.Planner.Check()
 }
 
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.

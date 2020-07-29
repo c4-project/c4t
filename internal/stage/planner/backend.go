@@ -25,6 +25,6 @@ type BackendFinder interface {
 func (p *Planner) planBackend(ctx context.Context, pn *plan.Plan) error {
 	// TODO(@MattWindsor91): fix this pointer awfulness.
 	var err error
-	pn.Backend, err = p.conf.Source.BProbe.FindBackend(ctx, id.FromString("litmus"), pn.Machine.ID)
+	pn.Backend, err = p.source.BProbe.FindBackend(ctx, id.FromString("litmus"), pn.Machine.ID)
 	return err
 }

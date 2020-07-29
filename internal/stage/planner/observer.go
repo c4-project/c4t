@@ -6,8 +6,13 @@
 package planner
 
 import (
+	"errors"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
+
+// ErrObserverNil is the error raised when any of the Observe*With functions receive a nil observer.
+var ErrObserverNil = errors.New("observer nil")
 
 // Observer groups all of the disparate observer interfaces that make up an ObserverSet.
 // Its main purpose is to let all of those interfaces be implemented by one slice.
@@ -25,16 +30,37 @@ type ObserverSet struct {
 	Compiler []CompilerObserver
 }
 
-// NewObserverSet creates an ObserverSet using the given observers obs in all roles.
-func NewObserverSet(obs ...Observer) ObserverSet {
-	lobs := len(obs)
-	oset := ObserverSet{
-		Corpus:   make([]builder.Observer, lobs),
-		Compiler: make([]CompilerObserver, lobs),
+// AddCorpus adds corpus observers to the observer set.
+func (s *ObserverSet) AddCorpus(obs ...builder.Observer) error {
+	for _, o := range obs {
+		if o == nil {
+			return ErrObserverNil
+		}
 	}
-	for i, o := range obs {
-		oset.Corpus[i] = o
-		oset.Compiler[i] = o
+	s.Corpus = append(s.Corpus, obs...)
+	return nil
+}
+
+// AddCompiler adds corpus observers to the observer set.
+func (s *ObserverSet) AddCompiler(obs ...CompilerObserver) error {
+	for _, o := range obs {
+		if o == nil {
+			return ErrObserverNil
+		}
 	}
-	return oset
+	s.Compiler = append(s.Compiler, obs...)
+	return nil
+}
+
+// Add adds observers to the observer set.
+func (s *ObserverSet) Add(obs ...Observer) error {
+	for _, o := range obs {
+		if err := s.AddCorpus(o); err != nil {
+			return err
+		}
+		if err := s.AddCompiler(o); err != nil {
+			return err
+		}
+	}
+	return nil
 }
