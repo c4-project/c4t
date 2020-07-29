@@ -145,7 +145,7 @@ func makeLogPane(d Dash) container.Option {
 		container.Top(
 			container.SplitHorizontal(
 				container.Top(
-					container.Border(linestyle.Double), container.BorderTitle("Run Start"),
+					container.Border(linestyle.Double), container.BorderTitle("Experiment Start"),
 					container.PlaceWidget(d.startTime),
 				),
 				container.Bottom(

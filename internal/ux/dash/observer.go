@@ -21,6 +21,14 @@ import (
 	"github.com/mum4k/termdash/widgets/text"
 )
 
+const (
+	headerCycle           = "Cycle"
+	headerCurrentActivity = "Current Activity"
+	headerStats           = "Statistics"
+	headerSparks          = "Sparklines"
+	headerCompilers       = "Compilers"
+)
+
 // Observer represents a single machine instance inside a dash.
 type Observer struct {
 	run   *runCounter
@@ -76,6 +84,7 @@ const (
 
 // AddToGrid adds this observer to a grid builder gb with the container ID id..
 func (o *Observer) AddToGrid(gb *grid.Builder, id string, pc int) {
+
 	gb.Add(grid.RowHeightPercWithOpts(pc,
 		[]container.Option{
 			container.ID(id),
@@ -86,20 +95,20 @@ func (o *Observer) AddToGrid(gb *grid.Builder, id string, pc int) {
 				40,
 				[]container.Option{
 					container.Border(linestyle.Light),
-					container.BorderTitle("Run"),
+					container.BorderTitle(headerCycle),
 				},
 				o.run.grid()...,
 			),
-			grid.RowHeightPerc(60, grid.Widget(o.compilers, container.Border(linestyle.Light), container.BorderTitle("Compilers"))),
+			grid.RowHeightPerc(60, grid.Widget(o.compilers, container.Border(linestyle.Light), container.BorderTitle(headerCompilers))),
 		),
 		grid.ColWidthPerc(percStats,
 			grid.RowHeightPercWithOpts(
 				40,
-				[]container.Option{container.Border(linestyle.Light), container.BorderTitle("Statistics")},
+				[]container.Option{container.Border(linestyle.Light), container.BorderTitle(headerStats)},
 				o.tally.grid()...,
 			),
 			grid.RowHeightPercWithOpts(60,
-				[]container.Option{container.Border(linestyle.Light), container.BorderTitle("Sparklines")},
+				[]container.Option{container.Border(linestyle.Light), container.BorderTitle(headerSparks)},
 				o.sparks.grid()...),
 		),
 		o.currentRunColumn(),
@@ -110,7 +119,7 @@ func (o *Observer) currentRunColumn() grid.Element {
 	return grid.ColWidthPercWithOpts(percActions,
 		[]container.Option{
 			container.Border(linestyle.Light),
-			container.BorderTitle("Current Run"),
+			container.BorderTitle(headerCurrentActivity),
 		},
 		o.action.gridRows()...,
 	)
