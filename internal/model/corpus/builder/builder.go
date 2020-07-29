@@ -11,6 +11,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -119,7 +121,7 @@ func (b *Builder) add(name string, s subject.Subject) error {
 	return b.c.Add(subject.Named{Name: name, Subject: s})
 }
 
-func (b *Builder) addCompile(name string, cid id.ID, res subject.CompileResult) error {
+func (b *Builder) addCompile(name string, cid id.ID, res compilation.CompileResult) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddCompileResult(cid, res)
 	})
@@ -131,7 +133,7 @@ func (b *Builder) addRecipe(name string, arch id.ID, r recipe.Recipe) error {
 	})
 }
 
-func (b *Builder) addRun(name string, cid id.ID, r subject.RunResult) error {
+func (b *Builder) addRun(name string, cid id.ID, r compilation.RunResult) error {
 	return b.rmwSubject(name, func(s *subject.Subject) error {
 		return s.AddRun(cid, r)
 	})

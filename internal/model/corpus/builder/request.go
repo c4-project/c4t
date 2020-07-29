@@ -8,6 +8,8 @@ package builder
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -58,11 +60,11 @@ type Compile struct {
 	CompilerID id.ID
 
 	// Result is the compile result.
-	Result subject.CompileResult
+	Result compilation.CompileResult
 }
 
 // CompileRequest constructs an add-compile request for the subject with name sname, compiler ID cid, and result r.
-func CompileRequest(sname string, cid id.ID, r subject.CompileResult) Request {
+func CompileRequest(sname string, cid id.ID, r compilation.CompileResult) Request {
 	return Request{Name: sname, Compile: &Compile{CompilerID: cid, Result: r}}
 }
 
@@ -86,10 +88,10 @@ type Run struct {
 	CompilerID id.ID
 
 	// Run is the run result.
-	Result subject.RunResult
+	Result compilation.RunResult
 }
 
 // RunRequest constructs an add-run request for the subject with name sname, compiler ID cid, and result r.
-func RunRequest(sname string, cid id.ID, r subject.RunResult) Request {
+func RunRequest(sname string, cid id.ID, r compilation.RunResult) Request {
 	return Request{Name: sname, Run: &Run{CompilerID: cid, Result: r}}
 }

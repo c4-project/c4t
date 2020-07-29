@@ -9,6 +9,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
@@ -42,19 +44,19 @@ func MockFailedCompile(name string) *subject.Subject {
 			},
 		),
 		subject.WithCompile(id.FromString("gcc"),
-			subject.CompileResult{
-				Result: subject.Result{Status: status.CompileFail},
-				Files:  subject.CompileFileset{},
+			compilation.CompileResult{
+				Result: compilation.Result{Status: status.CompileFail},
+				Files:  compilation.CompileFileset{},
 			},
 		),
 		subject.WithCompile(id.FromString("clang"),
 			MockSuccessfulCompile("clang", name),
 		),
 		subject.WithRun(id.FromString("gcc"),
-			subject.RunResult{Result: subject.Result{Status: status.CompileFail}},
+			compilation.RunResult{Result: compilation.Result{Status: status.CompileFail}},
 		),
 		subject.WithRun(id.FromString("clang"),
-			subject.RunResult{Result: subject.Result{Status: status.Ok}},
+			compilation.RunResult{Result: compilation.Result{Status: status.Ok}},
 		),
 	)
 }
@@ -66,8 +68,8 @@ func MockFlaggedRun(name string) *subject.Subject {
 		subject.WithRecipe(id.ArchX8664, MockRecipe("x86")),
 		subject.WithCompile(id.FromString("gcc"), MockSuccessfulCompile("gcc", name)),
 		subject.WithCompile(id.FromString("icc"), MockSuccessfulCompile("icc", name)),
-		subject.WithRun(id.FromString("gcc"), subject.RunResult{Result: subject.Result{Status: status.Flagged}}),
-		subject.WithRun(id.FromString("icc"), subject.RunResult{Result: subject.Result{Status: status.Flagged}}),
+		subject.WithRun(id.FromString("gcc"), compilation.RunResult{Result: compilation.Result{Status: status.Flagged}}),
+		subject.WithRun(id.FromString("icc"), compilation.RunResult{Result: compilation.Result{Status: status.Flagged}}),
 	)
 }
 
@@ -77,18 +79,18 @@ func MockTimeoutRun(name string) *subject.Subject {
 		litmus.New("baz.litmus", litmus.WithThreads(4)),
 		subject.WithRecipe(id.ArchPPC, MockRecipe("ppc")),
 		subject.WithCompile(id.FromString("msvc"), MockSuccessfulCompile("msvc", name)),
-		subject.WithRun(id.FromString("msvc"), subject.RunResult{Result: subject.Result{Status: status.RunTimeout}}),
+		subject.WithRun(id.FromString("msvc"), compilation.RunResult{Result: compilation.Result{Status: status.RunTimeout}}),
 	)
 }
 
 // MockSuccessfulCompile generates a mock CompileResult for a successful compile of subject sname with compiler cstr.
-func MockSuccessfulCompile(cstr string, sname string) subject.CompileResult {
-	return subject.CompileResult{
-		Result: subject.Result{
+func MockSuccessfulCompile(cstr string, sname string) compilation.CompileResult {
+	return compilation.CompileResult{
+		Result: compilation.Result{
 			Duration: 200 * time.Second,
 			Status:   status.Ok,
 		},
-		Files: subject.CompileFileset{
+		Files: compilation.CompileFileset{
 			Bin: path.Join(cstr, sname, "a.out"),
 			Log: path.Join(cstr, sname, "log.txt"),
 		},

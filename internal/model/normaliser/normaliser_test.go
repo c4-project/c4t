@@ -9,6 +9,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
@@ -108,17 +110,17 @@ var testSubjects = map[string]func(root string) testCase{
 		c := func(comp, file string) string { return path.Join(root, normaliser.DirCompiles, comp, file) }
 		return testCase{
 			in: subject.Subject{
-				Compiles: map[string]subject.CompileResult{
+				Compiles: map[string]compilation.CompileResult{
 					"clang": {
-						Result: subject.Result{Status: status.Ok},
-						Files: subject.CompileFileset{
+						Result: compilation.Result{Status: status.Ok},
+						Files: compilation.CompileFileset{
 							Bin: path.Join("foobaz", "clang", "a.out"),
 							Log: path.Join("foobaz", "clang", "errors"),
 						},
 					},
 					"gcc": {
-						Result: subject.Result{Status: status.Ok},
-						Files: subject.CompileFileset{
+						Result: compilation.Result{Status: status.Ok},
+						Files: compilation.CompileFileset{
 							Bin: path.Join("foobaz", "gcc", "a.out"),
 							Log: path.Join("foobaz", "gcc", "errors"),
 						},
@@ -126,17 +128,17 @@ var testSubjects = map[string]func(root string) testCase{
 				},
 			},
 			out: subject.Subject{
-				Compiles: map[string]subject.CompileResult{
+				Compiles: map[string]compilation.CompileResult{
 					"clang": {
-						Result: subject.Result{Status: status.Ok},
-						Files: subject.CompileFileset{
+						Result: compilation.Result{Status: status.Ok},
+						Files: compilation.CompileFileset{
 							Bin: c("clang", normaliser.FileBin),
 							Log: c("clang", normaliser.FileCompileLog),
 						},
 					},
 					"gcc": {
-						Result: subject.Result{Status: status.Ok},
-						Files: subject.CompileFileset{
+						Result: compilation.Result{Status: status.Ok},
+						Files: compilation.CompileFileset{
 							Bin: c("gcc", normaliser.FileBin),
 							Log: c("gcc", normaliser.FileCompileLog),
 						},

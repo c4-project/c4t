@@ -13,6 +13,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
@@ -28,8 +30,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
@@ -58,9 +58,6 @@ type Instance struct {
 
 	// resCh is the channel to which the compile run should send compiled subject records.
 	resCh chan<- builder.Request
-
-	// Corpus is the corpus to compile.
-	corpus corpus.Corpus
 }
 
 func (j *Instance) Compile(ctx context.Context) error {
@@ -86,7 +83,7 @@ func (j *Instance) compileOnCompiler(ctx context.Context, nc *compiler.Named) er
 		return herr
 	}
 
-	sc := SubjectCompile{CompilerID: nc.ID, Name: j.subject.Name}
+	sc := compilation.Name{CompilerID: nc.ID, SubjectName: j.subject.Name}
 	sp := j.paths.SubjectPaths(sc)
 
 	res, rerr := j.runCompiler(ctx, nc, sp, h)
@@ -97,10 +94,10 @@ func (j *Instance) compileOnCompiler(ctx context.Context, nc *compiler.Named) er
 	return j.sendResult(ctx, sc, res)
 }
 
-func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp subject.CompileFileset, h recipe.Recipe) (subject.CompileResult, error) {
+func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp compilation.CompileFileset, h recipe.Recipe) (compilation.CompileResult, error) {
 	logf, err := j.openLogFile(sp.Log)
 	if err != nil {
-		return subject.CompileResult{}, err
+		return compilation.CompileResult{}, err
 	}
 
 	tctx, cancel := j.quantities.Timeout.OnContext(ctx)
@@ -133,15 +130,15 @@ func (j *Instance) openLogFile(l string) (io.WriteCloser, error) {
 	return os.Create(l)
 }
 
-func (j *Instance) compileJob(r recipe.Recipe, nc *compiler.Named, sp subject.CompileFileset) compile.Recipe {
+func (j *Instance) compileJob(r recipe.Recipe, nc *compiler.Named, sp compilation.CompileFileset) compile.Recipe {
 	return compile.FromRecipe(&nc.Compiler, r, sp.Bin)
 }
 
 // makeCompileResult makes a compile result given a possible err and fileset sp.
 // It fails if the error is considered substantially fatal.
-func (j *Instance) makeCompileResult(sp subject.CompileFileset, start time.Time, err error) (subject.CompileResult, error) {
-	cr := subject.CompileResult{
-		Result: subject.Result{
+func (j *Instance) makeCompileResult(sp compilation.CompileFileset, start time.Time, err error) (compilation.CompileResult, error) {
+	cr := compilation.CompileResult{
+		Result: compilation.Result{
 			Time:     start,
 			Duration: time.Since(start),
 			Status:   status.Unknown,
@@ -155,9 +152,9 @@ func (j *Instance) makeCompileResult(sp subject.CompileFileset, start time.Time,
 
 // sendResult tries to send a compile job result to the result channel.
 // If the context ctx has been cancelled, it will fail and instead terminate the job.
-func (j *Instance) sendResult(ctx context.Context, sc SubjectCompile, r subject.CompileResult) error {
+func (j *Instance) sendResult(ctx context.Context, sc compilation.Name, r compilation.CompileResult) error {
 	// TODO(@MattWindsor91): propagate sc further?
-	return builder.CompileRequest(sc.Name, sc.CompilerID, r).SendTo(ctx, j.resCh)
+	return builder.CompileRequest(sc.SubjectName, sc.CompilerID, r).SendTo(ctx, j.resCh)
 }
 
 // mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and

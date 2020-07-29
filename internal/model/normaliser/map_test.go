@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
@@ -32,9 +34,9 @@ func ExampleMap_RenamesMatching() {
 			},
 		),
 		subject.WithCompile(id.FromString("clang"),
-			subject.CompileResult{
-				Result: subject.Result{Status: status.Ok},
-				Files: subject.CompileFileset{
+			compilation.CompileResult{
+				Result: compilation.Result{Status: status.Ok},
+				Files: compilation.CompileFileset{
 					Bin: path.Join("foobaz", "clang", "a.out"),
 					Log: path.Join("foobaz", "clang", "errors"),
 				},

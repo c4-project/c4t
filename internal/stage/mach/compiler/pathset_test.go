@@ -12,6 +12,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -60,9 +62,9 @@ func TestPathset_SubjectPaths(t *testing.T) {
 		DirLogs: "logs",
 	}
 	cid := id.FromString("foo.bar.baz")
-	sps := ps.SubjectPaths(SubjectCompile{
-		Name:       "yeet",
-		CompilerID: cid,
+	sps := ps.SubjectPaths(compilation.Name{
+		SubjectName: "yeet",
+		CompilerID:  cid,
 	})
 
 	wantb := path.Join("bins", "foo", "bar", "baz", "yeet")

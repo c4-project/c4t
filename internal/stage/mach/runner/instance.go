@@ -12,6 +12,8 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
@@ -57,7 +59,7 @@ func (n *Instance) Run(ctx context.Context) error {
 	return nil
 }
 
-func (n *Instance) runCompile(ctx context.Context, cid id.ID, c *subject.CompileResult) error {
+func (n *Instance) runCompile(ctx context.Context, cid id.ID, c *compilation.CompileResult) error {
 	run, err := n.runCompileInner(ctx, cid, c)
 	if err != nil {
 		return err
@@ -65,15 +67,15 @@ func (n *Instance) runCompile(ctx context.Context, cid id.ID, c *subject.Compile
 	return n.makeBuilderReq(cid, run).SendTo(ctx, n.resCh)
 }
 
-func (n *Instance) runCompileInner(ctx context.Context, cid id.ID, c *subject.CompileResult) (subject.RunResult, error) {
+func (n *Instance) runCompileInner(ctx context.Context, cid id.ID, c *compilation.CompileResult) (compilation.RunResult, error) {
 	if !c.Status.IsOk() {
-		return subject.RunResult{Result: subject.Result{Status: c.Status}}, nil
+		return compilation.RunResult{Result: compilation.Result{Status: c.Status}}, nil
 	}
 
 	bin := c.Files.Bin
 	if bin == "" {
-		return subject.RunResult{
-			Result: subject.Result{Status: status.Unknown},
+		return compilation.RunResult{
+			Result: compilation.Result{Status: status.Unknown},
 		}, fmt.Errorf("%w: subject=%s, compiler=%s", ErrNoBin, n.subject.Name, cid.String())
 	}
 
@@ -84,9 +86,9 @@ func (n *Instance) runCompileInner(ctx context.Context, cid id.ID, c *subject.Co
 	return n.makeResult(start, s, o), err
 }
 
-func (n *Instance) makeResult(start time.Time, s status.Status, o *obs.Obs) subject.RunResult {
-	return subject.RunResult{
-		Result: subject.Result{
+func (n *Instance) makeResult(start time.Time, s status.Status, o *obs.Obs) compilation.RunResult {
+	return compilation.RunResult{
+		Result: compilation.Result{
 			Time:     start,
 			Duration: time.Since(start),
 			Status:   s,
@@ -143,7 +145,7 @@ func mostRelevantError(r, p, c error) error {
 	}
 }
 
-func (n *Instance) makeBuilderReq(cid id.ID, run subject.RunResult) builder.Request {
+func (n *Instance) makeBuilderReq(cid id.ID, run compilation.RunResult) builder.Request {
 	return builder.RunRequest(n.subject.Name, cid, run)
 }
 

@@ -9,6 +9,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 	"github.com/MattWindsor91/act-tester/internal/plan"
 
@@ -21,8 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/mock"
-
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/stretchr/testify/require"
@@ -89,9 +89,9 @@ func TestCompiler_Run(t *testing.T) {
 
 	for _, n := range names {
 		n := n
-		mp.On("SubjectPaths", mock.MatchedBy(func(x compiler.SubjectCompile) bool {
-			return x.Name == n
-		})).Return(subject.CompileFileset{
+		mp.On("SubjectPaths", mock.MatchedBy(func(x compilation.Name) bool {
+			return x.SubjectName == n
+		})).Return(compilation.CompileFileset{
 			Bin: "bin",
 			Log: "", // disable logging
 		}).Once()

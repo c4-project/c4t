@@ -3,19 +3,20 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package subject_test
+package compilation_test
 
 import (
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
 
 	"github.com/BurntSushi/toml"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
 // TestRun_TomlDecode tests the decoding of a test run from various TOML examples.
@@ -23,9 +24,9 @@ func TestRun_TomlDecode(t *testing.T) {
 	t.Parallel()
 	cases := map[string]struct {
 		toml string
-		want subject.RunResult
+		want compilation.RunResult
 	}{
-		"empty": {toml: "", want: subject.RunResult{}},
+		"empty": {toml: "", want: compilation.RunResult{}},
 		"unsat": {
 			toml: `
 time = 2015-10-21T07:28:00-08:00
@@ -41,8 +42,8 @@ status = "flagged"
 [[obs.states]]
   "0:r0" = "1"
   x = "1"`,
-			want: subject.RunResult{
-				Result: subject.Result{
+			want: compilation.RunResult{
+				Result: compilation.Result{
 					Time:     time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
 					Duration: 8675309,
 					Status:   status.Flagged,
@@ -64,7 +65,7 @@ status = "flagged"
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			var got subject.RunResult
+			var got compilation.RunResult
 			if _, err := toml.Decode(c.toml, &got); err != nil {
 				t.Fatal("unexpected decode error:", err)
 			}

@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
@@ -87,18 +89,18 @@ func (n *Normaliser) recipe(archstr string, h recipe.Recipe) recipe.Recipe {
 	return h
 }
 
-func (n *Normaliser) compiles(cs map[string]subject.CompileResult) map[string]subject.CompileResult {
+func (n *Normaliser) compiles(cs map[string]compilation.CompileResult) map[string]compilation.CompileResult {
 	if cs == nil {
 		return nil
 	}
-	ncs := make(map[string]subject.CompileResult, len(cs))
+	ncs := make(map[string]compilation.CompileResult, len(cs))
 	for cidstr, c := range cs {
 		ncs[cidstr] = n.compile(cidstr, c)
 	}
 	return ncs
 }
 
-func (n *Normaliser) compile(cidstr string, c subject.CompileResult) subject.CompileResult {
+func (n *Normaliser) compile(cidstr string, c compilation.CompileResult) compilation.CompileResult {
 	c.Files.Bin = n.replaceAndAdd(c.Files.Bin, filekind.Bin, filekind.InCompile, DirCompiles, cidstr, FileBin)
 	c.Files.Log = n.replaceAndAdd(c.Files.Log, filekind.Log, filekind.InCompile, DirCompiles, cidstr, FileCompileLog)
 	return c

@@ -12,6 +12,8 @@ import (
 	"errors"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -49,7 +51,7 @@ type SubjectPather interface {
 	Prepare(compilers []id.ID) error
 
 	// SubjectPaths gets the binary and log file paths for the subject/compiler pair sc.
-	SubjectPaths(sc SubjectCompile) subject.CompileFileset
+	SubjectPaths(sc compilation.Name) compilation.CompileFileset
 }
 
 //go:generate mockery --name=SubjectPather

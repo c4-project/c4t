@@ -9,6 +9,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 )
 
 // New is a convenience constructor for subjects.
@@ -43,7 +44,7 @@ func Options(os ...Option) Option {
 }
 
 // WithCompile is an option that tries to preload a compile result for compiler ID cid onto a subject.
-func WithCompile(cid id.ID, c CompileResult) Option {
+func WithCompile(cid id.ID, c compilation.CompileResult) Option {
 	return func(s *Subject) error { return s.AddCompileResult(cid, c) }
 }
 
@@ -53,7 +54,7 @@ func WithRecipe(arch id.ID, r recipe.Recipe) Option {
 }
 
 // WithRun is an option that tries to preload a run for compiler ID cid onto a subject.
-func WithRun(cid id.ID, r RunResult) Option {
+func WithRun(cid id.ID, r compilation.RunResult) Option {
 	return func(s *Subject) error { return s.AddRun(cid, r) }
 }
 

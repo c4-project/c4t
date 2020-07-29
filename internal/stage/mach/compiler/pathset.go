@@ -8,9 +8,9 @@ package compiler
 import (
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
@@ -58,9 +58,9 @@ func (p *Pathset) Dirs(compilers ...id.ID) []string {
 }
 
 // SubjectPaths gets the binary and log file paths for the subject/compiler pair sc.
-func (p *Pathset) SubjectPaths(sc SubjectCompile) subject.CompileFileset {
-	csub := append(sc.CompilerID.Tags(), sc.Name)
+func (p *Pathset) SubjectPaths(sc compilation.Name) compilation.CompileFileset {
+	csub := append(sc.CompilerID.Tags(), sc.SubjectName)
 	bpath := append([]string{p.DirBins}, csub...)
 	lpath := append([]string{p.DirLogs}, csub...)
-	return subject.CompileFileset{Bin: path.Join(bpath...), Log: path.Join(lpath...)}
+	return compilation.CompileFileset{Bin: path.Join(bpath...), Log: path.Join(lpath...)}
 }

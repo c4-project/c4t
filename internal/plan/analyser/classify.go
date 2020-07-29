@@ -8,6 +8,8 @@ package analyser
 import (
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
@@ -34,7 +36,7 @@ func classify(named subject.Named) classification {
 	return c
 }
 
-func (c *classification) classifyCompiles(cs map[string]subject.CompileResult) {
+func (c *classification) classifyCompiles(cs map[string]compilation.CompileResult) {
 	for n, cm := range cs {
 		sf := cm.Status.Flag()
 		c.flags |= sf
@@ -46,7 +48,7 @@ func (c *classification) classifyCompiles(cs map[string]subject.CompileResult) {
 	}
 }
 
-func (c *classification) classifyRuns(rs map[string]subject.RunResult) {
+func (c *classification) classifyRuns(rs map[string]compilation.RunResult) {
 	for n, r := range rs {
 		sf := r.Status.Flag()
 		c.flags |= sf

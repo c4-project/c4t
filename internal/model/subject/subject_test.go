@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/stretchr/testify/assert"
@@ -45,9 +47,9 @@ func ExampleSubject_BestLitmus() {
 
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
-	s := subject.Subject{Compiles: map[string]subject.CompileResult{
-		"gcc":   {Result: subject.Result{Status: status.Ok}, Files: subject.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
-		"clang": {Result: subject.Result{Status: status.CompileFail}, Files: subject.CompileFileset{Bin: "a.out", Log: "clang.log"}},
+	s := subject.Subject{Compiles: map[string]compilation.CompileResult{
+		"gcc":   {Result: compilation.Result{Status: status.Ok}, Files: compilation.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
+		"clang": {Result: compilation.Result{Status: status.CompileFail}, Files: compilation.CompileFileset{Bin: "a.out", Log: "clang.log"}},
 	}}
 	gr, _ := s.CompileResult(id.FromString("gcc"))
 	cr, _ := s.CompileResult(id.FromString("clang"))
@@ -84,9 +86,9 @@ func ExampleSubject_Recipe() {
 
 // ExampleSubject_RunOf is a testable example for RunOf.
 func ExampleSubject_RunOf() {
-	s := subject.Subject{Runs: map[string]subject.RunResult{
-		"gcc":   {Result: subject.Result{Status: status.Ok}},
-		"clang": {Result: subject.Result{Status: status.RunTimeout}},
+	s := subject.Subject{Runs: map[string]compilation.RunResult{
+		"gcc":   {Result: compilation.Result{Status: status.Ok}},
+		"clang": {Result: compilation.Result{Status: status.RunTimeout}},
 	}}
 	gr, _ := s.RunOf(id.FromString("gcc"))
 	cr, _ := s.RunOf(id.FromString("clang"))
@@ -114,9 +116,9 @@ func TestSubject_AddCompileResult(t *testing.T) {
 	t.Parallel()
 
 	var s subject.Subject
-	c := subject.CompileResult{
-		Result: subject.Result{Status: status.Ok},
-		Files: subject.CompileFileset{
+	c := compilation.CompileResult{
+		Result: compilation.Result{Status: status.Ok},
+		Files: compilation.CompileFileset{
 			Bin: "a.out",
 			Log: "gcc.log",
 		},
@@ -134,7 +136,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		err := s.AddCompileResult(mcomp, subject.CompileResult{})
+		err := s.AddCompileResult(mcomp, compilation.CompileResult{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateCompile, "adding compile twice")
 	})
 }
@@ -189,7 +191,7 @@ func TestSubject_AddRun(t *testing.T) {
 	t.Parallel()
 
 	var s subject.Subject
-	c := subject.RunResult{Result: subject.Result{Status: status.RunTimeout}}
+	c := compilation.RunResult{Result: compilation.Result{Status: status.RunTimeout}}
 
 	mcomp := id.FromString("gcc")
 
@@ -203,7 +205,7 @@ func TestSubject_AddRun(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		err := s.AddRun(mcomp, subject.RunResult{})
+		err := s.AddRun(mcomp, compilation.RunResult{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRun, "adding compile twice")
 	})
 }

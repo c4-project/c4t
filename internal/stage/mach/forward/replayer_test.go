@@ -14,6 +14,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
@@ -58,9 +60,9 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	com := builder.CompileRequest(
 		"foo",
 		id.CStyleGCC,
-		subject.CompileResult{
-			Result: subject.Result{Status: status.Ok},
-			Files: subject.CompileFileset{
+		compilation.CompileResult{
+			Result: compilation.Result{Status: status.Ok},
+			Files: compilation.CompileFileset{
 				Bin: "foo/bin",
 				Log: "foo/log",
 			},
@@ -68,8 +70,8 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	run := builder.RunRequest(
 		"foo",
 		id.CStyleGCC,
-		subject.RunResult{
-			Result: subject.Result{Status: status.Flagged},
+		compilation.RunResult{
+			Result: compilation.Result{Status: status.Flagged},
 		})
 
 	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {

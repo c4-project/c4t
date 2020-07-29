@@ -8,12 +8,12 @@ package dash
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/mum4k/termdash/cell"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -88,7 +88,7 @@ func (o *actionObserver) onRun(sname string, b *builder.Run) {
 	o.onMachOp(sname, "RUN", b.CompilerID, b.Result.Result)
 }
 
-func (o *actionObserver) onMachOp(sname, opname string, cid id.ID, r subject.Result) {
+func (o *actionObserver) onMachOp(sname, opname string, cid id.ID, r compilation.Result) {
 	descStub := idQualSubjectDesc(sname, cid)
 	desc := fmt.Sprintf("%s%s %s", descStub, suffixOfStatus(r.Status), r.Duration)
 	o.logAndStepGauge(opname, desc, statusColours[r.Status])
