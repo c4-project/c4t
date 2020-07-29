@@ -7,10 +7,11 @@ package runner
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os/exec"
 	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
@@ -81,7 +82,7 @@ func (n *Instance) runCompileInner(ctx context.Context, name compilation.Name, c
 	}
 
 	start := time.Now()
-	o, runErr := n.runAndParseBin(ctx, name.CompilerID, bin)
+	o, runErr := n.runAndParseBin(ctx, name, bin)
 	s, err := statusOfRun(o, runErr)
 
 	return n.makeResult(start, s, o), err
@@ -106,55 +107,34 @@ func statusOfRun(o *obs.Obs, runErr error) (status.Status, error) {
 }
 
 // runAndParseBin runs the binary at bin and parses its result into an observation struct.
-func (n *Instance) runAndParseBin(ctx context.Context, cid id.ID, bin string) (*obs.Obs, error) {
+func (n *Instance) runAndParseBin(ctx context.Context, name compilation.Name, bin string) (*obs.Obs, error) {
 	tctx, cancel := n.quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
 	cmd := exec.CommandContext(tctx, bin)
 	obsr, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, n.liftError(cid, "opening pipe for", err)
+		return nil, n.liftError(name, "opening pipe for", err)
 	}
 	if err := cmd.Start(); err != nil {
-		return nil, n.liftError(cid, "starting", err)
+		return nil, n.liftError(name, "starting", err)
 	}
 
 	var o obs.Obs
 	perr := n.parser.ParseObs(tctx, n.backend, obsr, &o)
 	werr := cmd.Wait()
 
-	return &o, mostRelevantError(werr, perr, tctx.Err())
-}
-
-// mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and
-// possible context errors c.
-//
-// The order of relevance is as follows:
-// - Timeouts (through c)
-// - Run errors (through r)
-// - Parse errors (through p)
-//
-// We assume that no other context errors need to be propagated.
-func mostRelevantError(r, p, c error) error {
-	switch {
-	case c != nil && errors.Is(c, context.DeadlineExceeded):
-		return c
-	case r != nil:
-		return r
-	default:
-		return p
-	}
+	return &o, errhelp.TimeoutOrFirstError(tctx, werr, perr)
 }
 
 // liftError wraps err with context about where it occurred.
-func (n *Instance) liftError(cid id.ID, stage string, err error) error {
+func (n *Instance) liftError(name compilation.Name, stage string, err error) error {
 	if err == nil {
 		return nil
 	}
 	return Error{
-		Stage:    stage,
-		Compiler: cid,
-		Subject:  n.subject.Name,
-		Inner:    err,
+		Stage:       stage,
+		Compilation: name,
+		Inner:       err,
 	}
 }

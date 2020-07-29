@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/1set/gut/yos"
@@ -58,7 +60,7 @@ func (l *Instance) patchToTemp(rpath string) (wpath string, err error) {
 	}
 	wpath, werr := l.patchReaderToTemp(r)
 	cerr := r.Close()
-	return wpath, iohelp.FirstError(werr, cerr)
+	return wpath, errhelp.FirstError(werr, cerr)
 }
 
 func (l *Instance) patchReaderToTemp(r io.Reader) (string, error) {
@@ -70,7 +72,7 @@ func (l *Instance) patchReaderToTemp(r io.Reader) (string, error) {
 	// Right now, there's only one thing to patch, so this is fairly easy.
 	err := l.Fixset.PatchMainFile(r, w)
 	cerr := w.Close()
-	return wpath, iohelp.FirstError(err, cerr)
+	return wpath, errhelp.FirstError(err, cerr)
 }
 
 // PatchMainFile patches the main C file represented by rw according to this fixset.

@@ -7,11 +7,12 @@ package compiler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"time"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
@@ -110,9 +111,7 @@ func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp compi
 	rerr := j.runCompilerJob(tctx, job, logf)
 
 	lerr := logf.Close()
-
-	// We could close the log file here, but we want fatal compiler errors to take priority over log file close errors.
-	return j.makeCompileResult(sp, start, mostRelevantError(rerr, lerr, tctx.Err()))
+	return j.makeCompileResult(sp, start, errhelp.TimeoutOrFirstError(tctx, rerr, lerr))
 }
 
 func (j *Instance) runCompilerJob(ctx context.Context, job compile.Recipe, logf io.Writer) error {
@@ -148,25 +147,4 @@ func (j *Instance) makeCompileResult(sp compilation.CompileFileset, start time.T
 
 	cr.Status, err = status.FromCompileError(err)
 	return cr, err
-}
-
-// mostRelevantError tries to get the 'most relevant' error, given the run errors r, parsing errors p, and
-// possible context errors c.
-//
-// The order of relevance is as follows:
-// - Timeouts (through c)
-// - Run errors (through r)
-// - Log file close errors (through l)
-//
-// We assume that no other context errors need to be propagated.
-func mostRelevantError(r, l, c error) error {
-	// TODO(@MattWindsor91): dedupe with runner equivalent
-	switch {
-	case c != nil && errors.Is(c, context.DeadlineExceeded):
-		return c
-	case r != nil:
-		return r
-	default:
-		return l
-	}
 }

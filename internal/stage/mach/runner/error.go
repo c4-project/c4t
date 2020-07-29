@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 )
 
 var (
@@ -26,11 +26,8 @@ type Error struct {
 	// Stage is a representation of the part of the runner that went wrong.
 	Stage string
 
-	// Compiler is the ID of the compiler that produced the binary whose run caused the error.
-	Compiler id.ID
-
-	// Normalise is the name of the subject that caused the error.
-	Subject string
+	// Compilation is the name of the compilation whose run caused the error.
+	Compilation compilation.Name
 
 	// Inner is the inner error, if any, that caused this error.
 	Inner error
@@ -38,8 +35,8 @@ type Error struct {
 
 // Error implements the error protocol for Error.
 func (e Error) Error() string {
-	return fmt.Sprintf("while %s subject %s compile %s: %s",
-		e.Stage, e.Subject, e.Compiler.String(), e.Inner.Error(),
+	return fmt.Sprintf("while %s compilation %s: %s",
+		e.Stage, e.Compilation, e.Inner.Error(),
 	)
 }
 

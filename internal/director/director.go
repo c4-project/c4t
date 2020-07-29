@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
@@ -87,7 +89,7 @@ func liftInitError(err error) error {
 func (d *Director) Direct(ctx context.Context) error {
 	err := d.directInner(ctx)
 	cerr := observer.CloseAll(d.observers...)
-	return iohelp.FirstError(err, cerr)
+	return errhelp.FirstError(err, cerr)
 }
 
 func (d *Director) directInner(ctx context.Context) error {

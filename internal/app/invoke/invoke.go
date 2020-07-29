@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
@@ -59,7 +61,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 
 	err = ux.RunOnCliPlan(ctx, inv, outw)
 	cerr := inv.Close()
-	return iohelp.FirstError(err, cerr)
+	return errhelp.FirstError(err, cerr)
 }
 
 func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.Invoker, error) {

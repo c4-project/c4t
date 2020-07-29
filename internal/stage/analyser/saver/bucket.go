@@ -8,7 +8,8 @@ package saver
 import (
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/plan"
@@ -55,5 +56,5 @@ func (b *bucketSaver) archiveSubject(name string) error {
 	nameMap := b.parent.norm.BySubject[name].Mappings
 	aerr := ArchiveSubject(ar, name, path, nameMap, b.parent.observers...)
 	cerr := ar.Close()
-	return iohelp.FirstError(aerr, cerr)
+	return errhelp.FirstError(aerr, cerr)
 }

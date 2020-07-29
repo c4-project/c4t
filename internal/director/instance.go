@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
@@ -111,7 +113,7 @@ func (i *Instance) Run(ctx context.Context) error {
 	err = i.mainLoop(ctx, sc)
 	i.Logger.Println("cleaning up")
 	cerr := i.cleanUp()
-	return iohelp.FirstError(err, cerr)
+	return errhelp.FirstError(err, cerr)
 }
 
 // cleanUp closes things that should be gracefully closed after an instance terminates.

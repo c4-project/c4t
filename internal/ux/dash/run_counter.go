@@ -9,7 +9,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"
@@ -48,7 +49,7 @@ func (r *runCounter) grid() []grid.Element {
 }
 
 func (r *runCounter) onIteration(run run.Run) error {
-	err := iohelp.FirstError(r.updateText(run), r.updateSpark(run))
+	err := errhelp.FirstError(r.updateText(run), r.updateSpark(run))
 	r.last = run
 	return err
 }

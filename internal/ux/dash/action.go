@@ -8,11 +8,12 @@ package dash
 import (
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/mum4k/termdash/cell"
 
@@ -152,7 +153,7 @@ func (o *actionObserver) reset() {
 func (o *actionObserver) logAndStepGauge(rq, desc string, c cell.Color) {
 	lerr := o.logStep(rq, desc, c)
 	serr := o.stepGauge(c)
-	o.logError(iohelp.FirstError(lerr, serr))
+	o.logError(errhelp.FirstError(lerr, serr))
 }
 
 // logStep logs an observed builder request with name rq and summary desc to the per-machine log.
@@ -160,7 +161,7 @@ func (o *actionObserver) logAndStepGauge(rq, desc string, c cell.Color) {
 func (o *actionObserver) logStep(rq, desc string, c cell.Color) error {
 	ferr := o.log.Write(rq, text.WriteCellOpts(cell.FgColor(c)))
 	lerr := o.log.Write(" " + desc + "\n")
-	return iohelp.FirstError(ferr, lerr)
+	return errhelp.FirstError(ferr, lerr)
 }
 
 // stepGauge increments the gauge and sets its colour to c.

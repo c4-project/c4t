@@ -12,6 +12,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
 
@@ -45,7 +47,7 @@ func ReadCompressed(r io.Reader, p *Plan) error {
 	}
 	rerr := Read(rc, p)
 	cerr := rc.Close()
-	return iohelp.FirstError(rerr, cerr)
+	return errhelp.FirstError(rerr, cerr)
 }
 
 func hasGzMagic(r io.ReadSeeker) (bool, error) {
@@ -84,7 +86,7 @@ func ReadFile(path string, p *Plan) error {
 	}
 	perr := ReadMagic(r, p)
 	cerr := r.Close()
-	return iohelp.FirstError(perr, cerr)
+	return errhelp.FirstError(perr, cerr)
 }
 
 // wrapForCompress wraps w according to whether flags requires it to compress.
@@ -106,7 +108,7 @@ func (p *Plan) Write(w io.Writer, flags WriteFlag) error {
 	err := enc.Encode(p)
 	// We need to close in case we're compressing; else, the footer won't be written.
 	cerr := wc.Close()
-	return iohelp.FirstError(err, cerr)
+	return errhelp.FirstError(err, cerr)
 }
 
 // WriteFile dumps plan p to the file named by path.
@@ -117,5 +119,5 @@ func (p *Plan) WriteFile(path string, flags WriteFlag) error {
 	}
 	err = p.Write(f, flags)
 	cerr := f.Close()
-	return iohelp.FirstError(err, cerr)
+	return errhelp.FirstError(err, cerr)
 }
