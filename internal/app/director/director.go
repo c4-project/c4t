@@ -28,10 +28,10 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-	"github.com/MattWindsor91/act-tester/internal/view/dash"
+	"github.com/MattWindsor91/act-tester/internal/ux/dash"
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

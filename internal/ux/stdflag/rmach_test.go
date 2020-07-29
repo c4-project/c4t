@@ -18,7 +18,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	"github.com/stretchr/testify/assert"
 	c "github.com/urfave/cli/v2"
 )

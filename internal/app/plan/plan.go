@@ -19,8 +19,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

@@ -10,10 +10,10 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/app/gccnt"
 
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/ux"
 )
 
 func main() {
 	app := gccnt.App(os.Stdout, os.Stderr)
-	view.LogTopError(app.Run(os.Args))
+	ux.LogTopError(app.Run(os.Args))
 }

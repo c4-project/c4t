@@ -12,7 +12,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
 

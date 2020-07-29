@@ -22,7 +22,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 

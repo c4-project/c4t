@@ -10,10 +10,10 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/app/fuzz"
 
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/ux"
 )
 
 func main() {
 	app := fuzz.App(os.Stdout, os.Stderr)
-	view.LogTopError(app.Run(os.Args))
+	ux.LogTopError(app.Run(os.Args))
 }

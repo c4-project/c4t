@@ -19,8 +19,8 @@ import (
 	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
-	"github.com/MattWindsor91/act-tester/internal/view"
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -61,7 +61,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return view.RunOnCliPlan(ctx, m, outw)
+	return ux.RunOnCliPlan(ctx, m, outw)
 }
 
 func makeMach(ctx *c.Context, errw io.Writer) (*mach.Mach, error) {

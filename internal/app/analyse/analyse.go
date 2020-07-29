@@ -17,9 +17,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
 
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/ux"
 
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -104,7 +104,7 @@ func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return view.RunOnCliPlan(ctx, a, ioutil.Discard)
+	return ux.RunOnCliPlan(ctx, a, ioutil.Discard)
 }
 
 func observers(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error) {

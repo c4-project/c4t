@@ -13,13 +13,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
-	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
+	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
 
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/ux"
 )
 
 // defaultOutDir is the default directory used for the results of the lifter.
@@ -55,7 +55,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return view.RunOnPlanFile(ctx.Context, lft, pf, outw)
+	return ux.RunOnPlanFile(ctx.Context, lft, pf, outw)
 }
 
 func makeLifter(ctx *c.Context, l *log.Logger, errw io.Writer) (*lifter.Lifter, error) {

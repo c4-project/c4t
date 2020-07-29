@@ -9,10 +9,10 @@ import (
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/app/mkdoc"
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/ux"
 )
 
 func main() {
 	app := mkdoc.App(os.Stdout, os.Stderr)
-	view.LogTopError(app.Run(os.Args))
+	ux.LogTopError(app.Run(os.Args))
 }

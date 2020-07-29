@@ -3,14 +3,14 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package view
+package ux
 
 import (
 	"context"
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"

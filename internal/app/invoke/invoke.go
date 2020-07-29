@@ -10,7 +10,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -19,9 +19,9 @@ import (
 
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/act-tester/internal/view/singleobs"
+	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
 
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/ux"
 )
 
 const Name = "act-tester-invoke"
@@ -57,7 +57,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 		return err
 	}
 
-	err = view.RunOnCliPlan(ctx, inv, outw)
+	err = ux.RunOnCliPlan(ctx, inv, outw)
 	cerr := inv.Close()
 	return iohelp.FirstError(err, cerr)
 }

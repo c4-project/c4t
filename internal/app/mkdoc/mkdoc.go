@@ -23,7 +23,7 @@ import (
 
 	"github.com/1set/gut/yos"
 	"github.com/MattWindsor91/act-tester/internal/app/plan"
-	"github.com/MattWindsor91/act-tester/internal/view/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
 	c "github.com/urfave/cli/v2"
 )

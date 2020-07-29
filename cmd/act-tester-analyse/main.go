@@ -9,9 +9,9 @@ import (
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/app/analyse"
-	"github.com/MattWindsor91/act-tester/internal/view"
+	"github.com/MattWindsor91/act-tester/internal/ux"
 )
 
 func main() {
-	view.LogTopError(analyse.App(os.Stdout, os.Stderr).Run(os.Args))
+	ux.LogTopError(analyse.App(os.Stdout, os.Stderr).Run(os.Args))
 }
