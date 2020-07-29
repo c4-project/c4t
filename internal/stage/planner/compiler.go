@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
@@ -72,16 +74,16 @@ type CompilerPlanner struct {
 	Rng *rand.Rand
 }
 
-func (p *Planner) planCompilers(ctx context.Context) error {
+func (p *Planner) planCompilers(ctx context.Context, rng *rand.Rand, pn *plan.Plan) error {
 	c := CompilerPlanner{
 		Lister:    p.conf.Source.CLister,
 		Inspector: p.conf.Source.CInspector,
 		Observers: p.conf.Observers.Compiler,
-		MachineID: p.plan.Machine.ID,
-		Rng:       p.rng,
+		MachineID: pn.Machine.ID,
+		Rng:       rng,
 	}
 	var err error
-	p.plan.Compilers, err = c.Plan(ctx)
+	pn.Compilers, err = c.Plan(ctx)
 	return err
 }
 

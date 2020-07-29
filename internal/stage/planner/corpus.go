@@ -9,6 +9,8 @@ import (
 	"context"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/plan"
+
 	"github.com/1set/gut/yos"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -24,7 +26,7 @@ type SubjectProber interface {
 	ProbeSubject(ctx context.Context, litmus string) (*subject.Named, error)
 }
 
-func (p *Planner) planCorpus(ctx context.Context) error {
+func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, pn *plan.Plan) error {
 	files, err := expandFiles(p.fs)
 	if err != nil {
 		return err
@@ -33,10 +35,10 @@ func (p *Planner) planCorpus(ctx context.Context) error {
 		Files:      files,
 		Prober:     p.conf.Source.SProbe,
 		Observers:  p.conf.Observers.Corpus,
-		Rng:        p.rng,
+		Rng:        rng,
 		Quantities: p.conf.Quantities,
 	}
-	p.plan.Corpus, err = c.Plan(ctx)
+	pn.Corpus, err = c.Plan(ctx)
 	return err
 }
 

@@ -8,6 +8,8 @@ package planner
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -20,9 +22,9 @@ type BackendFinder interface {
 	FindBackend(ctx context.Context, style id.ID, machines ...id.ID) (*service.Backend, error)
 }
 
-func (p *Planner) planBackend(ctx context.Context) error {
+func (p *Planner) planBackend(ctx context.Context, pn *plan.Plan) error {
 	// TODO(@MattWindsor91): fix this pointer awfulness.
 	var err error
-	p.plan.Backend, err = p.conf.Source.BProbe.FindBackend(ctx, id.FromString("litmus"), p.plan.Machine.ID)
+	pn.Backend, err = p.conf.Source.BProbe.FindBackend(ctx, id.FromString("litmus"), pn.Machine.ID)
 	return err
 }

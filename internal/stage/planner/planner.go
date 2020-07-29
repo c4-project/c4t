@@ -10,8 +10,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"math/rand"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
@@ -29,8 +27,7 @@ type Planner struct {
 	conf Config
 	fs   []string
 	l    *log.Logger
-	plan plan.Plan
-	rng  *rand.Rand
+	mach machine.Named
 	seed int64
 }
 
@@ -52,9 +49,7 @@ func New(c *Config, mach machine.Named, fs []string, seed int64) (*Planner, erro
 		conf: *c,
 		fs:   fs,
 		l:    iohelp.EnsureLog(c.Logger),
-		plan: plan.Plan{
-			Machine: mach,
-		},
+		mach: mach,
 		seed: seed,
 	}
 
@@ -70,37 +65,29 @@ func checkConfig(c *Config) error {
 
 // Plan runs the test planner p.
 func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
+	return (&plan.Plan{Machine: p.mach}).RunStage(ctx, stage.Plan, p.planInner)
+}
+
+func (p *Planner) planInner(ctx context.Context, pn *plan.Plan) (*plan.Plan, error) {
 	hd := plan.NewMetadata(p.seed)
-	p.plan.Metadata = *hd
+	pn.Metadata = *hd
 
-	if p.rng == nil {
-		p.rng = hd.Rand()
-	}
+	rng := hd.Rand()
 
-	start := time.Now()
-
-	if err := p.planContent(ctx); err != nil {
+	p.l.Println("Planning backend...")
+	if err := p.planBackend(ctx, pn); err != nil {
 		return nil, err
 	}
 
-	p.plan.Metadata.ConfirmStage(stage.Plan, start, time.Now())
-	return &p.plan, nil
-}
-
-func (p *Planner) planContent(ctx context.Context) error {
-	p.l.Println("Planning backend...")
-	if err := p.planBackend(ctx); err != nil {
-		return err
-	}
-
 	p.l.Println("Planning compilers...")
-	if err := p.planCompilers(ctx); err != nil {
-		return err
+	if err := p.planCompilers(ctx, rng, pn); err != nil {
+		return nil, err
 	}
 
 	p.l.Println("Planning corpus...")
-	if err := p.planCorpus(ctx); err != nil {
-		return err
+	if err := p.planCorpus(ctx, rng, pn); err != nil {
+		return nil, err
 	}
-	return nil
+
+	return pn, nil
 }
