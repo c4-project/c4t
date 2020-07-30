@@ -99,7 +99,7 @@ func duration(d time.Duration) string {
 	return fmt.Sprint(d.Seconds())
 }
 
-func optName(i compiler.Compiler) string {
+func optName(i compiler.Configuration) string {
 	if i.SelectedOpt == nil {
 		return ""
 	}

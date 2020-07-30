@@ -9,21 +9,21 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// Named wraps a Compiler with its ID.
+// Named wraps a Configuration with its ID.
 type Named struct {
 	// ID is the ID of the compiler.
 	ID id.ID `toml:"id" json:"id"`
 
-	Compiler
+	Configuration
 }
 
-// AddName names this Compiler with ID name, lifting it to a Named.
-func (c Compiler) AddName(name id.ID) *Named {
-	return &Named{ID: name, Compiler: c}
+// AddName names this Configuration with ID name, lifting it to a Named.
+func (c Configuration) AddName(name id.ID) *Named {
+	return &Named{ID: name, Configuration: c}
 }
 
-// AddNameString tries to resolve name into an ID then name this Compiler with it.
-func (c Compiler) AddNameString(name string) (*Named, error) {
+// AddNameString tries to resolve name into an ID then name this Configuration with it.
+func (c Configuration) AddNameString(name string) (*Named, error) {
 	nid, err := id.TryFromString(name)
 	if err != nil {
 		return nil, err

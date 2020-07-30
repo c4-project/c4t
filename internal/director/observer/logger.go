@@ -126,7 +126,7 @@ func (j *Logger) logCompilers(cs compilerSet) error {
 		return err
 	}
 	for _, c := range cs.compilers {
-		if _, err := fmt.Fprintf(j.out, "- %s: %s\n", c.ID, c.Compiler); err != nil {
+		if _, err := fmt.Fprintf(j.out, "- %s: %s\n", c.ID, c.Configuration); err != nil {
 			return err
 		}
 	}

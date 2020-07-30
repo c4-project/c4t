@@ -41,7 +41,7 @@ type Plan struct {
 
 	// Compilers represents the compilers to be targeted by this plan.
 	// Each compiler's key is a stringified form of its machine CompilerID.
-	Compilers map[string]compiler.Compiler `json:"compilers"`
+	Compilers map[string]compiler.Configuration `json:"compilers"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
 	Corpus corpus.Corpus `json:"corpus"`

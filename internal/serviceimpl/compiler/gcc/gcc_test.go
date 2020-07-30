@@ -44,7 +44,7 @@ func ExampleArgs_opt() {
 	args := gcc.Args(
 		*service.NewRunInfo("gcc7", "-funroll-loops"),
 		compile.New(
-			&compiler.Compiler{SelectedOpt: &optlevel.Named{Name: "size"}},
+			&compiler.Configuration{SelectedOpt: &optlevel.Named{Name: "size"}},
 			"a.out",
 			"foo.c", "bar.c",
 		).Single(compile.Exe),
@@ -92,7 +92,7 @@ func TestArgs(t *testing.T) {
 		"with-mopt": {
 			run: *service.NewRunInfo("gcc8"),
 			job: compile.New(
-				&compiler.Compiler{
+				&compiler.Configuration{
 					SelectedMOpt: "arch=nehalem",
 				},
 				"a.out",
@@ -104,7 +104,7 @@ func TestArgs(t *testing.T) {
 		"with-opt": {
 			run: *service.NewRunInfo("gcc8"),
 			job: compile.New(
-				&compiler.Compiler{
+				&compiler.Configuration{
 					SelectedOpt: &optlevel.Named{
 						Name: "3",
 						Level: optlevel.Level{
@@ -123,7 +123,7 @@ func TestArgs(t *testing.T) {
 		"do-not-override-run": {
 			run: *service.NewRunInfo("gcc4", "-funroll-loops"),
 			job: compile.New(
-				&compiler.Compiler{
+				&compiler.Configuration{
 					Config: compiler.Config{
 						Run: service.NewRunInfo("gcc8", "-pthread"),
 					},

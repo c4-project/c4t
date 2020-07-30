@@ -16,7 +16,7 @@ import (
 // ExamplePlan_MaxNumRecipes is a testable example for MaxNumRecipes.
 func ExamplePlan_MaxNumRecipes() {
 	p := plan.Plan{
-		Compilers: map[string]compiler.Compiler{
+		Compilers: map[string]compiler.Configuration{
 			"gcc1": compiler.MockX86Gcc(),
 			"gcc2": compiler.MockX86Gcc(), // same architecture
 			"gcc3": compiler.MockPower9GCCOpt(),
@@ -32,7 +32,7 @@ func ExamplePlan_MaxNumRecipes() {
 // ExamplePlan_NumExpCompilations is a testable example for NumExpCompilations.
 func ExamplePlan_NumExpCompilations() {
 	p := plan.Plan{
-		Compilers: map[string]compiler.Compiler{
+		Compilers: map[string]compiler.Configuration{
 			"gcc1": compiler.MockX86Gcc(),
 			"gcc2": compiler.MockX86Gcc(),
 			"gcc3": compiler.MockPower9GCCOpt(),

@@ -28,7 +28,7 @@ func TestResolver_RunCompiler(t *testing.T) {
 	ctx := context.Background()
 	j := compile.Single{
 		Compile: compile.Compile{
-			Compiler: &mdl.Compiler{
+			Compiler: &mdl.Configuration{
 				SelectedMOpt: "plop",
 				Config: mdl.Config{
 					Style: id.FromString("gcc"),

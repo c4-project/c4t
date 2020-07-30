@@ -91,7 +91,7 @@ func (p *Planner) planCompilers(ctx context.Context, rng *rand.Rand, pn *plan.Pl
 }
 
 // Plan constructs the compiler set for a plan.
-func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compiler, error) {
+func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Configuration, error) {
 	cfgs, err := c.Lister.ListCompilers(ctx, c.MachineID)
 	if err != nil {
 		return nil, fmt.Errorf("listing compilers: %w", err)
@@ -104,7 +104,7 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Compile
 	nenabled := resolveDisabled(cfgs)
 	OnCompilerPlanStart(nenabled, c.Observers...)
 
-	cmps := make(map[string]compiler.Compiler, len(cfgs))
+	cmps := make(map[string]compiler.Configuration, len(cfgs))
 	for n, cfg := range cfgs {
 		nc, err := c.maybePlanCompiler(cmps, n, cfg)
 		if err != nil {
@@ -141,7 +141,7 @@ func resolveDisabled(cfgs map[string]compiler.Config) (nenabled int) {
 	return nenabled
 }
 
-func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Compiler, n string, cfg compiler.Config) (*compiler.Named, error) {
+func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Configuration, n string, cfg compiler.Config) (*compiler.Named, error) {
 	if cfg.Disabled {
 		return nil, nil
 	}
@@ -157,13 +157,13 @@ func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Compiler, n
 	return into[n].AddName(nid), nil
 }
 
-func (c *CompilerPlanner) planCompiler(cfg compiler.Config) (compiler.Compiler, error) {
+func (c *CompilerPlanner) planCompiler(cfg compiler.Config) (compiler.Configuration, error) {
 	opt, err := c.planCompilerOpt(cfg)
 	if err != nil {
-		return compiler.Compiler{}, nil
+		return compiler.Configuration{}, nil
 	}
 	mopt, err := c.planCompilerMOpt(cfg)
-	comp := compiler.Compiler{
+	comp := compiler.Configuration{
 		SelectedOpt:  opt,
 		SelectedMOpt: mopt,
 		Config:       cfg,

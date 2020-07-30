@@ -39,7 +39,7 @@ func TestInterpreter_Interpret(t *testing.T) {
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileAllCToExe(),
 	)
-	c := mdl.Compiler{}
+	c := mdl.Configuration{}
 	cr := compile.FromRecipe(&c, r, "a.out")
 	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
 		"filtering error making recipe")
@@ -78,7 +78,7 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileAllCToExe(),
 	)
-	c := mdl.Compiler{}
+	c := mdl.Configuration{}
 	cr := compile.FromRecipe(&c, r, "a.out")
 	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
 		"filtering error making recipe")
@@ -133,7 +133,7 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 				recipe.AddFiles("body.c", "harness.c", "body.h"),
 				recipe.AddInstructions(c.in...),
 			)
-			cmp := mdl.Compiler{}
+			cmp := mdl.Configuration{}
 			cr := compile.FromRecipe(&cmp, r, "a.out")
 			it, err := compiler.NewInterpreter(&mc, cr)
 			require.NoError(t, err, "error while making interpreter")
@@ -159,7 +159,7 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileFileToObj(path.Join("in", "harness.c")),
 	)
-	c := mdl.Compiler{}
+	c := mdl.Configuration{}
 	cr := compile.FromRecipe(&c, r, "a.out")
 	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
 		"filtering error making recipe")
@@ -189,7 +189,7 @@ func TestNewInterpreter_errors(t *testing.T) {
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileFileToObj(path.Join("in", "harness.c")),
 	)
-	cmp := mdl.Compiler{}
+	cmp := mdl.Configuration{}
 
 	cases := map[string]struct {
 		d   compiler.Driver

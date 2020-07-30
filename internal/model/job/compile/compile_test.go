@@ -30,13 +30,13 @@ func TestCompile_CompilerRun(t *testing.T) {
 		},
 		"no-runinfo": {
 			in: compile.Compile{
-				Compiler: &compiler.Compiler{},
+				Compiler: &compiler.Configuration{},
 			},
 			isNil: true,
 		},
 		"present": {
 			in: compile.Compile{
-				Compiler: &compiler.Compiler{
+				Compiler: &compiler.Configuration{
 					Config: compiler.Config{
 						Run: &service.RunInfo{
 							Cmd:  "foo",

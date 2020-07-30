@@ -20,7 +20,7 @@ type Recipe struct {
 }
 
 // FromRecipe constructs a recipe compile from the recipe r, compiler c, and output file out.
-func FromRecipe(c *compiler.Compiler, r recipe.Recipe, out string) Recipe {
+func FromRecipe(c *compiler.Configuration, r recipe.Recipe, out string) Recipe {
 	// TODO(@MattWindsor91): fix duplication in files?
 	return Recipe{
 		Compile: Compile{

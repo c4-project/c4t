@@ -46,7 +46,7 @@ type Instance struct {
 	subject subject.Named
 
 	// compilers points to the compilers to run.
-	compilers map[string]compiler.Compiler
+	compilers map[string]compiler.Configuration
 
 	// driver tells the instance how to run the compiler.
 	driver Driver
@@ -130,7 +130,7 @@ func (j *Instance) openLogFile(l string) (io.WriteCloser, error) {
 }
 
 func (j *Instance) compileJob(r recipe.Recipe, nc *compiler.Named, sp compilation.CompileFileset) compile.Recipe {
-	return compile.FromRecipe(&nc.Compiler, r, sp.Bin)
+	return compile.FromRecipe(&nc.Configuration, r, sp.Bin)
 }
 
 // makeCompileResult makes a compile result given a possible err and fileset sp.

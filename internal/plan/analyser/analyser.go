@@ -95,7 +95,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (a *Analyser) initCompilers(cs map[string]compiler.Compiler) {
+func (a *Analyser) initCompilers(cs map[string]compiler.Configuration) {
 	for cn, c := range cs {
 		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}

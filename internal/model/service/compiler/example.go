@@ -11,8 +11,8 @@ import (
 )
 
 // MockPower9GCCOpt produces a GCC-compatible power entry with Power9 architecture and optimisation configuration.
-func MockPower9GCCOpt() Compiler {
-	return Compiler{
+func MockPower9GCCOpt() Configuration {
+	return Configuration{
 		Config: Config{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchPPCPOWER9,
@@ -25,8 +25,8 @@ func MockPower9GCCOpt() Compiler {
 }
 
 // MockPower9GCCOpt produces a GCC-compatible power entry with X86 architecture.
-func MockX86Gcc() Compiler {
-	return Compiler{
+func MockX86Gcc() Configuration {
+	return Configuration{
 		Config: Config{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX86,
@@ -35,9 +35,9 @@ func MockX86Gcc() Compiler {
 }
 
 // MockSet produces a mock compiler set.
-func MockSet() map[string]Compiler {
+func MockSet() map[string]Configuration {
 	// These names line up with those in the example corpus.
-	return map[string]Compiler{
+	return map[string]Configuration{
 		"gcc":   MockPower9GCCOpt(),
 		"clang": MockX86Gcc(),
 	}

@@ -38,8 +38,8 @@ type Config struct {
 	Opt *optlevel.Selection `toml:"opt,omitempty" json:"opt,omitempty"`
 }
 
-// Compiler collects all test-relevant information about a compiler.
-type Compiler struct {
+// Configuration collects all test-relevant information about a compiler.
+type Configuration struct {
 	// SelectedMOpt refers to an architecture tuning level chosen using the compiler's configured march selection.
 	SelectedMOpt string `toml:"selected_mopt,optempty" json:"selected_mopt,omitempty"`
 	// SelectedOpt refers to an optimisation level chosen using the compiler's configured optimisation selection.
@@ -48,8 +48,8 @@ type Compiler struct {
 	Config
 }
 
-// String outputs a human-readable but machine-separable summary of this compiler.
-func (c Compiler) String() string {
+// String outputs a human-readable but machine-separable summary of this compiler configuration.
+func (c Configuration) String() string {
 	s, err := c.stringErr()
 	if err != nil {
 		return fmt.Sprintf("error: %s", err)
@@ -57,7 +57,7 @@ func (c Compiler) String() string {
 	return s
 }
 
-func (c Compiler) stringErr() (string, error) {
+func (c Configuration) stringErr() (string, error) {
 	var sb strings.Builder
 	if _, err := fmt.Fprintf(&sb, "%s@%s", c.Style, c.Arch); err != nil {
 		return "", err

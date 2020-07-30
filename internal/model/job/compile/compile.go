@@ -14,7 +14,7 @@ import (
 // Compile represents a request to compile a list of files to an executable given a particular compiler.
 type Compile struct {
 	// Compiler describes the compiler to use for the compilation.
-	Compiler *compiler.Compiler
+	Compiler *compiler.Configuration
 
 	// In is the list of files to be sent to the compiler.
 	In []string
@@ -23,7 +23,7 @@ type Compile struct {
 }
 
 // New is a convenience constructor for compiles.
-func New(c *compiler.Compiler, out string, in ...string) *Compile {
+func New(c *compiler.Configuration, out string, in ...string) *Compile {
 	return &Compile{
 		Compiler: c,
 		In:       in,
