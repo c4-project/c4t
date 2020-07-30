@@ -10,9 +10,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
@@ -74,38 +75,40 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 
 	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {
 		builder.OnBuildStart(m, obs)
-		builder.OnBuildRequest(add, obs)
-		builder.OnBuildRequest(rec, obs)
-		builder.OnBuildRequest(com, obs)
-		builder.OnBuildRequest(run, obs)
+		builder.OnBuildRequest(0, add, obs)
+		builder.OnBuildRequest(1, rec, obs)
+		builder.OnBuildRequest(2, com, obs)
+		builder.OnBuildRequest(3, run, obs)
 		builder.OnBuildFinish(obs)
 	}, func(obs *mocks.Observer) {
-		obs.On("OnBuild", mock.MatchedBy(func(msg builder.Message) bool {
-			return msg.Kind == builder.BuildStart &&
-				reflect.DeepEqual(*msg.Manifest, m)
-		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-			return m.Kind == builder.BuildRequest &&
-				m.Request.Name == add.Name &&
-				m.Request.Add != nil
-		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-			return m.Kind == builder.BuildRequest &&
-				m.Request.Name == rec.Name &&
-				m.Request.Recipe != nil
-		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-			return m.Kind == builder.BuildRequest &&
-				m.Request.Name == com.Name &&
-				m.Request.Compile != nil
-		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-			return m.Kind == builder.BuildRequest &&
-				m.Request.Name == run.Name &&
-				m.Request.Run != nil
-		})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-			return m.Kind == builder.BuildFinish
-		})).Return().Once()
+		onBuild(obs, observing.BatchStart, func(i int, name string, _ *builder.Request) bool {
+			return i == m.NReqs && name == m.Name
+		}).Return().Once()
+		onBuild(obs, observing.BatchStep, func(_ int, _ string, r *builder.Request) bool {
+			return r.Name == add.Name && r.Add != nil
+		}).Return().Once()
+		onBuild(obs, observing.BatchStep, func(_ int, _ string, r *builder.Request) bool {
+			return r.Name == rec.Name && r.Recipe != nil
+		}).Return().Once()
+		onBuild(obs, observing.BatchStep, func(_ int, _ string, r *builder.Request) bool {
+			return r.Name == com.Name && r.Compile != nil
+		}).Return().Once()
+		onBuild(obs, observing.BatchStep, func(_ int, _ string, r *builder.Request) bool {
+			return r.Name == run.Name && r.Run != nil
+		}).Return().Once()
+		onBuild(obs, observing.BatchEnd, func(_ int, _ string, r *builder.Request) bool {
+			return true
+		}).Return().Once()
 	})
 	require.NoError(t, err)
 
 	tobs.AssertExpectations(t)
+}
+
+func onBuild(m *mocks.Observer, k observing.BatchKind, f func(int, string, *builder.Request) bool) *mock.Call {
+	return m.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+		return m.Kind == k && f(m.Num, m.Name, m.Request)
+	}))
 }
 
 // TestReplayer_Run_roundTripError tests an error round-trip between Observer and Replayer.

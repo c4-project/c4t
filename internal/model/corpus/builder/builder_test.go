@@ -70,6 +70,7 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	}).Return().Once()
 
 	for i, c := range adds {
+		i := i
 		c := c
 		onBuild(&obs, observing.BatchStep, func(n int, _ string, request *builder.Request) bool {
 			return i == n &&
