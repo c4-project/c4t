@@ -25,6 +25,9 @@ const (
 	// Plan is the required stage corresponding to selecting an input corpus and compiler set for future testing.
 	Plan
 
+	// Perturb is the optional stage corresponding to randomising and sampling a preceding plan.
+	Perturb
+
 	// Fuzz is the optional stage corresponding to mutating an input corpus.
 	Fuzz
 

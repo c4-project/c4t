@@ -10,8 +10,8 @@ act-tester-mach
 
 ```
 [--compiler-timeout|-t]=[value]
-[--emit-json|-J]
-[--num-workers|-j]=[value]
+[--num-compiler-workers|-j]=[value]
+[--num-run-workers|-J]=[value]
 [--run-timeout|-T]=[value]
 [--skip-compiler]
 [--skip-runner]
@@ -28,9 +28,9 @@ act-tester-mach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--compiler-timeout, -t**="": a `timeout` to apply to each compilation (default: 1m0s)
 
-**--emit-json, -J**: emit progress reports in JSON form on stderr
+**--num-compiler-workers, -j**="": number of compiler `workers` to run in parallel (default: 1)
 
-**--num-workers, -j**="": number of `workers` to run in parallel (default: 1)
+**--num-run-workers, -J**="": number of runner `workers` to run in parallel (not recommended except on manycore machines) (default: 1)
 
 **--run-timeout, -T**="": a `timeout` to apply to each run (default: 1m0s)
 

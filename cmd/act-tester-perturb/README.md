@@ -10,7 +10,6 @@ act-tester-plan
 
 ```
 [--corpus-size|-n]=[value]
-[--filter-compiler]=[value]
 [--num-workers|-j]=[value]
 [--seed|-s]=[value]
 [-A]=[value]
@@ -29,8 +28,6 @@ act-tester-plan [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--corpus-size, -n**="": `number` of corpus files to select for this test plan;
 if positive, the planner will use all viable provided corpus files (default: 0)
-
-**--filter-compiler**="": `glob` to use to filter compilers to enable
 
 **--num-workers, -j**="": number of `workers` to run in parallel (default: 1)
 

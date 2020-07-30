@@ -1,17 +1,17 @@
-% act-tester-rmach 8
+% act-tester-invoke 8
 
 # NAME
 
-act-tester-rmach - runs the machine-dependent phase of an ACT test, potentially remotely
+act-tester-invoke - runs the machine-dependent phase of an ACT test, potentially remotely
 
 # SYNOPSIS
 
-act-tester-rmach
+act-tester-invoke
 
 ```
 [--compiler-timeout|-t]=[value]
-[--emit-json|-J]
-[--num-workers|-j]=[value]
+[--num-compiler-workers|-j]=[value]
+[--num-run-workers|-J]=[value]
 [--run-timeout|-T]=[value]
 [--skip-compiler]
 [--skip-runner]
@@ -22,16 +22,16 @@ act-tester-rmach
 **Usage**:
 
 ```
-act-tester-rmach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+act-tester-invoke [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 ```
 
 # GLOBAL OPTIONS
 
 **--compiler-timeout, -t**="": a `timeout` to apply to each compilation (default: 1m0s)
 
-**--emit-json, -J**: emit progress reports in JSON form on stderr
+**--num-compiler-workers, -j**="": number of compiler `workers` to run in parallel (default: 1)
 
-**--num-workers, -j**="": number of `workers` to run in parallel (default: 1)
+**--num-run-workers, -J**="": number of runner `workers` to run in parallel (not recommended except on manycore machines) (default: 1)
 
 **--run-timeout, -T**="": a `timeout` to apply to each run (default: 1m0s)
 

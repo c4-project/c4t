@@ -22,13 +22,14 @@ func ExampleStage_String() {
 	// Output:
 	// Unknown
 	// Plan
+	// Perturb
 	// Fuzz
 	// Lift
 	// Invoke
 	// Compile
 	// Run
 	// Analyse
-	// Stage(8)
+	// Stage(9)
 }
 
 // ExampleStage_MarshalJSON is a runnable example for MarshalJSON.
@@ -40,6 +41,7 @@ func ExampleStage_MarshalJSON() {
 
 	// Output:
 	// "Plan"
+	// "Perturb"
 	// "Fuzz"
 	// "Lift"
 	// "Invoke"

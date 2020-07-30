@@ -3,7 +3,7 @@
 
 .SH NAME
 .PP
-act\-tester\-analyse \- performs human\-readable queries on a plan file
+act\-tester\-analyse \- analyses a plan file
 
 
 .SH SYNOPSIS
@@ -14,8 +14,14 @@ act\-tester\-analyse
 .RS
 
 .nf
+[\-\-csv\-compilers]
+[\-\-csv\-stages]
 [\-\-num\-workers|\-j]=[value]
 [\-\-save\-dir|\-d]=[value]
+[\-\-show\-compilers|\-C]
+[\-\-show\-ok|\-O]
+[\-\-show\-plan\-info|\-P]
+[\-\-show\-subjects|\-S]
 
 .fi
 .RE
@@ -35,7 +41,25 @@ act\-tester\-analyse [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 .SH GLOBAL OPTIONS
 .PP
+\fB\-\-csv\-compilers\fP: dump CSV of compilers and their run times
+
+.PP
+\fB\-\-csv\-stages\fP: dump CSV of stages and their run times
+
+.PP
 \fB\-\-num\-workers, \-j\fP="": number of \fB\fCworkers\fR to run in parallel (default: 1)
 
 .PP
 \fB\-\-save\-dir, \-d\fP="": if present, save failing corpora to this \fB\fCdirectory\fR
+
+.PP
+\fB\-\-show\-compilers, \-C\fP: show breakdown of compilers and their run times
+
+.PP
+\fB\-\-show\-ok, \-O\fP: show subjects that did not have compile or run issues
+
+.PP
+\fB\-\-show\-plan\-info, \-P\fP: show plan metadata and stage times
+
+.PP
+\fB\-\-show\-subjects, \-S\fP: show subjects by status

@@ -10,17 +10,18 @@ func _() {
 	var x [1]struct{}
 	_ = x[Unknown-0]
 	_ = x[Plan-1]
-	_ = x[Fuzz-2]
-	_ = x[Lift-3]
-	_ = x[Invoke-4]
-	_ = x[Compile-5]
-	_ = x[Run-6]
-	_ = x[Analyse-7]
+	_ = x[Perturb-2]
+	_ = x[Fuzz-3]
+	_ = x[Lift-4]
+	_ = x[Invoke-5]
+	_ = x[Compile-6]
+	_ = x[Run-7]
+	_ = x[Analyse-8]
 }
 
-const _Stage_name = "UnknownPlanFuzzLiftInvokeCompileRunAnalyse"
+const _Stage_name = "UnknownPlanPerturbFuzzLiftInvokeCompileRunAnalyse"
 
-var _Stage_index = [...]uint8{0, 7, 11, 15, 19, 25, 32, 35, 42}
+var _Stage_index = [...]uint8{0, 7, 11, 18, 22, 26, 32, 39, 42, 49}
 
 func (i Stage) String() string {
 	if i >= Stage(len(_Stage_index)-1) {

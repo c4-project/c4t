@@ -10,6 +10,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -38,6 +39,9 @@ func (p *Bar) OnCompilerConfig(m compiler.Message) {
 func (p *Bar) OnCopy(m copy2.Message) {
 	p.onBatch(m.Batch)
 }
+
+// OnPerturb does nothing.
+func (p *Bar) OnPerturb(perturber.Message) {}
 
 func (p *Bar) onBatch(m observing.Batch) {
 	switch m.Kind {

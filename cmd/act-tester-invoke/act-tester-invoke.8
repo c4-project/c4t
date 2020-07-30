@@ -1,22 +1,22 @@
 .nh
-.TH act\-tester\-rmach 8
+.TH act\-tester\-invoke 8
 
 .SH NAME
 .PP
-act\-tester\-rmach \- runs the machine\-dependent phase of an ACT test, potentially remotely
+act\-tester\-invoke \- runs the machine\-dependent phase of an ACT test, potentially remotely
 
 
 .SH SYNOPSIS
 .PP
-act\-tester\-rmach
+act\-tester\-invoke
 
 .PP
 .RS
 
 .nf
 [\-\-compiler\-timeout|\-t]=[value]
-[\-\-emit\-json|\-J]
-[\-\-num\-workers|\-j]=[value]
+[\-\-num\-compiler\-workers|\-j]=[value]
+[\-\-num\-run\-workers|\-J]=[value]
 [\-\-run\-timeout|\-T]=[value]
 [\-\-skip\-compiler]
 [\-\-skip\-runner]
@@ -33,7 +33,7 @@ act\-tester\-rmach
 .RS
 
 .nf
-act\-tester\-rmach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+act\-tester\-invoke [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 .fi
 .RE
@@ -44,10 +44,10 @@ act\-tester\-rmach [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 \fB\-\-compiler\-timeout, \-t\fP="": a \fB\fCtimeout\fR to apply to each compilation (default: 1m0s)
 
 .PP
-\fB\-\-emit\-json, \-J\fP: emit progress reports in JSON form on stderr
+\fB\-\-num\-compiler\-workers, \-j\fP="": number of compiler \fB\fCworkers\fR to run in parallel (default: 1)
 
 .PP
-\fB\-\-num\-workers, \-j\fP="": number of \fB\fCworkers\fR to run in parallel (default: 1)
+\fB\-\-num\-run\-workers, \-J\fP="": number of runner \fB\fCworkers\fR to run in parallel (not recommended except on manycore machines) (default: 1)
 
 .PP
 \fB\-\-run\-timeout, \-T\fP="": a \fB\fCtimeout\fR to apply to each run (default: 1m0s)

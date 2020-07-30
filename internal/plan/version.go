@@ -11,10 +11,11 @@ type Version uint32
 // CurrentVer is the current plan version.
 // It changes when the interface between various bits of the tester (generally manifested within the plan version)
 // changes.
-const CurrentVer Version = 2020_07_28
+const CurrentVer Version = 2020_07_30
 
 // Version history since 2020_05_29:
 //
+// 2020_07_30: New 'perturb' stage.  Some changes to observations that may alter the interface with the machine node.
 // 2020_07_28: No changes to the plan per se, but the machine node no longer supports human-readable output, and the
 //             JSON mode flag has been removed.
 // 2020_07_27: Added new (sub-)stages: Compile and Run.  (A typo meant that this version got stored as 2020_07_29,

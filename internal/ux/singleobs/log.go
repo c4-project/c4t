@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/observing"
@@ -79,4 +81,17 @@ func (l *Logger) OnCopy(c copy2.Message) {
 // onCopyStart briefly logs a file-copy start.
 func (l *Logger) onCopyStart(nfiles int) {
 	(*log.Logger)(l).Printf("copying %d files...\n", nfiles)
+}
+
+// OnPerturb logs perturb messages.
+func (l *Logger) OnPerturb(m perturber.Message) {
+	switch m.Kind {
+	case perturber.KindStart:
+		(*log.Logger)(l).Printf("perturbing plan...\n")
+		m.Quantities.Log((*log.Logger)(l))
+	case perturber.KindRandomiseOpts:
+		(*log.Logger)(l).Printf("- randomising compiler options...\n")
+	case perturber.KindSampleCorpus:
+		(*log.Logger)(l).Printf("- sampling corpus...\n")
+	}
 }

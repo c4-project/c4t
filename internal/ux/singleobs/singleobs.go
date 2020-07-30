@@ -9,6 +9,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -19,6 +21,15 @@ import (
 func Planner(l *log.Logger) []planner.Observer {
 	// The ordering is important here: we want log messages to appear _before_ progress bars.
 	return []planner.Observer{
+		NewBar(),
+		(*Logger)(l),
+	}
+}
+
+// Perturber builds a list of observers suitable for single-shot act-tester planner binaries.
+func Perturber(l *log.Logger) []perturber.Observer {
+	// The ordering is important here: we want log messages to appear _before_ progress bars.
+	return []perturber.Observer{
 		NewBar(),
 		(*Logger)(l),
 	}
