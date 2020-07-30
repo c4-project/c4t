@@ -60,7 +60,6 @@ func flags() []c.Flag {
 			Aliases: []string{stdflag.FlagNum},
 			Usage:   usageCorpusSize,
 		},
-		stdflag.WorkerCountCliFlag(),
 	}
 }
 
@@ -101,6 +100,5 @@ func source(cfg *config.Config) perturber.Source {
 func quantities(ctx *c.Context) perturber.QuantitySet {
 	return perturber.QuantitySet{
 		CorpusSize: ctx.Int(flagCorpusSize),
-		NWorkers:   stdflag.WorkerCountFromCli(ctx),
 	}
 }
