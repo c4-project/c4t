@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
@@ -234,11 +236,5 @@ func (l *InstanceLogger) addSource(c analyser.Analysis) analyser.AnalysisWithRun
 // OnBuild does nothing.
 func (l *InstanceLogger) OnBuild(builder.Message) {}
 
-// OnCopyStart does nothing.
-func (l *InstanceLogger) OnCopyStart(int) {}
-
 // OnCopy does nothing.
-func (l *InstanceLogger) OnCopy(string, string) {}
-
-// OnCopyFinish does nothing.
-func (l *InstanceLogger) OnCopyFinish() {}
+func (l *InstanceLogger) OnCopy(copy2.Message) {}

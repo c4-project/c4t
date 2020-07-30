@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
@@ -40,9 +42,6 @@ func (l *Logger) onBuildRequest(r *builder.Request) {
 	}
 }
 
-// OnBuildFinish does nothing.
-func (l *Logger) OnBuildFinish() {}
-
 // OnCompilerConfig logs compiler config messages.
 func (l *Logger) OnCompilerConfig(m compiler.Message) {
 	switch m.Kind {
@@ -69,13 +68,15 @@ func (l *Logger) onCompilerPlan(nc compiler.Named) {
 	}
 }
 
-// OnCopyStart briefly logs a file-copy start.
-func (l *Logger) OnCopyStart(nfiles int) {
-	(*log.Logger)(l).Printf("copying %d files...\n", nfiles)
+// OnCopy logs build messages.
+func (l *Logger) OnCopy(c copy2.Message) {
+	switch c.Kind {
+	case observing.BatchStep:
+		l.onCopyStart(c.Num)
+	}
 }
 
-// OnCopy does nothing.
-func (l *Logger) OnCopy(_, _ string) {}
-
-// OnCopyFinish does nothing.
-func (l *Logger) OnCopyFinish() {}
+// onCopyStart briefly logs a file-copy start.
+func (l *Logger) onCopyStart(nfiles int) {
+	(*log.Logger)(l).Printf("copying %d files...\n", nfiles)
+}

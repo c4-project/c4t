@@ -6,6 +6,7 @@
 package singleobs
 
 import (
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/observing"
@@ -18,18 +19,23 @@ type Bar struct {
 	bar *pb.ProgressBar
 }
 
-// NewBar creates a new observer using logger l to announce unusual cases.
+// NewBar creates a new observer.
 func NewBar() *Bar {
 	return &Bar{}
 }
 
-// OnBuildStart observes the start of a corpus build using a progress bar.
+// OnBuild observes a corpus build using a progress bar.
 func (p *Bar) OnBuild(m builder.Message) {
 	p.onBatch(m.Batch)
 }
 
-// OnCompilerPlanStart observes the start of a compiler plan using a progress bar.
+// OnCompilerConfig observes a compiler configuration using a progress bar.
 func (p *Bar) OnCompilerConfig(m compiler.Message) {
+	p.onBatch(m.Batch)
+}
+
+// OnCopy observes a file copy using a progress bar.
+func (p *Bar) OnCopy(m copy2.Message) {
 	p.onBatch(m.Batch)
 }
 
@@ -42,21 +48,6 @@ func (p *Bar) onBatch(m observing.Batch) {
 	case observing.BatchEnd:
 		p.finish()
 	}
-}
-
-// OnCopyStart observes the start of a file copy using a progress bar.
-func (p *Bar) OnCopyStart(nfiles int) {
-	p.start(nfiles)
-}
-
-// OnCopy observes a step of a file copy using a progress bar.
-func (p *Bar) OnCopy(_, _ string) {
-	p.step()
-}
-
-// OnCopyFinish observes the end of a file copy using a progress bar.
-func (p *Bar) OnCopyFinish() {
-	p.finish()
 }
 
 func (p *Bar) start(n int) {

@@ -6,6 +6,7 @@
 package dash
 
 import (
+	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/observing"
@@ -186,13 +187,15 @@ func (o *Observer) OnCopyStart(nfiles int) {
 }
 
 // OnCopy forwards a copy observation.
-func (o *Observer) OnCopy(dst, src string) {
-	o.action.OnCopy(dst, src)
-}
-
-// OnCopyFinish forwards a copy finish observation.
-func (o *Observer) OnCopyFinish() {
-	o.action.OnCopyFinish()
+func (o *Observer) OnCopy(m copy2.Message) {
+	switch m.Kind {
+	case observing.BatchStart:
+		o.action.OnCopyStart(m.Num)
+	case observing.BatchStep:
+		o.action.OnCopy(m.Dst, m.Src)
+	case observing.BatchEnd:
+		o.action.OnCopyFinish()
+	}
 }
 
 func (o *Observer) logError(err error) {

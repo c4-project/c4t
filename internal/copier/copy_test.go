@@ -12,6 +12,9 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/stretchr/testify/mock"
+
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/copier/mocks"
@@ -55,11 +58,18 @@ func TestSendMapping(t *testing.T) {
 
 	var o mocks.Observer
 
-	o.
-		On("OnCopyStart", len(mapping)).Return().Once().
-		On("OnCopyFinish").Return().Once()
+	onCopy(&o, observing.BatchStart, func(i int, s string, s2 string) bool {
+		return i == len(mapping)
+	}).Return().Once()
+	onCopy(&o, observing.BatchEnd, func(int, string, string) bool {
+		return true
+	}).Return().Once()
 	for r, l := range mapping {
-		o.On("OnCopy", r, l).Return().Once()
+		r := r
+		l := l
+		onCopy(&o, observing.BatchStep, func(_ int, dst, src string) bool {
+			return r == dst && l == src
+		}).Return().Once()
 	}
 
 	err := copy2.SendMapping(context.Background(), &m, mapping, &o)
@@ -74,4 +84,10 @@ func TestSendMapping(t *testing.T) {
 		}
 	}
 	o.AssertExpectations(t)
+}
+
+func onCopy(o *mocks.Observer, k observing.BatchKind, f func(int, string, string) bool) *mock.Call {
+	return o.On("OnCopy", mock.MatchedBy(func(m copy2.Message) bool {
+		return k == m.Kind && f(m.Num, m.Dst, m.Src)
+	}))
 }

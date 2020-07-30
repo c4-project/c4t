@@ -5,37 +5,45 @@
 
 package copier
 
+import "github.com/MattWindsor91/act-tester/internal/observing"
+
 // Observer is an interface for types that observe an SFTP file copy.
 type Observer interface {
-	// OnCopyStart lets the observer know when a file copy (of nfiles files) is beginning.
-	OnCopyStart(nfiles int)
-
-	// OnCopy lets the observer know that a file copy (from path src to path dst) has happened.
-	OnCopy(dst, src string)
-
-	// OnCopyFinish lets the observer know when a file copy has finished.
-	OnCopyFinish()
+	// OnCopy sends a copy observation message.
+	OnCopy(Message)
 }
 
-//go:generate mockery -name=Observer
+//go:generate mockery --name=Observer
+
+// Message is the type of copy observation messages.
+type Message struct {
+	observing.Batch
+
+	// Dst is the name of the destination file, if we're on a step.
+	Dst string `json:"dst,omitempty"`
+
+	// Src is the name of the source file, if we're on a step.
+	Src string `json:"src,omitempty"`
+}
+
+// OnCopy sends an OnCopyStep observation to multiple observers.
+func OnCopy(m Message, cos ...Observer) {
+	for _, o := range cos {
+		o.OnCopy(m)
+	}
+}
 
 // OnCopyStart sends an OnCopyStart observation to multiple observers.
 func OnCopyStart(nfiles int, cos ...Observer) {
-	for _, o := range cos {
-		o.OnCopyStart(nfiles)
-	}
+	OnCopy(Message{Batch: observing.NewBatchStart(nfiles)}, cos...)
 }
 
-// OnCopy sends an OnCopy observation to multiple observers.
-func OnCopy(dst, src string, cos ...Observer) {
-	for _, o := range cos {
-		o.OnCopy(dst, src)
-	}
+// OnCopyStep sends an OnCopyStep observation to multiple observers.
+func OnCopyStep(i int, dst, src string, cos ...Observer) {
+	OnCopy(Message{Batch: observing.NewBatchStep(i), Dst: dst, Src: src}, cos...)
 }
 
-// OnCopyFinish sends an OnCopyFinish observation to multiple observers.
-func OnCopyFinish(cos ...Observer) {
-	for _, o := range cos {
-		o.OnCopyFinish()
-	}
+// OnCopyEnd sends an OnCopyEnd observation to multiple observers.
+func OnCopyEnd(cos ...Observer) {
+	OnCopy(Message{Batch: observing.NewBatchEnd()}, cos...)
 }

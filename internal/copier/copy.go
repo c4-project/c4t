@@ -42,7 +42,7 @@ func RecvMapping(ctx context.Context, src Copier, mapping map[string]string, o .
 // It checks ctx for cancellation between operations.
 func CopyMapping(ctx context.Context, dst, src Copier, mapping map[string]string, o ...Observer) error {
 	OnCopyStart(len(mapping), o...)
-	defer OnCopyFinish(o...)
+	defer OnCopyEnd(o...)
 
 	if err := mkdirs(ctx, dst, mappingDirs(mapping)); err != nil {
 		return err
@@ -51,6 +51,7 @@ func CopyMapping(ctx context.Context, dst, src Copier, mapping map[string]string
 }
 
 func copyFiles(ctx context.Context, dst, src Copier, mapping map[string]string, o ...Observer) error {
+	i := 0
 	for dpath, spath := range mapping {
 		if err := iohelp.CheckDone(ctx); err != nil {
 			return err
@@ -58,7 +59,8 @@ func copyFiles(ctx context.Context, dst, src Copier, mapping map[string]string, 
 		if err := copyFile(dst, src, dpath, spath); err != nil {
 			return fmt.Errorf("copying %s to %s: %w", spath, dpath, err)
 		}
-		OnCopy(dpath, spath, o...)
+		OnCopyStep(i, dpath, spath, o...)
+		i++
 	}
 	return nil
 }
