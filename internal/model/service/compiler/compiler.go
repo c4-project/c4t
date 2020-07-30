@@ -17,8 +17,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 )
 
-// Config collects the part of a compiler's specification that comes from the act-tester configuration.
-type Config struct {
+// Compiler collects the part of a compiler's specification that comes from the act-tester configuration.
+type Compiler struct {
 	// Disabled specifies whether this compiler has been disabled.
 	Disabled bool `toml:"disabled,omitempty" json:"disabled,omitempty"`
 
@@ -45,7 +45,7 @@ type Configuration struct {
 	// SelectedOpt refers to an optimisation level chosen using the compiler's configured optimisation selection.
 	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty" json:"selected_opt,omitempty"`
 
-	Config
+	Compiler
 }
 
 // String outputs a human-readable but machine-separable summary of this compiler configuration.

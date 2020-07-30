@@ -18,7 +18,7 @@ import (
 // ExampleConfiguration_AddName is a runnable example for AddName.
 func ExampleConfiguration_AddName() {
 	c := compiler.Configuration{
-		Config: compiler.Config{
+		Compiler: compiler.Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX8664,
 		},
@@ -38,7 +38,7 @@ func ExampleConfiguration_AddName() {
 // ExampleConfiguration_AddNameString is a runnable example for AddName.
 func ExampleConfiguration_AddNameString() {
 	c := compiler.Configuration{
-		Config: compiler.Config{
+		Compiler: compiler.Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX8664,
 		},
@@ -60,7 +60,7 @@ func TestConfiguration_AddNameString_error(t *testing.T) {
 	t.Parallel()
 
 	c := compiler.Configuration{
-		Config: compiler.Config{
+		Compiler: compiler.Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX8664,
 		},

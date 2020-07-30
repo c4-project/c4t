@@ -70,7 +70,7 @@ func (m *mOptSet) Strings() stringhelp.Set {
 }
 
 // DefaultMOpts adapts the GCC mopts calculation to the interface needed for a compiler.
-func (g GCC) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
+func (g GCC) DefaultMOpts(c *compiler.Compiler) (stringhelp.Set, error) {
 	return MOpts(c.Arch)
 }
 

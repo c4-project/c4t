@@ -25,10 +25,10 @@ import (
 // ExamplePlan_CompilerIDs is a runnable example for CompilerIDs.
 func ExamplePlan_CompilerIDs() {
 	p := plan.Plan{Compilers: map[string]compiler.Configuration{
-		"gcc.ppc":   {Config: compiler.Config{Arch: id.ArchPPC}},
-		"clang.ppc": {Config: compiler.Config{Arch: id.ArchPPC}},
-		"gcc":       {Config: compiler.Config{Arch: id.ArchArm}},
-		"clang":     {Config: compiler.Config{Arch: id.ArchArm}},
+		"gcc.ppc":   {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
+		"clang.ppc": {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
+		"gcc":       {Compiler: compiler.Compiler{Arch: id.ArchArm}},
+		"clang":     {Compiler: compiler.Compiler{Arch: id.ArchArm}},
 	}}
 	cids, _ := p.CompilerIDs()
 	for _, c := range cids {
@@ -52,17 +52,17 @@ func TestPlan_Arches(t *testing.T) {
 	}{
 		"no arches": {plan.Plan{}, []id.ID{}},
 		"one compiler": {plan.Plan{Compilers: map[string]compiler.Configuration{
-			"gcc": {Config: compiler.Config{Arch: id.ArchX8664}},
+			"gcc": {Compiler: compiler.Compiler{Arch: id.ArchX8664}},
 		}}, []id.ID{id.ArchX8664}},
 		"same arch": {plan.Plan{Compilers: map[string]compiler.Configuration{
-			"gcc":   {Config: compiler.Config{Arch: id.ArchArm}},
-			"clang": {Config: compiler.Config{Arch: id.ArchArm}},
+			"gcc":   {Compiler: compiler.Compiler{Arch: id.ArchArm}},
+			"clang": {Compiler: compiler.Compiler{Arch: id.ArchArm}},
 		}}, []id.ID{id.ArchArm}},
 		"two arches": {plan.Plan{Compilers: map[string]compiler.Configuration{
-			"gcc-ppc":   {Config: compiler.Config{Arch: id.ArchPPC}},
-			"clang-ppc": {Config: compiler.Config{Arch: id.ArchPPC}},
-			"gcc":       {Config: compiler.Config{Arch: id.ArchArm}},
-			"clang":     {Config: compiler.Config{Arch: id.ArchArm}},
+			"gcc-ppc":   {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
+			"clang-ppc": {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
+			"gcc":       {Compiler: compiler.Compiler{Arch: id.ArchArm}},
+			"clang":     {Compiler: compiler.Compiler{Arch: id.ArchArm}},
 		}}, []id.ID{id.ArchArm, id.ArchPPC}},
 	}
 

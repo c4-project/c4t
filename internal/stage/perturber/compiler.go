@@ -24,7 +24,7 @@ import (
 // CompilerLister is the interface of things that can query compiler information.
 type CompilerLister interface {
 	// ListCompilers asks the compiler inspector to list all available compilers on machine ID mid.
-	ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Config, error)
+	ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error)
 }
 
 // CompilerPerturber contains the state necessary to make up the compiler part of a test plan.
@@ -66,7 +66,7 @@ func (c *CompilerPerturber) Perturb(cfgs map[string]compiler.Configuration) (map
 	ncfgs := make(map[string]compiler.Configuration, len(cfgs))
 	i := 0
 	for n, cfg := range cfgs {
-		nc, err := c.perturbCompiler(n, cfg.Config)
+		nc, err := c.perturbCompiler(n, cfg.Compiler)
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +80,7 @@ func (c *CompilerPerturber) Perturb(cfgs map[string]compiler.Configuration) (map
 	return ncfgs, nil
 }
 
-func (c *CompilerPerturber) perturbCompiler(name string, cmp compiler.Config) (*compiler.Named, error) {
+func (c *CompilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) (*compiler.Named, error) {
 	nid, err := id.TryFromString(name)
 	if err != nil {
 		return nil, fmt.Errorf("%s not a valid ID: %w", name, err)
@@ -94,13 +94,13 @@ func (c *CompilerPerturber) perturbCompiler(name string, cmp compiler.Config) (*
 	comp := compiler.Configuration{
 		SelectedOpt:  opt,
 		SelectedMOpt: mopt,
-		Config:       cmp,
+		Compiler:     cmp,
 	}
 
 	return comp.AddName(nid), err
 }
 
-func (c *CompilerPerturber) perturbCompilerOpt(cfg compiler.Config) (*optlevel.Named, error) {
+func (c *CompilerPerturber) perturbCompilerOpt(cfg compiler.Compiler) (*optlevel.Named, error) {
 	opts, err := compiler.SelectLevels(c.Inspector, &cfg)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (c *CompilerPerturber) perturbCompilerOpt(cfg compiler.Config) (*optlevel.N
 	return c.chooseOpt(opts, names), err
 }
 
-func (c *CompilerPerturber) perturbCompilerMOpt(cfg compiler.Config) (string, error) {
+func (c *CompilerPerturber) perturbCompilerMOpt(cfg compiler.Compiler) (string, error) {
 	mopts, err := compiler.SelectMOpts(c.Inspector, &cfg)
 	if err != nil {
 		return "", err

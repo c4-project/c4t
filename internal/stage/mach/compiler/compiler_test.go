@@ -61,7 +61,7 @@ func TestCompiler_Run(t *testing.T) {
 				BreaksStandards: false,
 			},
 		},
-		Config: mdl.Config{
+		Compiler: mdl.Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX86Skylake,
 			Run: &service.RunInfo{

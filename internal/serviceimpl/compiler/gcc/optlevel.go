@@ -78,7 +78,7 @@ var (
 )
 
 // DefaultOptLevels gets the default level set for GCC.
-func (g GCC) DefaultOptLevels(_ *compiler.Config) (stringhelp.Set, error) {
+func (g GCC) DefaultOptLevels(_ *compiler.Compiler) (stringhelp.Set, error) {
 	sel := optlevel.Selection{
 		Enabled:  OptLevelNames,
 		Disabled: OptLevelDisabledNames,
@@ -86,6 +86,6 @@ func (g GCC) DefaultOptLevels(_ *compiler.Config) (stringhelp.Set, error) {
 	return sel.Override(nil), nil
 }
 
-func (_ GCC) OptLevels(_ *compiler.Config) (map[string]optlevel.Level, error) {
+func (_ GCC) OptLevels(_ *compiler.Compiler) (map[string]optlevel.Level, error) {
 	return OptLevels, nil
 }

@@ -30,7 +30,7 @@ func TestResolver_RunCompiler(t *testing.T) {
 		Compile: compile.Compile{
 			Compiler: &mdl.Configuration{
 				SelectedMOpt: "plop",
-				Config: mdl.Config{
+				Compiler: mdl.Compiler{
 					Style: id.FromString("gcc"),
 					Arch:  id.FromString("x86"),
 				},

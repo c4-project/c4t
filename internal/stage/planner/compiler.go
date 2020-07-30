@@ -24,7 +24,7 @@ import (
 // CompilerLister is the interface of things that can query compiler information.
 type CompilerLister interface {
 	// ListCompilers asks the compiler inspector to list all available compilers on machine ID mid.
-	ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Config, error)
+	ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error)
 }
 
 // CompilerPlanner contains the state necessary to make up the compiler part of a test plan.
@@ -89,7 +89,7 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Configu
 	return cmps, nil
 }
 
-func (c *CompilerPlanner) filterCompilers(in map[string]compiler.Config) (map[string]compiler.Config, error) {
+func (c *CompilerPlanner) filterCompilers(in map[string]compiler.Compiler) (map[string]compiler.Compiler, error) {
 	if c.Filter.IsEmpty() {
 		return in, nil
 	}
@@ -97,10 +97,10 @@ func (c *CompilerPlanner) filterCompilers(in map[string]compiler.Config) (map[st
 	if err != nil {
 		return nil, err
 	}
-	return out.(map[string]compiler.Config), nil
+	return out.(map[string]compiler.Compiler), nil
 }
 
-func resolveDisabled(cfgs map[string]compiler.Config) (nenabled int) {
+func resolveDisabled(cfgs map[string]compiler.Compiler) (nenabled int) {
 	// TODO(@MattWindsor91): automatic disabling
 	for _, cfg := range cfgs {
 		if !cfg.Disabled {
@@ -110,7 +110,7 @@ func resolveDisabled(cfgs map[string]compiler.Config) (nenabled int) {
 	return nenabled
 }
 
-func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Configuration, n string, cfg compiler.Config) (*compiler.Named, error) {
+func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Configuration, n string, cfg compiler.Compiler) (*compiler.Named, error) {
 	if cfg.Disabled {
 		return nil, nil
 	}
@@ -126,7 +126,7 @@ func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Configurati
 	return into[n].AddName(nid), nil
 }
 
-func (c *CompilerPlanner) planCompiler(cfg compiler.Config) (compiler.Configuration, error) {
+func (c *CompilerPlanner) planCompiler(cfg compiler.Compiler) (compiler.Configuration, error) {
 	opt, err := c.planCompilerOpt(cfg)
 	if err != nil {
 		return compiler.Configuration{}, nil
@@ -135,12 +135,12 @@ func (c *CompilerPlanner) planCompiler(cfg compiler.Config) (compiler.Configurat
 	comp := compiler.Configuration{
 		SelectedOpt:  opt,
 		SelectedMOpt: mopt,
-		Config:       cfg,
+		Compiler:     cfg,
 	}
 	return comp, err
 }
 
-func (c *CompilerPlanner) planCompilerOpt(cfg compiler.Config) (*optlevel.Named, error) {
+func (c *CompilerPlanner) planCompilerOpt(cfg compiler.Compiler) (*optlevel.Named, error) {
 	opts, err := compiler.SelectLevels(c.Inspector, &cfg)
 	if err != nil {
 		return nil, err
@@ -152,7 +152,7 @@ func (c *CompilerPlanner) planCompilerOpt(cfg compiler.Config) (*optlevel.Named,
 	return c.chooseOpt(opts, names), err
 }
 
-func (c *CompilerPlanner) planCompilerMOpt(cfg compiler.Config) (string, error) {
+func (c *CompilerPlanner) planCompilerMOpt(cfg compiler.Compiler) (string, error) {
 	mopts, err := compiler.SelectMOpts(c.Inspector, &cfg)
 	if err != nil {
 		return "", err

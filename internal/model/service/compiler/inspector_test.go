@@ -24,17 +24,17 @@ type mockResolver struct {
 	mock.Mock
 }
 
-func (m *mockResolver) DefaultOptLevels(c *compiler.Config) (stringhelp.Set, error) {
+func (m *mockResolver) DefaultOptLevels(c *compiler.Compiler) (stringhelp.Set, error) {
 	args := m.Called(c)
 	return args.Get(0).(stringhelp.Set), args.Error(1)
 }
 
-func (m *mockResolver) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
+func (m *mockResolver) DefaultMOpts(c *compiler.Compiler) (stringhelp.Set, error) {
 	args := m.Called(c)
 	return args.Get(0).(stringhelp.Set), args.Error(1)
 }
 
-func (m *mockResolver) OptLevels(c *compiler.Config) (map[string]optlevel.Level, error) {
+func (m *mockResolver) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, error) {
 	args := m.Called(c)
 	return args.Get(0).(map[string]optlevel.Level), args.Error(1)
 }
@@ -57,28 +57,28 @@ func TestSelectLevels(t *testing.T) {
 	err := errors.New("test error please ignore")
 
 	cases := map[string]struct {
-		conf     *compiler.Config
+		conf     *compiler.Compiler
 		res      func() *mockResolver
 		expected stringhelp.Set
 		err      error
 	}{
 		"defaults-nil": {
-			conf:     &compiler.Config{Opt: nil},
+			conf:     &compiler.Compiler{Opt: nil},
 			res:      mr,
 			expected: dls,
 		},
 		"defaults": {
-			conf:     &compiler.Config{Opt: &optlevel.Selection{}},
+			conf:     &compiler.Compiler{Opt: &optlevel.Selection{}},
 			res:      mr,
 			expected: dls,
 		},
 		"disable-everything": {
-			conf:     &compiler.Config{Opt: &optlevel.Selection{Disabled: []string{"", "size", "speed"}}},
+			conf:     &compiler.Compiler{Opt: &optlevel.Selection{Disabled: []string{"", "size", "speed"}}},
 			res:      mr,
 			expected: nil,
 		},
 		"unknown-enable": {
-			conf: &compiler.Config{Opt: &optlevel.Selection{Enabled: []string{"kappa"}}},
+			conf: &compiler.Compiler{Opt: &optlevel.Selection{Enabled: []string{"kappa"}}},
 			res:  mr,
 			err:  compiler.ErrNoSuchLevel,
 		},
@@ -88,12 +88,12 @@ func TestSelectLevels(t *testing.T) {
 			err:  compiler.ErrConfigNil,
 		},
 		"d-error": {
-			conf: &compiler.Config{Opt: &optlevel.Selection{}},
+			conf: &compiler.Compiler{Opt: &optlevel.Selection{}},
 			res:  func() *mockResolver { return makeMockResolver(nil, nil, levels, err, nil, nil) },
 			err:  err,
 		},
 		"o-error": {
-			conf: &compiler.Config{Opt: &optlevel.Selection{}},
+			conf: &compiler.Compiler{Opt: &optlevel.Selection{}},
 			res:  func() *mockResolver { return makeMockResolver(dls, nil, nil, nil, nil, err) },
 			err:  err,
 		},
@@ -132,28 +132,28 @@ func TestSelectMOpts(t *testing.T) {
 	err := errors.New("test error please ignore")
 
 	cases := map[string]struct {
-		conf     *compiler.Config
+		conf     *compiler.Compiler
 		res      func() *mockResolver
 		expected stringhelp.Set
 		err      error
 	}{
 		"defaults-nil": {
-			conf:     &compiler.Config{MOpt: nil},
+			conf:     &compiler.Compiler{MOpt: nil},
 			res:      mr,
 			expected: dms,
 		},
 		"defaults": {
-			conf:     &compiler.Config{MOpt: &optlevel.Selection{}},
+			conf:     &compiler.Compiler{MOpt: &optlevel.Selection{}},
 			res:      mr,
 			expected: dms,
 		},
 		"disable-everything": {
-			conf:     &compiler.Config{MOpt: &optlevel.Selection{Disabled: dms.Slice()}},
+			conf:     &compiler.Compiler{MOpt: &optlevel.Selection{Disabled: dms.Slice()}},
 			res:      mr,
 			expected: nil,
 		},
 		"enable-new": {
-			conf:     &compiler.Config{MOpt: &optlevel.Selection{Enabled: []string{"kappa"}}},
+			conf:     &compiler.Compiler{MOpt: &optlevel.Selection{Enabled: []string{"kappa"}}},
 			res:      mr,
 			expected: dmsk,
 		},
@@ -163,7 +163,7 @@ func TestSelectMOpts(t *testing.T) {
 			err:  compiler.ErrConfigNil,
 		},
 		"error": {
-			conf: &compiler.Config{MOpt: &optlevel.Selection{}},
+			conf: &compiler.Compiler{MOpt: &optlevel.Selection{}},
 			res:  func() *mockResolver { return makeMockResolver(nil, nil, nil, nil, err, nil) },
 			err:  err,
 		},

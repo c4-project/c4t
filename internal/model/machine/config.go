@@ -14,5 +14,5 @@ type Config struct {
 	Machine
 
 	// Compilers contains information about the compilers attached to this machine.
-	Compilers map[string]compiler.Config `toml:"compilers,omitempty"`
+	Compilers map[string]compiler.Compiler `toml:"compilers,omitempty"`
 }

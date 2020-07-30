@@ -23,11 +23,11 @@ type Compiler struct {
 }
 
 // DefaultMOpts provides a mock function with given fields: c
-func (_m *Compiler) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
+func (_m *Compiler) DefaultMOpts(c *compiler.Compiler) (stringhelp.Set, error) {
 	ret := _m.Called(c)
 
 	var r0 stringhelp.Set
-	if rf, ok := ret.Get(0).(func(*compiler.Config) stringhelp.Set); ok {
+	if rf, ok := ret.Get(0).(func(*compiler.Compiler) stringhelp.Set); ok {
 		r0 = rf(c)
 	} else {
 		if ret.Get(0) != nil {
@@ -36,7 +36,7 @@ func (_m *Compiler) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*compiler.Config) error); ok {
+	if rf, ok := ret.Get(1).(func(*compiler.Compiler) error); ok {
 		r1 = rf(c)
 	} else {
 		r1 = ret.Error(1)
@@ -46,11 +46,11 @@ func (_m *Compiler) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
 }
 
 // DefaultOptLevels provides a mock function with given fields: c
-func (_m *Compiler) DefaultOptLevels(c *compiler.Config) (stringhelp.Set, error) {
+func (_m *Compiler) DefaultOptLevels(c *compiler.Compiler) (stringhelp.Set, error) {
 	ret := _m.Called(c)
 
 	var r0 stringhelp.Set
-	if rf, ok := ret.Get(0).(func(*compiler.Config) stringhelp.Set); ok {
+	if rf, ok := ret.Get(0).(func(*compiler.Compiler) stringhelp.Set); ok {
 		r0 = rf(c)
 	} else {
 		if ret.Get(0) != nil {
@@ -59,7 +59,7 @@ func (_m *Compiler) DefaultOptLevels(c *compiler.Config) (stringhelp.Set, error)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*compiler.Config) error); ok {
+	if rf, ok := ret.Get(1).(func(*compiler.Compiler) error); ok {
 		r1 = rf(c)
 	} else {
 		r1 = ret.Error(1)
@@ -69,11 +69,11 @@ func (_m *Compiler) DefaultOptLevels(c *compiler.Config) (stringhelp.Set, error)
 }
 
 // OptLevels provides a mock function with given fields: c
-func (_m *Compiler) OptLevels(c *compiler.Config) (map[string]optlevel.Level, error) {
+func (_m *Compiler) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, error) {
 	ret := _m.Called(c)
 
 	var r0 map[string]optlevel.Level
-	if rf, ok := ret.Get(0).(func(*compiler.Config) map[string]optlevel.Level); ok {
+	if rf, ok := ret.Get(0).(func(*compiler.Compiler) map[string]optlevel.Level); ok {
 		r0 = rf(c)
 	} else {
 		if ret.Get(0) != nil {
@@ -82,7 +82,7 @@ func (_m *Compiler) OptLevels(c *compiler.Config) (map[string]optlevel.Level, er
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*compiler.Config) error); ok {
+	if rf, ok := ret.Get(1).(func(*compiler.Compiler) error); ok {
 		r1 = rf(c)
 	} else {
 		r1 = ret.Error(1)

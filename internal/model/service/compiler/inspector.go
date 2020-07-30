@@ -24,19 +24,19 @@ var (
 // Inspector is the interface of types that support optimisation level lookup.
 type Inspector interface {
 	// DefaultOptLevels retrieves a set of optimisation levels that are enabled by default for compiler c.
-	DefaultOptLevels(c *Config) (stringhelp.Set, error)
+	DefaultOptLevels(c *Compiler) (stringhelp.Set, error)
 	// OptLevels retrieves a set of potential optimisation levels for compiler c.
 	// This map shouldn't be modified, as it may be global.
-	OptLevels(c *Config) (map[string]optlevel.Level, error)
+	OptLevels(c *Compiler) (map[string]optlevel.Level, error)
 	// DefaultMOpts retrieves a set of machine optimisation directives that are enabled by default for compiler c.
-	DefaultMOpts(c *Config) (stringhelp.Set, error)
+	DefaultMOpts(c *Compiler) (stringhelp.Set, error)
 
 	// We don't request a list of all possible MOpts from compilers, as the list expands so rapidly that any such
 	// list would be hideously out of date.
 }
 
 // SelectLevels selects from in the optimisation levels permitted by the configuration c.
-func SelectLevels(in Inspector, c *Config) (map[string]optlevel.Level, error) {
+func SelectLevels(in Inspector, c *Compiler) (map[string]optlevel.Level, error) {
 	if c == nil {
 		return nil, ErrConfigNil
 	}
@@ -53,7 +53,7 @@ func SelectLevels(in Inspector, c *Config) (map[string]optlevel.Level, error) {
 }
 
 // SelectMOpts selects from in the machine optimisation profiles (-march, etc.) permitted by the configuration c.
-func SelectMOpts(in Inspector, c *Config) (stringhelp.Set, error) {
+func SelectMOpts(in Inspector, c *Compiler) (stringhelp.Set, error) {
 	if c == nil {
 		return nil, ErrConfigNil
 	}

@@ -43,7 +43,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	ctx := context.Background()
 	mid := id.FromString("localhost")
 
-	cfgs := map[string]compiler.Config{
+	cfgs := map[string]compiler.Compiler{
 		"gcc": {
 			Style: id.CStyleGCC,
 			Arch:  id.ArchArmCortexA72,
@@ -133,7 +133,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	mo.AssertExpectations(t)
 
 	for n, c := range cs {
-		assert.Equalf(t, cfgs[n], c.Config, "config not passed through correctly for %s", n)
+		assert.Equalf(t, cfgs[n], c.Compiler, "config not passed through correctly for %s", n)
 
 		if !ystring.IsBlank(c.SelectedMOpt) {
 			checkSelection(t, "MOpt", n, c.SelectedMOpt, dms.Slice(), c.MOpt)
@@ -171,9 +171,9 @@ type mockCompilerLister struct {
 }
 
 // ListCompilers mocks the eponymous interface method.
-func (m *mockCompilerLister) ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Config, error) {
+func (m *mockCompilerLister) ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error) {
 	args := m.Called(ctx, mid)
-	return args.Get(0).(map[string]compiler.Config), args.Error(1)
+	return args.Get(0).(map[string]compiler.Compiler), args.Error(1)
 }
 
 // mockInspector mocks the Inspector interface.
@@ -182,19 +182,19 @@ type mockInspector struct {
 }
 
 // DefaultOptLevels mocks the eponymous interface method.
-func (m *mockInspector) DefaultOptLevels(c *compiler.Config) (stringhelp.Set, error) {
+func (m *mockInspector) DefaultOptLevels(c *compiler.Compiler) (stringhelp.Set, error) {
 	args := m.Called(c)
 	return args.Get(0).(stringhelp.Set), args.Error(1)
 }
 
 // OptLevels mocks the eponymous interface method.
-func (m *mockInspector) OptLevels(c *compiler.Config) (map[string]optlevel.Level, error) {
+func (m *mockInspector) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, error) {
 	args := m.Called(c)
 	return args.Get(0).(map[string]optlevel.Level), args.Error(1)
 }
 
 // DefaultMOpts mocks the eponymous interface method.
-func (m *mockInspector) DefaultMOpts(c *compiler.Config) (stringhelp.Set, error) {
+func (m *mockInspector) DefaultMOpts(c *compiler.Compiler) (stringhelp.Set, error) {
 	args := m.Called(c)
 	return args.Get(0).(stringhelp.Set), args.Error(1)
 }

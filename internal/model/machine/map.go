@@ -36,7 +36,7 @@ func (m ConfigMap) IDs() ([]id.ID, error) {
 }
 
 // ListCompilers implements the compiler listing operation using a config.
-func (m ConfigMap) ListCompilers(_ context.Context, mid id.ID) (map[string]compiler.Config, error) {
+func (m ConfigMap) ListCompilers(_ context.Context, mid id.ID) (map[string]compiler.Compiler, error) {
 	mstr := mid.String()
 	mach, ok := m[mstr]
 	if !ok {

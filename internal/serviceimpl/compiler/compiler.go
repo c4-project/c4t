@@ -54,7 +54,7 @@ type Resolver struct {
 }
 
 // Get tries to look up the compiler specified by nc in this resolver.
-func (r *Resolver) Get(c *mdl.Config) (Compiler, error) {
+func (r *Resolver) Get(c *mdl.Compiler) (Compiler, error) {
 	if c == nil {
 		return nil, ErrNil
 	}
@@ -67,7 +67,7 @@ func (r *Resolver) Get(c *mdl.Config) (Compiler, error) {
 }
 
 // DefaultOptLevels gets the default optimisation levels for the compiler described by c.
-func (r *Resolver) DefaultOptLevels(c *mdl.Config) (stringhelp.Set, error) {
+func (r *Resolver) DefaultOptLevels(c *mdl.Compiler) (stringhelp.Set, error) {
 	cp, err := r.Get(c)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (r *Resolver) DefaultOptLevels(c *mdl.Config) (stringhelp.Set, error) {
 }
 
 // OptLevels gets information about all available optimisation levels for the compiler described by c.
-func (r *Resolver) OptLevels(c *mdl.Config) (map[string]optlevel.Level, error) {
+func (r *Resolver) OptLevels(c *mdl.Compiler) (map[string]optlevel.Level, error) {
 	cp, err := r.Get(c)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (r *Resolver) OptLevels(c *mdl.Config) (map[string]optlevel.Level, error) {
 }
 
 // OptLevels gets the default machine-specific optimisation profiles for the compiler described by c.
-func (r *Resolver) DefaultMOpts(c *mdl.Config) (stringhelp.Set, error) {
+func (r *Resolver) DefaultMOpts(c *mdl.Compiler) (stringhelp.Set, error) {
 	cp, err := r.Get(c)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (r *Resolver) DefaultMOpts(c *mdl.Config) (stringhelp.Set, error) {
 
 // RunCompiler runs the compiler specified by nc on job j, using this resolver to map the style to a concrete compiler.
 func (r *Resolver) RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error {
-	cp, err := r.Get(&j.Compiler.Config)
+	cp, err := r.Get(&j.Compiler.Compiler)
 	if err != nil {
 		return err
 	}

@@ -37,7 +37,7 @@ func TestCompile_CompilerRun(t *testing.T) {
 		"present": {
 			in: compile.Compile{
 				Compiler: &compiler.Configuration{
-					Config: compiler.Config{
+					Compiler: compiler.Compiler{
 						Run: &service.RunInfo{
 							Cmd:  "foo",
 							Args: []string{"bar", "baz"},

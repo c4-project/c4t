@@ -124,7 +124,7 @@ func TestArgs(t *testing.T) {
 			run: *service.NewRunInfo("gcc4", "-funroll-loops"),
 			job: compile.New(
 				&compiler.Configuration{
-					Config: compiler.Config{
+					Compiler: compiler.Compiler{
 						Run: service.NewRunInfo("gcc8", "-pthread"),
 					},
 				},

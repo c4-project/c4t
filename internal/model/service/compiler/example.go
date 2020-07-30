@@ -13,7 +13,7 @@ import (
 // MockPower9GCCOpt produces a GCC-compatible power entry with Power9 architecture and optimisation configuration.
 func MockPower9GCCOpt() Configuration {
 	return Configuration{
-		Config: Config{
+		Compiler: Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchPPCPOWER9,
 			Opt: &optlevel.Selection{
@@ -27,7 +27,7 @@ func MockPower9GCCOpt() Configuration {
 // MockPower9GCCOpt produces a GCC-compatible power entry with X86 architecture.
 func MockX86Gcc() Configuration {
 	return Configuration{
-		Config: Config{
+		Compiler: Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX86,
 		},
