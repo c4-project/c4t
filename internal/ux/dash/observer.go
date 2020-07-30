@@ -8,6 +8,7 @@ package dash
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
@@ -167,11 +168,14 @@ func (o *Observer) logAnalysis(a analyser.Analysis) error {
 // OnBuild forwards a build observation.
 func (o *Observer) OnBuild(m builder.Message) {
 	switch m.Kind {
-	case builder.BuildStart:
-		o.action.OnBuildStart(*m.Manifest)
-	case builder.BuildRequest:
+	case observing.BatchStart:
+		o.action.OnBuildStart(builder.Manifest{
+			Name:  m.Name,
+			NReqs: m.Num,
+		})
+	case observing.BatchStep:
 		o.action.OnBuildRequest(*m.Request)
-	case builder.BuildFinish:
+	case observing.BatchEnd:
 		o.action.OnBuildFinish()
 	}
 }

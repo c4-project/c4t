@@ -84,7 +84,7 @@ func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
 	defer func() { OnBuildFinish(b.obs...) }()
 
 	for i := 0; i < b.m.NReqs; i++ {
-		if err := b.runSingle(ctx); err != nil {
+		if err := b.runSingle(i, ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -92,17 +92,17 @@ func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
 	return b.c, nil
 }
 
-func (b *Builder) runSingle(ctx context.Context) error {
+func (b *Builder) runSingle(i int, ctx context.Context) error {
 	select {
 	case r := <-b.reqCh:
-		return b.runRequest(r)
+		return b.runRequest(i, r)
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 }
 
-func (b *Builder) runRequest(r Request) error {
-	OnBuildRequest(r, b.obs...)
+func (b *Builder) runRequest(i int, r Request) error {
+	OnBuildRequest(i, r, b.obs...)
 	switch {
 	case r.Add != nil:
 		return b.add(r.Name, subject.Subject(*r.Add))

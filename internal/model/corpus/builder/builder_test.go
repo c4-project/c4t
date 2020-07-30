@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/observing"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/stretchr/testify/mock"
@@ -60,20 +62,22 @@ func TestBuilder_Run_Adds(t *testing.T) {
 
 	var got corpus.Corpus
 
-	obs.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-		return m.Kind == builder.BuildStart && m.Manifest.NReqs == c.NReqs
-	})).Return().Once().On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-		return m.Kind == builder.BuildFinish
-	})).Return().Once()
+	onBuild(&obs, observing.BatchStart, func(n int, s string, request *builder.Request) bool {
+		return n == c.NReqs && s == c.Name
+	}).Return().Once()
+	onBuild(&obs, observing.BatchEnd, func(int, string, *builder.Request) bool {
+		return true
+	}).Return().Once()
 
-	for _, c := range adds {
+	for i, c := range adds {
 		c := c
-		obs.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-			return m.Kind == builder.BuildRequest &&
-				m.Request.Name == c.Name &&
-				m.Request.Add != nil &&
-				m.Request.Add.Source == c.Source
-		})).Return().Once()
+		onBuild(&obs, observing.BatchStep, func(n int, _ string, request *builder.Request) bool {
+			return i == n &&
+				request != nil &&
+				request.Name == c.Name &&
+				request.Add != nil &&
+				request.Add.Source == c.Source
+		}).Return().Once()
 	}
 
 	eg, ectx := errgroup.WithContext(context.Background())
@@ -98,6 +102,12 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	checkAddCorpus(t, adds, got)
 
 	obs.AssertExpectations(t)
+}
+
+func onBuild(m *mocks.Observer, k observing.BatchKind, f func(int, string, *builder.Request) bool) *mock.Call {
+	return m.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+		return m.Kind == k && f(m.Num, m.Name, m.Request)
+	}))
 }
 
 func checkAddCorpus(t *testing.T, adds []subject.Named, got corpus.Corpus) {

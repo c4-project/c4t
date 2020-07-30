@@ -25,7 +25,7 @@ type Logger log.Logger
 // OnBuild logs build messages.
 func (l *Logger) OnBuild(b builder.Message) {
 	switch b.Kind {
-	case builder.BuildRequest:
+	case observing.BatchStep:
 		l.onBuildRequest(b.Request)
 	}
 }

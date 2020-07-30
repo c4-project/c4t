@@ -5,7 +5,11 @@
 
 package builder
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/MattWindsor91/act-tester/internal/observing"
+)
 
 // Observer is the interface for things that observe a builder.
 type Observer interface {
@@ -14,18 +18,6 @@ type Observer interface {
 }
 
 //go:generate mockery -name Observer
-
-// MessageKind is the enumeration of kinds of message.
-type MessageKind uint8
-
-const (
-	// BuildStart signifies the start of a corpus build.
-	BuildStart MessageKind = iota
-	// BuildRequest signifies a step in a corpus build.
-	BuildRequest
-	// BuildFinish signifies the end of a corpus build.
-	BuildFinish
-)
 
 // ErrObserverNil is the error returned when AppendObservers receives a nil observer.
 var ErrObserverNil = errors.New("observer nil")
@@ -42,10 +34,10 @@ func AppendObservers(dst []Observer, src ...Observer) ([]Observer, error) {
 
 // Message is the type of builder observation messages.
 type Message struct {
-	// Kind is the kind of this message.
-	Kind MessageKind `json:"kind"`
-	// Manifest carries a builder manifest, if we're on a build-start.
-	Manifest *Manifest `json:"manifest,omitempty"`
+	observing.Batch
+
+	// Manifest carries the name of the subject being (re-)built, if we're on a build-start.
+	Name string `json:"name,omitempty"`
 
 	// Request carries a builder request, if we're on a build-step.
 	Request *Request `json:"request,omitempty"`
@@ -60,15 +52,15 @@ func OnBuild(m Message, obs ...Observer) {
 
 // OnBuildStart sends an OnBuildStart message to each observer in obs.
 func OnBuildStart(m Manifest, obs ...Observer) {
-	OnBuild(Message{Kind: BuildStart, Manifest: &m}, obs...)
+	OnBuild(Message{Batch: observing.NewBatchStart(m.NReqs), Name: m.Name}, obs...)
 }
 
 // OnBuildRequest sends an OnBuildRequest message to each observer in obs.
-func OnBuildRequest(r Request, obs ...Observer) {
-	OnBuild(Message{Kind: BuildRequest, Request: &r}, obs...)
+func OnBuildRequest(i int, r Request, obs ...Observer) {
+	OnBuild(Message{Batch: observing.NewBatchStep(i), Request: &r}, obs...)
 }
 
 // OnBuildStart sends an OnBuildFinish message to each observer in obs.
 func OnBuildFinish(obs ...Observer) {
-	OnBuild(Message{Kind: BuildFinish}, obs...)
+	OnBuild(Message{Batch: observing.NewBatchEnd()}, obs...)
 }
