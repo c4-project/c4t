@@ -21,39 +21,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// CompilerObserver observes the actions of a CompilerPlanner.
-type CompilerObserver interface {
-	// OnCompilerPlanStart observes that the compiler planner is beginning to configure ncompilers compilers.
-	OnCompilerPlanStart(ncompilers int)
-	// OnCompilerPlan observes that the corpus has added the compiler c to the plan.
-	OnCompilerPlan(c compiler.Named)
-	// OnCompilerPlanFinish observes that the compiler planner has finished adding compilers.
-	OnCompilerPlanFinish()
-}
-
-//go:generate mockery -name=CompilerObserver
-
-// OnCompilerPlanStart sends an OnCompilerPlanStart to every observer in obs.
-func OnCompilerPlanStart(ncompilers int, obs ...CompilerObserver) {
-	for _, o := range obs {
-		o.OnCompilerPlanStart(ncompilers)
-	}
-}
-
-// OnCompilerPlan sends an OnCompilerPlanStart to every observer in obs.
-func OnCompilerPlan(c compiler.Named, obs ...CompilerObserver) {
-	for _, o := range obs {
-		o.OnCompilerPlan(c)
-	}
-}
-
-// OnCompilerPlanFinish sends an OnCompilerPlanStart to every observer in obs.
-func OnCompilerPlanFinish(obs ...CompilerObserver) {
-	for _, o := range obs {
-		o.OnCompilerPlanFinish()
-	}
-}
-
 // CompilerLister is the interface of things that can query compiler information.
 type CompilerLister interface {
 	// ListCompilers asks the compiler inspector to list all available compilers on machine ID mid.
@@ -69,7 +36,7 @@ type CompilerPlanner struct {
 	// Filter is the filtering glob to use on compiler names.
 	Filter id.ID
 	// Observers contains observers for the CompilerPlanner.
-	Observers []CompilerObserver
+	Observers []compiler.Observer
 	// MachineID is the identifier of the machine for which we are making a plan.
 	MachineID id.ID
 	// Rng is the random number generator to use in configuration randomisation.
@@ -102,20 +69,22 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Configu
 	}
 
 	nenabled := resolveDisabled(cfgs)
-	OnCompilerPlanStart(nenabled, c.Observers...)
+	compiler.OnCompilerConfigStart(nenabled, c.Observers...)
 
 	cmps := make(map[string]compiler.Configuration, len(cfgs))
+	i := 0
 	for n, cfg := range cfgs {
 		nc, err := c.maybePlanCompiler(cmps, n, cfg)
 		if err != nil {
 			return nil, err
 		}
 		if nc != nil {
-			OnCompilerPlan(*nc, c.Observers...)
+			compiler.OnCompilerConfigStep(i, *nc, c.Observers...)
 		}
+		i++
 	}
 
-	OnCompilerPlanFinish(c.Observers...)
+	compiler.OnCompilerConfigEnd(c.Observers...)
 
 	return cmps, nil
 }

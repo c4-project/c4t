@@ -8,6 +8,7 @@ package singleobs
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -35,18 +36,19 @@ func (p *Bar) OnBuild(m builder.Message) {
 }
 
 // OnCompilerPlanStart observes the start of a compiler plan using a progress bar.
-func (p *Bar) OnCompilerPlanStart(ncompilers int) {
-	p.start(ncompilers)
+func (p *Bar) OnCompilerConfig(m compiler.Message) {
+	p.onBatch(m.Batch)
 }
 
-// OnCompilerPlan observes a step of a compiler plan using a progress bar.
-func (p *Bar) OnCompilerPlan(compiler.Named) {
-	p.step()
-}
-
-// OnCompilerPlanFinish observes the end of a compiler plan using a progress bar.
-func (p *Bar) OnCompilerPlanFinish() {
-	p.finish()
+func (p *Bar) onBatch(m observing.Batch) {
+	switch m.Kind {
+	case observing.BatchStart:
+		p.start(m.Num)
+	case observing.BatchStep:
+		p.step()
+	case observing.BatchEnd:
+		p.finish()
+	}
 }
 
 // OnCopyStart observes the start of a file copy using a progress bar.

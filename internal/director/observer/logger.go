@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/observing"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
@@ -26,7 +28,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 )
 
-// Logger is a director observer that emits logs to a writer when runs finish up.
+// TODO(@MattWindsor91): merge this with the singleobs logger?
+
+// Logger is a director observer that emits logs to a writer when cycles finish up.
 type Logger struct {
 	// out is the writer to use for logging analyses.
 	// It will be closed by the director.
@@ -161,17 +165,28 @@ type archiveMessage struct {
 	body saver.ArchiveMessage
 }
 
-func (l *InstanceLogger) OnCompilerPlanStart(ncompilers int) {
+func (l *InstanceLogger) OnCompilerConfig(m compiler.Message) {
+	switch m.Kind {
+	case observing.BatchStart:
+		l.onCompilerPlanStart(m.Num)
+	case observing.BatchStep:
+		l.onCompilerPlan(*m.Configuration)
+	case observing.BatchEnd:
+		l.onCompilerPlanFinish()
+	}
+}
+
+func (l *InstanceLogger) onCompilerPlanStart(ncompilers int) {
 	l.compilers = make([]compiler.Named, ncompilers)
 	l.icompiler = 0
 }
 
-func (l *InstanceLogger) OnCompilerPlan(c compiler.Named) {
+func (l *InstanceLogger) onCompilerPlan(c compiler.Named) {
 	l.compilers[l.icompiler] = c
 	l.icompiler++
 }
 
-func (l *InstanceLogger) OnCompilerPlanFinish() {
+func (l *InstanceLogger) onCompilerPlanFinish() {
 	select {
 	case <-l.done:
 	case l.compCh <- l.makeCompilerSet():

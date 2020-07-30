@@ -11,7 +11,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner/mocks"
+	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/1set/gut/ystring"
 
@@ -26,6 +26,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/mocks"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 	"github.com/stretchr/testify/mock"
 )
@@ -35,7 +36,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	var (
 		mi mockInspector
 		ml mockCompilerLister
-		mo mocks.CompilerObserver
+		mo mocks.Observer
 	)
 
 	rng := rand.New(rand.NewSource(0))
@@ -97,10 +98,6 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	}
 
 	ml.On("ListCompilers", ctx, mid).Return(cfgs, nil).Once()
-
-	mo.On("OnCompilerPlanStart", ncfgs-1).Return().Once()
-	mo.On("OnCompilerPlanFinish").Return().Once()
-
 	mi.On("DefaultMOpts", mock.Anything).Return(dms, nil).Times(ncfgs - 1)
 	mi.On("DefaultOptLevels", mock.Anything).Return(dls, nil).Times(ncfgs - 1)
 	mi.On("OptLevels", mock.Anything).Return(ols, nil).Times(ncfgs - 1)
@@ -108,16 +105,22 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	keys, _ := stringhelp.MapKeys(cfgs)
 	sort.Strings(keys)
 
-	mo.On("OnCompilerPlan", mock.MatchedBy(func(c compiler.Named) bool {
-		cs := c.ID.String()
+	mockOnCompilerConfig(&mo, observing.BatchStart, func(n int, _ *compiler.Named) bool {
+		return n == ncfgs-1
+	}).Return().Once()
+	mockOnCompilerConfig(&mo, observing.BatchStep, func(_ int, nc *compiler.Named) bool {
+		cs := nc.ID.String()
 		i := sort.SearchStrings(keys, cs)
-		return i < ncfgs && keys[i] == cs && !c.Disabled
-	})).Return().Times(ncfgs - 1)
+		return i < ncfgs && keys[i] == cs && !nc.Disabled
+	}).Return().Times(ncfgs - 1)
+	mockOnCompilerConfig(&mo, observing.BatchEnd, func(int, *compiler.Named) bool {
+		return true
+	}).Return().Once()
 
 	cp := planner.CompilerPlanner{
 		Lister:    &ml,
 		Inspector: &mi,
-		Observers: []planner.CompilerObserver{&mo},
+		Observers: []compiler.Observer{&mo},
 		MachineID: mid,
 		Rng:       rng,
 	}
@@ -140,6 +143,15 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 		}
 		assert.Falsef(t, c.Disabled, "picked up disabled compiler %s", n)
 	}
+}
+
+func mockOnCompilerConfig(mo *mocks.Observer, kind observing.BatchKind, f func(int, *compiler.Named) bool) *mock.Call {
+	return mo.On("OnCompilerConfig", mock.MatchedBy(func(m compiler.Message) bool {
+		if m.Kind != kind {
+			return false
+		}
+		return f(m.Num, m.Configuration)
+	}))
 }
 
 func checkSelection(t *testing.T, ty, n, chosen string, defaults []string, sel *optlevel.Selection) {

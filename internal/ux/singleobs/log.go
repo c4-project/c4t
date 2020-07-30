@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/observing"
+
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
 	"github.com/1set/gut/ystring"
@@ -41,13 +43,23 @@ func (l *Logger) onBuildRequest(r *builder.Request) {
 // OnBuildFinish does nothing.
 func (l *Logger) OnBuildFinish() {}
 
-// OnCompilerPlanStart briefly logs a compiler start.
-func (l *Logger) OnCompilerPlanStart(ncompilers int) {
+// OnCompilerConfig logs compiler config messages.
+func (l *Logger) OnCompilerConfig(m compiler.Message) {
+	switch m.Kind {
+	case observing.BatchStart:
+		l.onCompilerPlanStart(m.Num)
+	case observing.BatchStep:
+		l.onCompilerPlan(*m.Configuration)
+	}
+}
+
+// onCompilerPlanStart briefly logs a compiler start.
+func (l *Logger) onCompilerPlanStart(ncompilers int) {
 	(*log.Logger)(l).Printf("planning %d compiler(s)...\n", ncompilers)
 }
 
-// OnCompilerPlan does nothing.
-func (l *Logger) OnCompilerPlan(nc compiler.Named) {
+// onCompilerPlan logs a compiler plan.
+func (l *Logger) onCompilerPlan(nc compiler.Named) {
 	(*log.Logger)(l).Printf("compiler %s:\n", nc.ID)
 	if nc.SelectedOpt != nil {
 		(*log.Logger)(l).Printf(" - opt: %q:\n", nc.SelectedOpt.Name)
@@ -57,10 +69,7 @@ func (l *Logger) OnCompilerPlan(nc compiler.Named) {
 	}
 }
 
-// OnCompilerPlanFinish does nothing.
-func (l *Logger) OnCompilerPlanFinish() {}
-
-// OnCompilerPlanStart briefly logs a file-copy start.
+// OnCopyStart briefly logs a file-copy start.
 func (l *Logger) OnCopyStart(nfiles int) {
 	(*log.Logger)(l).Printf("copying %d files...\n", nfiles)
 }

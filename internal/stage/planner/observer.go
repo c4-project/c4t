@@ -6,18 +6,15 @@
 package planner
 
 import (
-	"errors"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
 
-// ErrObserverNil is the error raised when any of the Observe*With functions receive a nil observer.
-var ErrObserverNil = errors.New("observer nil")
-
 // Observer groups all of the disparate observer interfaces that make up an ObserverSet.
 // Its main purpose is to let all of those interfaces be implemented by one slice.
 type Observer interface {
-	CompilerObserver
+	compiler.Observer
 	builder.Observer
 }
 
@@ -27,29 +24,21 @@ type ObserverSet struct {
 	Corpus []builder.Observer
 
 	// Compiler contains the compiler observers to be used when configuring the compilers to test.
-	Compiler []CompilerObserver
+	Compiler []compiler.Observer
 }
 
 // AddCorpus adds corpus observers to the observer set.
 func (s *ObserverSet) AddCorpus(obs ...builder.Observer) error {
-	for _, o := range obs {
-		if o == nil {
-			return ErrObserverNil
-		}
-	}
-	s.Corpus = append(s.Corpus, obs...)
-	return nil
+	var err error
+	s.Corpus, err = builder.AppendObservers(s.Corpus, obs...)
+	return err
 }
 
 // AddCompiler adds corpus observers to the observer set.
-func (s *ObserverSet) AddCompiler(obs ...CompilerObserver) error {
-	for _, o := range obs {
-		if o == nil {
-			return ErrObserverNil
-		}
-	}
-	s.Compiler = append(s.Compiler, obs...)
-	return nil
+func (s *ObserverSet) AddCompiler(obs ...compiler.Observer) error {
+	var err error
+	s.Compiler, err = compiler.AppendObservers(s.Compiler, obs...)
+	return err
 }
 
 // Add adds observers to the observer set.
