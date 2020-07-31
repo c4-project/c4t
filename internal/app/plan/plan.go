@@ -19,7 +19,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
@@ -108,10 +107,9 @@ func makePlanner(ctx *c.Context, errw io.Writer) (*planner.Planner, error) {
 
 func source(a *act.Runner, cfg *config.Config) planner.Source {
 	return planner.Source{
-		BProbe:     cfg,
-		CLister:    cfg.Machines,
-		CInspector: &compiler.CResolve,
-		SProbe:     a,
+		BProbe:  cfg,
+		CLister: cfg.Machines,
+		SProbe:  a,
 	}
 }
 

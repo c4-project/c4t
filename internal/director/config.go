@@ -9,6 +9,9 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/1set/gut/ystring"
@@ -131,6 +134,9 @@ type Env struct {
 	// Lifter is a single-shot recipe lifter.
 	Lifter lifter.SingleLifter
 
+	// CInspector is the compiler inspector used for perturbing compiler optimisation levels.
+	CInspector compiler.Inspector
+
 	// Planner instructs any planners built for this director as to how to acquire information about compilers, etc.
 	Planner planner.Source
 }
@@ -142,6 +148,9 @@ func (e Env) Check() error {
 	}
 	if e.Lifter == nil {
 		return lifter.ErrDriverNil
+	}
+	if e.CInspector == nil {
+		return perturber.ErrCInspectorNil
 	}
 	return e.Planner.Check()
 }

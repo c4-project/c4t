@@ -237,13 +237,13 @@ func makeObservers(cfg *config.Config, args args) ([]observer.Observer, io.Write
 
 func makeEnv(a *act.Runner, c *config.Config) director.Env {
 	return director.Env{
-		Fuzzer: a,
-		Lifter: &backend.BResolve,
+		Fuzzer:     a,
+		Lifter:     &backend.BResolve,
+		CInspector: &compiler.CResolve,
 		Planner: planner.Source{
-			BProbe:     c,
-			CLister:    c.Machines,
-			CInspector: &compiler.CResolve,
-			SProbe:     a,
+			BProbe:  c,
+			CLister: c.Machines,
+			SProbe:  a,
 		},
 	}
 }

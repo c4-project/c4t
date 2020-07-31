@@ -253,7 +253,7 @@ func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error)
 
 func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber, error) {
 	return perturber.New(
-		i.Env.Planner.CInspector,
+		i.Env.CInspector,
 		perturber.ObserveWith(obs...),
 		perturber.OverrideQuantities(i.Quantities.Perturb),
 	)
