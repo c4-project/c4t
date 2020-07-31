@@ -30,7 +30,8 @@ func ExampleTimeoutOrFirstError() {
 	fmt.Println("TimeoutOrFirstError(ok ctx) ==", errhelp.TimeoutOrFirstError(ctx))
 	fmt.Println("TimeoutOrFirstError(ok ctx, x, y) ==", errhelp.TimeoutOrFirstError(ctx, errors.New("x"), errors.New("y")))
 
-	tctx, _ := context.WithTimeout(ctx, 0)
+	tctx, cf := context.WithTimeout(ctx, 0)
+	defer cf()
 	fmt.Println("TimeoutOrFirstError(t/o ctx) ==", errhelp.TimeoutOrFirstError(tctx))
 	fmt.Println("TimeoutOrFirstError(t/o ctx, x, y) ==", errhelp.TimeoutOrFirstError(tctx, errors.New("x"), errors.New("y")))
 

@@ -18,8 +18,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
 )
 
-// ExampleQuantitySet_Log is a testable example for Log.
-func ExampleQuantitySet_Log() {
+// ExampleSet_Log is a testable example for Log.
+func ExampleSet_Log() {
 	qs := quantity.Set{
 		Compiler: quantity.SingleSet{
 			Timeout:  timeout.Timeout(1 * time.Minute),
@@ -43,8 +43,8 @@ func ExampleQuantitySet_Log() {
 	// timeout at 2m0s
 }
 
-// TestQuantitySet_Override tests Override against some cases.
-func TestQuantitySet_Override(t *testing.T) {
+// TestSet_Override tests Override against some cases.
+func TestSet_Override(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
