@@ -7,7 +7,6 @@ package planner
 
 import (
 	"context"
-	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 
@@ -26,7 +25,7 @@ type SubjectProber interface {
 	ProbeSubject(ctx context.Context, litmus string) (*subject.Named, error)
 }
 
-func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, pn *plan.Plan) error {
+func (p *Planner) planCorpus(ctx context.Context, pn *plan.Plan) error {
 	files, err := expandFiles(p.fs)
 	if err != nil {
 		return err
@@ -35,7 +34,6 @@ func (p *Planner) planCorpus(ctx context.Context, rng *rand.Rand, pn *plan.Plan)
 		Files:      files,
 		Prober:     p.source.SProbe,
 		Observers:  p.observers.Corpus,
-		Rng:        rng,
 		Quantities: p.quantities,
 	}
 	pn.Corpus, err = c.Plan(ctx)
@@ -50,8 +48,6 @@ type CorpusPlanner struct {
 	Observers []builder.Observer
 	// Prober tells the planner how to probe corpus files for specific information.
 	Prober SubjectProber
-	// Rng is the random number generator to use in corpus sampling.
-	Rng *rand.Rand
 	// Quantities contains the target size and worker count of the corpus.
 	Quantities QuantitySet
 }
@@ -59,16 +55,6 @@ type CorpusPlanner struct {
 // Plan probes each subject in this planner's corpus file list, producing a Corpus proper.
 // It does not sample; sampling is left to the perturb stage.
 func (p *CorpusPlanner) Plan(ctx context.Context) (corpus.Corpus, error) {
-	probed, err := p.probe(ctx)
-	if err != nil {
-		return corpus.Corpus{}, err
-	}
-
-	return p.sample(probed)
-}
-
-// probe probes each subject in this planner's corpus file list, producing a Corpus proper.
-func (p *CorpusPlanner) probe(ctx context.Context) (corpus.Corpus, error) {
 	cfg := p.makeBuilderConfig()
 	// TODO(@MattWindsor91): perform corpus pruning
 	return builder.ParBuild(ctx, p.Quantities.NWorkers, corpus.New(p.Files...), cfg,
@@ -127,8 +113,4 @@ func (p *CorpusPlanner) probeSubject(ctx context.Context, f string, ch chan<- bu
 		return err
 	}
 	return builder.AddRequest(s).SendTo(ctx, ch)
-}
-
-func (p *CorpusPlanner) sample(c corpus.Corpus) (corpus.Corpus, error) {
-	return c.Sample(p.Rng, p.Quantities.CorpusSize)
 }

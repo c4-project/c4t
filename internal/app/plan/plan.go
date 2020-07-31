@@ -27,13 +27,6 @@ import (
 )
 
 const (
-	envSeed         = "ACT_SEED"
-	flagSeed        = "seed"
-	flagSeedShort   = "s"
-	usageSeed       = "`seed` to use for any randomised components of this test plan; -1 uses run time as seed"
-	flagCorpusSize  = "corpus-size"
-	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
-		"if positive, the planner will use all viable provided corpus files"
 	usageMach = "ID of machine to use for this test plan"
 
 	flagCompilerFilter  = "filter-compiler"
@@ -56,13 +49,6 @@ func App(outw, errw io.Writer) *c.App {
 func flags() []c.Flag {
 	ownFlags := []c.Flag{
 		stdflag.ConfFileCliFlag(),
-		&c.Int64Flag{
-			Name:    flagSeed,
-			Aliases: []string{flagSeedShort},
-			EnvVars: []string{envSeed},
-			Usage:   usageSeed,
-			Value:   plan.UseDateSeed,
-		},
 		&c.StringFlag{
 			Name:  stdflag.FlagMachine,
 			Usage: usageMach,
@@ -70,11 +56,6 @@ func flags() []c.Flag {
 		&c.StringFlag{
 			Name:  flagCompilerFilter,
 			Usage: usageCompilerFilter,
-		},
-		&c.IntFlag{
-			Name:    flagCorpusSize,
-			Aliases: []string{stdflag.FlagNum},
-			Usage:   usageCorpusSize,
 		},
 		stdflag.WorkerCountCliFlag(),
 	}
@@ -123,7 +104,6 @@ func makePlanner(ctx *c.Context, errw io.Writer) (*planner.Planner, error) {
 		planner.ObserveWith(singleobs.Planner(l)...),
 		planner.OverrideQuantities(qs),
 		planner.FilterCompilers(ctx.String(flagCompilerFilter)),
-		planner.UseSeed(ctx.Int64(flagSeed)),
 	)
 }
 
@@ -138,8 +118,7 @@ func source(a *act.Runner, cfg *config.Config) planner.Source {
 
 func quantities(ctx *c.Context) planner.QuantitySet {
 	return planner.QuantitySet{
-		CorpusSize: ctx.Int(flagCorpusSize),
-		NWorkers:   stdflag.WorkerCountFromCli(ctx),
+		NWorkers: stdflag.WorkerCountFromCli(ctx),
 	}
 }
 

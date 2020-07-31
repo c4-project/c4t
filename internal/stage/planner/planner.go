@@ -33,9 +33,10 @@ type Planner struct {
 	observers ObserverSet
 	// quantities contains quantity information for this planner.
 	quantities QuantitySet
-	fs         []string
-	mach       machine.Named
-	seed       int64
+	// fs is the set of input corpus files to use for this planner.
+	fs []string
+	// mach is the machine to use for this planner.
+	mach machine.Named
 }
 
 // New constructs a new planner with the given config, machine information, files, and options.
@@ -52,7 +53,6 @@ func New(src Source, mach machine.Named, fs []string, opts ...Option) (*Planner,
 		source: src,
 		fs:     fs,
 		mach:   mach,
-		seed:   plan.UseDateSeed,
 	}
 	if err := Options(opts...)(p); err != nil {
 		return nil, err
@@ -67,10 +67,8 @@ func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 }
 
 func (p *Planner) planInner(ctx context.Context, pn *plan.Plan) (*plan.Plan, error) {
-	hd := plan.NewMetadata(p.seed)
+	hd := plan.NewMetadata(0)
 	pn.Metadata = *hd
-
-	rng := hd.Rand()
 
 	p.l.Println("Planning backend...")
 	if err := p.planBackend(ctx, pn); err != nil {
@@ -78,12 +76,12 @@ func (p *Planner) planInner(ctx context.Context, pn *plan.Plan) (*plan.Plan, err
 	}
 
 	p.l.Println("Planning compilers...")
-	if err := p.planCompilers(ctx, rng, pn); err != nil {
+	if err := p.planCompilers(ctx, pn); err != nil {
 		return nil, err
 	}
 
 	p.l.Println("Planning corpus...")
-	if err := p.planCorpus(ctx, rng, pn); err != nil {
+	if err := p.planCorpus(ctx, pn); err != nil {
 		return nil, err
 	}
 

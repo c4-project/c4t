@@ -7,7 +7,6 @@ package planner_test
 
 import (
 	"context"
-	"math/rand"
 	"sort"
 	"testing"
 
@@ -34,12 +33,10 @@ import (
 // TestCompilerPlanner_Plan tests the happy path of a compiler planner using copious amounts of mocking.
 func TestCompilerPlanner_Plan(t *testing.T) {
 	var (
-		mi mockInspector
 		ml mockCompilerLister
 		mo mocks.Observer
 	)
 
-	rng := rand.New(rand.NewSource(0))
 	ctx := context.Background()
 	mid := id.FromString("localhost")
 
@@ -74,33 +71,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	dls := stringhelp.NewSet("0", "2", "fast")
 	dms := stringhelp.NewSet("march=armv7-a")
 
-	ols := map[string]optlevel.Level{
-		"0": {
-			Optimises:       false,
-			Bias:            optlevel.BiasDebug,
-			BreaksStandards: false,
-		},
-		"1": {
-			Optimises:       true,
-			Bias:            optlevel.BiasSize,
-			BreaksStandards: false,
-		},
-		"2": {
-			Optimises:       true,
-			Bias:            optlevel.BiasSpeed,
-			BreaksStandards: false,
-		},
-		"fast": {
-			Optimises:       true,
-			Bias:            optlevel.BiasSpeed,
-			BreaksStandards: true,
-		},
-	}
-
 	ml.On("ListCompilers", ctx, mid).Return(cfgs, nil).Once()
-	mi.On("DefaultMOpts", mock.Anything).Return(dms, nil).Times(ncfgs - 1)
-	mi.On("DefaultOptLevels", mock.Anything).Return(dls, nil).Times(ncfgs - 1)
-	mi.On("OptLevels", mock.Anything).Return(ols, nil).Times(ncfgs - 1)
 
 	keys, _ := stringhelp.MapKeys(cfgs)
 	sort.Strings(keys)
@@ -119,16 +90,13 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 
 	cp := planner.CompilerPlanner{
 		Lister:    &ml,
-		Inspector: &mi,
 		Observers: []compiler.Observer{&mo},
 		MachineID: mid,
-		Rng:       rng,
 	}
 
 	cs, err := cp.Plan(ctx)
 	require.NoError(t, err)
 
-	mi.AssertExpectations(t)
 	ml.AssertExpectations(t)
 	mo.AssertExpectations(t)
 
@@ -174,27 +142,4 @@ type mockCompilerLister struct {
 func (m *mockCompilerLister) ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error) {
 	args := m.Called(ctx, mid)
 	return args.Get(0).(map[string]compiler.Compiler), args.Error(1)
-}
-
-// mockInspector mocks the Inspector interface.
-type mockInspector struct {
-	mock.Mock
-}
-
-// DefaultOptLevels mocks the eponymous interface method.
-func (m *mockInspector) DefaultOptLevels(c *compiler.Compiler) (stringhelp.Set, error) {
-	args := m.Called(c)
-	return args.Get(0).(stringhelp.Set), args.Error(1)
-}
-
-// OptLevels mocks the eponymous interface method.
-func (m *mockInspector) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, error) {
-	args := m.Called(c)
-	return args.Get(0).(map[string]optlevel.Level), args.Error(1)
-}
-
-// DefaultMOpts mocks the eponymous interface method.
-func (m *mockInspector) DefaultMOpts(c *compiler.Compiler) (stringhelp.Set, error) {
-	args := m.Called(c)
-	return args.Get(0).(stringhelp.Set), args.Error(1)
 }

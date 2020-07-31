@@ -8,13 +8,8 @@ package planner
 import (
 	"context"
 	"fmt"
-	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
-
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
@@ -31,26 +26,20 @@ type CompilerLister interface {
 type CompilerPlanner struct {
 	// Lister lists the available compilers.
 	Lister CompilerLister
-	// Inspector resolves configuration pertaining to a particular compiler.
-	Inspector compiler.Inspector
 	// Filter is the filtering glob to use on compiler names.
 	Filter id.ID
 	// Observers contains observers for the CompilerPlanner.
 	Observers []compiler.Observer
 	// MachineID is the identifier of the machine for which we are making a plan.
 	MachineID id.ID
-	// Rng is the random number generator to use in configuration randomisation.
-	Rng *rand.Rand
 }
 
-func (p *Planner) planCompilers(ctx context.Context, rng *rand.Rand, pn *plan.Plan) error {
+func (p *Planner) planCompilers(ctx context.Context, pn *plan.Plan) error {
 	c := CompilerPlanner{
 		Filter:    id.FromString(p.filter),
 		Lister:    p.source.CLister,
-		Inspector: p.source.CInspector,
 		Observers: p.observers.Compiler,
 		MachineID: pn.Machine.ID,
-		Rng:       rng,
 	}
 	var err error
 	pn.Compilers, err = c.Plan(ctx)
@@ -119,73 +108,8 @@ func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Configurati
 	if err != nil {
 		return nil, fmt.Errorf("%s not a valid ID: %w", n, err)
 	}
-	if into[n], err = c.planCompiler(cfg); err != nil {
-		return nil, fmt.Errorf("planning compiler %s/%s: %w", c.MachineID, n, err)
-	}
 
+	// Everything that used to be here is now in the perturber.
+	into[n] = compiler.Configuration{Compiler: cfg}
 	return into[n].AddName(nid), nil
-}
-
-func (c *CompilerPlanner) planCompiler(cfg compiler.Compiler) (compiler.Configuration, error) {
-	opt, err := c.planCompilerOpt(cfg)
-	if err != nil {
-		return compiler.Configuration{}, nil
-	}
-	mopt, err := c.planCompilerMOpt(cfg)
-	comp := compiler.Configuration{
-		SelectedOpt:  opt,
-		SelectedMOpt: mopt,
-		Compiler:     cfg,
-	}
-	return comp, err
-}
-
-func (c *CompilerPlanner) planCompilerOpt(cfg compiler.Compiler) (*optlevel.Named, error) {
-	opts, err := compiler.SelectLevels(c.Inspector, &cfg)
-	if err != nil {
-		return nil, err
-	}
-	names, err := stringhelp.MapKeys(opts)
-	if err != nil {
-		return nil, err
-	}
-	return c.chooseOpt(opts, names), err
-}
-
-func (c *CompilerPlanner) planCompilerMOpt(cfg compiler.Compiler) (string, error) {
-	mopts, err := compiler.SelectMOpts(c.Inspector, &cfg)
-	if err != nil {
-		return "", err
-	}
-	return c.chooseMOpt(mopts), err
-}
-
-func (c *CompilerPlanner) chooseOpt(opts map[string]optlevel.Level, names []string) *optlevel.Named {
-	// Don't bother trying to select an optimisation if there aren't any
-	if len(opts) == 0 {
-		return nil
-	}
-
-	// The idea here is that we're giving 'don't choose an optimisation' - index -1 - an equal chance.
-	i := c.Rng.Intn(len(opts)+1) - 1
-	if i < 0 {
-		return nil
-	}
-
-	name := names[i]
-	return &optlevel.Named{Name: name, Level: opts[name]}
-
-}
-
-func (c *CompilerPlanner) chooseMOpt(opts stringhelp.Set) string {
-	// Don't bother trying to select an mopt if there aren't any
-	// TODO(@MattWindsor91): should this be an error?
-	nopts := len(opts)
-	if nopts == 0 {
-		return ""
-	}
-	// 'don't choose an mopt' - the empty string, may or may not be a valid choice, so we don't factor it in here.
-	optsl := opts.Slice()
-	i := c.Rng.Intn(nopts)
-	return optsl[i]
 }

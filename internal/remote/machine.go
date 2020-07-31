@@ -73,11 +73,14 @@ func (m *MachineConfig) MachineRunner(c *Config) (*MachineRunner, error) {
 }
 
 func (m *MachineConfig) hostPort() string {
-	p := m.Port
-	if p == 0 {
-		p = 22
+	return fmt.Sprintf("%s:%d", m.Host, m.portOrDefault())
+}
+
+func (m *MachineConfig) portOrDefault() int {
+	if m.Port == 0 {
+		return 22
 	}
-	return fmt.Sprintf("%s:%d", m.Host, p)
+	return m.Port
 }
 
 // clientConfig gets the SSH config for this machine, given the global configuration c.

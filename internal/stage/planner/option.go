@@ -49,15 +49,6 @@ func LogWith(l *log.Logger) Option {
 	}
 }
 
-// UseSeed overrides the seed used by the planner.
-// If seed is UseDateSeed, a date-specific seed is generated at runtime.
-func UseSeed(seed int64) Option {
-	return func(p *Planner) error {
-		p.seed = seed
-		return nil
-	}
-}
-
 // FilterCompilers sets the glob used for filtering compilers.
 func FilterCompilers(filter string) Option {
 	return func(p *Planner) error {

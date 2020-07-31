@@ -8,10 +8,11 @@ package planner_test
 import (
 	"context"
 	"errors"
-	"math/rand"
 	"sort"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
@@ -43,13 +44,9 @@ func TestCorpusPlanner_Plan(t *testing.T) {
 	tp := TestProber{}
 	p := makeCorpusPlanner(&tp)
 	c, err := p.Plan(context.Background())
-	if err != nil {
-		t.Fatal("unexpected error in Plan:", err)
-	}
+	require.NoError(t, err, "unexpected error in Plan")
 
-	if len(c) != p.Quantities.CorpusSize {
-		t.Fatalf("corpus size mismatch: got=%d, want=%d", len(c), p.Quantities.CorpusSize)
-	}
+	require.Len(t, c, len(p.Files), "corpus size mismatch")
 
 	for n, s := range c {
 		f := n + ".litmus"
@@ -78,16 +75,12 @@ func TestCorpusPlanner_Plan_ProbeError(t *testing.T) {
 
 // makeCorpusPlanner builds a test CorpusPlanner using tp as the prober.
 func makeCorpusPlanner(tp *TestProber) *planner.CorpusPlanner {
-	r := rand.New(rand.NewSource(0))
 	in := []string{"foo.litmus", "bar.litmus", "baz.litmus", "foobar.litmus", "foobaz.litmus", "barbaz.litmus"}
 	sort.Strings(in)
 	return &planner.CorpusPlanner{
 		Files:  in,
 		Prober: tp,
-		Rng:    r,
 		Quantities: planner.QuantitySet{
-			// This should enforce a degree of sampling.
-			CorpusSize: len(in) / 2,
 			// This should enforce a degree of parallelism.
 			NWorkers: len(in) / 2,
 		},
