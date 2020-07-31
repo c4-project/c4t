@@ -128,11 +128,9 @@ func (d *Director) plan(ctx context.Context) (map[string]plan.Plan, error) {
 }
 
 func (d *Director) makePlanner() (*planner.Planner, error) {
-	obs := singleobs.Planner(d.l)
-	// TODO(@MattWindsor91): move planner config outside of instance
 	return planner.New(
 		d.env.Planner,
-		planner.ObserveWith(obs...),
+		planner.ObserveWith(singleobs.Planner(d.l)...),
 		planner.OverrideQuantities(d.quantities.Plan),
 	)
 }
