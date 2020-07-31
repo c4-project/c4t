@@ -11,6 +11,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -42,6 +43,9 @@ func (p *Bar) OnCopy(m copy2.Message) {
 
 // OnPerturb does nothing.
 func (p *Bar) OnPerturb(perturber.Message) {}
+
+// OnPlan does nothing.
+func (p *Bar) OnPlan(planner.Message) {}
 
 func (p *Bar) onBatch(m observing.Batch) {
 	switch m.Kind {

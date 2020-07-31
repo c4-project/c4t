@@ -94,13 +94,12 @@ func makePlanner(ctx *c.Context, errw io.Writer) (*planner.Planner, error) {
 		return nil, err
 	}
 
-	l := log.New(errw, "", 0)
+	l := log.New(errw, "[planner] ", log.LstdFlags)
 
 	return planner.New(
 		src,
 		mach,
 		fs,
-		planner.LogWith(l),
 		planner.ObserveWith(singleobs.Planner(l)...),
 		planner.OverrideQuantities(qs),
 		planner.FilterCompilers(ctx.String(flagCompilerFilter)),

@@ -10,6 +10,8 @@ import (
 	"context"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
@@ -59,6 +61,9 @@ type Instance interface {
 	// Instance observers can observe plan saves.
 	saver.Observer
 
+	// Instance observers can observe perturber operations.
+	perturber.Observer
+
 	// Instance observers can observe planner operations.
 	planner.Observer
 
@@ -85,6 +90,15 @@ func LowerToMachine(obs []Observer) []machine.Observer {
 // LowerToAnalyser lowers a slice of instance observers to a slice of analyser observers.
 func LowerToAnalyser(obs []Instance) []analyser.Observer {
 	cos := make([]analyser.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
+}
+
+// LowerToPerturber lowers a slice of instance observers to a slice of perturber observers.
+func LowerToPerturber(obs []Instance) []perturber.Observer {
+	cos := make([]perturber.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}

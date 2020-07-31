@@ -38,7 +38,7 @@ func (p *Planner) planCompilers(ctx context.Context, pn *plan.Plan) error {
 	c := CompilerPlanner{
 		Filter:    id.FromString(p.filter),
 		Lister:    p.source.CLister,
-		Observers: p.observers.Compiler,
+		Observers: lowerToCompiler(p.observers),
 		MachineID: pn.Machine.ID,
 	}
 	var err error

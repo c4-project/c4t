@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
@@ -95,5 +97,20 @@ func (l *Logger) OnPerturb(m perturber.Message) {
 		(*log.Logger)(l).Printf("- randomising compiler options...\n")
 	case perturber.KindSamplingCorpus:
 		(*log.Logger)(l).Printf("- sampling corpus...\n")
+	}
+}
+
+// OnPlan logs plan messages.
+func (l *Logger) OnPlan(m planner.Message) {
+	switch m.Kind {
+	case planner.KindStart:
+		(*log.Logger)(l).Printf("planning...\n")
+		m.Quantities.Log((*log.Logger)(l))
+	case planner.KindPlanningBackend:
+		(*log.Logger)(l).Printf("- probing backend...\n")
+	case planner.KindPlanningCompilers:
+		(*log.Logger)(l).Printf("- probing compilers on machine %s...\n", m.MachineID)
+	case planner.KindPlanningCorpus:
+		(*log.Logger)(l).Printf("- probing corpus...\n")
 	}
 }

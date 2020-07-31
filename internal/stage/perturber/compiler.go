@@ -6,7 +6,6 @@
 package perturber
 
 import (
-	"context"
 	"fmt"
 	"math/rand"
 
@@ -20,12 +19,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
-
-// CompilerLister is the interface of things that can query compiler information.
-type CompilerLister interface {
-	// ListCompilers asks the compiler inspector to list all available compilers on machine ID mid.
-	ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error)
-}
 
 // CompilerPerturber contains the state necessary to make up the compiler part of a test plan.
 type CompilerPerturber struct {

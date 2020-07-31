@@ -11,6 +11,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
 
@@ -197,6 +199,12 @@ func (o *Observer) OnCopy(m copy2.Message) {
 		o.action.OnCopyFinish()
 	}
 }
+
+// OnPlan does nothing, at the moment.
+func (o *Observer) OnPlan(planner.Message) {}
+
+// OnPerturb does nothing, at the moment.
+func (o *Observer) OnPerturb(perturber.Message) {}
 
 func (o *Observer) logError(err error) {
 	// For want of better location.

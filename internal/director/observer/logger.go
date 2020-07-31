@@ -10,6 +10,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/observing"
@@ -232,6 +236,12 @@ func (l *InstanceLogger) addSource(c analyser.Analysis) analyser.AnalysisWithRun
 		Analysis: c,
 	}
 }
+
+// OnPerturb does nothing, at the moment.
+func (l *InstanceLogger) OnPerturb(perturber.Message) {}
+
+// OnPlan does nothing, at the moment.
+func (l *InstanceLogger) OnPlan(planner.Message) {}
 
 // OnBuild does nothing.
 func (l *InstanceLogger) OnBuild(builder.Message) {}

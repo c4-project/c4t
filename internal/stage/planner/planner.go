@@ -8,13 +8,10 @@ package planner
 
 import (
 	"context"
-	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
@@ -27,10 +24,8 @@ type Planner struct {
 	source Source
 	// filter is the compiler filter to use to select compilers to test.
 	filter string
-	// l is the logger used by the planner.
-	l *log.Logger
 	// observers contains the set of observers used to get feedback on the planning action as it completes.
-	observers ObserverSet
+	observers []Observer
 	// quantities contains quantity information for this planner.
 	quantities QuantitySet
 	// fs is the set of input corpus files to use for this planner.
@@ -54,11 +49,8 @@ func New(src Source, mach machine.Named, fs []string, opts ...Option) (*Planner,
 		fs:     fs,
 		mach:   mach,
 	}
-	if err := Options(opts...)(p); err != nil {
-		return nil, err
-	}
-	p.l = iohelp.EnsureLog(p.l)
-	return p, nil
+	err := Options(opts...)(p)
+	return p, err
 }
 
 // Plan runs the test planner p.
@@ -67,23 +59,29 @@ func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
 }
 
 func (p *Planner) planInner(ctx context.Context, pn *plan.Plan) (*plan.Plan, error) {
+	p.announce(Message{Kind: KindStart, Quantities: &p.quantities})
+
 	hd := plan.NewMetadata(0)
 	pn.Metadata = *hd
 
-	p.l.Println("Planning backend...")
+	p.announce(Message{Kind: KindPlanningBackend})
 	if err := p.planBackend(ctx, pn); err != nil {
 		return nil, err
 	}
 
-	p.l.Println("Planning compilers...")
+	p.announce(Message{Kind: KindPlanningCompilers, MachineID: p.mach.ID})
 	if err := p.planCompilers(ctx, pn); err != nil {
 		return nil, err
 	}
 
-	p.l.Println("Planning corpus...")
+	p.announce(Message{Kind: KindPlanningCorpus})
 	if err := p.planCorpus(ctx, pn); err != nil {
 		return nil, err
 	}
 
 	return pn, nil
+}
+
+func (p *Planner) announce(m Message) {
+	OnPlan(m, p.observers...)
 }

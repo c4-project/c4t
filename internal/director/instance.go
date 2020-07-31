@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -211,6 +213,9 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Plan, err = i.makePlanner(observer.LowerToPlanner(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
+	if sc.Perturb, err = i.makePerturber(observer.LowerToPerturber(i.Observers)); err != nil {
+		return nil, fmt.Errorf("when making planner: %w", err)
+	}
 	if sc.Fuzz, err = i.makeFuzzer(bobs); err != nil {
 		return nil, fmt.Errorf("when making fuzzer config: %w", err)
 	}
@@ -241,9 +246,16 @@ func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error)
 		i.Env.Planner,
 		i.machineForPlan(),
 		i.InFiles,
-		planner.LogWith(i.Logger),
 		planner.ObserveWith(obs...),
 		planner.OverrideQuantities(i.Quantities.Plan),
+	)
+}
+
+func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber, error) {
+	return perturber.New(
+		i.Env.Planner.CInspector,
+		perturber.ObserveWith(obs...),
+		perturber.OverrideQuantities(i.Quantities.Perturb),
 	)
 }
 

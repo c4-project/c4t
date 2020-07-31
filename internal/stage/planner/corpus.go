@@ -33,7 +33,7 @@ func (p *Planner) planCorpus(ctx context.Context, pn *plan.Plan) error {
 	c := CorpusPlanner{
 		Files:      files,
 		Prober:     p.source.SProbe,
-		Observers:  p.observers.Corpus,
+		Observers:  lowerToBuilder(p.observers),
 		Quantities: p.quantities,
 	}
 	pn.Corpus, err = c.Plan(ctx)

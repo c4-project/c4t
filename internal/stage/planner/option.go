@@ -5,9 +5,7 @@
 
 package planner
 
-import (
-	"log"
-)
+import "github.com/MattWindsor91/act-tester/internal/observing"
 
 // Option is the type of options to the Planner constructor.
 type Option func(*Planner) error
@@ -27,7 +25,11 @@ func Options(opts ...Option) Option {
 // ObserveWith adds each observer in obs to the observer pool.
 func ObserveWith(obs ...Observer) Option {
 	return func(p *Planner) error {
-		return p.observers.Add(obs...)
+		if err := observing.CheckObservers(obs); err != nil {
+			return err
+		}
+		p.observers = append(p.observers, obs...)
+		return nil
 	}
 }
 
@@ -35,16 +37,6 @@ func ObserveWith(obs ...Observer) Option {
 func OverrideQuantities(qs QuantitySet) Option {
 	return func(p *Planner) error {
 		p.quantities.Override(qs)
-		return nil
-	}
-}
-
-// LogWith sets the logger for the planner to l.
-func LogWith(l *log.Logger) Option {
-	// TODO(@MattWindsor91): it goes without saying, but this logger should be replaced with observer calls.
-	return func(p *Planner) error {
-		// EnsureLog is called after all options are parsed.
-		p.l = l
 		return nil
 	}
 }
