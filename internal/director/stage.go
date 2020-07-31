@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
@@ -25,7 +27,10 @@ import (
 // StageConfig groups together the stage configuration for of a director instance.
 type StageConfig struct {
 	// Plan contains configuration for the instance's plan stage.
+	// TODO(@MattWindsor91): remove this
 	Plan *planner.Planner
+	// Perturb contains configuration for the instance's perturb stage.
+	Perturb *perturber.Perturber
 	// Fuzz contains configuration for the instance's fuzz stage.
 	Fuzz *fuzzer.Fuzzer
 	// Lift contains configuration for the instance's lift stage.
@@ -42,6 +47,9 @@ var ErrStageConfigMissing = errors.New("stage config missing")
 func (c *StageConfig) Check() error {
 	if c.Plan == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Plan)
+	}
+	if c.Perturb == nil {
+		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Perturb)
 	}
 	if c.Fuzz == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Fuzz)
@@ -72,6 +80,12 @@ var Stages = []stageRunner{
 		Stage: stage.Plan,
 		Run: func(c *StageConfig, ctx context.Context, _ *plan.Plan) (*plan.Plan, error) {
 			return c.Plan.Plan(ctx)
+		},
+	},
+	{
+		Stage: stage.Perturb,
+		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+			return c.Perturb.Run(ctx, p)
 		},
 	},
 	{
