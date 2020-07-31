@@ -8,7 +8,7 @@ package main
 import (
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/perturb"
+	"github.com/MattWindsor91/act-tester/internal/app/perturb"
 
 	"github.com/MattWindsor91/act-tester/internal/ux"
 )

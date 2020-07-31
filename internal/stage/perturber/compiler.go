@@ -33,17 +33,14 @@ type CompilerPerturber struct {
 	Inspector compiler.Inspector
 	// Observers contains observers for the CompilerPlanner.
 	Observers []compiler.Observer
-	// MachineID is the identifier of the machine for which we are making a plan.
-	MachineID id.ID
 	// Rng is the random number generator to use in configuration randomisation.
 	Rng *rand.Rand
 }
 
 func (p *Perturber) perturbCompilers(rng *rand.Rand, pn *plan.Plan) error {
 	c := CompilerPerturber{
-		Inspector: p.source.CInspector,
+		Inspector: p.ci,
 		Observers: lowerToCompiler(p.observers),
-		MachineID: pn.Machine.ID,
 		Rng:       rng,
 	}
 	var err error
@@ -88,7 +85,7 @@ func (c *CompilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) 
 
 	opt, err := c.perturbCompilerOpt(cmp)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	mopt, err := c.perturbCompilerMOpt(cmp)
 	comp := compiler.Configuration{
@@ -109,7 +106,7 @@ func (c *CompilerPerturber) perturbCompilerOpt(cfg compiler.Compiler) (*optlevel
 	if err != nil {
 		return nil, err
 	}
-	return c.chooseOpt(opts, names), err
+	return c.chooseOpt(opts, names), nil
 }
 
 func (c *CompilerPerturber) perturbCompilerMOpt(cfg compiler.Compiler) (string, error) {
@@ -117,7 +114,7 @@ func (c *CompilerPerturber) perturbCompilerMOpt(cfg compiler.Compiler) (string, 
 	if err != nil {
 		return "", err
 	}
-	return c.chooseMOpt(mopts), err
+	return c.chooseMOpt(mopts), nil
 }
 
 func (c *CompilerPerturber) chooseOpt(opts map[string]optlevel.Level, names []string) *optlevel.Named {

@@ -77,28 +77,22 @@ func makePerturber(ctx *c.Context, errw io.Writer) (*perturber.Perturber, error)
 		return nil, err
 	}
 
-	qs := quantities(ctx)
-	src := source(cfg)
+	qs := quantities(ctx, cfg)
 
 	l := log.New(errw, "[perturb] ", log.LstdFlags)
 
 	return perturber.New(
-		src,
+		&compiler.CResolve,
 		perturber.ObserveWith(singleobs.Perturber(l)...),
 		perturber.OverrideQuantities(qs),
 		perturber.UseSeed(ctx.Int64(flagSeed)),
 	)
 }
 
-func source(cfg *config.Config) perturber.Source {
-	return perturber.Source{
-		CLister:    cfg.Machines,
-		CInspector: &compiler.CResolve,
-	}
-}
-
-func quantities(ctx *c.Context) perturber.QuantitySet {
-	return perturber.QuantitySet{
+func quantities(ctx *c.Context, cfg *config.Config) perturber.QuantitySet {
+	qs := cfg.Quantities.Perturb
+	qs.Override(perturber.QuantitySet{
 		CorpusSize: ctx.Int(flagCorpusSize),
-	}
+	})
+	return qs
 }

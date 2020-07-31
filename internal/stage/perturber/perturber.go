@@ -8,16 +8,22 @@ package perturber
 
 import (
 	"context"
+	"errors"
+
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
+// ErrCInspectorNil occurs if the perturber constructor is passed a nil compiler inspector.
+var ErrCInspectorNil = errors.New("compiler inspector nil")
+
 // Perturber holds all configuration for the test perturber.
 type Perturber struct {
-	// source contains all of the various sources for a Planner's information.
-	source Source
+	// ci contains the inspector used to get possible optimisation levels for compiler randomisation.
+	ci compiler.Inspector
 	// observers contains the set of observers used to get feedback on the planning action as it completes.
 	observers []Observer
 	// quantities contains quantity information for this planner.
@@ -25,15 +31,15 @@ type Perturber struct {
 	seed       int64
 }
 
-// New constructs a new perturber with the given source and options.
-func New(src Source, opts ...Option) (*Perturber, error) {
-	if err := src.Check(); err != nil {
-		return nil, err
+// New constructs a new perturber with the given compiler inspector and options.
+func New(ci compiler.Inspector, opts ...Option) (*Perturber, error) {
+	if ci == nil {
+		return nil, ErrCInspectorNil
 	}
 
 	p := &Perturber{
-		source: src,
-		seed:   plan.UseDateSeed,
+		ci:   ci,
+		seed: plan.UseDateSeed,
 	}
 	if err := Options(opts...)(p); err != nil {
 		return nil, err

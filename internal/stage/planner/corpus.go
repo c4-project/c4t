@@ -56,19 +56,21 @@ type CorpusPlanner struct {
 	Quantities QuantitySet
 }
 
+// Plan probes each subject in this planner's corpus file list, producing a Corpus proper.
+// It does not sample; sampling is left to the perturb stage.
 func (p *CorpusPlanner) Plan(ctx context.Context) (corpus.Corpus, error) {
 	probed, err := p.probe(ctx)
 	if err != nil {
 		return corpus.Corpus{}, err
 	}
 
-	// TODO(@MattWindsor91): perform corpus pruning
 	return p.sample(probed)
 }
 
 // probe probes each subject in this planner's corpus file list, producing a Corpus proper.
 func (p *CorpusPlanner) probe(ctx context.Context) (corpus.Corpus, error) {
 	cfg := p.makeBuilderConfig()
+	// TODO(@MattWindsor91): perform corpus pruning
 	return builder.ParBuild(ctx, p.Quantities.NWorkers, corpus.New(p.Files...), cfg,
 		func(ctx context.Context, named subject.Named, requests chan<- builder.Request) error {
 			// TODO(@MattWindsor91): make it so we don't get the litmus file through the *name* of the subject!

@@ -8,6 +8,8 @@ package config
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
@@ -22,6 +24,8 @@ type QuantitySet struct {
 	Mach quantity.Set `toml:"mach,omitzero"`
 	// Plan is the quantity set for the planner stage.
 	Plan planner.QuantitySet `toml:"plan,omitzero"`
+	// Perturb is the quantity set for the planner stage.
+	Perturb perturber.QuantitySet `toml:"perturb,omitzero"`
 }
 
 // Log logs q to l.
@@ -32,6 +36,8 @@ func (q *QuantitySet) Log(l *log.Logger) {
 	q.Mach.Log(l)
 	l.Println("[Plan]")
 	q.Plan.Log(l)
+	l.Println("[Perturb]")
+	q.Perturb.Log(l)
 }
 
 // Override substitutes any quantities in new that are non-zero for those in this set.
@@ -39,4 +45,5 @@ func (q *QuantitySet) Override(new QuantitySet) {
 	q.Fuzz.Override(new.Fuzz)
 	q.Mach.Override(new.Mach)
 	q.Plan.Override(new.Plan)
+	q.Perturb.Override(new.Perturb)
 }
