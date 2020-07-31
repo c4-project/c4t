@@ -47,7 +47,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
@@ -68,8 +67,8 @@ type Instance struct {
 	// ID is the ID for this machine.
 	ID id.ID
 
-	// InFiles is the list of files to use as the base corpus for this machine loop.
-	InFiles []string
+	// InitialPlan is the plan that is perturbed to form the plan for each test cycle.
+	InitialPlan plan.Plan
 
 	// Env contains the parts of the director's config that tell it how to do various environmental tasks.
 	Env *Env
@@ -169,10 +168,10 @@ func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 
 // iterate performs one iteration of the main testing loop (number iter) for one machine.
 func (i *Instance) iterate(ctx context.Context, iter uint64, sc *StageConfig) error {
-	var (
-		p   *plan.Plan
-		err error
-	)
+	var err error
+
+	pcopy := i.InitialPlan
+	p := &pcopy
 
 	r := run.Run{
 		MachineID: i.ID,
@@ -210,9 +209,6 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 		sc  StageConfig
 	)
 
-	if sc.Plan, err = i.makePlanner(observer.LowerToPlanner(i.Observers)); err != nil {
-		return nil, fmt.Errorf("when making planner: %w", err)
-	}
 	if sc.Perturb, err = i.makePerturber(observer.LowerToPerturber(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
@@ -240,31 +236,12 @@ func (i *Instance) makeAnalyser(aobs []analyser.Observer, sobs []saver.Observer)
 	)
 }
 
-func (i *Instance) makePlanner(obs []planner.Observer) (*planner.Planner, error) {
-	// TODO(@MattWindsor91): move planner config outside of instance
-	return planner.New(
-		i.Env.Planner,
-		i.machineForPlan(),
-		i.InFiles,
-		planner.ObserveWith(obs...),
-		planner.OverrideQuantities(i.Quantities.Plan),
-	)
-}
-
 func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber, error) {
 	return perturber.New(
 		i.Env.CInspector,
 		perturber.ObserveWith(obs...),
 		perturber.OverrideQuantities(i.Quantities.Perturb),
 	)
-}
-
-// machineForPlan massages this instance's machine config into a form with which the planner is comfortable.
-func (i *Instance) machineForPlan() machine.Named {
-	return machine.Named{
-		ID:      i.ID,
-		Machine: i.MachConfig.Machine,
-	}
 }
 
 func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {

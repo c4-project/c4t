@@ -66,7 +66,7 @@ func (p *Plan) RunStage(ctx context.Context, s stage.Stage, f func(context.Conte
 	if err != nil {
 		return nil, err
 	}
-	np.Metadata.ConfirmStage(s, start, time.Now())
+	np.Metadata.ConfirmStage(s, start, time.Since(start))
 	return np, nil
 }
 

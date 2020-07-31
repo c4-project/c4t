@@ -169,7 +169,7 @@ func TestFuzzer_Run_error(t *testing.T) {
 			require.NoError(t, err, "there shouldn't be an error yet!")
 
 			p := makePlan()
-			p.Metadata.ConfirmStage(stage.Plan, time.Now(), time.Now())
+			p.Metadata.ConfirmStage(stage.Plan, time.Now(), 0)
 			if f := c.pdelta; f != nil {
 				p = f(p)
 			}
@@ -197,7 +197,7 @@ func TestFuzzer_Run_nop(t *testing.T) {
 	md.On("DumpStats", mock.Anything, mock.Anything, "fuzz.litmus").Return(nil)
 
 	p := makePlan()
-	p.Metadata.ConfirmStage(stage.Plan, time.Now(), time.Now())
+	p.Metadata.ConfirmStage(stage.Plan, time.Now(), 0)
 
 	p2, err := f.Run(context.Background(), p)
 	require.NoError(t, err, "unexpected error in Run")

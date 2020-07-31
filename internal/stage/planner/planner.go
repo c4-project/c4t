@@ -8,12 +8,14 @@ package planner
 
 import (
 	"context"
+	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
-
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+
+	"github.com/MattWindsor91/act-tester/internal/model/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
@@ -28,57 +30,76 @@ type Planner struct {
 	observers []Observer
 	// quantities contains quantity information for this planner.
 	quantities QuantitySet
-	// fs is the set of input corpus files to use for this planner.
-	fs []string
-	// mach is the machine to use for this planner.
-	mach machine.Named
 }
 
-// New constructs a new planner with the given config, machine information, files, and options.
-func New(src Source, mach machine.Named, fs []string, opts ...Option) (*Planner, error) {
+// New constructs a new planner with the given source and options.
+func New(src Source, opts ...Option) (*Planner, error) {
 	if err := src.Check(); err != nil {
 		return nil, err
-	}
-	// Early out to prevent us from doing any planning if we received no files.
-	if len(fs) == 0 {
-		return nil, corpus.ErrNone
 	}
 
 	p := &Planner{
 		source: src,
-		fs:     fs,
-		mach:   mach,
 	}
 	err := Options(opts...)(p)
 	return p, err
 }
 
 // Plan runs the test planner p.
-func (p *Planner) Plan(ctx context.Context) (*plan.Plan, error) {
-	return (&plan.Plan{Machine: p.mach}).RunStage(ctx, stage.Plan, p.planInner)
-}
+func (p *Planner) Plan(ctx context.Context, ms machine.ConfigMap, fs ...string) (map[string]plan.Plan, error) {
+	// Early out to prevent us from doing any planning if we received no files.
+	if len(fs) == 0 {
+		return nil, corpus.ErrNone
+	}
 
-func (p *Planner) planInner(ctx context.Context, pn *plan.Plan) (*plan.Plan, error) {
+	start := time.Now()
 	p.announce(Message{Kind: KindStart, Quantities: &p.quantities})
 
-	hd := plan.NewMetadata(0)
-	pn.Metadata = *hd
-
-	p.announce(Message{Kind: KindPlanningBackend})
-	if err := p.planBackend(ctx, pn); err != nil {
-		return nil, err
-	}
-
-	p.announce(Message{Kind: KindPlanningCompilers, MachineID: p.mach.ID})
-	if err := p.planCompilers(ctx, pn); err != nil {
-		return nil, err
-	}
+	ps := make(map[string]plan.Plan, len(ms))
 
 	p.announce(Message{Kind: KindPlanningCorpus})
-	if err := p.planCorpus(ctx, pn); err != nil {
+	corp, err := p.planCorpus(ctx, fs...)
+	if err != nil {
 		return nil, err
 	}
 
+	for n, m := range ms {
+		nid, err := id.TryFromString(n)
+		if err != nil {
+			return nil, err
+		}
+		ps[n], err = p.makeMachinePlan(ctx, start, machine.Named{ID: nid, Machine: m.Machine}, corp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ps, nil
+}
+
+func (p *Planner) makeMachinePlan(ctx context.Context, start time.Time, nm machine.Named, corp corpus.Corpus) (plan.Plan, error) {
+
+	var (
+		pn  plan.Plan
+		err error
+	)
+
+	pn.Machine = nm
+	pn.Corpus = corp
+
+	p.announce(Message{Kind: KindPlanningBackend, MachineID: nm.ID})
+	pn.Backend, err = p.planBackend(ctx, nm.ID)
+	if err != nil {
+		return pn, err
+	}
+
+	p.announce(Message{Kind: KindPlanningCompilers, MachineID: nm.ID})
+	pn.Compilers, err = p.planCompilers(ctx, nm.ID)
+	if err != nil {
+		return pn, err
+	}
+
+	pn.Metadata = *plan.NewMetadata(0)
+	pn.Metadata.ConfirmStage(stage.Plan, start, time.Since(start))
 	return pn, nil
 }
 

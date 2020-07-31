@@ -9,8 +9,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
-
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -34,16 +32,14 @@ type CompilerPlanner struct {
 	MachineID id.ID
 }
 
-func (p *Planner) planCompilers(ctx context.Context, pn *plan.Plan) error {
+func (p *Planner) planCompilers(ctx context.Context, nid id.ID) (map[string]compiler.Configuration, error) {
 	c := CompilerPlanner{
 		Filter:    id.FromString(p.filter),
 		Lister:    p.source.CLister,
 		Observers: lowerToCompiler(p.observers),
-		MachineID: pn.Machine.ID,
+		MachineID: nid,
 	}
-	var err error
-	pn.Compilers, err = c.Plan(ctx)
-	return err
+	return c.Plan(ctx)
 }
 
 // Plan constructs the compiler set for a plan.

@@ -15,8 +15,7 @@ import (
 // ExampleNewRecord is a testable example for NewRecord.
 func ExampleNewRecord() {
 	start := time.Date(1997, time.May, 1, 23, 0, 0, 0, time.UTC)
-	end := start.Add(10 * time.Minute)
-	r := stage.NewRecord(stage.Fuzz, start, end)
+	r := stage.NewRecord(stage.Fuzz, start, 10*time.Minute)
 	fmt.Println(r)
 
 	// Output:

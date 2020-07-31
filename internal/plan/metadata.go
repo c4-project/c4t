@@ -59,9 +59,9 @@ func (m *Metadata) CheckVersion() error {
 	return nil
 }
 
-// ConfirmStage adds a stage confirmation for s, which started at start and ended at end, to this metadata.
-func (m *Metadata) ConfirmStage(s stage.Stage, start, end time.Time) {
-	m.Stages = append(m.Stages, stage.NewRecord(s, start, end))
+// ConfirmStage adds a stage confirmation for s, which started at start and lasted for dur, to this metadata.
+func (m *Metadata) ConfirmStage(s stage.Stage, start time.Time, dur time.Duration) {
+	m.Stages = append(m.Stages, stage.NewRecord(s, start, dur))
 }
 
 func (m *Metadata) requireOneStage(s stage.Stage) error {

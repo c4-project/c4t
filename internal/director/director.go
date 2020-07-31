@@ -11,6 +11,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+
+	"github.com/MattWindsor91/act-tester/internal/plan"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/machine"
@@ -97,7 +103,12 @@ func (d *Director) directInner(ctx context.Context) error {
 		return err
 	}
 
-	ms, err := d.makeMachines()
+	pn, err := d.plan(ctx)
+	if err != nil {
+		return err
+	}
+
+	ms, err := d.makeMachines(pn)
 	if err != nil {
 		return err
 	}
@@ -106,6 +117,24 @@ func (d *Director) directInner(ctx context.Context) error {
 	defer cancel()
 
 	return d.runLoops(cctx, cancel, ms)
+}
+
+func (d *Director) plan(ctx context.Context) (map[string]plan.Plan, error) {
+	p, err := d.makePlanner()
+	if err != nil {
+		return nil, fmt.Errorf("when making planner: %w", err)
+	}
+	return p.Plan(ctx, d.machines, d.files...)
+}
+
+func (d *Director) makePlanner() (*planner.Planner, error) {
+	obs := singleobs.Planner(d.l)
+	// TODO(@MattWindsor91): move planner config outside of instance
+	return planner.New(
+		d.env.Planner,
+		planner.ObserveWith(obs...),
+		planner.OverrideQuantities(d.quantities.Plan),
+	)
 }
 
 func (d *Director) runLoops(cctx context.Context, cancel func(), ms []*Instance) error {
@@ -121,21 +150,6 @@ func (d *Director) runLoops(cctx context.Context, cancel func(), ms []*Instance)
 	return eg.Wait()
 }
 
-func (d *Director) makeMachines() ([]*Instance, error) {
-	ms := make([]*Instance, len(d.machines))
-	var (
-		i   int
-		err error
-	)
-	for midstr, c := range d.machines {
-		if ms[i], err = d.makeMachine(midstr, c); err != nil {
-			return nil, err
-		}
-		i++
-	}
-	return ms, nil
-}
-
 func (d *Director) prepare() error {
 	d.quantities.Log(d.l)
 
@@ -147,7 +161,22 @@ func (d *Director) prepare() error {
 	return d.machines.ObserveOn(observer.LowerToMachine(d.observers)...)
 }
 
-func (d *Director) makeMachine(midstr string, c machine.Config) (*Instance, error) {
+func (d *Director) makeMachines(plans map[string]plan.Plan) ([]*Instance, error) {
+	ms := make([]*Instance, len(d.machines))
+	var (
+		i   int
+		err error
+	)
+	for midstr, c := range d.machines {
+		if ms[i], err = d.makeMachine(midstr, c, plans[midstr]); err != nil {
+			return nil, err
+		}
+		i++
+	}
+	return ms, nil
+}
+
+func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*Instance, error) {
 	l := log.New(d.l.Writer(), logPrefix(midstr), 0)
 	mid, err := id.TryFromString(midstr)
 	if err != nil {
@@ -164,12 +193,12 @@ func (d *Director) makeMachine(midstr string, c machine.Config) (*Instance, erro
 		SSHConfig:    d.ssh,
 		Env:          &d.env,
 		ID:           mid,
-		InFiles:      d.files,
 		Observers:    obs,
 		ScratchPaths: sps,
 		SavedPaths:   vps,
 		Logger:       l,
 		Quantities:   d.quantities,
+		InitialPlan:  p,
 	}
 	return &m, nil
 }

@@ -12,12 +12,11 @@ import (
 	"log"
 	"os"
 
+	"github.com/1set/gut/yos"
+
 	"github.com/MattWindsor91/act-tester/internal/act"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
-
 	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
@@ -39,7 +38,7 @@ func App(outw, errw io.Writer) *c.App {
 		Usage: "runs the planning phase of an ACT test standalone",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
-			return run(ctx, os.Stdout, os.Stderr)
+			return run(ctx, os.Stderr)
 		},
 	}
 	return stdflag.SetCommonAppSettings(&a, outw, errw)
@@ -57,48 +56,53 @@ func flags() []c.Flag {
 			Usage: usageCompilerFilter,
 		},
 		stdflag.WorkerCountCliFlag(),
+		stdflag.OutDirCliFlag(""),
 	}
 	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
 }
 
-func run(ctx *c.Context, outw, errw io.Writer) error {
-	pr, err := makePlanner(ctx, errw)
-	if err != nil {
-		return err
-	}
-
-	p, err := pr.Plan(ctx.Context)
-	if err != nil {
-		return err
-	}
-
-	return p.Write(outw, plan.WriteHuman)
-}
-
-func makePlanner(ctx *c.Context, errw io.Writer) (*planner.Planner, error) {
-	a := stdflag.ActRunnerFromCli(ctx, errw)
-
+func run(ctx *c.Context, errw io.Writer) error {
 	cfg, err := stdflag.ConfFileFromCli(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
+
+	pr, err := makePlanner(ctx, cfg, errw)
+	if err != nil {
+		return err
+	}
+
+	ps, err := pr.Plan(ctx.Context, cfg.Machines, ctx.Args().Slice()...)
+	if err != nil {
+		return err
+	}
+
+	return writePlans(stdflag.OutDirFromCli(ctx), ps)
+}
+
+func writePlans(outdir string, ps map[string]plan.Plan) error {
+	if err := yos.MakeDir(outdir); err != nil {
+		return err
+	}
+	for n, p := range ps {
+		file := fmt.Sprintf("plan.%s.json", n)
+		if err := p.WriteFile(yos.JoinPath(outdir, file), plan.WriteHuman); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.Planner, error) {
+	a := stdflag.ActRunnerFromCli(ctx, errw)
 
 	qs := quantities(ctx)
 	src := source(a, cfg)
-	fs := ctx.Args().Slice()
-
-	midstr := ctx.String(stdflag.FlagMachine)
-	mach, err := getMachine(cfg, midstr)
-	if err != nil {
-		return nil, err
-	}
 
 	l := log.New(errw, "[planner] ", log.LstdFlags)
 
 	return planner.New(
 		src,
-		mach,
-		fs,
 		planner.ObserveWith(singleobs.Planner(l)...),
 		planner.OverrideQuantities(qs),
 		planner.FilterCompilers(ctx.String(flagCompilerFilter)),
@@ -117,21 +121,4 @@ func quantities(ctx *c.Context) planner.QuantitySet {
 	return planner.QuantitySet{
 		NWorkers: stdflag.WorkerCountFromCli(ctx),
 	}
-}
-
-func getMachine(cfg *config.Config, midstr string) (machine.Named, error) {
-	mid, err := id.TryFromString(midstr)
-	if err != nil {
-		return machine.Named{}, err
-	}
-
-	mach, ok := cfg.Machines[midstr]
-	if !ok {
-		return machine.Named{}, fmt.Errorf("no such machine: %s", midstr)
-	}
-	m := machine.Named{
-		ID:      mid,
-		Machine: mach.Machine,
-	}
-	return m, nil
 }

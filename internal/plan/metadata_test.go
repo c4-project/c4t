@@ -17,7 +17,7 @@ import (
 func ExampleMetadata_RequireStage() {
 	m := plan.NewMetadata(plan.UseDateSeed)
 	fmt.Println("starts with plan stage?:", m.RequireStage(stage.Plan) == nil)
-	m.ConfirmStage(stage.Plan, time.Now(), time.Now())
+	m.ConfirmStage(stage.Plan, time.Now(), 0)
 	fmt.Println("ends with plan stage?:", m.RequireStage(stage.Plan) == nil)
 
 	// Output:

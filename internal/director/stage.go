@@ -21,14 +21,12 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 )
 
 // StageConfig groups together the stage configuration for of a director instance.
 type StageConfig struct {
-	// Plan contains configuration for the instance's plan stage.
-	// TODO(@MattWindsor91): remove this
-	Plan *planner.Planner
+	// Planning happens outside of the normal test cycle, so it doesn't appear here.
+
 	// Perturb contains configuration for the instance's perturb stage.
 	Perturb *perturber.Perturber
 	// Fuzz contains configuration for the instance's fuzz stage.
@@ -45,9 +43,6 @@ var ErrStageConfigMissing = errors.New("stage config missing")
 
 // Check makes sure the StageConfig has all configuration elements present.
 func (c *StageConfig) Check() error {
-	if c.Plan == nil {
-		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Plan)
-	}
 	if c.Perturb == nil {
 		return fmt.Errorf("%w: %s", ErrStageConfigMissing, stage.Perturb)
 	}
@@ -76,12 +71,6 @@ type stageRunner struct {
 
 // Stages is the list of director stages.
 var Stages = []stageRunner{
-	{
-		Stage: stage.Plan,
-		Run: func(c *StageConfig, ctx context.Context, _ *plan.Plan) (*plan.Plan, error) {
-			return c.Plan.Plan(ctx)
-		},
-	},
 	{
 		Stage: stage.Perturb,
 		Run: func(c *StageConfig, ctx context.Context, p *plan.Plan) (*plan.Plan, error) {

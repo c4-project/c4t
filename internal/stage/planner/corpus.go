@@ -8,8 +8,6 @@ package planner
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
-
 	"github.com/1set/gut/yos"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -25,10 +23,10 @@ type SubjectProber interface {
 	ProbeSubject(ctx context.Context, litmus string) (*subject.Named, error)
 }
 
-func (p *Planner) planCorpus(ctx context.Context, pn *plan.Plan) error {
-	files, err := expandFiles(p.fs)
+func (p *Planner) planCorpus(ctx context.Context, fs ...string) (corpus.Corpus, error) {
+	files, err := expandFiles(fs)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	c := CorpusPlanner{
 		Files:      files,
@@ -36,8 +34,7 @@ func (p *Planner) planCorpus(ctx context.Context, pn *plan.Plan) error {
 		Observers:  lowerToBuilder(p.observers),
 		Quantities: p.quantities,
 	}
-	pn.Corpus, err = c.Plan(ctx)
-	return err
+	return c.Plan(ctx)
 }
 
 // CorpusPlanner contains the state required to plan the corpus part of an initial plan file.

@@ -28,12 +28,12 @@ func (r Record) String() string {
 	return fmt.Sprintf("%s completed on %s (took %s)", r.Stage, r.CompletedOn.Format(time.RFC3339), r.Duration)
 }
 
-// NewRecord creates a completion record for a stage s that started on start and ended on end (usually time.Now()).
+// NewRecord creates a completion record for a stage s that started on start and lasted for dur.
 // The completed-on and duration fields are set relative to the current time.
-func NewRecord(s Stage, start, end time.Time) Record {
+func NewRecord(s Stage, start time.Time, dur time.Duration) Record {
 	return Record{
 		Stage:       s,
-		CompletedOn: end,
-		Duration:    end.Sub(start),
+		CompletedOn: start.Add(dur),
+		Duration:    dur,
 	}
 }
