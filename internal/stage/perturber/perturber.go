@@ -64,17 +64,18 @@ func (p *Perturber) perturbInner(_ context.Context, inplan *plan.Plan) (*plan.Pl
 }
 
 func (p *Perturber) perturbCopy(pn *plan.Plan) error {
-	OnPerturb(Message{Kind: KindStart, Quantities: &p.quantities})
+	p.announce(Message{Kind: KindStart, Quantities: &p.quantities})
 
 	p.perturbMetadata(pn)
 	rng := pn.Metadata.Rand()
+	p.announce(Message{Kind: KindSeedChanged, Seed: pn.Metadata.Seed})
 
-	OnPerturb(Message{Kind: KindRandomiseOpts})
+	p.announce(Message{Kind: KindRandomisingOpts})
 	if err := p.perturbCompilers(rng, pn); err != nil {
 		return err
 	}
 
-	OnPerturb(Message{Kind: KindSampleCorpus}, p.observers...)
+	p.announce(Message{Kind: KindSamplingCorpus})
 	if err := p.sampleCorpus(rng, pn); err != nil {
 		return err
 	}
@@ -86,4 +87,8 @@ func (p *Perturber) perturbMetadata(pn *plan.Plan) {
 	hd := plan.NewMetadata(p.seed)
 	hd.Stages = pn.Metadata.Stages
 	pn.Metadata = *hd
+}
+
+func (p *Perturber) announce(m Message) {
+	OnPerturb(m, p.observers...)
 }

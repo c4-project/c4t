@@ -89,9 +89,11 @@ func (l *Logger) OnPerturb(m perturber.Message) {
 	case perturber.KindStart:
 		(*log.Logger)(l).Printf("perturbing plan...\n")
 		m.Quantities.Log((*log.Logger)(l))
-	case perturber.KindRandomiseOpts:
+	case perturber.KindSeedChanged:
+		(*log.Logger)(l).Printf("- seed is now %d\n", m.Seed)
+	case perturber.KindRandomisingOpts:
 		(*log.Logger)(l).Printf("- randomising compiler options...\n")
-	case perturber.KindSampleCorpus:
+	case perturber.KindSamplingCorpus:
 		(*log.Logger)(l).Printf("- sampling corpus...\n")
 	}
 }

@@ -48,14 +48,6 @@ func (p *Perturber) perturbCompilers(rng *rand.Rand, pn *plan.Plan) error {
 	return err
 }
 
-func lowerToCompiler(obs []Observer) []compiler.Observer {
-	cobs := make([]compiler.Observer, len(obs))
-	for i, o := range obs {
-		cobs[i] = o
-	}
-	return cobs
-}
-
 // Perturb perturbs the compiler set for a plan.
 func (c *CompilerPerturber) Perturb(cfgs map[string]compiler.Configuration) (map[string]compiler.Configuration, error) {
 	compiler.OnCompilerConfigStart(len(cfgs), c.Observers...)

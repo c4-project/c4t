@@ -24,12 +24,18 @@ type Observer interface {
 type Kind uint8
 
 const (
-	// The perturber is starting.  Quantities points to the perturber's quantity set.
+	// The perturber is starting.
+	// Quantities points to the perturber's quantity set.
 	KindStart Kind = iota
+	// The perturber has now changed the seed.
+	// Seed points to the new seed.
+	KindSeedChanged
 	// The perturber is now sampling the corpus.
-	KindSampleCorpus
+	// The selected corpus will be announced as a series of OnBuild messages.
+	KindSamplingCorpus
 	// The perturber is now randomising the compiler optimisations.
-	KindRandomiseOpts
+	// The selected compilers will be announced as a series of OnCompilerConfig messages.
+	KindRandomisingOpts
 )
 
 // Message is the type of messages sent through OnPerturb.
@@ -39,6 +45,9 @@ type Message struct {
 
 	// Quantities points to the quantity set on start messages.
 	Quantities *QuantitySet
+
+	// Seed points to the seed set on seed-changed messages.
+	Seed int64
 }
 
 // OnPerturb sends a perturb message m to each observer in obs.
@@ -46,4 +55,20 @@ func OnPerturb(m Message, obs ...Observer) {
 	for _, o := range obs {
 		o.OnPerturb(m)
 	}
+}
+
+func lowerToBuilder(obs []Observer) []builder.Observer {
+	cobs := make([]builder.Observer, len(obs))
+	for i, o := range obs {
+		cobs[i] = o
+	}
+	return cobs
+}
+
+func lowerToCompiler(obs []Observer) []compiler.Observer {
+	cobs := make([]compiler.Observer, len(obs))
+	for i, o := range obs {
+		cobs[i] = o
+	}
+	return cobs
 }
