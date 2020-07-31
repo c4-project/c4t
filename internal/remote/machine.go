@@ -48,6 +48,9 @@ func (r *MachineRunner) NewSFTP() (*sftp.Client, error) {
 
 // Close closes this MachineRunner's underlying SSH connection.
 func (r *MachineRunner) Close() error {
+	if r.cli == nil {
+		return nil
+	}
 	return r.cli.Close()
 }
 

@@ -45,6 +45,9 @@ func (s *RemoteFactory) MakeRunner(_ *plan.Plan, obs ...copier.Observer) (Runner
 
 // Close closes the underlying SSH connection being used for runners created by this factory.
 func (s *RemoteFactory) Close() error {
+	if s.machine == nil {
+		return nil
+	}
 	return s.machine.Close()
 }
 
