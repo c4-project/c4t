@@ -33,7 +33,7 @@ import (
 // TestCompilerPerturber_Perturb tests the happy path of a compiler perturber using copious amounts of mocking.
 func TestCompilerPerturber_Perturb(t *testing.T) {
 	var (
-		mi mockInspector
+		mi mocks.Inspector
 		mo mocks.Observer
 	)
 
@@ -160,27 +160,4 @@ func checkSelection(t *testing.T, ty, n, chosen string, defaults []string, sel *
 		assert.NotContainsf(t, sel.Disabled, chosen, "selected %s for %s (%s) disabled", ty, n, chosen)
 	}
 	assert.Containsf(t, allowed, chosen, "selected %s for %s (%s) not allowed", ty, n, chosen)
-}
-
-// mockInspector mocks the Inspector interface.
-type mockInspector struct {
-	mock.Mock
-}
-
-// DefaultOptLevels mocks the eponymous interface method.
-func (m *mockInspector) DefaultOptLevels(c *compiler.Compiler) (stringhelp.Set, error) {
-	args := m.Called(c)
-	return args.Get(0).(stringhelp.Set), args.Error(1)
-}
-
-// OptLevels mocks the eponymous interface method.
-func (m *mockInspector) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, error) {
-	args := m.Called(c)
-	return args.Get(0).(map[string]optlevel.Level), args.Error(1)
-}
-
-// DefaultMOpts mocks the eponymous interface method.
-func (m *mockInspector) DefaultMOpts(c *compiler.Compiler) (stringhelp.Set, error) {
-	args := m.Called(c)
-	return args.Get(0).(stringhelp.Set), args.Error(1)
 }

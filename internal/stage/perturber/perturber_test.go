@@ -9,6 +9,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/mocks"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 	"github.com/stretchr/testify/mock"
@@ -27,7 +29,7 @@ func TestPerturber_Run(t *testing.T) {
 	require.Less(t, 0, sampleSize, "sample size of mock plan is nonpositive")
 	qs := perturber.QuantitySet{CorpusSize: sampleSize}
 
-	var mi mockInspector
+	var mi mocks.Inspector
 
 	dls := stringhelp.NewSet("0", "2", "fast")
 	dms := stringhelp.NewSet("march=armv7-a")

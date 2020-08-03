@@ -9,6 +9,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/mocks"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
@@ -19,28 +21,8 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// mockResolver mocks Inspector.
-type mockResolver struct {
-	mock.Mock
-}
-
-func (m *mockResolver) DefaultOptLevels(c *compiler.Compiler) (stringhelp.Set, error) {
-	args := m.Called(c)
-	return args.Get(0).(stringhelp.Set), args.Error(1)
-}
-
-func (m *mockResolver) DefaultMOpts(c *compiler.Compiler) (stringhelp.Set, error) {
-	args := m.Called(c)
-	return args.Get(0).(stringhelp.Set), args.Error(1)
-}
-
-func (m *mockResolver) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, error) {
-	args := m.Called(c)
-	return args.Get(0).(map[string]optlevel.Level), args.Error(1)
-}
-
-func makeMockResolver(dls, dms stringhelp.Set, levels map[string]optlevel.Level, derr, merr, oerr error) *mockResolver {
-	var mr mockResolver
+func makeMockResolver(dls, dms stringhelp.Set, levels map[string]optlevel.Level, derr, merr, oerr error) *mocks.Inspector {
+	var mr mocks.Inspector
 	mr.On("DefaultOptLevels", mock.Anything).Return(dls, derr).Once()
 	mr.On("DefaultMOpts", mock.Anything).Return(dms, merr).Once()
 	mr.On("OptLevels", mock.Anything).Return(levels, oerr).Once()
@@ -52,13 +34,13 @@ func TestSelectLevels(t *testing.T) {
 	t.Parallel()
 
 	dls, levels := testData()
-	mr := func() *mockResolver { return makeMockResolver(dls, nil, levels, nil, nil, nil) }
+	mr := func() *mocks.Inspector { return makeMockResolver(dls, nil, levels, nil, nil, nil) }
 
 	err := errors.New("test error please ignore")
 
 	cases := map[string]struct {
 		conf     *compiler.Compiler
-		res      func() *mockResolver
+		res      func() *mocks.Inspector
 		expected stringhelp.Set
 		err      error
 	}{
@@ -89,12 +71,12 @@ func TestSelectLevels(t *testing.T) {
 		},
 		"d-error": {
 			conf: &compiler.Compiler{Opt: &optlevel.Selection{}},
-			res:  func() *mockResolver { return makeMockResolver(nil, nil, levels, err, nil, nil) },
+			res:  func() *mocks.Inspector { return makeMockResolver(nil, nil, levels, err, nil, nil) },
 			err:  err,
 		},
 		"o-error": {
 			conf: &compiler.Compiler{Opt: &optlevel.Selection{}},
-			res:  func() *mockResolver { return makeMockResolver(dls, nil, nil, nil, nil, err) },
+			res:  func() *mocks.Inspector { return makeMockResolver(dls, nil, nil, nil, nil, err) },
 			err:  err,
 		},
 	}
@@ -127,13 +109,13 @@ func TestSelectMOpts(t *testing.T) {
 	dmsk := dms.Copy()
 	dmsk.Add("kappa")
 
-	mr := func() *mockResolver { return makeMockResolver(nil, dms, nil, nil, nil, nil) }
+	mr := func() *mocks.Inspector { return makeMockResolver(nil, dms, nil, nil, nil, nil) }
 
 	err := errors.New("test error please ignore")
 
 	cases := map[string]struct {
 		conf     *compiler.Compiler
-		res      func() *mockResolver
+		res      func() *mocks.Inspector
 		expected stringhelp.Set
 		err      error
 	}{
@@ -164,7 +146,7 @@ func TestSelectMOpts(t *testing.T) {
 		},
 		"error": {
 			conf: &compiler.Compiler{MOpt: &optlevel.Selection{}},
-			res:  func() *mockResolver { return makeMockResolver(nil, nil, nil, nil, err, nil) },
+			res:  func() *mocks.Inspector { return makeMockResolver(nil, nil, nil, nil, err, nil) },
 			err:  err,
 		},
 	}

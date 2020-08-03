@@ -20,6 +20,8 @@ type CompilerLister interface {
 	ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error)
 }
 
+//go:generate mockery --name=CompilerLister
+
 // CompilerPlanner contains the state necessary to make up the compiler part of a test plan.
 type CompilerPlanner struct {
 	// Lister lists the available compilers.

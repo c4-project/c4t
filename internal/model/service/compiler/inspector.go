@@ -35,6 +35,8 @@ type Inspector interface {
 	// list would be hideously out of date.
 }
 
+//go:generate mockery --name=Inspector
+
 // SelectLevels selects from in the optimisation levels permitted by the configuration c.
 func SelectLevels(in Inspector, c *Compiler) (map[string]optlevel.Level, error) {
 	if c == nil {

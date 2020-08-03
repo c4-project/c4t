@@ -10,6 +10,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/planner/mocks"
+
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/1set/gut/ystring"
@@ -25,7 +27,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/mocks"
+	cmocks "github.com/MattWindsor91/act-tester/internal/model/service/compiler/mocks"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
 	"github.com/stretchr/testify/mock"
 )
@@ -33,8 +35,8 @@ import (
 // TestCompilerPlanner_Plan tests the happy path of a compiler planner using copious amounts of mocking.
 func TestCompilerPlanner_Plan(t *testing.T) {
 	var (
-		ml mockCompilerLister
-		mo mocks.Observer
+		ml mocks.CompilerLister
+		mo cmocks.Observer
 	)
 
 	ctx := context.Background()
@@ -113,7 +115,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	}
 }
 
-func mockOnCompilerConfig(mo *mocks.Observer, kind observing.BatchKind, f func(int, *compiler.Named) bool) *mock.Call {
+func mockOnCompilerConfig(mo *cmocks.Observer, kind observing.BatchKind, f func(int, *compiler.Named) bool) *mock.Call {
 	return mo.On("OnCompilerConfig", mock.MatchedBy(func(m compiler.Message) bool {
 		if m.Kind != kind {
 			return false
@@ -131,15 +133,4 @@ func checkSelection(t *testing.T, ty, n, chosen string, defaults []string, sel *
 		assert.NotContainsf(t, sel.Disabled, chosen, "selected %s for %s (%s) disabled", ty, n, chosen)
 	}
 	assert.Containsf(t, allowed, chosen, "selected %s for %s (%s) not allowed", ty, n, chosen)
-}
-
-// mockCompilerLister mocks the CompilerLister interface.
-type mockCompilerLister struct {
-	mock.Mock
-}
-
-// ListCompilers mocks the eponymous interface method.
-func (m *mockCompilerLister) ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error) {
-	args := m.Called(ctx, mid)
-	return args.Get(0).(map[string]compiler.Compiler), args.Error(1)
 }
