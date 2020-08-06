@@ -6,7 +6,7 @@ require (
 	github.com/1set/gut v0.0.0-20200722022712-b823fbdcfd65
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alessio/shellescape v1.2.2
-	github.com/cheggaaa/pb/v3 v3.0.4
+	github.com/cheggaaa/pb/v3 v3.0.5
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
@@ -20,7 +20,7 @@ require (
 	github.com/urfave/cli/v2 v2.2.0
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
-	golang.org/x/sys v0.0.0-20200802091954-4b90ce9b60b3 // indirect
+	golang.org/x/sys v0.0.0-20200806060901-a37d78b92225 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
