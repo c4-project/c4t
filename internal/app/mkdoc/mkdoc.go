@@ -11,13 +11,16 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/app/fuzz"
+	"github.com/MattWindsor91/act-tester/internal/app/analyse"
 	"github.com/MattWindsor91/act-tester/internal/app/invoke"
+	"github.com/MattWindsor91/act-tester/internal/app/perturb"
+	"github.com/MattWindsor91/act-tester/internal/app/setc"
+
+	"github.com/MattWindsor91/act-tester/internal/app/fuzz"
 	"github.com/MattWindsor91/act-tester/internal/app/lift"
 
 	"github.com/MattWindsor91/act-tester/internal/app/gccnt"
 
-	"github.com/MattWindsor91/act-tester/internal/app/analyse"
 	"github.com/MattWindsor91/act-tester/internal/app/director"
 	"github.com/MattWindsor91/act-tester/internal/app/mach"
 
@@ -58,14 +61,16 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 }
 
 var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
+	analyse.App,
 	director.App,
 	fuzz.App,
 	gccnt.App,
+	invoke.App,
 	lift.App,
 	mach.App,
+	perturb.App,
 	plan.App,
-	analyse.App,
-	invoke.App,
+	setc.App,
 }
 
 func appsToDocument(ctx *c.Context, outw io.Writer, errw io.Writer) []*c.App {

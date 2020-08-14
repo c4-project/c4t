@@ -35,7 +35,7 @@ act-tester [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-A**="": read ACT config from this `file`
 
-**-C**="": read ACT config from this `file`
+**-C**="": read tester config from this `file`
 
 **-k**="": number of `cycles` to run for each subject in the corpus (default: 10)
 

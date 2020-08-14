@@ -39,7 +39,7 @@ act-tester-invoke [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--skip-runner**: if given, skip the runner
 
-**-C**="": read ACT config from this `file`
+**-C**="": read tester config from this `file`
 
 **-d**="": `directory` to which outputs will be written (default: mach_results)
 

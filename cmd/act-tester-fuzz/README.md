@@ -10,6 +10,7 @@ act-tester-fuzz
 
 ```
 [-A]=[value]
+[-C]=[value]
 [-d]=[value]
 [-k]=[value]
 [-n]=[value]
@@ -25,6 +26,8 @@ act-tester-fuzz [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 # GLOBAL OPTIONS
 
 **-A**="": read ACT config from this `file`
+
+**-C**="": read tester config from this `file`
 
 **-d**="": `directory` to which outputs will be written (default: fuzz_results)
 

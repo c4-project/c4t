@@ -9,13 +9,12 @@ act-tester-plan - runs the planning phase of an ACT test standalone
 act-tester-plan
 
 ```
-[--corpus-size|-n]=[value]
-[--filter-compiler]=[value]
+[--filter-compilers|-c]=[value]
+[--filter-machines|-m]=[value]
 [--num-workers|-j]=[value]
-[--seed|-s]=[value]
 [-A]=[value]
 [-C]=[value]
-[-m]=[value]
+[-d]=[value]
 [-x]
 ```
 
@@ -27,20 +26,17 @@ act-tester-plan [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 # GLOBAL OPTIONS
 
-**--corpus-size, -n**="": `number` of corpus files to select for this test plan;
-if positive, the planner will use all viable provided corpus files (default: 0)
+**--filter-compilers, -c**="": `glob` to use to filter compilers to enable
 
-**--filter-compiler**="": `glob` to use to filter compilers to enable
+**--filter-machines, -m**="": `glob` to use to filter machines to plan
 
 **--num-workers, -j**="": number of `workers` to run in parallel (default: 1)
 
-**--seed, -s**="": `seed` to use for any randomised components of this test plan; -1 uses run time as seed (default: -1)
-
 **-A**="": read ACT config from this `file`
 
-**-C**="": read ACT config from this `file`
+**-C**="": read tester config from this `file`
 
-**-m**="": ID of machine to use for this test plan
+**-d**="": `directory` to which outputs will be written
 
 **-x**: if true, use 'dune exec' to run OCaml ACT binaries
 
