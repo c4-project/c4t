@@ -195,10 +195,16 @@ func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*I
 		ScratchPaths: sps,
 		SavedPaths:   vps,
 		Logger:       l,
-		Quantities:   d.quantities,
+		Quantities:   d.machineQuantities(&c),
 		InitialPlan:  p,
 	}
 	return &m, nil
+}
+
+func (d *Director) machineQuantities(c *machine.Config) quantity.MachineSet {
+	qs := d.quantities.MachineSet
+	qs.Override(c.Quantities)
+	return qs
 }
 
 func (d *Director) instanceObservers(mid id.ID) ([]observer.Instance, error) {

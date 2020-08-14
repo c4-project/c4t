@@ -86,7 +86,7 @@ type Instance struct {
 	ScratchPaths *pathset.Scratch
 
 	// Quantities contains the quantity set for this machine.
-	Quantities quantity.RootSet
+	Quantities quantity.MachineSet
 }
 
 // Run runs this machine's testing loop.
