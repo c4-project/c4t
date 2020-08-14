@@ -9,6 +9,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/mocks"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
@@ -27,7 +29,7 @@ func TestPerturber_Run(t *testing.T) {
 	// This should give us a degree of sampling.
 	sampleSize := len(pm.Corpus) / 2
 	require.Less(t, 0, sampleSize, "sample size of mock plan is nonpositive")
-	qs := perturber.QuantitySet{CorpusSize: sampleSize}
+	qs := quantity.PerturbSet{CorpusSize: sampleSize}
 
 	var mi mocks.Inspector
 

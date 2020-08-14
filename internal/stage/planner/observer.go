@@ -8,6 +8,7 @@ package planner
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
@@ -45,7 +46,7 @@ type Message struct {
 	Kind Kind
 
 	// Quantities points to the quantity set on start messages.
-	Quantities *QuantitySet
+	Quantities *quantity.PlanSet
 
 	// MachineID contains the machine identifier in certain messages.
 	MachineID id.ID

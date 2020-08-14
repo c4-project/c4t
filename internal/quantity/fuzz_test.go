@@ -3,21 +3,21 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package fuzzer_test
+package quantity_test
 
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 )
 
-// ExampleQuantitySet_Override is a runnable example for Override.
-func ExampleQuantitySet_Override() {
-	q1 := fuzzer.QuantitySet{
+// ExampleFuzzSet_Override is a runnable example for FuzzSet.Override.
+func ExampleFuzzSet_Override() {
+	q1 := quantity.FuzzSet{
 		CorpusSize:    27,
 		SubjectCycles: 53,
 	}
-	q2 := fuzzer.QuantitySet{
+	q2 := quantity.FuzzSet{
 		SubjectCycles: 42,
 	}
 	q1.Override(q2)

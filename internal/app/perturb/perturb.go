@@ -11,6 +11,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 	"github.com/MattWindsor91/act-tester/internal/ux"
 
@@ -89,9 +91,9 @@ func makePerturber(ctx *c.Context, errw io.Writer) (*perturber.Perturber, error)
 	)
 }
 
-func quantities(ctx *c.Context, cfg *config.Config) perturber.QuantitySet {
+func quantities(ctx *c.Context, cfg *config.Config) quantity.PerturbSet {
 	qs := cfg.Quantities.Perturb
-	qs.Override(perturber.QuantitySet{
+	qs.Override(quantity.PerturbSet{
 		CorpusSize: ctx.Int(flagCorpusSize),
 	})
 	return qs

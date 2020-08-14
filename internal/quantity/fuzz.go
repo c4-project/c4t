@@ -3,17 +3,16 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package fuzzer
+package quantity
 
 import (
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/confhelp"
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 )
 
-// QuantitySet represents the part of a configuration that holds various tunable parameters for the batch runner.
-type QuantitySet struct {
+// FuzzSet represents the part of a configuration that holds various tunable parameters for the fuzzer.
+type FuzzSet struct {
 	// CorpusSize is the sampling size for the corpus after fuzzing.
 	// It has a similar effect to CorpusSize in planner.Planner.
 	CorpusSize int `toml:"corpus_size,omitzero"`
@@ -26,13 +25,13 @@ type QuantitySet struct {
 }
 
 // Override substitutes any quantities in new that are non-zero for those in this set.
-func (q *QuantitySet) Override(new QuantitySet) {
-	confhelp.GenericOverride(q, new)
+func (q *FuzzSet) Override(new FuzzSet) {
+	GenericOverride(q, new)
 }
 
 // Log logs q to l.
-func (q *QuantitySet) Log(l *log.Logger) {
-	confhelp.LogWorkers(l, q.NWorkers)
-	l.Println("fuzzing each subject", iohelp.PluralQuantity(q.SubjectCycles, "time", "", "s"))
-	l.Println("target corpus size:", iohelp.PluralQuantity(q.CorpusSize, "subject", "", "s"))
+func (q *FuzzSet) Log(l *log.Logger) {
+	LogWorkers(l, q.NWorkers)
+	l.Println("fuzzing each subject", stringhelp.PluralQuantity(q.SubjectCycles, "time", "", "s"))
+	l.Println("target corpus size:", stringhelp.PluralQuantity(q.CorpusSize, "subject", "", "s"))
 }

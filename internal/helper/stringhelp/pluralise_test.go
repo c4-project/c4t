@@ -3,20 +3,20 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package iohelp_test
+package stringhelp_test
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 )
 
 // ExamplePluralQuantity is a runnable example for PluralQuantity.
 func ExamplePluralQuantity() {
-	fmt.Println(iohelp.PluralQuantity(0, "director", "y", "ies"))
-	fmt.Println(iohelp.PluralQuantity(1, "fil", "e", "es"))
-	fmt.Println(iohelp.PluralQuantity(2, "corp", "us", "ora"))
+	fmt.Println(stringhelp.PluralQuantity(0, "director", "y", "ies"))
+	fmt.Println(stringhelp.PluralQuantity(1, "fil", "e", "es"))
+	fmt.Println(stringhelp.PluralQuantity(2, "corp", "us", "ora"))
 
 	// Output:
 	// 0 directories
@@ -43,7 +43,7 @@ func benchmarkPluralQuantity(n int, b *testing.B) {
 	var result string
 
 	for i := 0; i < b.N; i++ {
-		result = iohelp.PluralQuantity(n, "director", "y", "ies")
+		result = stringhelp.PluralQuantity(n, "director", "y", "ies")
 	}
 
 	// This just exists to stop 'result' being flagged as unused.

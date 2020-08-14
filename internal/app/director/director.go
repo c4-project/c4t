@@ -16,9 +16,9 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	"github.com/1set/gut/ystring"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/config"
@@ -154,7 +154,7 @@ func setupPprof(cppath string) (func(), error) {
 	}, nil
 }
 
-func runWithArgs(cfg *config.Config, qs config.QuantitySet, a *act.Runner, args args) error {
+func runWithArgs(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args) error {
 	o, lw, err := makeObservers(cfg, args)
 	if err != nil {
 		return err
@@ -189,7 +189,7 @@ func createResultLogFile(c *config.Config) (*os.File, error) {
 	return logw, nil
 }
 
-func makeOptions(c *config.Config, qs config.QuantitySet, mfilter string, lw io.Writer, o ...observer.Observer) ([]director.Option, error) {
+func makeOptions(c *config.Config, qs quantity.RootSet, mfilter string, lw io.Writer, o ...observer.Observer) ([]director.Option, error) {
 	glob, err := makeGlob(mfilter)
 	if err != nil {
 		return nil, err
@@ -248,12 +248,14 @@ func makeEnv(a *act.Runner, c *config.Config) director.Env {
 	}
 }
 
-func setupQuantityOverrides(ctx *c.Context) config.QuantitySet {
+func setupQuantityOverrides(ctx *c.Context) quantity.RootSet {
 	// TODO(@MattWindsor91): disambiguate the corpus size argument
-	return config.QuantitySet{
-		Fuzz: fuzzer.QuantitySet{
-			CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
-			SubjectCycles: stdflag.SubjectCyclesFromCli(ctx),
+	return quantity.RootSet{
+		MachineSet: quantity.MachineSet{
+			Fuzz: quantity.FuzzSet{
+				CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
+				SubjectCycles: stdflag.SubjectCyclesFromCli(ctx),
+			},
 		},
 	}
 }

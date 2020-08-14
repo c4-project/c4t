@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	machine "github.com/MattWindsor91/act-tester/internal/model/machine"
+	machine "github.com/MattWindsor91/act-tester/internal/machine"
 	mock "github.com/stretchr/testify/mock"
 )
 

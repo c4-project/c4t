@@ -5,7 +5,10 @@
 
 package planner
 
-import "github.com/MattWindsor91/act-tester/internal/observing"
+import (
+	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+)
 
 // Option is the type of options to the Planner constructor.
 type Option func(*Planner) error
@@ -34,7 +37,7 @@ func ObserveWith(obs ...Observer) Option {
 }
 
 // OverrideQuantities overrides this planner's quantities with qs.
-func OverrideQuantities(qs QuantitySet) Option {
+func OverrideQuantities(qs quantity.PlanSet) Option {
 	return func(p *Planner) error {
 		p.quantities.Override(qs)
 		return nil

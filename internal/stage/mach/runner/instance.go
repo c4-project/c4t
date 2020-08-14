@@ -15,7 +15,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -46,7 +46,7 @@ type Instance struct {
 	subject *subject.Named
 
 	// quantities is the set of quantities used to parametrise the running job.
-	quantities quantity.SingleSet
+	quantities quantity.BatchSet
 }
 
 // Run runs the instance with context ctx.

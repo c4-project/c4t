@@ -12,12 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	runner2 "github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	"github.com/stretchr/testify/assert"
 	c "github.com/urfave/cli/v2"
@@ -32,13 +31,13 @@ func ExampleMachInvoker_MachArgs() {
 		OutDir:       "foo",
 		SkipCompiler: true,
 		SkipRunner:   false,
-		Quantities: quantity.Set{
-			Compiler: quantity.SingleSet{
-				Timeout:  timeout.Timeout(10 * time.Second),
+		Quantities: quantity.MachNodeSet{
+			Compiler: quantity.BatchSet{
+				Timeout:  quantity.Timeout(10 * time.Second),
 				NWorkers: 10,
 			},
-			Runner: quantity.SingleSet{
-				Timeout:  timeout.Timeout(5 * time.Minute),
+			Runner: quantity.BatchSet{
+				Timeout:  quantity.Timeout(5 * time.Minute),
 				NWorkers: 20,
 			},
 		},
@@ -65,13 +64,13 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 		},
 		"quantities": {
 			OutDir: "foo",
-			Quantities: quantity.Set{
-				Compiler: quantity.SingleSet{
-					Timeout:  timeout.Timeout(27 * time.Second),
+			Quantities: quantity.MachNodeSet{
+				Compiler: quantity.BatchSet{
+					Timeout:  quantity.Timeout(27 * time.Second),
 					NWorkers: 64,
 				},
-				Runner: quantity.SingleSet{
-					Timeout:  timeout.Timeout(53 * time.Second),
+				Runner: quantity.BatchSet{
+					Timeout:  quantity.Timeout(53 * time.Second),
 					NWorkers: 42,
 				},
 			},
@@ -87,7 +86,7 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 			a := testApp(
 				func(ctx *c.Context) error {
 					t.Helper()
-					out := stdflag.MachConfigFromCli(ctx, quantity.Set{})
+					out := stdflag.MachConfigFromCli(ctx, quantity.MachNodeSet{})
 					assert.Equal(t, in, out, "user config didn't match")
 
 					return nil

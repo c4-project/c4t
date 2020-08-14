@@ -8,7 +8,7 @@ package mach
 import (
 	"errors"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
 
@@ -48,7 +48,7 @@ func SkipRunner(skip bool) Option {
 }
 
 // OverrideQuantities overrides the compiler and runner quantities with qs.
-func OverrideQuantities(qs quantity.Set) Option {
+func OverrideQuantities(qs quantity.MachNodeSet) Option {
 	return Options(
 		WithCompilerOptions(compiler.OverrideQuantities(qs.Compiler)),
 		WithRunnerOptions(runner.OverrideQuantities(qs.Runner)),
@@ -106,7 +106,7 @@ type UserConfig struct {
 	// SkipRunner tells the machine-runner to skip running.
 	SkipRunner bool
 	// Quantities contains various tunable quantities for the machine-dependent stage.
-	Quantities quantity.Set
+	Quantities quantity.MachNodeSet
 }
 
 // WithUserConfig applies all of the settings specified in uc.

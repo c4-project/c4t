@@ -12,6 +12,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
@@ -80,7 +82,7 @@ func makeCorpusPlanner(tp *TestProber) *planner.CorpusPlanner {
 	return &planner.CorpusPlanner{
 		Files:  in,
 		Prober: tp,
-		Quantities: planner.QuantitySet{
+		Quantities: quantity.PlanSet{
 			// This should enforce a degree of parallelism.
 			NWorkers: len(in) / 2,
 		},

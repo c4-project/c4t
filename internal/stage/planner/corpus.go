@@ -8,6 +8,8 @@ package planner
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/1set/gut/yos"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
@@ -46,7 +48,7 @@ type CorpusPlanner struct {
 	// Prober tells the planner how to probe corpus files for specific information.
 	Prober SubjectProber
 	// Quantities contains the target size and worker count of the corpus.
-	Quantities QuantitySet
+	Quantities quantity.PlanSet
 }
 
 // Plan probes each subject in this planner's corpus file list, producing a Corpus proper.

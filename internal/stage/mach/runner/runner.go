@@ -10,7 +10,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -44,7 +44,7 @@ type Runner struct {
 	paths *Pathset
 
 	// quantities contains quantity configuration for this runner.
-	quantities quantity.SingleSet
+	quantities quantity.BatchSet
 }
 
 // New creates a new batch compiler instance using the config c and plan p.

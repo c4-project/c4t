@@ -10,7 +10,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
@@ -70,7 +70,7 @@ func makeMach(ctx *c.Context, errw io.Writer) (*mach.Mach, error) {
 	return mach.New(
 		&cimpl.CResolve,
 		&bimpl.BResolve,
-		mach.WithUserConfig(stdflag.MachConfigFromCli(ctx, quantity.Set{})),
+		mach.WithUserConfig(stdflag.MachConfigFromCli(ctx, quantity.MachNodeSet{})),
 		mach.ForwardTo(fwd),
 	)
 }

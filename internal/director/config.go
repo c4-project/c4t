@@ -9,6 +9,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
@@ -94,7 +96,7 @@ func FilterMachines(glob id.ID) Option {
 }
 
 // OverrideQuantities overrides the director's quantities with qs.
-func OverrideQuantities(qs config.QuantitySet) Option {
+func OverrideQuantities(qs quantity.RootSet) Option {
 	return func(d *Director) error {
 		d.quantities.Override(qs)
 		return nil

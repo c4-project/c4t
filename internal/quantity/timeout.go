@@ -3,9 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package timeout implements mach's configurable compile and run timeouts.
-// These behave as context's timeouts, with the exception that non-positive values represent an absence of timeout.
-package timeout
+package quantity
 
 import (
 	"context"

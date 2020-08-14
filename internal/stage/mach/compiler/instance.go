@@ -16,7 +16,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 
@@ -55,7 +55,7 @@ type Instance struct {
 	paths SubjectPather
 
 	// quantities is the quantity set for this instance.
-	quantities quantity.SingleSet
+	quantities quantity.BatchSet
 
 	// resCh is the channel to which the compile run should send compiled subject records.
 	resCh chan<- builder.Request

@@ -9,12 +9,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/timeout"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -98,7 +97,7 @@ func MachCliFlags() []c.Flag {
 const defaultOutDir = "mach_results"
 
 // MachConfigFromCli creates a machine configuration using the flags in ctx and the default quantities in defq.
-func MachConfigFromCli(ctx *c.Context, defq quantity.Set) mach.UserConfig {
+func MachConfigFromCli(ctx *c.Context, defq quantity.MachNodeSet) mach.UserConfig {
 	defq.Override(makeQuantitySet(ctx))
 
 	return mach.UserConfig{
@@ -109,14 +108,14 @@ func MachConfigFromCli(ctx *c.Context, defq quantity.Set) mach.UserConfig {
 	}
 }
 
-func makeQuantitySet(ctx *c.Context) quantity.Set {
-	return quantity.Set{
-		Compiler: quantity.SingleSet{
-			Timeout:  timeout.Timeout(ctx.Duration(FlagCompilerTimeoutLong)),
+func makeQuantitySet(ctx *c.Context) quantity.MachNodeSet {
+	return quantity.MachNodeSet{
+		Compiler: quantity.BatchSet{
+			Timeout:  quantity.Timeout(ctx.Duration(FlagCompilerTimeoutLong)),
 			NWorkers: ctx.Int(FlagCompilerWorkerCountLong),
 		},
-		Runner: quantity.SingleSet{
-			Timeout:  timeout.Timeout(ctx.Duration(FlagRunTimeoutLong)),
+		Runner: quantity.BatchSet{
+			Timeout:  quantity.Timeout(ctx.Duration(FlagRunTimeoutLong)),
 			NWorkers: ctx.Int(FlagRunWorkerCountLong),
 		},
 	}

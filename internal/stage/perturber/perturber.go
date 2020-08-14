@@ -10,6 +10,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -27,7 +29,7 @@ type Perturber struct {
 	// observers contains the set of observers used to get feedback on the planning action as it completes.
 	observers []Observer
 	// quantities contains quantity information for this planner.
-	quantities QuantitySet
+	quantities quantity.PerturbSet
 	seed       int64
 }
 

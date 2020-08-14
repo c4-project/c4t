@@ -12,10 +12,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/1set/gut/yos"
 
@@ -177,8 +179,8 @@ func source(a *act.Runner, cfg *config.Config) planner.Source {
 	}
 }
 
-func quantities(ctx *c.Context) planner.QuantitySet {
-	return planner.QuantitySet{
+func quantities(ctx *c.Context) quantity.PlanSet {
+	return quantity.PlanSet{
 		NWorkers: stdflag.WorkerCountFromCli(ctx),
 	}
 }

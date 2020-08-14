@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/config"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
@@ -75,8 +77,8 @@ func makeFuzzer(ctx *c.Context, cfg *config.Config, drv fuzzer.Driver, l *log.Lo
 	)
 }
 
-func setupQuantityFlags(ctx *c.Context) fuzzer.QuantitySet {
-	return fuzzer.QuantitySet{
+func setupQuantityFlags(ctx *c.Context) quantity.FuzzSet {
+	return quantity.FuzzSet{
 		CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
 		SubjectCycles: stdflag.SubjectCyclesFromCli(ctx),
 		NWorkers:      stdflag.WorkerCountFromCli(ctx),

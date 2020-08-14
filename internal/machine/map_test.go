@@ -11,12 +11,12 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine/mocks"
+	"github.com/MattWindsor91/act-tester/internal/machine/mocks"
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 )
 
 // ExampleConfigMap_IDs is a runnable example for IDs.

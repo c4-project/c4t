@@ -7,6 +7,7 @@ package perturber
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
@@ -44,7 +45,7 @@ type Message struct {
 	Kind Kind
 
 	// Quantities points to the quantity set on start messages.
-	Quantities *QuantitySet
+	Quantities *quantity.PerturbSet
 
 	// Seed points to the seed set on seed-changed messages.
 	Seed int64

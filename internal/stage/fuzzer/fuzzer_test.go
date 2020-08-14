@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
@@ -84,7 +86,7 @@ func TestNew_error(t *testing.T) {
 			driver: fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md},
 			paths:  mp,
 			opts: []fuzzer.Option{
-				fuzzer.OverrideQuantities(fuzzer.QuantitySet{SubjectCycles: -1}),
+				fuzzer.OverrideQuantities(quantity.FuzzSet{SubjectCycles: -1}),
 			},
 			err: corpus.ErrSmall,
 		},
@@ -153,7 +155,7 @@ func TestFuzzer_Run_error(t *testing.T) {
 		"small-corpus": {
 			opts: []fuzzer.Option{
 				fuzzer.OverrideQuantities(
-					fuzzer.QuantitySet{CorpusSize: 255},
+					quantity.FuzzSet{CorpusSize: 255},
 				),
 			},
 			err: corpus.ErrSmall,

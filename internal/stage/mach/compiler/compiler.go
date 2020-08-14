@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
@@ -68,7 +68,7 @@ type Compiler struct {
 	paths SubjectPather
 
 	// quantities is this compiler stage's quantity set.
-	quantities quantity.SingleSet
+	quantities quantity.BatchSet
 }
 
 // New creates a new batch compiler instance using the config c and plan p.

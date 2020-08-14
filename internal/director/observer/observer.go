@@ -18,7 +18,7 @@ import (
 
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
@@ -99,15 +99,6 @@ func LowerToAnalyser(obs []Instance) []analyser.Observer {
 // LowerToPerturber lowers a slice of instance observers to a slice of perturber observers.
 func LowerToPerturber(obs []Instance) []perturber.Observer {
 	cos := make([]perturber.Observer, len(obs))
-	for i, o := range obs {
-		cos[i] = o
-	}
-	return cos
-}
-
-// LowerToPlanner lowers a slice of instance observers to a slice of planner observers.
-func LowerToPlanner(obs []Instance) []planner.Observer {
-	cos := make([]planner.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}

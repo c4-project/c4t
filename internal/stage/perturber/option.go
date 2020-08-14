@@ -7,6 +7,7 @@ package perturber
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 )
 
 // Option is the type of options to the Planner constructor.
@@ -36,7 +37,7 @@ func ObserveWith(obs ...Observer) Option {
 }
 
 // OverrideQuantities overrides this planner's quantities with qs.
-func OverrideQuantities(qs QuantitySet) Option {
+func OverrideQuantities(qs quantity.PerturbSet) Option {
 	return func(p *Perturber) error {
 		p.quantities.Override(qs)
 		return nil

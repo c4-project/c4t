@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
@@ -19,7 +21,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
 
@@ -48,7 +50,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 )
 
@@ -85,7 +86,7 @@ type Instance struct {
 	ScratchPaths *pathset.Scratch
 
 	// Quantities contains the quantity set for this machine.
-	Quantities config.QuantitySet
+	Quantities quantity.RootSet
 }
 
 // Run runs this machine's testing loop.

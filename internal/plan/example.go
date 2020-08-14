@@ -10,7 +10,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 

@@ -15,7 +15,7 @@ import (
 
 	"github.com/mum4k/termdash/cell"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/mum4k/termdash/linestyle"
 

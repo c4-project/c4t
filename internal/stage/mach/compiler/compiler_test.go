@@ -11,7 +11,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 	"github.com/MattWindsor91/act-tester/internal/plan"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler/mocks"

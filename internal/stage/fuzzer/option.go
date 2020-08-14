@@ -8,6 +8,8 @@ package fuzzer
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
 
@@ -44,7 +46,7 @@ func LogWith(l *log.Logger) Option {
 }
 
 // OverrideQuantities overrides the fuzzer's quantities with qs.
-func OverrideQuantities(qs QuantitySet) Option {
+func OverrideQuantities(qs quantity.FuzzSet) Option {
 	return func(f *Fuzzer) error {
 		f.quantities.Override(qs)
 		return nil

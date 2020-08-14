@@ -12,7 +12,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 
@@ -30,7 +32,7 @@ type Config struct {
 	Machines machine.ConfigMap `toml:"machines,omitempty"`
 
 	// Quantities gives the default quantities for the director.
-	Quantities QuantitySet `toml:"quantities,omitempty"`
+	Quantities quantity.RootSet `toml:"quantities,omitempty"`
 
 	// SSH contains top-level SSH configuration.
 	SSH *remote.Config `toml:"ssh,omitempty"`

@@ -10,12 +10,14 @@ import (
 	"context"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
@@ -29,7 +31,7 @@ type Planner struct {
 	// observers contains the set of observers used to get feedback on the planning action as it completes.
 	observers []Observer
 	// quantities contains quantity information for this planner.
-	quantities QuantitySet
+	quantities quantity.PlanSet
 }
 
 // New constructs a new planner with the given source and options.

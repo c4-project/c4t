@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
@@ -22,8 +24,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
@@ -100,10 +101,10 @@ func (j *Logger) runStep(ctx context.Context) error {
 func (j *Logger) OnMachines(m machine.Message) {
 	switch m.Kind {
 	case machine.MessageStart:
-		_, _ = fmt.Fprintf(j.out, "%s:\n", iohelp.PluralQuantity(m.Index, "machine", "", "s"))
+		_, _ = fmt.Fprintf(j.out, "%s:\n", stringhelp.PluralQuantity(m.Index, "machine", "", "s"))
 	case machine.MessageRecord:
 		// TODO(@MattWindsor91): store more information?
-		_, _ = fmt.Fprintf(j.out, " - %s (%s)\n", m.Machine.ID, iohelp.PluralQuantity(m.Machine.Cores, "core", "", "s"))
+		_, _ = fmt.Fprintf(j.out, " - %s (%s)\n", m.Machine.ID, stringhelp.PluralQuantity(m.Machine.Cores, "core", "", "s"))
 	}
 }
 

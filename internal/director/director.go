@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
@@ -19,7 +21,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/machine"
+	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 	"github.com/MattWindsor91/act-tester/internal/remote"
@@ -29,8 +31,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-
-	"github.com/MattWindsor91/act-tester/internal/config"
 
 	"golang.org/x/sync/errgroup"
 
@@ -50,7 +50,7 @@ type Director struct {
 	// ssh, if present, provides configuration for the director's remote invocation.
 	ssh *remote.Config
 	// quantities contains various tunable quantities for the director's stages.
-	quantities config.QuantitySet
+	quantities quantity.RootSet
 	// files is the input file set.
 	files []string
 	// l is the logger for the director.

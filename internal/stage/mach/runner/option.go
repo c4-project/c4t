@@ -6,7 +6,7 @@
 package runner
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/quantity"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
@@ -36,7 +36,7 @@ func ObserveWith(obs ...builder.Observer) Option {
 }
 
 // OverrideQuantities overrides this runner's quantities with qs.
-func OverrideQuantities(qs quantity.SingleSet) Option {
+func OverrideQuantities(qs quantity.BatchSet) Option {
 	return func(r *Runner) error {
 		r.quantities.Override(qs)
 		return nil
