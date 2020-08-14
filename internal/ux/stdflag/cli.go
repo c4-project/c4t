@@ -56,7 +56,7 @@ func ActRunnerFromCli(ctx *c.Context, errw io.Writer) *act.Runner {
 func ConfFileCliFlag() c.Flag {
 	return &c.PathFlag{
 		Name:      flagConfFile,
-		Usage:     usageActConfFile,
+		Usage:     usageConfFile,
 		TakesFile: true,
 	}
 }

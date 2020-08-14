@@ -6,10 +6,10 @@
 package stdflag
 
 const (
-	// FlagRunTimeout is a short flag for run timeout.
-	FlagRunTimeout  = "T"
 	flagActConfFile = "A"
-	flagConfFile    = "C"
+	// FlagCompiler is a standard flag for compiler selection arguments.
+	FlagCompiler = "c"
+	flagConfFile = "C"
 	// FlagOutDir is a short flag for specifying an output directory.
 	FlagOutDir = "d"
 	// FlagWorkerCount is a standard flag for arguments that set a worker count.
@@ -23,7 +23,9 @@ const (
 	FlagNum = "n"
 	// FlagCompilerTimeout is a short flag for compiler timeout.
 	FlagCompilerTimeout = "t"
-	flagActDuneExec     = "x"
+	// FlagRunTimeout is a short flag for run timeout.
+	FlagRunTimeout  = "T"
+	flagActDuneExec = "x"
 
 	// FlagCPUProfile is a standard flag for specifying a CPU profile output.
 	FlagCPUProfile = "cpuprofile"
@@ -43,6 +45,7 @@ const (
 	FlagRunWorkerCountLong = "num-run-workers"
 
 	usageActConfFile = "read ACT config from this `file`"
+	usageConfFile    = "read tester config from this `file`"
 	usageCorpusSize  = "`number` of corpus files to select for this test plan;\n" +
 		"if non-positive, the planner will use all viable provided corpus files"
 	usageActDuneExec   = "if true, use 'dune exec' to run OCaml ACT binaries"
