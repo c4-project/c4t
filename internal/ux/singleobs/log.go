@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
@@ -73,9 +73,9 @@ func (l *Logger) onCompilerPlan(nc compiler.Named) {
 }
 
 // OnCopy logs build messages.
-func (l *Logger) OnCopy(c copy2.Message) {
+func (l *Logger) OnCopy(c copier.Message) {
 	switch c.Kind {
-	case observing.BatchStep:
+	case observing.BatchStart:
 		l.onCopyStart(c.Num)
 	}
 }
