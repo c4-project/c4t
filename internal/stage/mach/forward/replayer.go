@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
 
@@ -23,7 +25,7 @@ type Replayer struct {
 	Decoder *json.Decoder
 
 	// Observers is the set of observers to which we are forwarding observations.
-	Observers []builder.Observer
+	Observers []observer.Observer
 }
 
 // Run runs the replayer.
@@ -52,8 +54,11 @@ func (r *Replayer) forwardToObs(f Forward) error {
 	switch {
 	case f.Error != "":
 		return fmt.Errorf("%w: %s", ErrRemote, f.Error)
+	case f.Action != nil:
+		observer.OnMachineNodeAction(*f.Action, r.Observers...)
+		return nil
 	case f.Build != nil:
-		builder.OnBuild(*f.Build, r.Observers...)
+		builder.OnBuild(*f.Build, observer.LowerToBuilder(r.Observers...)...)
 		return nil
 	default:
 		return errors.New("received forward with nothing present")

@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 )
 
@@ -22,9 +24,14 @@ func NewObserver(w io.Writer) *Observer {
 	return &Observer{json.NewEncoder(w)}
 }
 
-// OnBuildStart sends a build message through this Observer's encoder.
+// OnBuild sends a build message through this Observer's encoder.
 func (o *Observer) OnBuild(m builder.Message) {
 	o.forwardHandlingError(Forward{Build: &m})
+}
+
+// OnMachineNodeAction sends an action message through this Observer's encoder.
+func (o *Observer) OnMachineNodeAction(m observer.Message) {
+	o.forwardHandlingError(Forward{Action: &m})
 }
 
 // Error forwards err to this Observer's encoder.

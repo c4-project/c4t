@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	observer2 "github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
@@ -219,7 +221,7 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Lift, err = i.makeLifter(bobs); err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	if sc.Invoke, err = i.makeInvoker(cobs, bobs); err != nil {
+	if sc.Invoke, err = i.makeInvoker(cobs, observer.LowerToMach(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making machine invoker: %w", err)
 	}
 	if sc.Analyser, err = i.makeAnalyser(observer.LowerToAnalyser(i.Observers), observer.LowerToSaver(i.Observers)); err != nil {
@@ -264,7 +266,7 @@ func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 	)
 }
 
-func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) (*invoker.Invoker, error) {
+func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer) (*invoker.Invoker, error) {
 	return invoker.New(i.ScratchPaths.DirRun,
 		stdflag.MachInvoker{
 			// TODO(@MattWindsor91): this is a bit messy.
@@ -274,7 +276,7 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, bobs []builder.Observer) 
 			},
 		},
 		invoker.ObserveCopiesWith(cobs...),
-		invoker.ObserveCorpusWith(bobs...),
+		invoker.ObserveMachWith(mobs...),
 		invoker.UseSSH(i.SSHConfig, i.MachConfig.SSH),
 	)
 }

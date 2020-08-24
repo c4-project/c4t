@@ -6,20 +6,14 @@
 package invoker
 
 import (
-	"errors"
+	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-
 	"github.com/MattWindsor91/act-tester/internal/remote"
-)
-
-var (
-	// ErrObserverNil occurs when we try to pass a nil observer as an option.
-	ErrObserverNil = errors.New("observer nil")
 )
 
 // Option is the type of options for the invoker.
@@ -37,10 +31,13 @@ func Options(ops ...Option) Option {
 	}
 }
 
-// ObserveWith adds each observer given to the invoker's observer pools.
-func ObserveWith(obs ...Observer) Option {
+// ObserveMachWith adds each observer given to the invoker's machine observer pool.
+func ObserveMachWith(obs ...observer.Observer) Option {
 	return func(r *Invoker) error {
-		r.observers.Append(NewObserverSet(obs...))
+		if err := observing.CheckObservers(obs); err != nil {
+			return err
+		}
+		r.machObservers = append(r.machObservers, obs...)
 		return nil
 	}
 }
@@ -48,25 +45,10 @@ func ObserveWith(obs ...Observer) Option {
 // ObserveCopiesWith adds each observer given to the invoker's copy observer pool.
 func ObserveCopiesWith(obs ...copier.Observer) Option {
 	return func(r *Invoker) error {
-		for _, o := range obs {
-			if o == nil {
-				return ErrObserverNil
-			}
-			r.observers.Copy = append(r.observers.Copy, o)
+		if err := observing.CheckObservers(obs); err != nil {
+			return err
 		}
-		return nil
-	}
-}
-
-// ObserveCorpusWith adds each observer given to the invoker's corpus observer pool.
-func ObserveCorpusWith(obs ...builder.Observer) Option {
-	return func(r *Invoker) error {
-		for _, o := range obs {
-			if o == nil {
-				return ErrObserverNil
-			}
-			r.observers.Corpus = append(r.observers.Corpus, o)
-		}
+		r.copyObservers = append(r.copyObservers, obs...)
 		return nil
 	}
 }

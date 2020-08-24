@@ -6,9 +6,9 @@
 package compiler
 
 import (
+	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/quantity"
-
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 )
 
 // Option is the type of options to the compiler sub-stage constructor.
@@ -27,11 +27,13 @@ func Options(opts ...Option) Option {
 }
 
 // ObserveWith adds each observer in obs to the runner's observer list.
-func ObserveWith(obs ...builder.Observer) Option {
+func ObserveWith(obs ...observer.Observer) Option {
 	return func(c *Compiler) error {
-		var err error
-		c.observers, err = builder.AppendObservers(c.observers, obs...)
-		return err
+		if err := observing.CheckObservers(obs); err != nil {
+			return err
+		}
+		c.observers = append(c.observers, obs...)
+		return nil
 	}
 }
 

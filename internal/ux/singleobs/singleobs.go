@@ -9,9 +9,10 @@ package singleobs
 import (
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+	"github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
@@ -44,10 +45,19 @@ func Builder(l *log.Logger) []builder.Observer {
 	}
 }
 
-// Invoker builds a list of observers suitable for single-shot act-tester remote-mach binaries.
-func Invoker(l *log.Logger) []invoker.Observer {
-	// The ordering is important here: we want log messages to appear _before_ progress bars.
-	return []invoker.Observer{
+// Copier builds a list of observers suitable for observing file copies in single-shot binaries.
+func Copier(l *log.Logger) []copier.Observer {
+	// See above.
+	return []copier.Observer{
+		NewBar(),
+		(*Logger)(l),
+	}
+}
+
+// Mach builds a list of observers suitable for observing machine node actions in single-shot binaries.
+func MachNode(l *log.Logger) []observer.Observer {
+	// See above.
+	return []observer.Observer{
 		NewBar(),
 		(*Logger)(l),
 	}

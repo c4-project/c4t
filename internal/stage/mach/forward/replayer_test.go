@@ -34,11 +34,12 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder/mocks"
 
 	"golang.org/x/sync/errgroup"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer/mocks"
 )
 
 // TestReplayer_Run_roundTrip tests a round-trip between Observer and Replayer.
@@ -155,6 +156,6 @@ func roundTripPipe() (io.Closer, forward.Observer, *mocks.Observer, forward.Repl
 	pr, pw := io.Pipe()
 	obs := forward.Observer{Encoder: json.NewEncoder(pw)}
 	tobs := mocks.Observer{}
-	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observers: []builder.Observer{&tobs}}
+	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observers: []observer.Observer{&tobs}}
 	return pw, obs, &tobs, rep
 }

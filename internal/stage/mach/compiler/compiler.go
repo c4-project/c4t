@@ -13,6 +13,7 @@ import (
 	"io"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
@@ -62,7 +63,7 @@ type Compiler struct {
 	driver Driver
 
 	// observers observe the compiler's progress across a corpus.
-	observers []builder.Observer
+	observers []observer.Observer
 
 	// paths is the pathset for this compiler run.
 	paths SubjectPather
@@ -103,8 +104,7 @@ func (c *Compiler) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, erro
 		return nil, err
 	}
 
-	// TODO(@MattWindsor91): port this to observers
-	// c.quantities.Log(c.l)
+	observer.OnCompileStart(c.quantities, c.observers...)
 
 	newc, err := builder.ParBuild(
 		ctx,
@@ -133,7 +133,7 @@ func checkPlan(p *plan.Plan) error {
 func (c *Compiler) builderConfig(p *plan.Plan) builder.Config {
 	return builder.Config{
 		Init:      p.Corpus,
-		Observers: c.observers,
+		Observers: observer.LowerToBuilder(c.observers...),
 		Manifest: builder.Manifest{
 			Name:  "compile",
 			NReqs: p.NumExpCompilations(),

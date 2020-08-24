@@ -6,9 +6,9 @@
 package runner
 
 import (
+	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/quantity"
-
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 )
 
 // Option is the type of functional options for the machine node.
@@ -27,11 +27,13 @@ func Options(opts ...Option) Option {
 }
 
 // ObserveWith adds each observer in obs to the runner's observer list.
-func ObserveWith(obs ...builder.Observer) Option {
+func ObserveWith(obs ...observer.Observer) Option {
 	return func(r *Runner) error {
-		var err error
-		r.observers, err = builder.AppendObservers(r.observers, obs...)
-		return err
+		if err := observing.CheckObservers(obs); err != nil {
+			return err
+		}
+		r.observers = append(r.observers, obs...)
+		return nil
 	}
 }
 

@@ -31,7 +31,7 @@ func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 
 // invoke runs the machine binary.
 func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	runner, err := m.rfac.MakeRunner(p, m.observers.Copy...)
+	runner, err := m.rfac.MakeRunner(p, m.copyObservers...)
 	if err != nil {
 		return nil, fmt.Errorf("while spawning runner: %w", err)
 	}
@@ -102,7 +102,7 @@ func (m *Invoker) runPipework(ctx context.Context, rp *plan.Plan, ps *remote.Pip
 func (m *Invoker) runReplayer(ctx context.Context, r io.Reader) error {
 	rp := forward.Replayer{
 		Decoder:   json.NewDecoder(r),
-		Observers: m.observers.Corpus,
+		Observers: m.machObservers,
 	}
 	return rp.Run(ctx)
 }

@@ -10,13 +10,14 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
-
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
@@ -248,4 +249,7 @@ func (l *InstanceLogger) OnPlan(planner.Message) {}
 func (l *InstanceLogger) OnBuild(builder.Message) {}
 
 // OnCopy does nothing.
-func (l *InstanceLogger) OnCopy(copy2.Message) {}
+func (l *InstanceLogger) OnCopy(copier.Message) {}
+
+// OnMachineNodeMessage does nothing.
+func (l *InstanceLogger) OnMachineNodeAction(observer.Message) {}

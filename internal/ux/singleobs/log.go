@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
@@ -112,5 +114,17 @@ func (l *Logger) OnPlan(m planner.Message) {
 		(*log.Logger)(l).Printf("- probing compilers on machine %s...\n", m.MachineID)
 	case planner.KindPlanningCorpus:
 		(*log.Logger)(l).Printf("- probing corpus...\n")
+	}
+}
+
+// OnMachineNodeAction logs node messages.
+func (l *Logger) OnMachineNodeAction(m observer.Message) {
+	switch m.Kind {
+	case observer.KindCompileStart:
+		(*log.Logger)(l).Printf("compiling...\n")
+		m.Quantities.Compiler.Log((*log.Logger)(l))
+	case observer.KindRunStart:
+		(*log.Logger)(l).Printf("running...\n")
+		m.Quantities.Runner.Log((*log.Logger)(l))
 	}
 }

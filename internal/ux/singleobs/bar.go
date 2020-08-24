@@ -10,6 +10,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
@@ -46,6 +47,9 @@ func (p *Bar) OnPerturb(perturber.Message) {}
 
 // OnPlan does nothing.
 func (p *Bar) OnPlan(planner.Message) {}
+
+// OnMachineNodeAction does nothing.
+func (p *Bar) OnMachineNodeAction(observer.Message) {}
 
 func (p *Bar) onBatch(m observing.Batch) {
 	switch m.Kind {

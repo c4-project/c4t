@@ -10,13 +10,15 @@ import (
 	"context"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/copier"
+
+	mach "github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
-
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
@@ -68,7 +70,10 @@ type Instance interface {
 	planner.Observer
 
 	// Instance observers can observe file copies.
-	copy2.Observer
+	copier.Observer
+
+	// Instance observers can observe machine node actions.
+	mach.Observer
 }
 
 // OnIteration sends OnIteration to every instance observer in obs.
@@ -124,8 +129,17 @@ func LowerToBuilder(obs []Instance) []builder.Observer {
 }
 
 // LowerToCopy lowers a slice of instance observers to a slice of copy observers.
-func LowerToCopy(obs []Instance) []copy2.Observer {
-	cos := make([]copy2.Observer, len(obs))
+func LowerToCopy(obs []Instance) []copier.Observer {
+	cos := make([]copier.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
+}
+
+// LowerToMach lowers a slice of director observers to a slice of machine node observers.
+func LowerToMach(obs []Instance) []mach.Observer {
+	cos := make([]mach.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}

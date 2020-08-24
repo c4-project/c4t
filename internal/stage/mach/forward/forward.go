@@ -7,7 +7,10 @@
 // and errors from a machine-runner to a director, potentially over SSH.
 package forward
 
-import "github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+import (
+	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+)
 
 // Forward describes a 'forwarded' message or error.
 type Forward struct {
@@ -16,4 +19,7 @@ type Forward struct {
 
 	// Build carries information about a corpus build.
 	Build *builder.Message `json:"build,omitempty"`
+
+	// Action carries information about a machine-node action.
+	Action *observer.Message `json:"action.omitempty"`
 }

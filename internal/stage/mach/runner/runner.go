@@ -11,6 +11,7 @@ import (
 	"io"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/obs"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -35,7 +36,7 @@ type ObsParser interface {
 // Runner contains information necessary to run a plan's compiled test cases.
 type Runner struct {
 	// observers observe the runner's progress across a corpus.
-	observers []builder.Observer
+	observers []observer.Observer
 
 	// parser handles the parsing of observations.
 	parser ObsParser
@@ -76,8 +77,7 @@ func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	// TODO(@MattWindsor91): port to observers
-	// r.quantities.Log(r.l)
+	observer.OnRunStart(r.quantities, r.observers...)
 
 	bcfg := r.builderConfig(p)
 	c, err := builder.ParBuild(ctx, r.quantities.NWorkers, p.Corpus, bcfg,
@@ -96,7 +96,7 @@ func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
 func (r *Runner) builderConfig(p *plan.Plan) builder.Config {
 	return builder.Config{
 		Init:      p.Corpus,
-		Observers: r.observers,
+		Observers: observer.LowerToBuilder(r.observers...),
 		Manifest: builder.Manifest{
 			Name:  "run",
 			NReqs: p.NumExpCompilations(),

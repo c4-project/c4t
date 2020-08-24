@@ -8,7 +8,9 @@ package invoker
 
 import (
 	"github.com/1set/gut/ystring"
+	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 )
 
 // Invoker runs the machine-runner, through SSH if needed.
@@ -17,8 +19,10 @@ type Invoker struct {
 	dirLocal string
 	// invoker tells the remote-machine stage which arguments to send to the machine binary.
 	invoker runner.InvocationGetter
-	// observers is the set of observers listening for file copying and remote corpus manipulations.
-	observers ObserverSet
+	// copyObservers is the set of observers listening for file copying.
+	copyObservers []copier.Observer
+	// machObservers is the set of observers listening for remote corpus manipulations.
+	machObservers []observer.Observer
 	// rfac governs how the invoker will run the machine node when given a plan to invoke.
 	rfac runner.Factory
 }

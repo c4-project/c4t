@@ -11,6 +11,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
@@ -205,6 +206,9 @@ func (o *Observer) OnPlan(planner.Message) {}
 
 // OnPerturb does nothing, at the moment.
 func (o *Observer) OnPerturb(perturber.Message) {}
+
+// OnMachineNodeAction does nothing, at the moment.
+func (o *Observer) OnMachineNodeAction(observer.Message) {}
 
 func (o *Observer) logError(err error) {
 	// For want of better location.

@@ -72,7 +72,8 @@ func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.I
 		stdflag.MachInvoker{
 			Config: &mcfg,
 		},
-		invoker.ObserveWith(singleobs.Invoker(l)...),
+		invoker.ObserveCopiesWith(singleobs.Copier(l)...),
+		invoker.ObserveMachWith(singleobs.MachNode(l)...),
 		invoker.UsePlanSSH(cfg.SSH),
 	)
 }
