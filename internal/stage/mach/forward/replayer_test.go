@@ -182,7 +182,7 @@ func roundTrip(ctx context.Context, input func(*forward.Observer), obsf func(*mo
 	obsf(tobs)
 	eg, ectx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		input(&obs)
+		input(obs)
 		return pw.Close()
 	})
 	eg.Go(func() error {
@@ -191,9 +191,9 @@ func roundTrip(ctx context.Context, input func(*forward.Observer), obsf func(*mo
 	return tobs, eg.Wait()
 }
 
-func roundTripPipe() (io.Closer, forward.Observer, *mocks.Observer, forward.Replayer) {
+func roundTripPipe() (io.Closer, *forward.Observer, *mocks.Observer, forward.Replayer) {
 	pr, pw := io.Pipe()
-	obs := forward.Observer{Encoder: json.NewEncoder(pw)}
+	obs := forward.NewObserver(pw)
 	tobs := mocks.Observer{}
 	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observers: []observer.Observer{&tobs}}
 	return pw, obs, &tobs, rep
