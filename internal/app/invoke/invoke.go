@@ -69,6 +69,7 @@ func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.I
 	mcfg := stdflag.MachConfigFromCli(ctx, cfg.Quantities.Mach)
 
 	return invoker.New(stdflag.OutDirFromCli(ctx),
+		// TODO(@MattWindsor91): work out how to feed in config from the plan's machine BEFORE overriding with ctx
 		stdflag.MachInvoker{
 			Config: &mcfg,
 		},
