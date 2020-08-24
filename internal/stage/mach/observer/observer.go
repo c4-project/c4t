@@ -56,7 +56,7 @@ func OnCompileStart(qs quantity.BatchSet, obs ...Observer) {
 
 // OnRunStart sends a run start message to every observer in obs, containing the quantity set qs.
 func OnRunStart(qs quantity.BatchSet, obs ...Observer) {
-	OnMachineNodeAction(Message{Kind: KindRunStart, Quantities: quantity.MachNodeSet{Compiler: qs}}, obs...)
+	OnMachineNodeAction(Message{Kind: KindRunStart, Quantities: quantity.MachNodeSet{Runner: qs}}, obs...)
 }
 
 // LowerToBuilder lowers each observer in obs to a corpus builder observer.

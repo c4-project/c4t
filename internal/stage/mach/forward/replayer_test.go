@@ -13,6 +13,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
@@ -42,8 +44,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer/mocks"
 )
 
-// TestReplayer_Run_roundTrip tests a round-trip between Observer and Replayer.
-func TestReplayer_Run_roundTrip(t *testing.T) {
+// TestReplayer_Run_roundTripBuilder a round-trip between Observer and Replayer over builder requests.
+func TestReplayer_Run_roundTripBuilder(t *testing.T) {
 	t.Parallel()
 
 	m := builder.Manifest{
@@ -106,10 +108,35 @@ func TestReplayer_Run_roundTrip(t *testing.T) {
 	tobs.AssertExpectations(t)
 }
 
-func onBuild(m *mocks.Observer, k observing.BatchKind, f func(int, string, *builder.Request) bool) *mock.Call {
-	return m.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
-		return m.Kind == k && f(m.Num, m.Name, m.Request)
-	}))
+// TestReplayer_Run_roundTripMachNode a round-trip between Observer and Replayer over machine node observations.
+func TestReplayer_Run_roundTripMachNode(t *testing.T) {
+	t.Parallel()
+
+	qs := quantity.MachNodeSet{
+		Compiler: quantity.BatchSet{
+			Timeout:  1,
+			NWorkers: 2,
+		},
+		Runner: quantity.BatchSet{
+			Timeout:  3,
+			NWorkers: 4,
+		},
+	}
+
+	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {
+		observer.OnCompileStart(qs.Compiler, obs)
+		observer.OnRunStart(qs.Runner, obs)
+	}, func(obs *mocks.Observer) {
+		onMachNode(obs, observer.KindCompileStart, func(q *quantity.MachNodeSet) bool {
+			return q.Compiler.NWorkers == qs.Compiler.NWorkers && q.Compiler.Timeout == qs.Compiler.Timeout
+		}).Return().Once()
+		onMachNode(obs, observer.KindRunStart, func(q *quantity.MachNodeSet) bool {
+			return q.Runner.NWorkers == qs.Runner.NWorkers && q.Runner.Timeout == qs.Runner.Timeout
+		}).Return().Once()
+	})
+	require.NoError(t, err)
+
+	tobs.AssertExpectations(t)
 }
 
 // TestReplayer_Run_roundTripError tests an error round-trip between Observer and Replayer.
@@ -136,6 +163,18 @@ func TestReplayer_Run_immediateCancel(t *testing.T) {
 
 	_, err := roundTrip(ctx, func(*forward.Observer) {}, func(*mocks.Observer) {})
 	testhelp.ExpectErrorIs(t, err, ctx.Err(), "replay with immediate cancel")
+}
+
+func onBuild(m *mocks.Observer, k observing.BatchKind, f func(int, string, *builder.Request) bool) *mock.Call {
+	return m.On("OnBuild", mock.MatchedBy(func(m builder.Message) bool {
+		return m.Kind == k && f(m.Num, m.Name, m.Request)
+	}))
+}
+
+func onMachNode(m *mocks.Observer, k observer.MessageKind, f func(set *quantity.MachNodeSet) bool) *mock.Call {
+	return m.On("OnMachineNodeAction", mock.MatchedBy(func(m observer.Message) bool {
+		return m.Kind == k && f(&m.Quantities)
+	}))
 }
 
 func roundTrip(ctx context.Context, input func(*forward.Observer), obsf func(*mocks.Observer)) (*mocks.Observer, error) {
