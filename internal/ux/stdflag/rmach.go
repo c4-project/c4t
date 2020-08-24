@@ -7,7 +7,6 @@ package stdflag
 
 import (
 	"strconv"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
@@ -67,28 +66,32 @@ func MachCliFlags() []c.Flag {
 			Usage: "if given, skip the runner",
 		},
 		&c.DurationFlag{
-			Name:    FlagCompilerTimeoutLong,
-			Aliases: []string{FlagCompilerTimeout},
-			Value:   1 * time.Minute,
-			Usage:   "a `timeout` to apply to each compilation",
+			Name:        FlagCompilerTimeoutLong,
+			Aliases:     []string{FlagCompilerTimeout},
+			Value:       0,
+			Usage:       "a `timeout` to apply to each compilation",
+			DefaultText: "from config",
 		},
 		&c.DurationFlag{
-			Name:    FlagRunTimeoutLong,
-			Aliases: []string{FlagRunTimeout},
-			Value:   1 * time.Minute,
-			Usage:   "a `timeout` to apply to each run",
+			Name:        FlagRunTimeoutLong,
+			Aliases:     []string{FlagRunTimeout},
+			Value:       0,
+			Usage:       "a `timeout` to apply to each run",
+			DefaultText: "from config",
 		},
 		&c.IntFlag{
-			Name:    FlagCompilerWorkerCountLong,
-			Aliases: []string{FlagWorkerCount},
-			Value:   1,
-			Usage:   "number of compiler `workers` to run in parallel",
+			Name:        FlagCompilerWorkerCountLong,
+			Aliases:     []string{FlagWorkerCount},
+			Value:       0,
+			Usage:       "number of compiler `workers` to run in parallel",
+			DefaultText: "from config",
 		},
 		&c.IntFlag{
-			Name:    FlagRunWorkerCountLong,
-			Aliases: []string{FlagAltWorkerCount},
-			Value:   1,
-			Usage:   "number of runner `workers` to run in parallel (not recommended except on manycore machines)",
+			Name:        FlagRunWorkerCountLong,
+			Aliases:     []string{FlagAltWorkerCount},
+			Value:       0,
+			Usage:       "number of runner `workers` to run in parallel (not recommended except on manycore machines)",
+			DefaultText: "from config",
 		},
 		OutDirCliFlag(defaultOutDir),
 	}
