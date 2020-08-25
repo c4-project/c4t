@@ -11,6 +11,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
@@ -31,6 +33,10 @@ type Instance struct {
 
 	// SubjectCycles is the number of times each subject should be fuzzed.
 	SubjectCycles int
+
+	// Machine is the machine, if any, being targeted by the fuzzer.
+	// Knowledge of the machine can be used to shape things like thread counts.
+	Machine *machine.Machine
 
 	// Pathset points to the pathset to use to work out where to store fuzz output.
 	Pathset SubjectPather
@@ -101,6 +107,7 @@ func (j *Instance) makeJob(sc SubjectCycle) job.Fuzzer {
 		In:        j.Subject.Source.Path,
 		OutLitmus: j.Pathset.SubjectLitmus(sc),
 		OutTrace:  j.Pathset.SubjectTrace(sc),
+		Machine:   j.Machine,
 	}
 	return jb
 }

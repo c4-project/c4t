@@ -5,6 +5,8 @@
 
 package job
 
+import "github.com/MattWindsor91/act-tester/internal/machine"
+
 // Fuzzer contains information on how to fuzz a litmus file.
 type Fuzzer struct {
 	// Seed is the seed to use for randomising decisions made by the fuzzer.
@@ -18,4 +20,7 @@ type Fuzzer struct {
 
 	// OutTrace is the slashpath to the trace file that should be outputted by the fuzzer.
 	OutTrace string
+
+	// Machine is, optionally, the machine that is the target of the fuzzed output.
+	Machine *machine.Machine
 }

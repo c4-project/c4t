@@ -13,6 +13,8 @@ import (
 	"log"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/machine"
+
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -103,7 +105,7 @@ func (f *Fuzzer) fuzz(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 
 	f.l.Println("now fuzzing")
 	rng := p.Metadata.Rand()
-	fcs, ferr := f.fuzzCorpus(ctx, rng, p.Corpus)
+	fcs, ferr := f.fuzzCorpus(ctx, rng, p.Corpus, p.Machine.Machine)
 	if ferr != nil {
 		return nil, ferr
 	}
@@ -134,17 +136,17 @@ func (f *Fuzzer) count(c corpus.Corpus) (nsubjects, nruns int) {
 }
 
 // fuzzCorpus actually does the business of fuzzing.
-func (f *Fuzzer) fuzzCorpus(ctx context.Context, rng *rand.Rand, c corpus.Corpus) (corpus.Corpus, error) {
+func (f *Fuzzer) fuzzCorpus(ctx context.Context, rng *rand.Rand, c corpus.Corpus, m machine.Machine) (corpus.Corpus, error) {
 	_, nfuzzes := f.count(c)
 
 	f.l.Printf("Fuzzing %d inputs\n", len(c))
 
 	seeds := corpusSeeds(rng, c)
 
-	m := builder.Manifest{Name: "fuzz", NReqs: nfuzzes}
-	bc := builder.Config{Manifest: m, Observers: f.observers}
+	mf := builder.Manifest{Name: "fuzz", NReqs: nfuzzes}
+	bc := builder.Config{Manifest: mf, Observers: f.observers}
 	return builder.ParBuild(ctx, f.quantities.NWorkers, c, bc, func(ctx context.Context, s subject.Named, ch chan<- builder.Request) error {
-		return f.makeInstance(s, seeds[s.Name], ch).Fuzz(ctx)
+		return f.makeInstance(s, seeds[s.Name], m, ch).Fuzz(ctx)
 	})
 }
 
@@ -157,7 +159,7 @@ func corpusSeeds(rng *rand.Rand, c corpus.Corpus) map[string]int64 {
 	return seeds
 }
 
-func (f *Fuzzer) makeInstance(s subject.Named, seed int64, resCh chan<- builder.Request) *Instance {
+func (f *Fuzzer) makeInstance(s subject.Named, seed int64, m machine.Machine, resCh chan<- builder.Request) *Instance {
 	return &Instance{
 		Driver:        f.driver,
 		Subject:       s,
@@ -165,6 +167,7 @@ func (f *Fuzzer) makeInstance(s subject.Named, seed int64, resCh chan<- builder.
 		Pathset:       f.paths,
 		Rng:           rand.New(rand.NewSource(seed)),
 		ResCh:         resCh,
+		Machine:       &m,
 	}
 }
 func (f *Fuzzer) checkPlan(p *plan.Plan) error {
