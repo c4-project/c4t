@@ -7,8 +7,6 @@ package plan_test
 
 import (
 	"bytes"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -57,10 +55,7 @@ func TestPlan_Write_roundTrip(t *testing.T) {
 // the reconstituted plan is similar.
 func TestPlan_WriteFile_roundTrip(t *testing.T) {
 	// Is it safe to call t.Parallel on these?
-	dir, err := ioutil.TempDir("", "roundTrip")
-	if err != nil {
-		log.Fatal(err)
-	}
+	dir := t.TempDir()
 	defer func() { _ = os.RemoveAll(dir) }()
 
 	tmpfn := filepath.Join(dir, "plan.json")

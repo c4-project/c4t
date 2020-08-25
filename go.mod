@@ -1,6 +1,6 @@
 module github.com/MattWindsor91/act-tester
 
-go 1.14
+go 1.15
 
 require (
 	github.com/1set/gut v0.0.0-20200722022712-b823fbdcfd65
