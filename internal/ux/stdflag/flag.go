@@ -6,7 +6,6 @@
 package stdflag
 
 const (
-	flagActConfFile = "A"
 	// FlagCompiler is a standard flag for compiler selection arguments.
 	FlagCompiler = "c"
 	flagConfFile = "C"
@@ -41,9 +40,8 @@ const (
 	// FlagRunWorkerCountLong is a long flag for arguments that set a runner worker count.
 	FlagRunWorkerCountLong = "num-run-workers"
 
-	usageActConfFile = "read ACT config from this `file`"
-	usageConfFile    = "read tester config from this `file`"
-	usageCorpusSize  = "`number` of corpus files to select for this test plan;\n" +
+	usageConfFile   = "read tester config from this `file`"
+	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
 		"if non-positive, the planner will use all viable provided corpus files"
 	usageActDuneExec   = "if true, use 'dune exec' to run OCaml ACT binaries"
 	usageOutDir        = "`directory` to which outputs will be written"

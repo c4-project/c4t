@@ -16,10 +16,6 @@ type Runner struct {
 	// DuneExec toggles whether ACT should be run through dune.
 	DuneExec bool
 
-	// ConfFile is the path to the act.conf to use.
-	// If missing, we use ACT's default.
-	ConfFile string
-
 	// Stderr is the destination for any error output from ACT commands.
 	Stderr io.Writer
 }
@@ -56,11 +52,6 @@ func (a *Runner) actArgv(sub string, sargs StandardArgs, argv []string) []string
 	fargv := make([]string, 1, 3+len(sargv)+len(argv))
 	fargv[0] = sub
 	fargv = append(fargv, sargs.ToArgv()...)
-
-	if a.ConfFile != "" {
-		fargv = append(fargv, "-config", a.ConfFile)
-	}
-
 	return append(fargv, argv...)
 }
 

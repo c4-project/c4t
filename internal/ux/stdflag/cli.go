@@ -31,11 +31,6 @@ func OutDirCliFlag(defaultdir string) c.Flag {
 // ActRunnerCliFlags gets the 'cli' flags needed to set up an ACT runner.
 func ActRunnerCliFlags() []c.Flag {
 	return []c.Flag{
-		&c.PathFlag{
-			Name:      flagActConfFile,
-			Usage:     usageActConfFile,
-			TakesFile: true,
-		},
 		&c.BoolFlag{
 			Name:  flagActDuneExec,
 			Usage: usageActDuneExec,
@@ -47,7 +42,6 @@ func ActRunnerCliFlags() []c.Flag {
 func ActRunnerFromCli(ctx *c.Context, errw io.Writer) *act.Runner {
 	return &act.Runner{
 		DuneExec: ctx.Bool(flagActDuneExec),
-		ConfFile: ctx.Path(flagActConfFile),
 		Stderr:   errw,
 	}
 }
