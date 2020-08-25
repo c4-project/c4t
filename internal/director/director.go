@@ -202,8 +202,11 @@ func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*I
 }
 
 func (d *Director) machineQuantities(c *machine.Config) quantity.MachineSet {
+	if c.Quantities == nil {
+		return d.quantities.MachineSet
+	}
 	qs := d.quantities.MachineSet
-	qs.Override(c.Quantities)
+	qs.Override(*c.Quantities)
 	return qs
 }
 

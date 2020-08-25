@@ -70,12 +70,12 @@ func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.I
 	l := log.New(errw, "[invoker] ", log.LstdFlags)
 
 	return invoker.New(stdflag.OutDirFromCli(ctx),
-		// TODO(@MattWindsor91): work out how to feed in config from the plan's machine BEFORE overriding with ctx
 		&runner.FromPlanFactory{Config: cfg.SSH},
 		invoker.ObserveCopiesWith(singleobs.Copier(l)...),
 		invoker.ObserveMachWith(singleobs.MachNode(l)...),
+		// The idea here is that the configuration's quantities should be lowest priority, then those in the plan,
+		// and then those in the command line arguments.
 		invoker.OverrideBaseQuantities(cfg.Quantities.Mach),
-		// TODO(@MattWindsor91): this should happen *after* plan feeding.
-		invoker.OverrideBaseQuantities(stdflag.MachNodeQuantitySetFromCli(ctx)),
+		invoker.OverrideQuantitiesFromPlanThen(stdflag.MachNodeQuantitySetFromCli(ctx)),
 	)
 }

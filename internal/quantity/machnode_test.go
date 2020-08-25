@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// ExampleSet_Log is a testable example for Log.
+// ExampleMachNodeSet_Log is a testable example for MachNodeSet.Log.
 func ExampleMachNodeSet_Log() {
 	qs := quantity.MachNodeSet{
 		Compiler: quantity.BatchSet{
@@ -41,7 +41,7 @@ func ExampleMachNodeSet_Log() {
 	// timeout at 2m0s
 }
 
-// TestMachNodeSet_Override tests Override against some cases.
+// TestMachNodeSet_Override tests MachNodeSet.Override against some cases.
 func TestMachNodeSet_Override(t *testing.T) {
 	t.Parallel()
 

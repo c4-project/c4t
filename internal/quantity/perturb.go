@@ -17,7 +17,7 @@ type PerturbSet struct {
 	// If zero, no corpus sampling is done, but the perturber will still error if the final corpus size is 0.
 	// If nonzero, the corpus will be sampled if larger than the size, and an error occurs if the final size is below
 	// that requested.
-	CorpusSize int `toml:"corpus_size,omitzero"`
+	CorpusSize int `toml:"corpus_size,omitzero" json:"corpus_size,omitempty"`
 }
 
 // Override substitutes any quantities in new that are non-zero for those in this set.

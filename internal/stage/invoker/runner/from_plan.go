@@ -15,7 +15,8 @@ import (
 // configuration inside the first plan passed to it.
 //
 // This is useful for single-shot invocation over a plan, where there is no benefit to setting up a connection based
-// on central machine/SSH configuration.
+// on central machine/SSH configuration.  In the director, the invoker will set up the machine configuration in
+// advance, and there is no need to consult the plan.
 type FromPlanFactory struct {
 	// The global remoting config used for any remote connections initiated by this factory.
 	Config *remote.Config

@@ -57,3 +57,16 @@ func OverrideBaseQuantities(qs quantity.MachNodeSet) Option {
 		return nil
 	}
 }
+
+// OverrideQuantitiesFromPlanThen tells the invoker to override its base quantity set with the quantities in the
+// incoming plan, and then override them again using qs.
+//
+// This is intended for single-shot uses of the invoker, where there is no pre-calculation of the quantity set;
+// in the director form of the invoker, the director will cache the expected quantity set, and there is no need to
+// consult the plan.
+func OverrideQuantitiesFromPlanThen(qs quantity.MachNodeSet) Option {
+	return func(r *Invoker) error {
+		r.pqo = &ConfigPlanQuantityOverrider{PostPlanOverrides: qs}
+		return nil
+	}
+}

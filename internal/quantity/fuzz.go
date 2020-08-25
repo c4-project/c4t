@@ -15,13 +15,13 @@ import (
 type FuzzSet struct {
 	// CorpusSize is the sampling size for the corpus after fuzzing.
 	// It has a similar effect to CorpusSize in planner.Planner.
-	CorpusSize int `toml:"corpus_size,omitzero"`
+	CorpusSize int `toml:"corpus_size,omitzero" json:"corpus_size,omitempty"`
 
 	// SubjectCycles is the number of times to fuzz each file.
-	SubjectCycles int `toml:"subject_cycles,omitzero"`
+	SubjectCycles int `toml:"subject_cycles,omitzero" json:"subject_cycles,omitempty"`
 
 	// NWorkers is the number of workers to use when fuzzing.
-	NWorkers int `toml:"workers,omitzero"`
+	NWorkers int `toml:"workers,omitzero" json:"num_workers,omitempty"`
 }
 
 // Override substitutes any quantities in new that are non-zero for those in this set.

@@ -13,11 +13,11 @@ import (
 // Often, but not always, these quantities will be shared between machines.
 type MachineSet struct {
 	// Fuzz is the quantity set for the fuzz stage.
-	Fuzz FuzzSet `toml:"fuzz,omitzero"`
+	Fuzz FuzzSet `toml:"fuzz,omitzero" json:"fuzz,omitempty"`
 	// Mach is the quantity set for the machine-local stage, as well as any machine-local stages run remotely.
-	Mach MachNodeSet `toml:"mach,omitzero"`
+	Mach MachNodeSet `toml:"mach,omitzero" json:"mach,omitempty"`
 	// Perturb is the quantity set for the planner stage.
-	Perturb PerturbSet `toml:"perturb,omitzero"`
+	Perturb PerturbSet `toml:"perturb,omitzero" json:"perturb,omitempty"`
 }
 
 // Log logs q to l.

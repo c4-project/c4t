@@ -8,6 +8,7 @@ package machine
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 	"github.com/MattWindsor91/act-tester/internal/remote"
 )
 
@@ -19,6 +20,9 @@ type Machine struct {
 
 	// SSH contains, if present, information about how to dial into a remote machine through SSH.
 	SSH *remote.MachineConfig `toml:"ssh,omitempty" json:"ssh,omitempty"`
+
+	// Quantities contains, if present, quantity overrides for this machine.
+	Quantities *quantity.MachineSet `toml:"quantities,omitempty,omitzero" json:"quantities,omitempty"`
 }
 
 // Named wraps a plan machine with its ID.

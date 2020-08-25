@@ -12,9 +12,9 @@ import (
 // MachNodeSet contains the tunable quantities for both batch-compiler and batch-runner.
 type MachNodeSet struct {
 	// Compiler is the quantity set for the compiler.
-	Compiler BatchSet `toml:"compiler,omitzero"`
+	Compiler BatchSet `toml:"compiler,omitzero" json:"compiler,omitempty"`
 	// Runner is the quantity set for the runner.
-	Runner BatchSet `toml:"runner,omitzero"`
+	Runner BatchSet `toml:"runner,omitzero" json:"runner,omitempty"`
 }
 
 // Log logs q to l.
@@ -35,11 +35,11 @@ func (q *MachNodeSet) Override(new MachNodeSet) {
 type BatchSet struct {
 	// Timeout is the timeout for each runner.
 	// Non-positive values disable the timeout.
-	Timeout Timeout `toml:"timeout,omitzero"`
+	Timeout Timeout `toml:"timeout,omitzero" json:"timeout,omitempty"`
 
 	// NWorkers is the number of parallel run workers that should be spawned.
 	// Anything less than or equal to 1 will sequentialise the run.
-	NWorkers int `toml:"workers,omitzero"`
+	NWorkers int `toml:"workers,omitzero" json:"workers,omitempty"`
 }
 
 // Log logs this quantity set to l.

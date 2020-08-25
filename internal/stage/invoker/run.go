@@ -41,8 +41,11 @@ func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) 
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
 
-	// TODO(@MattWindsor91): wire the quantities up properly
-	ps, err := runner.Start(ctx, m.baseQuantities)
+	qs := m.baseQuantities
+	if err := m.pqo.OverrideQuantitiesFromPlan(p, &qs); err != nil {
+		return nil, fmt.Errorf("while extracting quantities from plan: %w", err)
+	}
+	ps, err := runner.Start(ctx, qs)
 	if err != nil {
 		return nil, fmt.Errorf("while starting command: %w", err)
 	}
