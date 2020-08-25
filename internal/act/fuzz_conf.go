@@ -6,8 +6,12 @@
 package act
 
 import (
+	"fmt"
 	"io"
+	"io/ioutil"
 	"text/template"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 )
@@ -28,4 +32,18 @@ func WriteFuzzConf(w io.Writer, j job.Fuzzer) error {
 		return err
 	}
 	return t.Execute(w, j)
+}
+
+// MakeFuzzConfFile creates a temporary file, then outputs WriteFuzzConf of j to it and returns the filepath.
+// It is the caller's responsibility to delete the file.
+func MakeFuzzConfFile(j job.Fuzzer) (string, error) {
+	cf, err := ioutil.TempFile("", "act.*.conf")
+	if err != nil {
+		return "", fmt.Errorf("creating temporary fuzzer config file: %w", err)
+	}
+
+	werr := WriteFuzzConf(cf, j)
+	cerr := cf.Close()
+
+	return cf.Name(), errhelp.FirstError(werr, cerr)
 }

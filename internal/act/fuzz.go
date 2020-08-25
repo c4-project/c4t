@@ -7,7 +7,10 @@ package act
 
 import (
 	"context"
+	"os"
 	"strconv"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 )
@@ -19,7 +22,16 @@ const BinActFuzz = "act-fuzz"
 func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
 	sargs := StandardArgs{Verbose: false}
 	seedStr := strconv.Itoa(int(j.Seed))
-	args := []string{"-seed", seedStr, "-o", j.OutLitmus, "-trace-output", j.OutTrace, j.In}
+
+	cf, err := MakeFuzzConfFile(j)
+	if err != nil {
+		return err
+	}
+
+	args := []string{"-config", cf, "-seed", seedStr, "-o", j.OutLitmus, "-trace-output", j.OutTrace, j.In}
 	cmd := a.CommandContext(ctx, BinActFuzz, "run", sargs, args...)
-	return cmd.Run()
+
+	cerr := cmd.Run()
+	rerr := os.Remove(cf)
+	return errhelp.FirstError(cerr, rerr)
 }
