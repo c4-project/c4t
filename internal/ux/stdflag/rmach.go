@@ -16,40 +16,36 @@ import (
 	c "github.com/urfave/cli/v2"
 )
 
-const BinMach = "act-tester-mach"
+// MachBinName is the name of the machine node binary.
+const MachBinName = "act-tester-mach"
 
-// MachInvoker tells the various invoker runners how to talk to a mach binary,
-// passing through a user config in the form of flags.
-type MachInvoker struct {
-	Config *mach.UserConfig
-}
-
-func (m MachInvoker) MachBin() string {
-	return BinMach
-}
-
-// MachArgs is the arguments for an invocation of act-tester-mach, given directory dir and the config in this invoker.
-func (m MachInvoker) MachArgs(dir string) []string {
+// MachArgs is the arguments for an invocation of act-tester-mach, given directory dir and the config uc.
+func MachArgs(dir string, uc mach.UserConfig) []string {
 	// We assume that any shell escaping is done elsewhere.
 	args := []string{
-		"-" + FlagOutDir, m.maybeOverrideDir(dir),
-		"-" + FlagCompilerTimeoutLong, m.Config.Quantities.Compiler.Timeout.String(),
-		"-" + FlagRunTimeoutLong, m.Config.Quantities.Runner.Timeout.String(),
-		"-" + FlagCompilerWorkerCountLong, strconv.Itoa(m.Config.Quantities.Compiler.NWorkers),
-		"-" + FlagRunWorkerCountLong, strconv.Itoa(m.Config.Quantities.Runner.NWorkers),
+		"-" + FlagOutDir, maybeOverrideDir(dir, uc),
+		"-" + FlagCompilerTimeoutLong, uc.Quantities.Compiler.Timeout.String(),
+		"-" + FlagRunTimeoutLong, uc.Quantities.Runner.Timeout.String(),
+		"-" + FlagCompilerWorkerCountLong, strconv.Itoa(uc.Quantities.Compiler.NWorkers),
+		"-" + FlagRunWorkerCountLong, strconv.Itoa(uc.Quantities.Runner.NWorkers),
 	}
-	if m.Config.SkipCompiler {
+	if uc.SkipCompiler {
 		args = append(args, "-"+FlagSkipCompiler)
 	}
-	if m.Config.SkipRunner {
+	if uc.SkipRunner {
 		args = append(args, "-"+FlagSkipRunner)
 	}
 	return args
 }
 
-func (m MachInvoker) maybeOverrideDir(dir string) string {
+// MachInvocation gets the invocation for the local-machine binary as a string list.
+func MachInvocation(dir string, uc mach.UserConfig) []string {
+	return append([]string{MachBinName}, MachArgs(dir, uc)...)
+}
+
+func maybeOverrideDir(dir string, uc mach.UserConfig) string {
 	if ystring.IsBlank(dir) {
-		return m.Config.OutDir
+		return uc.OutDir
 	}
 	return dir
 }

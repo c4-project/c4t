@@ -29,10 +29,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
-
 	"github.com/MattWindsor91/act-tester/internal/model/run"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -268,12 +266,10 @@ func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 
 func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer) (*invoker.Invoker, error) {
 	return invoker.New(i.ScratchPaths.DirRun,
-		stdflag.MachInvoker{
-			// TODO(@MattWindsor91): this is a bit messy.
-			Config: &mach.UserConfig{
-				OutDir:     i.ScratchPaths.DirRun,
-				Quantities: i.Quantities.Mach,
-			},
+		// TODO(@MattWindsor91): this is a bit messy.
+		mach.UserConfig{
+			OutDir:     i.ScratchPaths.DirRun,
+			Quantities: i.Quantities.Mach,
 		},
 		invoker.ObserveCopiesWith(cobs...),
 		invoker.ObserveMachWith(mobs...),

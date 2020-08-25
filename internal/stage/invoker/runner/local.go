@@ -10,6 +10,10 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
@@ -43,8 +47,8 @@ func NewLocalRunner(dir string) *LocalRunner {
 }
 
 // Start starts the machine-runner binary locally using ctx, and returns a pipeset for talking to it.
-func (r *LocalRunner) Start(ctx context.Context, i InvocationGetter) (*remote.Pipeset, error) {
-	r.cmd = exec.CommandContext(ctx, i.MachBin(), i.MachArgs(r.dir)...)
+func (r *LocalRunner) Start(ctx context.Context, uc mach.UserConfig) (*remote.Pipeset, error) {
+	r.cmd = exec.CommandContext(ctx, stdflag.MachBinName, stdflag.MachArgs(r.dir, uc)...)
 	ps, err := r.openPipes()
 	if err != nil {
 		return nil, fmt.Errorf("opening pipes: %w", err)

@@ -12,8 +12,3 @@ type InvocationGetter interface {
 	// MachArgs computes the argument set for invoking the node binary.
 	MachArgs(dir string) []string
 }
-
-// Invocation gets the invocation for the local-machine binary as a string list.
-func Invocation(i InvocationGetter, dir string) []string {
-	return append([]string{i.MachBin()}, i.MachArgs(dir)...)
-}

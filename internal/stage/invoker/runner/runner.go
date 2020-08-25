@@ -9,6 +9,8 @@ package runner
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+
 	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/remote"
 )
@@ -20,7 +22,7 @@ type Runner interface {
 	Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
 
 	// Start starts the machine binary, returning a set of pipe readers and writers to use for communication with it.
-	Start(ctx context.Context, mi InvocationGetter) (*remote.Pipeset, error)
+	Start(ctx context.Context, uc mach.UserConfig) (*remote.Pipeset, error)
 
 	// Wait blocks waiting for the command to finish (or the context passed into Start to cancel).
 	Wait() error

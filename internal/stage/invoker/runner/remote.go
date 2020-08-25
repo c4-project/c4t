@@ -11,6 +11,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+
 	"github.com/MattWindsor91/act-tester/internal/copier"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
@@ -73,8 +77,8 @@ func NewRemoteRunner(r *remote.MachineRunner, localRoot string, o ...copier.Obse
 	return &RemoteRunner{runner: r, observers: o, localRoot: localRoot, remoteRoot: r.Config.DirCopy}, nil
 }
 
-// Start starts a SSH session connected to a machine node with name and arguments constructed through i.
-func (r *RemoteRunner) Start(ctx context.Context, i InvocationGetter) (*remote.Pipeset, error) {
+// Start starts a SSH session connected to a machine node with name and arguments constructed through uc.
+func (r *RemoteRunner) Start(ctx context.Context, uc mach.UserConfig) (*remote.Pipeset, error) {
 	var (
 		err error
 		ps  *remote.Pipeset
@@ -88,7 +92,7 @@ func (r *RemoteRunner) Start(ctx context.Context, i InvocationGetter) (*remote.P
 		return nil, fmt.Errorf("while opening pipes: %w", err)
 	}
 
-	if err := r.session.Start(r.invocation(i)); err != nil {
+	if err := r.session.Start(r.invocation(uc)); err != nil {
 		_ = ps.Close()
 		return nil, fmt.Errorf("while starting local runner: %w", err)
 	}
@@ -130,10 +134,10 @@ func (r *RemoteRunner) Wait() error {
 }
 
 // invocation works out what the SSH command invocation for the tester should be.
-func (r *RemoteRunner) invocation(i InvocationGetter) string {
+func (r *RemoteRunner) invocation(uc mach.UserConfig) string {
 	dir := path.Join(r.remoteRoot, "mach")
 	qdir := shellescape.Quote(dir)
-	return strings.Join(Invocation(i, qdir), " ")
+	return strings.Join(stdflag.MachInvocation(qdir, uc), " ")
 }
 
 // openPipes tries to open stdin, stdout, and stderr pipes for r.

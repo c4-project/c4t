@@ -41,7 +41,7 @@ func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) 
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
 
-	ps, err := runner.Start(ctx, m.invoker)
+	ps, err := runner.Start(ctx, m.userConfig)
 	if err != nil {
 		return nil, fmt.Errorf("while starting command: %w", err)
 	}

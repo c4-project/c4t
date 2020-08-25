@@ -10,11 +10,12 @@ import (
 	"io"
 	"strings"
 
+	"github.com/MattWindsor91/act-tester/internal/app/invoke"
+
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
@@ -25,7 +26,9 @@ import (
 )
 
 const (
-	Name = "act-tester-mach"
+	// Name is the name of this binary.
+	// The name of this binary is depended-upon by the invoker, so we store it with the rest of the invocation stuff.
+	Name = stdflag.MachBinName
 
 	readme = `
    This part of the tester, also known as the 'machine invoker', runs the parts

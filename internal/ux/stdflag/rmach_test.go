@@ -14,20 +14,18 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
-	runner2 "github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
-
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	"github.com/stretchr/testify/assert"
 	c "github.com/urfave/cli/v2"
 )
 
-// ExampleMachInvoker_MachArgs is a testable example for MachArgs.
-func ExampleMachInvoker_MachArgs() {
-	mempty := stdflag.MachInvoker{Config: &mach.UserConfig{}}
-	fmt.Println(strings.Join(mempty.MachArgs(""), ", "))
+// ExampleMachArgs is a testable example for MachArgs.
+func ExampleMachArgs() {
+	mempty := mach.UserConfig{}
+	fmt.Println(strings.Join(stdflag.MachArgs("", mempty), ", "))
 
-	mi := stdflag.MachInvoker{Config: &mach.UserConfig{
+	mi := mach.UserConfig{
 		OutDir:       "foo",
 		SkipCompiler: true,
 		SkipRunner:   false,
@@ -41,9 +39,9 @@ func ExampleMachInvoker_MachArgs() {
 				NWorkers: 20,
 			},
 		},
-	}}
+	}
 
-	fmt.Println(strings.Join(mi.MachArgs(""), ", "))
+	fmt.Println(strings.Join(stdflag.MachArgs("", mi), ", "))
 
 	// Output:
 	// -d, , -compiler-timeout, 0s, -run-timeout, 0s, -num-compiler-workers, 0, -num-run-workers, 0
@@ -82,7 +80,7 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			args := runner2.Invocation(stdflag.MachInvoker{Config: &in}, "")
+			args := stdflag.MachInvocation("", in)
 			a := testApp(
 				func(ctx *c.Context) error {
 					t.Helper()

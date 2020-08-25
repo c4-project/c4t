@@ -70,9 +70,7 @@ func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.I
 
 	return invoker.New(stdflag.OutDirFromCli(ctx),
 		// TODO(@MattWindsor91): work out how to feed in config from the plan's machine BEFORE overriding with ctx
-		stdflag.MachInvoker{
-			Config: &mcfg,
-		},
+		mcfg,
 		invoker.ObserveCopiesWith(singleobs.Copier(l)...),
 		invoker.ObserveMachWith(singleobs.MachNode(l)...),
 		invoker.UsePlanSSH(cfg.SSH),

@@ -10,6 +10,7 @@ import (
 	"github.com/1set/gut/ystring"
 	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 )
 
@@ -17,8 +18,8 @@ import (
 type Invoker struct {
 	// dirLocal is the filepath to the directory to which local outcomes from this invoker run will appear.
 	dirLocal string
-	// invoker tells the remote-machine stage which arguments to send to the machine binary.
-	invoker runner.InvocationGetter
+	// userConfig contains the user-accessible configuration
+	userConfig mach.UserConfig
 	// copyObservers is the set of observers listening for file copying.
 	copyObservers []copier.Observer
 	// machObservers is the set of observers listening for remote corpus manipulations.
@@ -28,24 +29,14 @@ type Invoker struct {
 }
 
 // New constructs a new Invoker with local directory ldir, invocation getter inv, and options o.
-func New(ldir string, inv runner.InvocationGetter, o ...Option) (*Invoker, error) {
-	if err := check(ldir, inv); err != nil {
-		return nil, err
+func New(ldir string, uc mach.UserConfig, o ...Option) (*Invoker, error) {
+	if ystring.IsBlank(ldir) {
+		return nil, ErrDirEmpty
 	}
 
-	invoker := Invoker{dirLocal: ldir, invoker: inv, rfac: runner.LocalFactory(ldir)}
+	invoker := Invoker{dirLocal: ldir, userConfig: uc, rfac: runner.LocalFactory(ldir)}
 	if err := Options(o...)(&invoker); err != nil {
 		return nil, err
 	}
 	return &invoker, nil
-}
-
-func check(ldir string, inv runner.InvocationGetter) error {
-	if ystring.IsBlank(ldir) {
-		return ErrDirEmpty
-	}
-	if inv == nil {
-		return ErrInvokerNil
-	}
-	return nil
 }
