@@ -3,8 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package forward describes the JSON-based protocol used to 'forward' messages
-// and errors from a machine-runner to a director, potentially over SSH.
+// Package forward describes the JSON-based protocol used to 'forward' messages  and errors from a machine node to its
+// invoker, potentially over SSH.
 package forward
 
 import (
