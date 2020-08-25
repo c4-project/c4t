@@ -10,9 +10,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
-	"github.com/1set/gut/ystring"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -20,47 +17,26 @@ import (
 const MachBinName = "act-tester-mach"
 
 // MachArgs is the arguments for an invocation of act-tester-mach, given directory dir and the config uc.
-func MachArgs(dir string, uc mach.UserConfig) []string {
+func MachArgs(dir string, qs quantity.MachNodeSet) []string {
 	// We assume that any shell escaping is done elsewhere.
 	args := []string{
-		"-" + FlagOutDir, maybeOverrideDir(dir, uc),
-		"-" + FlagCompilerTimeoutLong, uc.Quantities.Compiler.Timeout.String(),
-		"-" + FlagRunTimeoutLong, uc.Quantities.Runner.Timeout.String(),
-		"-" + FlagCompilerWorkerCountLong, strconv.Itoa(uc.Quantities.Compiler.NWorkers),
-		"-" + FlagRunWorkerCountLong, strconv.Itoa(uc.Quantities.Runner.NWorkers),
-	}
-	if uc.SkipCompiler {
-		args = append(args, "-"+FlagSkipCompiler)
-	}
-	if uc.SkipRunner {
-		args = append(args, "-"+FlagSkipRunner)
+		"-" + FlagOutDir, dir,
+		"-" + FlagCompilerTimeoutLong, qs.Compiler.Timeout.String(),
+		"-" + FlagRunTimeoutLong, qs.Runner.Timeout.String(),
+		"-" + FlagCompilerWorkerCountLong, strconv.Itoa(qs.Compiler.NWorkers),
+		"-" + FlagRunWorkerCountLong, strconv.Itoa(qs.Runner.NWorkers),
 	}
 	return args
 }
 
 // MachInvocation gets the invocation for the local-machine binary as a string list.
-func MachInvocation(dir string, uc mach.UserConfig) []string {
-	return append([]string{MachBinName}, MachArgs(dir, uc)...)
-}
-
-func maybeOverrideDir(dir string, uc mach.UserConfig) string {
-	if ystring.IsBlank(dir) {
-		return uc.OutDir
-	}
-	return dir
+func MachInvocation(dir string, qs quantity.MachNodeSet) []string {
+	return append([]string{MachBinName}, MachArgs(dir, qs)...)
 }
 
 // MachCliFlags gets the cli flags for setting up the 'user config' part of a mach or invoker invocation.
 func MachCliFlags() []c.Flag {
 	return []c.Flag{
-		&c.BoolFlag{
-			Name:  FlagSkipCompiler,
-			Usage: "if given, skip the compiler",
-		},
-		&c.BoolFlag{
-			Name:  FlagSkipRunner,
-			Usage: "if given, skip the runner",
-		},
 		&c.DurationFlag{
 			Name:        FlagCompilerTimeoutLong,
 			Aliases:     []string{FlagCompilerTimeout},
@@ -95,19 +71,8 @@ func MachCliFlags() []c.Flag {
 
 const defaultOutDir = "mach_results"
 
-// MachConfigFromCli creates a machine configuration using the flags in ctx and the default quantities in defq.
-func MachConfigFromCli(ctx *c.Context, defq quantity.MachNodeSet) mach.UserConfig {
-	defq.Override(makeQuantitySet(ctx))
-
-	return mach.UserConfig{
-		OutDir:       OutDirFromCli(ctx),
-		SkipCompiler: ctx.Bool(FlagSkipCompiler),
-		SkipRunner:   ctx.Bool(FlagSkipRunner),
-		Quantities:   defq,
-	}
-}
-
-func makeQuantitySet(ctx *c.Context) quantity.MachNodeSet {
+// MachNodeQuantitySetFromCli gets the machine node quantity set from the flags in ctx.
+func MachNodeQuantitySetFromCli(ctx *c.Context) quantity.MachNodeSet {
 	return quantity.MachNodeSet{
 		Compiler: quantity.BatchSet{
 			Timeout:  quantity.Timeout(ctx.Duration(FlagCompilerTimeoutLong)),

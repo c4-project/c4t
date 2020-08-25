@@ -30,9 +30,6 @@ const (
 	// FlagCPUProfile is a standard flag for specifying a CPU profile output.
 	FlagCPUProfile = "cpuprofile"
 
-	FlagSkipCompiler = "skip-compiler"
-	FlagSkipRunner   = "skip-runner"
-
 	// FlagCompilerTimeoutLong is a long flag for compiler timeout.
 	FlagCompilerTimeoutLong = "compiler-timeout"
 	// FlagRunTimeoutLong is a long flag for run timeout.

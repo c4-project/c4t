@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
+
 	observer2 "github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
@@ -30,7 +32,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 
@@ -265,15 +266,19 @@ func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 }
 
 func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer) (*invoker.Invoker, error) {
+	// Unlike the single-shot, we don't late-bind the factory using the plan.  This is because we've already
+	// got the machine configuration without it.
+	f, err := runner.FactoryFromRemoteConfig(i.SSHConfig, i.MachConfig.SSH)
+	if err != nil {
+		return nil, err
+	}
 	return invoker.New(i.ScratchPaths.DirRun,
-		// TODO(@MattWindsor91): this is a bit messy.
-		mach.UserConfig{
-			OutDir:     i.ScratchPaths.DirRun,
-			Quantities: i.Quantities.Mach,
-		},
+		f,
 		invoker.ObserveCopiesWith(cobs...),
 		invoker.ObserveMachWith(mobs...),
-		invoker.UseSSH(i.SSHConfig, i.MachConfig.SSH),
+		// As above, there is no loading of quantities using the plan, as we already know which machine the plan is
+		// targeting without consulting the plan.
+		invoker.OverrideBaseQuantities(i.Quantities.Mach),
 	)
 }
 

@@ -17,8 +17,6 @@ import (
 // This is useful for single-shot invocation over a plan, where there is no benefit to setting up a connection based
 // on central machine/SSH configuration.
 type FromPlanFactory struct {
-	// The local root directory to use for invocation results.
-	LocalRoot string
 	// The global remoting config used for any remote connections initiated by this factory.
 	Config *remote.Config
 
@@ -26,21 +24,18 @@ type FromPlanFactory struct {
 }
 
 // MakeRunner makes a runner using the machine configuration in pl.
-func (p *FromPlanFactory) MakeRunner(pl *plan.Plan, obs ...copier.Observer) (Runner, error) {
+func (p *FromPlanFactory) MakeRunner(ldir string, pl *plan.Plan, obs ...copier.Observer) (Runner, error) {
 	var err error
 	if p.cached == nil {
 		if p.cached, err = p.makeFactory(pl); err != nil {
 			return nil, err
 		}
 	}
-	return p.cached.MakeRunner(pl, obs...)
+	return p.cached.MakeRunner(ldir, pl, obs...)
 }
 
 func (p *FromPlanFactory) makeFactory(pl *plan.Plan) (Factory, error) {
-	if pl.Machine.SSH == nil {
-		return LocalFactory(p.LocalRoot), nil
-	}
-	return NewRemoteFactory(p.LocalRoot, p.Config, pl.Machine.SSH)
+	return FactoryFromRemoteConfig(p.Config, pl.Machine.SSH)
 }
 
 // Close closes the runner factory, if it was ever instantiated.

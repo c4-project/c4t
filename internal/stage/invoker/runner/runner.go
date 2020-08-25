@@ -9,7 +9,7 @@ package runner
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 	"github.com/MattWindsor91/act-tester/internal/remote"
@@ -18,11 +18,11 @@ import (
 // Runner is the interface of types that know how to run the machine node.
 type Runner interface {
 	// Send performs any copying and transformation needed for p to run.
-	// It returns a pointer to the plan to send to the machine runner, which may or may not be p.
+	// It returns a pointer to the plan to send to the machine node, which may or may not be p.
 	Send(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
 
 	// Start starts the machine binary, returning a set of pipe readers and writers to use for communication with it.
-	Start(ctx context.Context, uc mach.UserConfig) (*remote.Pipeset, error)
+	Start(ctx context.Context, qs quantity.MachNodeSet) (*remote.Pipeset, error)
 
 	// Wait blocks waiting for the command to finish (or the context passed into Start to cancel).
 	Wait() error

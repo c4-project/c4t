@@ -7,13 +7,10 @@ package invoker
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
-
 	"github.com/MattWindsor91/act-tester/internal/copier"
-
-	"github.com/MattWindsor91/act-tester/internal/remote"
 )
 
 // Option is the type of options for the invoker.
@@ -53,41 +50,10 @@ func ObserveCopiesWith(obs ...copier.Observer) Option {
 	}
 }
 
-// UsePlanSSH sets the invoker up to read any SSH configuration from the first plan it receives, and, if needed, open
-// a SSH connection to use for that and subsequent invocations.
-func UsePlanSSH(gc *remote.Config) Option {
+// OverrideBaseQuantities overrides the base quantity set with qs.
+func OverrideBaseQuantities(qs quantity.MachNodeSet) Option {
 	return func(r *Invoker) error {
-		return MakeRunnersWith(
-			&runner.FromPlanFactory{
-				LocalRoot: r.dirLocal,
-				Config:    gc,
-			},
-		)(r)
-	}
-}
-
-// UseSSH opens a SSH connection according to gc and mc, and sets the invoker up so that it invokes the machine node
-// through that connection.
-//
-// If mc is nil, UseSSH is a no-op.
-func UseSSH(gc *remote.Config, mc *remote.MachineConfig) Option {
-	return func(r *Invoker) error {
-		if mc == nil {
-			return nil
-		}
-
-		sr, err := runner.NewRemoteFactory(r.dirLocal, gc, mc)
-		if err != nil {
-			return err
-		}
-		return MakeRunnersWith(sr)(r)
-	}
-}
-
-// MakeRunnersWith sets the invoker to use rf to build runners.
-func MakeRunnersWith(rf runner.Factory) Option {
-	return func(r *Invoker) error {
-		r.rfac = rf
+		r.baseQuantities.Override(qs)
 		return nil
 	}
 }

@@ -31,7 +31,7 @@ func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 
 // invoke runs the machine binary.
 func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	runner, err := m.rfac.MakeRunner(p, m.copyObservers...)
+	runner, err := m.rfac.MakeRunner(m.ldir, p, m.copyObservers...)
 	if err != nil {
 		return nil, fmt.Errorf("while spawning runner: %w", err)
 	}
@@ -41,7 +41,8 @@ func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) 
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
 
-	ps, err := runner.Start(ctx, m.userConfig)
+	// TODO(@MattWindsor91): wire the quantities up properly
+	ps, err := runner.Start(ctx, m.baseQuantities)
 	if err != nil {
 		return nil, fmt.Errorf("while starting command: %w", err)
 	}

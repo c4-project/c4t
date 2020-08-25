@@ -12,8 +12,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
@@ -73,7 +71,8 @@ func makeMach(ctx *c.Context, errw io.Writer) (*mach.Mach, error) {
 	return mach.New(
 		&cimpl.CResolve,
 		&bimpl.BResolve,
-		mach.WithUserConfig(stdflag.MachConfigFromCli(ctx, quantity.MachNodeSet{})),
+		mach.OutputDir(stdflag.OutDirFromCli(ctx)),
+		mach.OverrideQuantities(stdflag.MachNodeQuantitySetFromCli(ctx)),
 		mach.ForwardTo(fwd),
 	)
 }

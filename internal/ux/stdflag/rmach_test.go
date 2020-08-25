@@ -14,7 +14,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	"github.com/stretchr/testify/assert"
 	c "github.com/urfave/cli/v2"
@@ -22,47 +21,39 @@ import (
 
 // ExampleMachArgs is a testable example for MachArgs.
 func ExampleMachArgs() {
-	mempty := mach.UserConfig{}
-	fmt.Println(strings.Join(stdflag.MachArgs("", mempty), ", "))
+	qempty := quantity.MachNodeSet{}
+	fmt.Println(strings.Join(stdflag.MachArgs("", qempty), ", "))
 
-	mi := mach.UserConfig{
-		OutDir:       "foo",
-		SkipCompiler: true,
-		SkipRunner:   false,
-		Quantities: quantity.MachNodeSet{
-			Compiler: quantity.BatchSet{
-				Timeout:  quantity.Timeout(10 * time.Second),
-				NWorkers: 10,
-			},
-			Runner: quantity.BatchSet{
-				Timeout:  quantity.Timeout(5 * time.Minute),
-				NWorkers: 20,
-			},
+	qi := quantity.MachNodeSet{
+		Compiler: quantity.BatchSet{
+			Timeout:  quantity.Timeout(10 * time.Second),
+			NWorkers: 10,
+		},
+		Runner: quantity.BatchSet{
+			Timeout:  quantity.Timeout(5 * time.Minute),
+			NWorkers: 20,
 		},
 	}
 
-	fmt.Println(strings.Join(stdflag.MachArgs("", mi), ", "))
+	fmt.Println(strings.Join(stdflag.MachArgs("foo", qi), ", "))
 
 	// Output:
 	// -d, , -compiler-timeout, 0s, -run-timeout, 0s, -num-compiler-workers, 0, -num-run-workers, 0
-	// -d, foo, -compiler-timeout, 10s, -run-timeout, 5m0s, -num-compiler-workers, 10, -num-run-workers, 20, -skip-compiler
+	// -d, foo, -compiler-timeout, 10s, -run-timeout, 5m0s, -num-compiler-workers, 10, -num-run-workers, 20
 }
 
 // TestMachConfigFromCli_roundTrip tests that sending a local config through CLI flags works properly.
 func TestMachConfigFromCli_roundTrip(t *testing.T) {
 	t.Parallel()
 
-	cases := map[string]mach.UserConfig{
+	cases := map[string]struct {
+		dir string
+		qs  quantity.MachNodeSet
+	}{
 		"empty": {},
-		"skip-compiler": {
-			SkipCompiler: true,
-		},
-		"skip-runner": {
-			SkipRunner: true,
-		},
 		"quantities": {
-			OutDir: "foo",
-			Quantities: quantity.MachNodeSet{
+			dir: "foo",
+			qs: quantity.MachNodeSet{
 				Compiler: quantity.BatchSet{
 					Timeout:  quantity.Timeout(27 * time.Second),
 					NWorkers: 64,
@@ -80,12 +71,14 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			args := stdflag.MachInvocation("", in)
+			args := stdflag.MachInvocation(in.dir, in.qs)
 			a := testApp(
 				func(ctx *c.Context) error {
 					t.Helper()
-					out := stdflag.MachConfigFromCli(ctx, quantity.MachNodeSet{})
-					assert.Equal(t, in, out, "user config didn't match")
+					odir := stdflag.OutDirFromCli(ctx)
+					assert.Equal(t, in.dir, odir, "directories didn't match")
+					oqs := stdflag.MachNodeQuantitySetFromCli(ctx)
+					assert.Equal(t, in.qs, oqs, "quantities didn't match")
 
 					return nil
 				})

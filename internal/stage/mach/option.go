@@ -31,22 +31,6 @@ func Options(opts ...Option) Option {
 	}
 }
 
-// SkipCompiler sets whether to skip the compiler.
-func SkipCompiler(skip bool) Option {
-	return func(mach *Mach) error {
-		mach.skipCompiler = skip
-		return nil
-	}
-}
-
-// SkipRunner sets whether to skip the runner.
-func SkipRunner(skip bool) Option {
-	return func(mach *Mach) error {
-		mach.skipRunner = skip
-		return nil
-	}
-}
-
 // OverrideQuantities overrides the compiler and runner quantities with qs.
 func OverrideQuantities(qs quantity.MachNodeSet) Option {
 	return Options(
@@ -94,27 +78,4 @@ func OutputDir(path string) Option {
 		m.path = path
 		return nil
 	}
-}
-
-// UserConfig contains the part of the machine-stage configuration that can be set by the user,
-// either directly or through invoker.
-type UserConfig struct {
-	// OutDir is the path to the output directory.
-	OutDir string
-	// SkipCompiler tells the machine-runner to skip compilation.
-	SkipCompiler bool
-	// SkipRunner tells the machine-runner to skip running.
-	SkipRunner bool
-	// Quantities contains various tunable quantities for the machine-dependent stage.
-	Quantities quantity.MachNodeSet
-}
-
-// WithUserConfig applies all of the settings specified in uc.
-func WithUserConfig(uc UserConfig) Option {
-	return Options(
-		OutputDir(uc.OutDir),
-		OverrideQuantities(uc.Quantities),
-		SkipCompiler(uc.SkipCompiler),
-		SkipRunner(uc.SkipRunner),
-	)
 }

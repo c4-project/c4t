@@ -11,7 +11,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
@@ -29,22 +29,21 @@ import (
 
 // RemoteFactory is a factory that produces runners in the form of SSH sessions.
 type RemoteFactory struct {
-	recvRoot string
 	// machine contains the instantiated machine runner, if present.
 	machine *remote.MachineRunner
 }
 
 // NewRemoteFactory opens a SSH connection using Config and mc.
-// If successful, it creates a runner factory over it, using LocalRoot as the local directory.
-func NewRemoteFactory(recvRoot string, gc *remote.Config, mc *remote.MachineConfig) (*RemoteFactory, error) {
+// If successful, it creates a runner factory over it.
+func NewRemoteFactory(gc *remote.Config, mc *remote.MachineConfig) (*RemoteFactory, error) {
 	machine, err := mc.MachineRunner(gc)
-	return &RemoteFactory{recvRoot: recvRoot, machine: machine}, err
+	return &RemoteFactory{machine: machine}, err
 }
 
 // MakeRunner constructs a runner using this factory's open SSH connection.
-func (s *RemoteFactory) MakeRunner(_ *plan.Plan, obs ...copier.Observer) (Runner, error) {
+func (s *RemoteFactory) MakeRunner(ldir string, _ *plan.Plan, obs ...copier.Observer) (Runner, error) {
 	// TODO(@MattWindsor91): re-establish connection if errors
-	return NewRemoteRunner(s.machine, s.recvRoot, obs...)
+	return NewRemoteRunner(s.machine, ldir, obs...)
 }
 
 // Close closes the underlying SSH connection being used for runners created by this factory.
@@ -77,8 +76,8 @@ func NewRemoteRunner(r *remote.MachineRunner, localRoot string, o ...copier.Obse
 	return &RemoteRunner{runner: r, observers: o, localRoot: localRoot, remoteRoot: r.Config.DirCopy}, nil
 }
 
-// Start starts a SSH session connected to a machine node with name and arguments constructed through uc.
-func (r *RemoteRunner) Start(ctx context.Context, uc mach.UserConfig) (*remote.Pipeset, error) {
+// Start starts a SSH session connected to a machine node with the quantities specified in qs.
+func (r *RemoteRunner) Start(ctx context.Context, qs quantity.MachNodeSet) (*remote.Pipeset, error) {
 	var (
 		err error
 		ps  *remote.Pipeset
@@ -92,7 +91,7 @@ func (r *RemoteRunner) Start(ctx context.Context, uc mach.UserConfig) (*remote.P
 		return nil, fmt.Errorf("while opening pipes: %w", err)
 	}
 
-	if err := r.session.Start(r.invocation(uc)); err != nil {
+	if err := r.session.Start(r.invocation(qs)); err != nil {
 		_ = ps.Close()
 		return nil, fmt.Errorf("while starting local runner: %w", err)
 	}
@@ -134,10 +133,10 @@ func (r *RemoteRunner) Wait() error {
 }
 
 // invocation works out what the SSH command invocation for the tester should be.
-func (r *RemoteRunner) invocation(uc mach.UserConfig) string {
+func (r *RemoteRunner) invocation(qs quantity.MachNodeSet) string {
 	dir := path.Join(r.remoteRoot, "mach")
 	qdir := shellescape.Quote(dir)
-	return strings.Join(stdflag.MachInvocation(qdir, uc), " ")
+	return strings.Join(stdflag.MachInvocation(qdir, qs), " ")
 }
 
 // openPipes tries to open stdin, stdout, and stderr pipes for r.

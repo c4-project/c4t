@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
+	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 
@@ -23,11 +23,11 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
-// LocalFactory wraps a path to allow spawning of local runners using said path as the local directory.
-type LocalFactory string
+// LocalFactory allows spawning of local runners using said path as the local directory.
+type LocalFactory struct{}
 
-func (l LocalFactory) MakeRunner(*plan.Plan, ...copy2.Observer) (Runner, error) {
-	return NewLocalRunner(string(l)), nil
+func (l LocalFactory) MakeRunner(ldir string, _ *plan.Plan, _ ...copy2.Observer) (Runner, error) {
+	return NewLocalRunner(ldir), nil
 }
 
 // Close does nothing.
@@ -47,8 +47,8 @@ func NewLocalRunner(dir string) *LocalRunner {
 }
 
 // Start starts the machine-runner binary locally using ctx, and returns a pipeset for talking to it.
-func (r *LocalRunner) Start(ctx context.Context, uc mach.UserConfig) (*remote.Pipeset, error) {
-	r.cmd = exec.CommandContext(ctx, stdflag.MachBinName, stdflag.MachArgs(r.dir, uc)...)
+func (r *LocalRunner) Start(ctx context.Context, qs quantity.MachNodeSet) (*remote.Pipeset, error) {
+	r.cmd = exec.CommandContext(ctx, stdflag.MachBinName, stdflag.MachArgs(r.dir, qs)...)
 	ps, err := r.openPipes()
 	if err != nil {
 		return nil, fmt.Errorf("opening pipes: %w", err)

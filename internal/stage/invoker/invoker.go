@@ -9,17 +9,17 @@ package invoker
 import (
 	"github.com/1set/gut/ystring"
 	"github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 )
 
 // Invoker runs the machine-runner, through SSH if needed.
 type Invoker struct {
-	// dirLocal is the filepath to the directory to which local outcomes from this invoker run will appear.
-	dirLocal string
-	// userConfig contains the user-accessible configuration
-	userConfig mach.UserConfig
+	// ldir is the local directory to which machine node files are to be copied.
+	ldir string
+	// baseQuantities contains the base quantity set, to be overridden by any other quantities given.
+	baseQuantities quantity.MachNodeSet
 	// copyObservers is the set of observers listening for file copying.
 	copyObservers []copier.Observer
 	// machObservers is the set of observers listening for remote corpus manipulations.
@@ -28,13 +28,13 @@ type Invoker struct {
 	rfac runner.Factory
 }
 
-// New constructs a new Invoker with local directory ldir, invocation getter inv, and options o.
-func New(ldir string, uc mach.UserConfig, o ...Option) (*Invoker, error) {
+// New constructs a new Invoker with local directory ldir, runner factory fac, and options o.
+func New(ldir string, fac runner.Factory, o ...Option) (*Invoker, error) {
 	if ystring.IsBlank(ldir) {
 		return nil, ErrDirEmpty
 	}
 
-	invoker := Invoker{dirLocal: ldir, userConfig: uc, rfac: runner.LocalFactory(ldir)}
+	invoker := Invoker{ldir: ldir, rfac: fac}
 	if err := Options(o...)(&invoker); err != nil {
 		return nil, err
 	}

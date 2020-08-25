@@ -24,10 +24,6 @@ type Mach struct {
 	coptions []compiler.Option
 	// roptions is the set of options used to configure the runner.
 	roptions []runner.Option
-	// skipCompiler is true if the compiler should be skipped.
-	skipCompiler bool
-	// skipRunner is true if the runner should be skipped.
-	skipRunner bool
 	// path is the output directory path for both substages.
 	path string
 
@@ -59,9 +55,6 @@ func (m *Mach) makeCompilerAndRunner(cdriver compiler.Driver, rdriver runner.Obs
 }
 
 func (m *Mach) makeCompiler(driver compiler.Driver) error {
-	if m.skipCompiler {
-		return nil
-	}
 	var err error
 	ps := compiler.NewPathset(m.path)
 	m.compiler, err = compiler.New(driver, ps, m.coptions...)
@@ -69,9 +62,6 @@ func (m *Mach) makeCompiler(driver compiler.Driver) error {
 }
 
 func (m *Mach) makeRunner(driver runner.ObsParser) error {
-	if m.skipRunner {
-		return nil
-	}
 	var err error
 	ps := runner.NewPathset(m.path)
 	m.runner, err = runner.New(driver, ps, m.roptions...)
