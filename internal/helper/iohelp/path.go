@@ -12,14 +12,14 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-// ExtlessFile gets the file part of fpath without its extension.
+// ExtlessFile gets the file part of slash-path fpath without its extension.
 func ExtlessFile(fpath string) string {
 	_, file := path.Split(fpath)
 	ext := path.Ext(file)
 	return strings.TrimSuffix(file, ext)
 }
 
-// ExpandMany applies homedir.Expand to every path in paths.
+// ExpandMany applies homedir.Expand to every (file)path in paths.
 func ExpandMany(paths []string) ([]string, error) {
 	var err error
 	xpaths := make([]string, len(paths))
