@@ -8,7 +8,8 @@ package remote
 import (
 	"path/filepath"
 
-	"github.com/mitchellh/go-homedir"
+	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )
@@ -34,13 +35,5 @@ func (c *Config) knownHosts() (ssh.HostKeyCallback, error) {
 // knownHostsPaths gets a list of slash-delimited, expanded paths to check for known-hosts files.
 func (c *Config) knownHostsPaths() ([]string, error) {
 	fpaths := append(c.KnownHostsFilePaths, filepath.Join("~", ".ssh", "known_hosts"))
-	paths := make([]string, len(fpaths))
-	for i := range fpaths {
-		xpath, err := homedir.Expand(fpaths[i])
-		if err != nil {
-			return nil, err
-		}
-		paths[i] = filepath.ToSlash(xpath)
-	}
-	return paths, nil
+	return iohelp.ExpandMany(fpaths)
 }

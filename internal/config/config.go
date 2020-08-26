@@ -37,8 +37,8 @@ type Config struct {
 	// SSH contains top-level SSH configuration.
 	SSH *remote.Config `toml:"ssh,omitempty"`
 
-	// OutDir is the output directory for fully directed test runs.
-	OutDir string `toml:"out_dir"`
+	// Paths contains path configuration for the config file.
+	Paths Pathset `toml:"paths,omitempty"`
 }
 
 // FindBackend uses the configuration to find a backend with style style.

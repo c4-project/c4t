@@ -160,14 +160,7 @@ func runWithArgs(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args ar
 		return err
 	}
 
-	opts, err := makeOptions(cfg, qs, args.mfilter, lw, o...)
-	if err != nil {
-		_ = observer.CloseAll(o...)
-		return err
-	}
-
-	e := makeEnv(a, cfg)
-	d, err := director.New(e, cfg.Machines, args.files, opts...)
+	d, err := makeDirector(cfg, qs, a, args, o, lw)
 	if err != nil {
 		_ = observer.CloseAll(o...)
 		return err
@@ -177,8 +170,20 @@ func runWithArgs(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args ar
 	return d.Direct(context.Background())
 }
 
+func makeDirector(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args, obs []observer.Observer, lw io.Writer) (*director.Director, error) {
+	opts, err := makeOptions(cfg, qs, args.mfilter, lw, obs...)
+	if err != nil {
+		return nil, err
+	}
+	files, err := cfg.Paths.FallbackToInputs(args.files)
+	if err != nil {
+		return nil, err
+	}
+	return director.New(makeEnv(a, cfg), cfg.Machines, files, opts...)
+}
+
 func createResultLogFile(c *config.Config) (*os.File, error) {
-	logpath, err := homedir.Expand(filepath.Join(c.OutDir, "results.log"))
+	logpath, err := homedir.Expand(filepath.Join(c.Paths.OutDir, "results.log"))
 	if err != nil {
 		return nil, fmt.Errorf("expanding result log file path: %w", err)
 	}

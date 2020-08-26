@@ -160,7 +160,7 @@ func (e Env) Check() error {
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
 func ConfigFromGlobal(g *config.Config) Option {
 	return Options(
-		OutDir(g.OutDir),
+		OutDir(g.Paths.OutDir),
 		OverrideQuantities(g.Quantities),
 		SSH(g.SSH),
 	)
