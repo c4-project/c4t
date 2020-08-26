@@ -9,8 +9,6 @@ package status
 type Flag int
 
 const (
-	// FlagOk signifies the absence of collation flags.
-	FlagOk Flag = 0
 	// FlagFiltered signifies that a subject was filtered out.
 	FlagFiltered Flag = 1 << iota
 	// FlagFlagged signifies that a subject was 'flagged'.
@@ -30,19 +28,28 @@ const (
 	FlagTimeout = FlagCompileTimeout | FlagRunTimeout
 )
 
-// Matches tests whether this Flag matches expected.
-// Generally this a bitwise test, except that FlagOk only Matches FlagOk.
+// Matches tests whether this Flag has all flag bits in expected present.
 func (f Flag) Matches(expected Flag) bool {
-	if expected == FlagOk {
-		return f == FlagOk
-	}
-
 	return (f & expected) == expected
+}
+
+// MatchesStatus tests whether this Flag matches the expected status.
+// Generally, this is a Matches test for Status.Flag, except in two situations:
+// first, Ok only matches an absence of other flags; second, the presence of FlagFiltered prevents matching with
+// any status other than Filtered.
+func (f Flag) MatchesStatus(expected Status) bool {
+	if expected == Ok {
+		return f == 0
+	}
+	if f.Matches(FlagFiltered) {
+		return expected == Filtered
+	}
+	return f.Matches(expected.Flag())
 }
 
 // statusFlags matches statuses to flags.
 var statusFlags = [Last + 1]Flag{
-	Ok:             FlagOk,
+	// Unknown and Ok don't have any flags set.
 	Filtered:       FlagFiltered,
 	Flagged:        FlagFlagged,
 	CompileTimeout: FlagCompileTimeout,

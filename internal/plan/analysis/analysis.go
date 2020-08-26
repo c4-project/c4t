@@ -82,5 +82,5 @@ func (a *Analysis) HasFlagged() bool {
 
 // HasFailures tests whether a collation has failure cases.
 func (a *Analysis) HasFailures() bool {
-	return a.Flags&(status.FlagCompileFail|status.FlagRunFail) != 0
+	return a.Flags&(status.FlagFail) != 0
 }

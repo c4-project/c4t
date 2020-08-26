@@ -20,7 +20,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 )
 
-// ExampleStatus_IsOk is a runnable example for IsOk.
+// ExampleStatus_IsOk is a runnable example for Status.IsOk.
 func ExampleStatus_IsOk() {
 	fmt.Println("is", status.Ok, "ok?", status.Ok.IsOk())
 	fmt.Println("is", status.Flagged, "ok?", status.Flagged.IsOk())

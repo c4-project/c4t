@@ -30,6 +30,9 @@ func Analyse(ctx context.Context, p *plan.Plan, nworkers int) (*Analysis, error)
 }
 
 // analyser oversees the analysis of a particular plan.
+//
+// The analysis proceeds by classifying individual subjects with a degree of parallelism, and builds an
+// Analysis in place by collating those classifications as they come in.
 type analyser struct {
 	// analysis is the analysis being built.
 	analysis *Analysis
@@ -126,15 +129,14 @@ func (a *analyser) build(ctx context.Context, ch <-chan classification) error {
 func (a *analyser) apply(r classification) {
 	a.analysis.Flags |= r.flags
 	for i := status.Ok; i <= status.Last; i++ {
-		sf := i.Flag()
-		a.applyByStatus(i, sf, r)
-		a.applyCompilers(i, sf, r)
+		a.applyByStatus(i, r)
+		a.applyCompilers(i, r)
 		a.applyTimes(r)
 	}
 }
 
-func (a *analyser) applyByStatus(s status.Status, sf status.Flag, r classification) {
-	if !r.flags.Matches(sf) {
+func (a *analyser) applyByStatus(s status.Status, r classification) {
+	if !r.flags.MatchesStatus(s) {
 		return
 	}
 	if _, ok := a.analysis.ByStatus[s]; !ok {
@@ -143,14 +145,14 @@ func (a *analyser) applyByStatus(s status.Status, sf status.Flag, r classificati
 	a.analysis.ByStatus[s][r.sub.Name] = r.sub.Subject
 }
 
-func (a *analyser) applyCompilers(s status.Status, sf status.Flag, r classification) {
+func (a *analyser) applyCompilers(s status.Status, r classification) {
 	for cstr, f := range r.cflags {
-		a.applyCompiler(s, sf, f, cstr)
+		a.applyCompiler(s, f, cstr)
 	}
 }
 
-func (a *analyser) applyCompiler(s status.Status, sf, cf status.Flag, cstr string) {
-	if !cf.Matches(sf) {
+func (a *analyser) applyCompiler(s status.Status, cf status.Flag, cstr string) {
+	if !cf.MatchesStatus(s) {
 		return
 	}
 	if _, ok := a.analysis.Compilers[cstr]; !ok {

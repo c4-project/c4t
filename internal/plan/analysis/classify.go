@@ -15,6 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
+// classification holds the result of performing a single analysis on one subject.
 type classification struct {
 	flags  status.Flag
 	sub    subject.Named
@@ -25,7 +26,7 @@ type classification struct {
 
 func classify(named subject.Named) classification {
 	c := classification{
-		flags:  status.FlagOk,
+		flags:  0,
 		cflags: map[string]status.Flag{},
 		ctimes: map[string][]time.Duration{},
 		rtimes: map[string][]time.Duration{},
@@ -42,7 +43,7 @@ func (c *classification) classifyCompiles(cs map[string]compilation.CompileResul
 		c.flags |= sf
 		c.cflags[n] |= sf
 
-		if cm.Duration != 0 && !(status.FlagFail | status.FlagTimeout).Matches(sf) {
+		if cm.Duration != 0 && !(status.FlagFail | status.FlagTimeout).MatchesStatus(cm.Status) {
 			c.ctimes[n] = append(c.ctimes[n], cm.Duration)
 		}
 	}
@@ -54,7 +55,7 @@ func (c *classification) classifyRuns(rs map[string]compilation.RunResult) {
 		c.flags |= sf
 		c.cflags[n] |= sf
 
-		if r.Duration != 0 && !(status.FlagRunFail | status.FlagRunTimeout).Matches(sf) {
+		if r.Duration != 0 && !(status.FlagRunFail | status.FlagRunTimeout).MatchesStatus(r.Status) {
 			c.rtimes[n] = append(c.rtimes[n], r.Duration)
 		}
 	}
