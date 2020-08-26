@@ -10,17 +10,16 @@ import (
 	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/csvdump"
 )
 
 // NB: the below CSV is likely to change as the plan mock changes.
 // At time of writing, the mock referred to compilers not in the plan, for instance.
 
-// ExampleCompilerWriter_OnAnalysis is a testable example for OnAnalysis.
+// ExampleCompilerWriter_OnAnalysis is a testable example for CompilerWriter.OnAnalysis.
 func ExampleCompilerWriter_OnAnalysis() {
-	az, _ := analyser.New(plan.Mock(), 1)
-	an, _ := az.Analyse(context.Background())
+	an, _ := analysis.Analyse(context.Background(), plan.Mock(), 1)
 
 	// nb: aside from the header, the actual order of compilers is not deterministic
 	cw := csvdump.NewCompilerWriter(os.Stdout)

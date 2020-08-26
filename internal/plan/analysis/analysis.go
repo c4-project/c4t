@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analyser
+package analysis
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 )
 
-// Analysis represents an analyser of a plan.
+// Analysis represents an analysis of a plan.
 type Analysis struct {
 	// Plan points to the plan that created this analyser.
 	Plan *plan.Plan
@@ -26,14 +26,14 @@ type Analysis struct {
 	// ByStatus maps each status to the corpus of subjects that fall into it.
 	ByStatus map[status.Status]corpus.Corpus
 
-	// Compilers maps each compiler ID to an analyser of that compiler.
+	// Compilers maps each compiler ID to an analysis of that compiler.
 	Compilers map[string]Compiler
 
-	// Flags aggregates all flags found during the analyser.
+	// Flags aggregates all flags found during the analysis.
 	Flags status.Flag
 }
 
-// Compiler represents information about a compiler in a corpus analyser.
+// Compiler represents information about a compiler in a corpus analysis.
 type Compiler struct {
 	// Info contains the compiler's plan record.
 	Info compiler.Configuration

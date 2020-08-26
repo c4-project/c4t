@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analyser
+package analysis
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"

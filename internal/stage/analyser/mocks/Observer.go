@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	analyser "github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	analyser "github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	mock "github.com/stretchr/testify/mock"
 )
 

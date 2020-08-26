@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
@@ -137,8 +137,8 @@ func (o *Observer) OnIteration(r run.Run) {
 	o.action.reset()
 }
 
-// OnAnalysis observes an analyser by adding failure/timeout/flag rates to the sparklines.
-func (o *Observer) OnAnalysis(a analyser.Analysis) {
+// OnAnalysis observes an analysis by adding failure/timeout/flag rates to the sparklines.
+func (o *Observer) OnAnalysis(a analysis.Analysis) {
 	for i := status.Ok; i <= status.Last; i++ {
 		o.sendStatusCount(i, len(a.ByStatus[i]))
 	}
@@ -161,8 +161,8 @@ func (o *Observer) sendStatusCount(i status.Status, n int) {
 	}
 }
 
-func (o *Observer) logAnalysis(a analyser.Analysis) error {
-	sc := analyser.AnalysisWithRun{
+func (o *Observer) logAnalysis(a analysis.Analysis) error {
+	sc := analysis.AnalysisWithRun{
 		Run:      o.run.last,
 		Analysis: a,
 	}

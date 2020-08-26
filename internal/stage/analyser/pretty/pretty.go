@@ -12,7 +12,7 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // Printer provides the ability to output human-readable summaries of analyses to a writer.
@@ -35,22 +35,22 @@ func NewPrinter(o ...Option) (*Printer, error) {
 	return aw, nil
 }
 
-// Write writes an unsourced analyser a to this writer.
-func (p *Printer) Write(a analyser.Analysis) error {
+// Write writes an unsourced analysis a to this writer.
+func (p *Printer) Write(a analysis.Analysis) error {
 	c := p.ctx
 	c.Analysis = &a
 	return p.tmpl.ExecuteTemplate(p.w, "root", c)
 }
 
-// OnAnalysis writes an unsourced analyser a to this printer; if an error occurs, it tries to rescue.
-func (p *Printer) OnAnalysis(a analyser.Analysis) {
+// OnAnalysis writes an unsourced analysis a to this printer; if an error occurs, it tries to rescue.
+func (p *Printer) OnAnalysis(a analysis.Analysis) {
 	if err := p.Write(a); err != nil {
 		p.handleError(err)
 	}
 }
 
-// WriteSourced writes a sourced analyser a to this printer.
-func (p *Printer) WriteSourced(a analyser.AnalysisWithRun) error {
+// WriteSourced writes a sourced analysis a to this printer.
+func (p *Printer) WriteSourced(a analysis.AnalysisWithRun) error {
 	if _, err := fmt.Fprintf(p.w, "# %s #\n\n", &a.Run); err != nil {
 		return err
 	}

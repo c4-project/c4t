@@ -3,8 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package analyser handles analysing a Corpus and filing its subjects into categorised sub-corpora.
-package analyser
+// Package analysis handles analysing a Corpus and filing its subjects into categorised sub-corpora.
+package analysis
 
 import (
 	"context"
@@ -20,9 +20,18 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/subject"
 )
 
-// Analyser oversees the analyser of a particular plan.
-type Analyser struct {
-	// analyser is the analyser being built.
+// Analyse runs the analyser with context ctx, on plan p and with nworkers parallel subject analysers.
+func Analyse(ctx context.Context, p *plan.Plan, nworkers int) (*Analysis, error) {
+	a, err := New(p, nworkers)
+	if err != nil {
+		return nil, err
+	}
+	return a.analyse(ctx)
+}
+
+// analyser oversees the analysis of a particular plan.
+type analyser struct {
+	// analysis is the analysis being built.
 	analysis *Analysis
 
 	// compilerTimes contains raw durations from each compiler's compilations.
@@ -38,14 +47,9 @@ type Analyser struct {
 	nworkers int
 }
 
-// Analyse runs the analyser with context ctx.
-func (a *Analyser) Analyse(ctx context.Context) (*Analysis, error) {
-	l := len(a.corpus)
-	if l == 0 {
-		return a.analysis, nil
-	}
-
-	if err := a.analyseCorpus(ctx, l); err != nil {
+// analyse runs the analyser with context ctx.
+func (a *analyser) analyse(ctx context.Context) (*Analysis, error) {
+	if err := a.analyseCorpus(ctx); err != nil {
 		return nil, err
 	}
 	for n, c := range a.analysis.Compilers {
@@ -56,7 +60,7 @@ func (a *Analyser) Analyse(ctx context.Context) (*Analysis, error) {
 	return a.analysis, nil
 }
 
-func (a *Analyser) analyseCorpus(ctx context.Context, l int) error {
+func (a *analyser) analyseCorpus(ctx context.Context) error {
 	ch := make(chan classification)
 	err := a.corpus.Par(ctx, a.nworkers,
 		func(ctx context.Context, named subject.Named) error {
@@ -64,20 +68,20 @@ func (a *Analyser) analyseCorpus(ctx context.Context, l int) error {
 			return nil
 		},
 		func(ctx context.Context) error {
-			return a.build(ctx, ch, l)
+			return a.build(ctx, ch)
 		},
 	)
 	return err
 }
 
 // New initialises an analyser for plan p, with workers nworkers.
-func New(p *plan.Plan, nworkers int) (*Analyser, error) {
+func New(p *plan.Plan, nworkers int) (*analyser, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
 
 	lc := len(p.Compilers)
-	a := Analyser{
+	a := analyser{
 		analysis:      newAnalysis(p),
 		corpus:        p.Corpus,
 		compilerTimes: make(map[string][]time.Duration, lc),
@@ -95,7 +99,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (a *Analyser) initCompilers(cs map[string]compiler.Configuration) {
+func (a *analyser) initCompilers(cs map[string]compiler.Configuration) {
 	for cn, c := range cs {
 		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}
@@ -107,8 +111,8 @@ func classifyAndSend(named subject.Named, ch chan<- classification) {
 	ch <- classify(named)
 }
 
-func (a *Analyser) build(ctx context.Context, ch <-chan classification, count int) error {
-	for i := 0; i < count; i++ {
+func (a *analyser) build(ctx context.Context, ch <-chan classification) error {
+	for i := 0; i < len(a.corpus); i++ {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -119,7 +123,7 @@ func (a *Analyser) build(ctx context.Context, ch <-chan classification, count in
 	return nil
 }
 
-func (a *Analyser) apply(r classification) {
+func (a *analyser) apply(r classification) {
 	a.analysis.Flags |= r.flags
 	for i := status.Ok; i <= status.Last; i++ {
 		sf := i.Flag()
@@ -129,7 +133,7 @@ func (a *Analyser) apply(r classification) {
 	}
 }
 
-func (a *Analyser) applyByStatus(s status.Status, sf status.Flag, r classification) {
+func (a *analyser) applyByStatus(s status.Status, sf status.Flag, r classification) {
 	if !r.flags.Matches(sf) {
 		return
 	}
@@ -139,13 +143,13 @@ func (a *Analyser) applyByStatus(s status.Status, sf status.Flag, r classificati
 	a.analysis.ByStatus[s][r.sub.Name] = r.sub.Subject
 }
 
-func (a *Analyser) applyCompilers(s status.Status, sf status.Flag, r classification) {
+func (a *analyser) applyCompilers(s status.Status, sf status.Flag, r classification) {
 	for cstr, f := range r.cflags {
 		a.applyCompiler(s, sf, f, cstr)
 	}
 }
 
-func (a *Analyser) applyCompiler(s status.Status, sf, cf status.Flag, cstr string) {
+func (a *analyser) applyCompiler(s status.Status, sf, cf status.Flag, cstr string) {
 	if !cf.Matches(sf) {
 		return
 	}
@@ -155,7 +159,7 @@ func (a *Analyser) applyCompiler(s status.Status, sf, cf status.Flag, cstr strin
 	a.analysis.Compilers[cstr].Counts[s]++
 }
 
-func (a *Analyser) applyTimes(r classification) {
+func (a *analyser) applyTimes(r classification) {
 	for cstr, ts := range r.ctimes {
 		a.compilerTimes[cstr] = append(a.compilerTimes[cstr], ts...)
 	}

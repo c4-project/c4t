@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
-// bucketSaver handles the setup of per-status buckets in an analyser save.
+// bucketSaver handles the setup of per-status buckets in an analysis save.
 type bucketSaver struct {
 	parent   *Saver
 	s        status.Status

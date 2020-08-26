@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/model/status"
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // CompilerWriter wraps a CSV writer and makes it output compiler analyses.
@@ -26,7 +26,7 @@ func NewCompilerWriter(w io.Writer) *CompilerWriter {
 }
 
 // OnAnalysis observes an analysis by emitting a CSV with compiler information.
-func (c *CompilerWriter) OnAnalysis(a analyser.Analysis) {
+func (c *CompilerWriter) OnAnalysis(a analysis.Analysis) {
 	c.writeHeader()
 	for cname, can := range a.Compilers {
 		c.writeCompiler(cname, can)
@@ -56,7 +56,7 @@ func timesetHeader(name string) []string {
 	return []string{"Min" + name, "Avg" + name, "Max" + name}
 }
 
-func (c *CompilerWriter) writeCompiler(cname string, can analyser.Compiler) {
+func (c *CompilerWriter) writeCompiler(cname string, can analysis.Compiler) {
 	scs := c.staticColumnsForCompiler(cname, can)
 	rec := scs[:]
 	rec = append(rec, timeset(can.Time)...)
@@ -69,7 +69,7 @@ func (c *CompilerWriter) write(record []string) {
 	_ = (*csv.Writer)(c).Write(record)
 }
 
-func (c *CompilerWriter) staticColumnsForCompiler(cname string, can analyser.Compiler) [len(staticColumnHeaders)]string {
+func (c *CompilerWriter) staticColumnsForCompiler(cname string, can analysis.Compiler) [len(staticColumnHeaders)]string {
 	return [...]string{
 		cname,
 		can.Info.Style.String(),
@@ -87,7 +87,7 @@ func counts(cs map[status.Status]int) []string {
 	return result
 }
 
-func timeset(ts *analyser.TimeSet) []string {
+func timeset(ts *analysis.TimeSet) []string {
 	return []string{
 		duration(ts.Min),
 		duration(ts.Mean()),

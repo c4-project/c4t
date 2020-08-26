@@ -12,7 +12,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/csvdump"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // NB: the below CSV is likely to change as the plan mock changes.
@@ -22,8 +22,7 @@ import (
 
 // ExampleStageWriter_OnAnalysis is a testable example for OnAnalysis.
 func ExampleStageWriter_OnAnalysis() {
-	az, _ := analyser.New(plan.Mock(), 1)
-	an, _ := az.Analyse(context.Background())
+	an, _ := analysis.Analyse(context.Background(), plan.Mock(), 1)
 
 	sw := csvdump.NewStageWriter(os.Stdout)
 	sw.OnAnalysis(*an)

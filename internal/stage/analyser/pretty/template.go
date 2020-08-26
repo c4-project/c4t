@@ -8,13 +8,13 @@ package pretty
 import (
 	"text/template"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // WriteContext is the type of roots sent to the template engine.
 type WriteContext struct {
-	// The analyser to write.
-	Analysis *analyser.Analysis
+	// The analysis to write.
+	Analysis *analysis.Analysis
 
 	// ShowCompilers is true if compiler breakdowns should be shown.
 	ShowCompilers bool

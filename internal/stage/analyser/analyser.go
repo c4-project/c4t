@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
@@ -20,7 +20,7 @@ import (
 // Analyser represents the state of the plan analyser stage.
 type Analyser struct {
 	savePaths *saver.Pathset
-	// nworkers is the number of parallel workers to use when performing subject analyser.
+	// nworkers is the number of parallel workers to use when performing subject analysis.
 	nworkers int
 	// observers is the list of observers to which analyses are sent.
 	observers []Observer
@@ -74,7 +74,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (a *Analyser) maybeSave(an *analyser.Analysis) error {
+func (a *Analyser) maybeSave(an *analysis.Analysis) error {
 	save, err := a.newSaver()
 	// save can be nil if we're not supposed to be saving.
 	if err != nil || save == nil {
@@ -83,10 +83,6 @@ func (a *Analyser) maybeSave(an *analyser.Analysis) error {
 	return save.Run(*an)
 }
 
-func (a *Analyser) analyse(ctx context.Context, p *plan.Plan) (*analyser.Analysis, error) {
-	ar, err := analyser.New(p, a.nworkers)
-	if err != nil {
-		return nil, err
-	}
-	return ar.Analyse(ctx)
+func (a *Analyser) analyse(ctx context.Context, p *plan.Plan) (*analysis.Analysis, error) {
+	return analysis.Analyse(ctx, p, a.nworkers)
 }

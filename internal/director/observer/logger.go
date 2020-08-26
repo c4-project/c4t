@@ -33,7 +33,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
 // TODO(@MattWindsor91): merge this with the singleobs logger?
@@ -46,7 +46,7 @@ type Logger struct {
 	// aw is the analyser writer used for outputting sourced analyses.
 	aw *pretty.Printer
 	// anaCh is used to send sourced analyses for logging.
-	anaCh chan analyser.AnalysisWithRun
+	anaCh chan analysis.AnalysisWithRun
 	// compCh is used to send compilers for logging.
 	compCh chan compilerSet
 	// saveCh is used to send save actions for logging.
@@ -66,7 +66,7 @@ func NewLogger(w io.WriteCloser) (*Logger, error) {
 	return &Logger{
 		out:    w,
 		aw:     aw,
-		anaCh:  make(chan analyser.AnalysisWithRun),
+		anaCh:  make(chan analysis.AnalysisWithRun),
 		compCh: make(chan compilerSet),
 		saveCh: make(chan archiveMessage),
 	}, nil
@@ -115,7 +115,7 @@ func (j *Logger) Instance(id.ID) (Instance, error) {
 }
 
 // logAnalysis logs s to this logger's file.
-func (j *Logger) logAnalysis(s analyser.AnalysisWithRun) error {
+func (j *Logger) logAnalysis(s analysis.AnalysisWithRun) error {
 	return j.aw.WriteSourced(s)
 }
 
@@ -152,7 +152,7 @@ type InstanceLogger struct {
 	// compCh is the channel used to send compiler sets for logging.
 	compCh chan<- compilerSet
 	// anaCh is the channel used to send sourced analyses for logging.
-	anaCh chan<- analyser.AnalysisWithRun
+	anaCh chan<- analysis.AnalysisWithRun
 	// saveCh is the channel used to send save actions for logging.
 	saveCh chan<- archiveMessage
 	// run contains information about the current iteration.
@@ -214,7 +214,7 @@ func (l *InstanceLogger) OnIteration(r run.Run) {
 }
 
 // OnCollation logs a collation to this logger.
-func (l *InstanceLogger) OnAnalysis(c analyser.Analysis) {
+func (l *InstanceLogger) OnAnalysis(c analysis.Analysis) {
 	select {
 	case <-l.done:
 	case l.anaCh <- l.addSource(c):
@@ -232,8 +232,8 @@ func (l *InstanceLogger) OnArchive(s saver.ArchiveMessage) {
 	}
 }
 
-func (l *InstanceLogger) addSource(c analyser.Analysis) analyser.AnalysisWithRun {
-	return analyser.AnalysisWithRun{
+func (l *InstanceLogger) addSource(c analysis.Analysis) analysis.AnalysisWithRun {
+	return analysis.AnalysisWithRun{
 		Run:      l.run,
 		Analysis: c,
 	}

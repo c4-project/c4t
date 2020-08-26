@@ -3,12 +3,12 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analyser_test
+package analysis_test
 
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -17,7 +17,7 @@ import (
 
 // ExampleAnalysis_String is a runnable example for String.
 func ExampleAnalysis_String() {
-	c := analyser.Analysis{
+	c := analysis.Analysis{
 		ByStatus: map[status.Status]corpus.Corpus{
 			status.Ok:             corpus.New("a", "b", "c", "ch"),
 			status.Flagged:        corpus.New("barbaz"),
@@ -35,10 +35,10 @@ func ExampleAnalysis_String() {
 
 // ExampleAnalysis_HasFlagged is a runnable example for HasFailures.
 func ExampleAnalysis_HasFlagged() {
-	var empty analyser.Analysis
+	var empty analysis.Analysis
 	fmt.Println("empty:", empty.HasFlagged())
 
-	flagged := analyser.Analysis{
+	flagged := analysis.Analysis{
 		ByStatus: map[status.Status]corpus.Corpus{
 			status.Flagged: corpus.New("foo", "bar", "baz"),
 		},
@@ -53,15 +53,15 @@ func ExampleAnalysis_HasFlagged() {
 
 // ExampleAnalysis_HasFailures is a runnable example for HasFailures.
 func ExampleAnalysis_HasFailures() {
-	var empty analyser.Analysis
+	var empty analysis.Analysis
 	fmt.Println("empty:", empty.HasFailures())
 
-	cfails := analyser.Analysis{
+	cfails := analysis.Analysis{
 		Flags: status.FlagCompileFail,
 	}
 	fmt.Println("compiler failures:", cfails.HasFailures())
 
-	rfails := analyser.Analysis{
+	rfails := analysis.Analysis{
 		Flags: status.FlagRunFail,
 	}
 	fmt.Println("run failures:", rfails.HasFailures())

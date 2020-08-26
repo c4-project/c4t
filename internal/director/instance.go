@@ -224,7 +224,7 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 		return nil, fmt.Errorf("when making machine invoker: %w", err)
 	}
 	if sc.Analyser, err = i.makeAnalyser(observer.LowerToAnalyser(i.Observers), observer.LowerToSaver(i.Observers)); err != nil {
-		return nil, fmt.Errorf("when making analyser: %w", err)
+		return nil, fmt.Errorf("when making analysis: %w", err)
 	}
 	return &sc, nil
 }

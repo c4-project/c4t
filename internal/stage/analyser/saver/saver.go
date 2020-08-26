@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analyser"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/model/status"
 
@@ -58,10 +58,10 @@ func New(paths *Pathset, archiveMaker func(path string) (Archiver, error), ops .
 
 // Run runs the saving stage over the analyser a.
 // It returns p unchanged; this is for signature compatibility with the other director stages.
-func (s *Saver) Run(a analyser.Analysis) error {
+func (s *Saver) Run(a analysis.Analysis) error {
 	p := a.Plan
 	if p == nil {
-		return fmt.Errorf("when saving analyser: %w", plan.ErrNil)
+		return fmt.Errorf("when saving analysis: %w", plan.ErrNil)
 	}
 	creation := p.Metadata.Creation
 
