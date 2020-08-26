@@ -25,6 +25,7 @@ const (
 
 	colourUnknown        = cell.ColorWhite
 	colourOk             = cell.ColorGreen
+	colourFiltered       = cell.ColorWhite // colourUnknown is unlikely to appear in practice, so duplication is ok
 	colourFlagged        = cell.ColorYellow
 	colourCompileFail    = cell.ColorRed
 	colourCompileTimeout = cell.ColorBlue
@@ -37,6 +38,7 @@ const (
 var statusColours = [status.Last + 1]cell.Color{
 	colourUnknown,
 	colourOk,
+	colourFiltered,
 	colourFlagged,
 	colourCompileFail,
 	colourCompileTimeout,

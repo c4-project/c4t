@@ -26,7 +26,7 @@ func ExampleCompilerWriter_OnAnalysis() {
 	cw.OnAnalysis(*an)
 
 	// Unordered output:
-	// CompilerID,StyleID,ArchID,Opt,MOpt,MinCompile,AvgCompile,MaxCompile,MinRun,AvgRun,MaxRun,Ok,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
-	// gcc,gcc,ppc.64le.power9,,,200,200,200,0,0,0,0,1,1,0,0,0
-	// clang,gcc,x86,,,200,200,200,0,0,0,1,0,0,0,0,0
+	// CompilerID,StyleID,ArchID,Opt,MOpt,MinCompile,AvgCompile,MaxCompile,MinRun,AvgRun,MaxRun,Ok,Filtered,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
+	// gcc,gcc,ppc.64le.power9,,,200,200,200,0,0,0,0,0,1,1,0,0,0
+	// clang,gcc,x86,,,200,200,200,0,0,0,1,0,0,0,0,0,0
 }

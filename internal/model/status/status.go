@@ -21,6 +21,8 @@ const (
 	Unknown Status = iota
 	// Ok indicates that a run completed successfully without incident.
 	Ok
+	// Filtered indicates that a run would have failed, but it has been caught by a filter.
+	Filtered
 	// Flagged indicates that a run completed successfully, but its observation was interesting.
 	// Usually this means a counter-example occurred.
 	Flagged
@@ -33,7 +35,7 @@ const (
 	// RunTimeout indicates that a run timed out.
 	RunTimeout
 
-	// FirstBad refers to the first status that is neither OK nor 'unknown'.
+	// FirstBad refers to the first status that represents an unwanted outcome.
 	FirstBad = Flagged
 	// Last is the last valid status.
 	Last = RunTimeout

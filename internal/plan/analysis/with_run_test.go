@@ -29,6 +29,7 @@ func ExampleAnalysisWithRun_String() {
 		Analysis: analysis.Analysis{
 			ByStatus: map[status.Status]corpus.Corpus{
 				status.Ok:             corpus.New("a", "b", "c", "ch"),
+				status.Filtered:       corpus.New("a", "i", "u", "e", "o"),
 				status.Flagged:        corpus.New("barbaz"),
 				status.CompileFail:    corpus.New("foo", "bar", "baz"),
 				status.CompileTimeout: corpus.New(),
@@ -40,5 +41,5 @@ func ExampleAnalysisWithRun_String() {
 	fmt.Println(&sc)
 
 	// Output:
-	// [foo.bar.baz #42 (May  1 10:00:00)] 4 Ok, 1 Flagged, 3 CompileFail, 0 CompileTimeout, 2 RunFail, 0 RunTimeout
+	// [foo.bar.baz #42 (May  1 10:00:00)] 4 Ok, 5 Filtered, 1 Flagged, 3 CompileFail, 0 CompileTimeout, 2 RunFail, 0 RunTimeout
 }

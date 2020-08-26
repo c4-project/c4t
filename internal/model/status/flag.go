@@ -11,8 +11,10 @@ type Flag int
 const (
 	// FlagOk signifies the absence of collation flags.
 	FlagOk Flag = 0
+	// FlagFiltered signifies that a subject was filtered out.
+	FlagFiltered Flag = 1 << iota
 	// FlagFlagged signifies that a subject was 'flagged'.
-	FlagFlagged Flag = 1 << iota
+	FlagFlagged
 	// FlagCompileFail signifies a compile failure.
 	FlagCompileFail
 	// FlagCompileTimeout signifies a compile timeout.
@@ -41,6 +43,7 @@ func (f Flag) Matches(expected Flag) bool {
 // statusFlags matches statuses to flags.
 var statusFlags = [Last + 1]Flag{
 	Ok:             FlagOk,
+	Filtered:       FlagFiltered,
 	Flagged:        FlagFlagged,
 	CompileTimeout: FlagCompileTimeout,
 	CompileFail:    FlagCompileFail,

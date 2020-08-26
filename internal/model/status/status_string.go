@@ -10,16 +10,17 @@ func _() {
 	var x [1]struct{}
 	_ = x[Unknown-0]
 	_ = x[Ok-1]
-	_ = x[Flagged-2]
-	_ = x[CompileFail-3]
-	_ = x[CompileTimeout-4]
-	_ = x[RunFail-5]
-	_ = x[RunTimeout-6]
+	_ = x[Filtered-2]
+	_ = x[Flagged-3]
+	_ = x[CompileFail-4]
+	_ = x[CompileTimeout-5]
+	_ = x[RunFail-6]
+	_ = x[RunTimeout-7]
 }
 
-const _Status_name = "UnknownOkFlaggedCompileFailCompileTimeoutRunFailRunTimeout"
+const _Status_name = "UnknownOkFilteredFlaggedCompileFailCompileTimeoutRunFailRunTimeout"
 
-var _Status_index = [...]uint8{0, 7, 9, 16, 27, 41, 48, 58}
+var _Status_index = [...]uint8{0, 7, 9, 17, 24, 35, 49, 56, 66}
 
 func (i Status) String() string {
 	if i < 0 || i >= Status(len(_Status_index)-1) {

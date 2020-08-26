@@ -20,6 +20,7 @@ func ExampleAnalysis_String() {
 	c := analysis.Analysis{
 		ByStatus: map[status.Status]corpus.Corpus{
 			status.Ok:             corpus.New("a", "b", "c", "ch"),
+			status.Filtered:       corpus.New("a", "i", "u", "e", "o"),
 			status.Flagged:        corpus.New("barbaz"),
 			status.CompileFail:    corpus.New("foo", "bar", "baz"),
 			status.CompileTimeout: corpus.New(),
@@ -30,10 +31,10 @@ func ExampleAnalysis_String() {
 	fmt.Println(&c)
 
 	// Output:
-	// 4 Ok, 1 Flagged, 3 CompileFail, 0 CompileTimeout, 2 RunFail, 0 RunTimeout
+	// 4 Ok, 5 Filtered, 1 Flagged, 3 CompileFail, 0 CompileTimeout, 2 RunFail, 0 RunTimeout
 }
 
-// ExampleAnalysis_HasFlagged is a runnable example for HasFailures.
+// ExampleAnalysis_HasFlagged is a runnable example for Analysis.HasFlagged.
 func ExampleAnalysis_HasFlagged() {
 	var empty analysis.Analysis
 	fmt.Println("empty:", empty.HasFlagged())
@@ -51,7 +52,7 @@ func ExampleAnalysis_HasFlagged() {
 	// flagged: true
 }
 
-// ExampleAnalysis_HasFailures is a runnable example for HasFailures.
+// ExampleAnalysis_HasFailures is a runnable example for Analysis.HasFailures.
 func ExampleAnalysis_HasFailures() {
 	var empty analysis.Analysis
 	fmt.Println("empty:", empty.HasFailures())
