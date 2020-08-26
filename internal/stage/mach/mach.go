@@ -31,7 +31,7 @@ type Mach struct {
 	compiler *compiler.Compiler
 	// runner is, if non-nil, the configured runner substage.
 	runner *runner.Runner
-	// json is, if non-nil, a JSON observer;
+	// fwd is, if non-nil, a JSON observer;
 	// it exists here so that, if we're using JSON mode, errors get trapped and sent over as JSON.
 	fwd *forward.Observer
 }
@@ -89,7 +89,7 @@ func (m *Mach) trap(err error) error {
 
 func (m *Mach) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
-		return nil, err
+		return nil, m.trap(err)
 	}
 	p, err := m.runInner(ctx, p)
 	return p, m.trap(err)
