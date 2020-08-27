@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/subject"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
@@ -24,7 +26,6 @@ const (
 	segCompileTimeouts = "compile_timeout"
 	segRunFailures     = "run_fail"
 	segRunTimeouts     = "run_timeout"
-	tarSuffix          = ".tar.gz"
 )
 
 // Pathset contains the pre-computed paths for saving 'interesting' run results.
@@ -87,7 +88,7 @@ func runRoot(root string, iterTime time.Time) string {
 
 // SubjectTarFile gets the path to which a tarball for subject sname should be saved.
 func (s *RunPathset) SubjectTarFile(sname string) string {
-	return s.subjectFile(sname + tarSuffix)
+	return s.subjectFile(sname + subject.TarSuffix)
 }
 
 func (s *RunPathset) subjectFile(fname string) string {
