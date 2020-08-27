@@ -6,8 +6,12 @@
 package plan_test
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 
@@ -22,7 +26,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
-// ExamplePlan_CompilerIDs is a runnable example for CompilerIDs.
+// ExamplePlan_CompilerIDs is a runnable example for Plan.CompilerIDs.
 func ExamplePlan_CompilerIDs() {
 	p := plan.Plan{Compilers: map[string]compiler.Configuration{
 		"gcc.ppc":   {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
@@ -42,7 +46,7 @@ func ExamplePlan_CompilerIDs() {
 	// gcc.ppc
 }
 
-// TestPlan_Arches tests the Arches method on Plan.
+// TestPlan_Arches tests Plan.Arches.
 func TestPlan_Arches(t *testing.T) {
 	t.Parallel()
 
@@ -76,7 +80,7 @@ func TestPlan_Arches(t *testing.T) {
 	}
 }
 
-// TestPlan_Check tests the Check method.
+// TestPlan_Check tests Plan.Check.
 func TestPlan_Check(t *testing.T) {
 	t.Parallel()
 
@@ -120,4 +124,18 @@ func TestPlan_Check(t *testing.T) {
 			testhelp.ExpectErrorIs(t, err, c.err, "check plan")
 		})
 	}
+}
+
+// TestPlan_RunStage_error tests that giving Plan.RunStage a body that errors propagates that error correctly.
+func TestPlan_RunStage_error(t *testing.T) {
+	t.Parallel()
+
+	p := plan.Mock()
+	want := errors.New("oops")
+
+	_, got := p.RunStage(context.Background(), stage.Last, func(context.Context, *plan.Plan) (*plan.Plan, error) {
+		return nil, want
+	})
+
+	testhelp.ExpectErrorIs(t, got, want, "running stage with error")
 }
