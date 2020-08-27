@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
@@ -53,6 +55,8 @@ type Director struct {
 	quantities quantity.RootSet
 	// files is the input file set.
 	files []string
+	// filters is the set of compiled filter sets to use in analysis.
+	filters analysis.FilterSet
 	// l is the logger for the director.
 	l *log.Logger
 }
@@ -197,6 +201,7 @@ func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*I
 		Logger:       l,
 		Quantities:   d.machineQuantities(&c),
 		InitialPlan:  p,
+		Filters:      d.filters,
 	}
 	return &m, nil
 }

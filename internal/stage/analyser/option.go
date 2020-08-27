@@ -8,6 +8,8 @@ package analyser
 import (
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 )
 
@@ -29,10 +31,10 @@ func Options(opts ...Option) Option {
 	}
 }
 
-// ParWorkers sets the number of parallel analyser workers to n.
-func ParWorkers(n int) Option {
+// Analysis sets some analysis options.
+func Analysis(opts ...analysis.Option) Option {
 	return func(a *Analyser) error {
-		a.nworkers = n
+		a.aopts = append(a.aopts, opts...)
 		return nil
 	}
 }

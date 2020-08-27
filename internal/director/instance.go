@@ -12,6 +12,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
 
 	observer2 "github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
@@ -88,6 +90,8 @@ type Instance struct {
 
 	// Quantities contains the quantity set for this machine.
 	Quantities quantity.MachineSet
+	// Filters contains the precompiled filter set for this machine.
+	Filters analysis.FilterSet
 }
 
 // Run runs this machine's testing loop.
@@ -233,7 +237,10 @@ func (i *Instance) makeAnalyser(aobs []analyser.Observer, sobs []saver.Observer)
 	return analyser.New(
 		analyser.ObserveWith(aobs...),
 		analyser.ObserveSaveWith(sobs...),
-		analyser.ParWorkers(10), // TODO(@MattWindsor91): get this from somewhere
+		analyser.Analysis(
+			analysis.WithWorkerCount(10), // TODO(@MattWindsor91): get this from somewhere
+			analysis.WithFilters(i.Filters),
+		),
 		analyser.SaveToPathset(i.SavedPaths),
 	)
 }

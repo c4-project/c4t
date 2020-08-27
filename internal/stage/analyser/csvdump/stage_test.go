@@ -22,7 +22,7 @@ import (
 
 // ExampleStageWriter_OnAnalysis is a testable example for OnAnalysis.
 func ExampleStageWriter_OnAnalysis() {
-	an, _ := analysis.Analyse(context.Background(), plan.Mock(), 1)
+	an, _ := analysis.Analyse(context.Background(), plan.Mock())
 
 	sw := csvdump.NewStageWriter(os.Stdout)
 	sw.OnAnalysis(*an)

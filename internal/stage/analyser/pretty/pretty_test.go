@@ -17,7 +17,7 @@ import (
 // ExamplePrinter_OnAnalysis is a testable example for Printer.OnAnalysis.
 func ExamplePrinter_OnAnalysis() {
 	p := plan.Mock()
-	a, err := analysis.Analyse(context.Background(), p, 10)
+	a, err := analysis.Analyse(context.Background(), p)
 	if err != nil {
 		fmt.Println("analysis error:", err)
 		return
@@ -41,7 +41,6 @@ func ExamplePrinter_OnAnalysis() {
 	//       - run: Min 0 Avg 0 Max 0
 	//     ### Results
 	//       - Ok: 1 subject(s)
-	//
 	//   ## gcc
 	//     - style: gcc
 	//     - arch: ppc.64le.power9

@@ -20,9 +20,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
-// Analyse runs the analyser with context ctx, on plan p and with nworkers parallel subject analysers.
-func Analyse(ctx context.Context, p *plan.Plan, nworkers int) (*Analysis, error) {
-	a, err := New(p, nworkers)
+// Analyse runs the analyser with context ctx, on plan p and with options opts.
+func Analyse(ctx context.Context, p *plan.Plan, opts ...Option) (*Analysis, error) {
+	a, err := newAnalyser(p, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +48,9 @@ type analyser struct {
 
 	// nworkers is the number of workers.
 	nworkers int
+
+	// filters is the set of filters to use when filtering compiler results.
+	filters FilterSet
 }
 
 // analyse runs the analyser with context ctx.
@@ -67,7 +70,7 @@ func (a *analyser) analyseCorpus(ctx context.Context) error {
 	ch := make(chan subjectAnalysis)
 	err := a.corpus.Par(ctx, a.nworkers,
 		func(ctx context.Context, named subject.Named) error {
-			classifyAndSend(ctx, named, ch)
+			a.analyseAndSend(ctx, named, ch)
 			return nil
 		},
 		func(ctx context.Context) error {
@@ -77,8 +80,8 @@ func (a *analyser) analyseCorpus(ctx context.Context) error {
 	return err
 }
 
-// New initialises an analyser for plan p, with workers nworkers.
-func New(p *plan.Plan, nworkers int) (*analyser, error) {
+// newAnalyser initialises an analyser for plan p, with workers nworkers.
+func newAnalyser(p *plan.Plan, opts ...Option) (*analyser, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
@@ -89,7 +92,9 @@ func New(p *plan.Plan, nworkers int) (*analyser, error) {
 		corpus:        p.Corpus,
 		compilerTimes: make(map[string][]time.Duration, lc),
 		runTimes:      make(map[string][]time.Duration, lc),
-		nworkers:      nworkers,
+	}
+	if err := Options(opts...)(&a); err != nil {
+		return nil, err
 	}
 	a.initCompilers(p.Compilers)
 	return &a, nil
@@ -110,9 +115,9 @@ func (a *analyser) initCompilers(cs map[string]compiler.Configuration) {
 	}
 }
 
-func classifyAndSend(ctx context.Context, named subject.Named, ch chan<- subjectAnalysis) {
+func (a *analyser) analyseAndSend(ctx context.Context, named subject.Named, ch chan<- subjectAnalysis) {
 	select {
-	case ch <- analyseSubject(named):
+	case ch <- a.analyseSubject(named):
 	case <-ctx.Done():
 	}
 }
@@ -143,7 +148,7 @@ func (a *analyser) applyCompilers(r subjectAnalysis) {
 	for cstr, cflag := range r.cflags {
 		if _, ok := a.analysis.Compilers[cstr]; !ok {
 			// Somehow the analysis is mentioning a compiler whose existence we haven't foreseen.
-			return
+			continue
 		}
 		a.analysis.Compilers[cstr].Logs[r.sub.Name] = r.clogs[cstr]
 

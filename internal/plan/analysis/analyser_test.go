@@ -58,7 +58,7 @@ func TestAnalyse_errors(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, err := analysis.Analyse(c.ctx(), c.p, 10)
+			_, err := analysis.Analyse(c.ctx(), c.p)
 			testhelp.ExpectErrorIs(t, err, c.err, "analysing broken plan")
 		})
 	}
@@ -69,7 +69,7 @@ func TestAnalyse_mock(t *testing.T) {
 	t.Parallel()
 
 	m := plan.Mock()
-	crp, err := analysis.Analyse(context.Background(), m, 10)
+	crp, err := analysis.Analyse(context.Background(), m)
 	require.NoError(t, err, "unexpected error analysing")
 
 	cases := map[string]struct {

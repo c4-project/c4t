@@ -19,7 +19,7 @@ import (
 
 // ExampleCompilerWriter_OnAnalysis is a testable example for CompilerWriter.OnAnalysis.
 func ExampleCompilerWriter_OnAnalysis() {
-	an, _ := analysis.Analyse(context.Background(), plan.Mock(), 1)
+	an, _ := analysis.Analyse(context.Background(), plan.Mock())
 
 	// nb: aside from the header, the actual order of compilers is not deterministic
 	cw := csvdump.NewCompilerWriter(os.Stdout)

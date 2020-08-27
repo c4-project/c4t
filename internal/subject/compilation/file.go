@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package subject
+package compilation
 
 import (
 	"archive/tar"
@@ -21,7 +21,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/1set/gut/yos"
-	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
 // TODO(MattWindsor91): a lot of this probably belongs elsewhere, but import cycles and methods make it difficult.
@@ -36,18 +35,14 @@ var (
 	ErrMissingFile = errors.New("subject file not available")
 )
 
-// ReadCompilerLog tries to read in the log for compiler, taking paths relative to root.
+// ReadLog tries to read in the log for compiler, taking paths relative to root.
 // If the compiler log doesn't exist relative to root, and its path is of the form FOO/BAR, we assume that it is in a
 // saved tarball called FOO.tar.gz (as file BAR) in root, and attempt to extract it.
-func (s *Subject) ReadCompilerLog(root string, compiler id.ID) ([]byte, error) {
-	cres, err := s.CompileResult(compiler)
-	if err != nil {
-		return nil, err
+func (c *CompileFileset) ReadLog(root string) ([]byte, error) {
+	if ystring.IsBlank(c.Log) {
+		return nil, ErrNoCompilerLog
 	}
-	if ystring.IsBlank(cres.Files.Log) {
-		return nil, fmt.Errorf("%w: %s", ErrNoCompilerLog, compiler)
-	}
-	return readSubjectFile(root, cres.Files.Log)
+	return readSubjectFile(root, c.Log)
 }
 
 func readSubjectFile(root, path string) ([]byte, error) {

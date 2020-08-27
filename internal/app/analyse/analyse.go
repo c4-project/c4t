@@ -9,6 +9,8 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/csvdump"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
 
@@ -39,6 +41,8 @@ const (
    summary of the plan file.  By passing -` + flagSaveDir + `, one can
    archive failing corpora to a directory for later experimentation.`
 
+	flagLoadFilters           = "filter-file"
+	usageLoadFilters          = "load compile result filters from this file"
 	flagCsvCompilers          = "csv-compilers"
 	usageCsvCompilers         = "dump CSV of compilers and their run times"
 	flagCsvStages             = "csv-stages"
@@ -91,6 +95,11 @@ func flags() []c.Flag {
 			Usage:       usageSaveDir,
 			DefaultText: "do not save",
 		},
+		&c.PathFlag{
+			Name:        flagLoadFilters,
+			Usage:       usageLoadFilters,
+			DefaultText: "do not load filters",
+		},
 	}
 }
 
@@ -102,7 +111,10 @@ func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 
 	a, err := analyser.New(
 		analyser.ObserveWith(obs...),
-		analyser.ParWorkers(stdflag.WorkerCountFromCli(ctx)),
+		analyser.Analysis(
+			analysis.WithFiltersFromFile(ctx.Path(flagLoadFilters)),
+			analysis.WithWorkerCount(stdflag.WorkerCountFromCli(ctx)),
+		),
 		analyser.SaveToPathset(savedPaths(ctx)),
 	)
 	if err != nil {

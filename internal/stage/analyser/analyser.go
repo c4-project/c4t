@@ -20,8 +20,8 @@ import (
 // Analyser represents the state of the plan analyser stage.
 type Analyser struct {
 	savePaths *saver.Pathset
-	// nworkers is the number of parallel workers to use when performing subject analysis.
-	nworkers int
+	// aopts is the set of options to pass to the underlying analysier.
+	aopts []analysis.Option
 	// observers is the list of observers to which analyses are sent.
 	observers []Observer
 	// saveObservers is the list of observers to which archival operations are sent.
@@ -84,5 +84,5 @@ func (a *Analyser) maybeSave(an *analysis.Analysis) error {
 }
 
 func (a *Analyser) analyse(ctx context.Context, p *plan.Plan) (*analysis.Analysis, error) {
-	return analysis.Analyse(ctx, p, a.nworkers)
+	return analysis.Analyse(ctx, p, a.aopts...)
 }

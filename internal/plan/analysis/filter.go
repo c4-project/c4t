@@ -6,8 +6,15 @@
 package analysis
 
 import (
+	"errors"
 	"io"
 	"os"
+	"regexp"
+
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
+
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -25,6 +32,8 @@ type Filter struct {
 	MajorVersionBelow int `yaml:"major_version_below,omitempty"`
 	// ErrorPattern is an uncompiled regexp that selects a particular phrase in a compiler error.
 	ErrorPattern string `yaml:"error_pattern,omitempty"`
+	// compiledPattern is the compiled version of ErrorPattern.
+	compiledPattern *regexp.Regexp
 }
 
 // FilterSet is the type of sets of filter.
@@ -35,7 +44,20 @@ func ReadFilterSet(r io.Reader) (FilterSet, error) {
 	yd := yaml.NewDecoder(r)
 	var fs FilterSet
 	err := yd.Decode(&fs)
-	return fs, err
+	if err != nil {
+		return nil, err
+	}
+	return compile(fs)
+}
+
+func compile(fs FilterSet) (FilterSet, error) {
+	var err error
+	for _, f := range fs {
+		if f.compiledPattern, err = regexp.Compile(f.ErrorPattern); err != nil {
+			return nil, err
+		}
+	}
+	return fs, nil
 }
 
 // LoadFilterSet loads a filter set from the filepath fpath.
@@ -48,4 +70,45 @@ func LoadFilterSet(fpath string) (FilterSet, error) {
 	fs, rerr := ReadFilterSet(f)
 	cerr := f.Close()
 	return fs, errhelp.FirstError(rerr, cerr)
+}
+
+// Filter returns true if, and only if, at least one filter in this set matches ci, and log.
+func (f FilterSet) Filter(ci compiler.Configuration, log string) (bool, error) {
+	for _, fl := range f {
+		matched, err := fl.Filter(ci, log)
+		if err != nil {
+			return false, err
+		}
+		if matched {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// FilteredStatus returns cm's status if FilterSet.Filter returns false over ci and log, or Filtered otherwise.
+func (f FilterSet) FilteredStatus(cm compilation.CompileResult, ci compiler.Configuration, log string) (status.Status, error) {
+	filtered, err := f.Filter(ci, log)
+	s := cm.Status
+	if filtered {
+		s = status.Filtered
+	}
+	return s, err
+}
+
+// Filter returns true if, and only if, this filter matches cm, ci, and log.
+func (f Filter) Filter(ci compiler.Configuration, log string) (bool, error) {
+	styleMatch, err := ci.Style.Matches(f.Style)
+	if err != nil || !styleMatch {
+		return false, err
+	}
+	// TODO(@MattWindsor91): compiler versions
+	return f.filterCompilerLog(log)
+}
+
+func (f Filter) filterCompilerLog(log string) (bool, error) {
+	if f.compiledPattern == nil {
+		return false, errors.New("filter was not compiled")
+	}
+	return f.compiledPattern.MatchString(log), nil
 }

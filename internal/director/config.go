@@ -9,6 +9,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
@@ -127,6 +129,28 @@ func OutDir(dir string) Option {
 	}
 }
 
+// Filters adds fs to the set of filters to use for any analyses this director runs.
+func Filters(fs analysis.FilterSet) Option {
+	return func(d *Director) error {
+		d.filters = append(d.filters, fs...)
+		return nil
+	}
+}
+
+// FiltersFromFile loads a filter set from path, if it is non-blank.
+func FiltersFromFile(path string) Option {
+	return func(d *Director) error {
+		if ystring.IsBlank(path) {
+			return nil
+		}
+		fs, err := analysis.LoadFilterSet(path)
+		if err != nil {
+			return err
+		}
+		return Filters(fs)(d)
+	}
+}
+
 // Env groups together the bits of configuration that pertain to dealing with the environment.
 type Env struct {
 	// Fuzzer is a single-shot fuzzing driver.
@@ -160,6 +184,7 @@ func (e Env) Check() error {
 // ConfigFromGlobal extracts the parts of a global config file relevant to a director, and builds a config from them.
 func ConfigFromGlobal(g *config.Config) Option {
 	return Options(
+		FiltersFromFile(g.Paths.FilterFile),
 		OutDir(g.Paths.OutDir),
 		OverrideQuantities(g.Quantities),
 		SSH(g.SSH),
