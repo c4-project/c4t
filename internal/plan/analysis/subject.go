@@ -15,8 +15,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
-// classification holds the result of performing a single analysis on one subject.
-type classification struct {
+// subjectAnalysis holds the result of performing a single analysis on one subject.
+type subjectAnalysis struct {
 	flags  status.Flag
 	sub    subject.Named
 	cflags map[string]status.Flag
@@ -24,20 +24,21 @@ type classification struct {
 	rtimes map[string][]time.Duration
 }
 
-func classify(named subject.Named) classification {
-	c := classification{
+// analyseSubject analyses the named subject s.
+func analyseSubject(s subject.Named) subjectAnalysis {
+	c := subjectAnalysis{
 		flags:  0,
 		cflags: map[string]status.Flag{},
 		ctimes: map[string][]time.Duration{},
 		rtimes: map[string][]time.Duration{},
-		sub:    named,
+		sub:    s,
 	}
-	c.classifyCompiles(named.Compiles)
-	c.classifyRuns(named.Runs)
+	c.classifyCompiles(s.Compiles)
+	c.classifyRuns(s.Runs)
 	return c
 }
 
-func (c *classification) classifyCompiles(cs map[string]compilation.CompileResult) {
+func (c *subjectAnalysis) classifyCompiles(cs map[string]compilation.CompileResult) {
 	for n, cm := range cs {
 		sf := cm.Status.Flag()
 		c.flags |= sf
@@ -49,7 +50,7 @@ func (c *classification) classifyCompiles(cs map[string]compilation.CompileResul
 	}
 }
 
-func (c *classification) classifyRuns(rs map[string]compilation.RunResult) {
+func (c *subjectAnalysis) classifyRuns(rs map[string]compilation.RunResult) {
 	for n, r := range rs {
 		sf := r.Status.Flag()
 		c.flags |= sf

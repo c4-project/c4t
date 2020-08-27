@@ -64,7 +64,7 @@ func (a *analyser) analyse(ctx context.Context) (*Analysis, error) {
 }
 
 func (a *analyser) analyseCorpus(ctx context.Context) error {
-	ch := make(chan classification)
+	ch := make(chan subjectAnalysis)
 	err := a.corpus.Par(ctx, a.nworkers,
 		func(ctx context.Context, named subject.Named) error {
 			classifyAndSend(named, ch)
@@ -110,11 +110,11 @@ func (a *analyser) initCompilers(cs map[string]compiler.Configuration) {
 	}
 }
 
-func classifyAndSend(named subject.Named, ch chan<- classification) {
-	ch <- classify(named)
+func classifyAndSend(named subject.Named, ch chan<- subjectAnalysis) {
+	ch <- analyseSubject(named)
 }
 
-func (a *analyser) build(ctx context.Context, ch <-chan classification) error {
+func (a *analyser) build(ctx context.Context, ch <-chan subjectAnalysis) error {
 	for i := 0; i < len(a.corpus); i++ {
 		select {
 		case <-ctx.Done():
@@ -126,7 +126,7 @@ func (a *analyser) build(ctx context.Context, ch <-chan classification) error {
 	return nil
 }
 
-func (a *analyser) apply(r classification) {
+func (a *analyser) apply(r subjectAnalysis) {
 	a.analysis.Flags |= r.flags
 	for i := status.Ok; i <= status.Last; i++ {
 		a.applyByStatus(i, r)
@@ -135,7 +135,7 @@ func (a *analyser) apply(r classification) {
 	}
 }
 
-func (a *analyser) applyByStatus(s status.Status, r classification) {
+func (a *analyser) applyByStatus(s status.Status, r subjectAnalysis) {
 	if !r.flags.MatchesStatus(s) {
 		return
 	}
@@ -145,7 +145,7 @@ func (a *analyser) applyByStatus(s status.Status, r classification) {
 	a.analysis.ByStatus[s][r.sub.Name] = r.sub.Subject
 }
 
-func (a *analyser) applyCompilers(s status.Status, r classification) {
+func (a *analyser) applyCompilers(s status.Status, r subjectAnalysis) {
 	for cstr, f := range r.cflags {
 		a.applyCompiler(s, f, cstr)
 	}
@@ -161,7 +161,7 @@ func (a *analyser) applyCompiler(s status.Status, cf status.Flag, cstr string) {
 	a.analysis.Compilers[cstr].Counts[s]++
 }
 
-func (a *analyser) applyTimes(r classification) {
+func (a *analyser) applyTimes(r subjectAnalysis) {
 	for cstr, ts := range r.ctimes {
 		a.compilerTimes[cstr] = append(a.compilerTimes[cstr], ts...)
 	}

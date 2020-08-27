@@ -80,7 +80,7 @@ func TestFlag_MatchesStatus(t *testing.T) {
 		"filtered fails against c-fail": {
 			toMatch:      status.FlagFail | status.FlagFiltered,
 			matchAgainst: status.CompileFail,
-			want:         false,
+			want:         true,
 		},
 		"c-fails against filtered": {
 			toMatch:      status.FlagCompileFail,

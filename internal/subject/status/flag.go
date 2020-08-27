@@ -34,15 +34,10 @@ func (f Flag) Matches(expected Flag) bool {
 }
 
 // MatchesStatus tests whether this Flag matches the expected status.
-// Generally, this is a Matches test for Status.Flag, except in two situations:
-// first, Ok only matches an absence of other flags; second, the presence of FlagFiltered prevents matching with
-// any status other than Filtered.
+// Generally, this is a Matches test for Status.Flag, except that Ok only matches an absence of other flags.
 func (f Flag) MatchesStatus(expected Status) bool {
 	if expected == Ok {
 		return f == 0
-	}
-	if f.Matches(FlagFiltered) {
-		return expected == Filtered
 	}
 	return f.Matches(expected.Flag())
 }

@@ -75,9 +75,9 @@ func (a *Analysis) String() string {
 	return sb.String()
 }
 
-// HasFlagged tests whether a collation has flagged cases.
+// HasFlagged tests whether an analysis has flagged cases.
 func (a *Analysis) HasFlagged() bool {
-	return a.Flags.Matches(status.FlagFlagged)
+	return a.Flags.MatchesStatus(status.Flagged)
 }
 
 // HasFailures tests whether a collation has failure cases.
