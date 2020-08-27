@@ -57,7 +57,6 @@ func New(paths *Pathset, archiveMaker func(path string) (Archiver, error), ops .
 }
 
 // Run runs the saving stage over the analyser a.
-// It returns p unchanged; this is for signature compatibility with the other director stages.
 func (s *Saver) Run(a analysis.Analysis) error {
 	p := a.Plan
 	if p == nil {

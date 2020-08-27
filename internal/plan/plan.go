@@ -9,7 +9,6 @@ package plan
 import (
 	"context"
 	"errors"
-	"sort"
 	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -73,23 +72,19 @@ func (p *Plan) RunStage(ctx context.Context, s stage.Stage, f func(context.Conte
 // Arches gets a list of all architectures targeted by compilers in the machine plan m.
 // These architectures are in order of their string equivalents.
 func (p *Plan) Arches() []id.ID {
-	amap := make(map[string]id.ID)
+	arches := p.archSet()
+	// Errors here come from the possibility that the arch set is the wrong type, or the strings aren't IDs,
+	// neither of which is statically possible.
+	ids, _ := id.MapKeys(arches)
+	return ids
+}
 
+func (p *Plan) archSet() map[string]struct{} {
+	amap := make(map[string]struct{})
 	for _, c := range p.Compilers {
-		amap[c.Arch.String()] = c.Arch
+		amap[c.Arch.String()] = struct{}{}
 	}
-
-	arches := make([]id.ID, len(amap))
-	i := 0
-	for _, arch := range amap {
-		arches[i] = arch
-		i++
-	}
-
-	sort.Slice(arches, func(i, j int) bool {
-		return arches[i].Less(arches[j])
-	})
-	return arches
+	return amap
 }
 
 // CompilerIDs gets a sorted slice of all compiler IDs mentioned in this machine plan.
