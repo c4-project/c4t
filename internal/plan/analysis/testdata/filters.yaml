@@ -1,4 +1,4 @@
 # an example set of filters, which will be added to as more complex things get filtered out.
-- style: gcc.gcc
+- style: gcc
   major_version_below: 4
   error_pattern: "error: invalid memory model for ‘__atomic_exchange’"

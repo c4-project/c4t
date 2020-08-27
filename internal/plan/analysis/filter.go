@@ -39,7 +39,7 @@ type Filter struct {
 // FilterSet is the type of sets of filter.
 type FilterSet []Filter
 
-// ReadFilterSet loads a filter set from the reader r.
+// ReadFilterSet loads and compiles a filter set from the reader r.
 func ReadFilterSet(r io.Reader) (FilterSet, error) {
 	yd := yaml.NewDecoder(r)
 	var fs FilterSet
@@ -47,13 +47,14 @@ func ReadFilterSet(r io.Reader) (FilterSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return compile(fs)
+	return Compile(fs)
 }
 
-func compile(fs FilterSet) (FilterSet, error) {
+// Compile compiles the filter set fs.
+func Compile(fs FilterSet) (FilterSet, error) {
 	var err error
-	for _, f := range fs {
-		if f.compiledPattern, err = regexp.Compile(f.ErrorPattern); err != nil {
+	for i := range fs {
+		if fs[i].compiledPattern, err = regexp.Compile(fs[i].ErrorPattern); err != nil {
 			return nil, err
 		}
 	}
