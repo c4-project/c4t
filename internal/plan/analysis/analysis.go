@@ -11,11 +11,11 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
 // Analysis represents an analysis of a plan.

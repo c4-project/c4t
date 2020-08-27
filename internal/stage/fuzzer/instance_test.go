@@ -16,10 +16,10 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 	"golang.org/x/sync/errgroup"
 )
 

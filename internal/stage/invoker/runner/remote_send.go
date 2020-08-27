@@ -12,8 +12,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
-	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
 )
 
 // Send translates p to the remote host, using SFTP to copy over any recipe files.

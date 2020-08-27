@@ -8,12 +8,12 @@ package dash
 import (
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/model/run"
-	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
@@ -21,7 +21,7 @@ import (
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/linestyle"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/mum4k/termdash/widgets/text"
 )

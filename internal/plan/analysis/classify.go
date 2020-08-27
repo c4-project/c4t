@@ -8,11 +8,11 @@ package analysis
 import (
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
 // classification holds the result of performing a single analysis on one subject.

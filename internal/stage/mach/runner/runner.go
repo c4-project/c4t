@@ -13,17 +13,17 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
 // ObsParser is the interface of things that can parse test outcomes.

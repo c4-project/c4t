@@ -18,13 +18,13 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
 // Logger lifts a Logger to an observer.

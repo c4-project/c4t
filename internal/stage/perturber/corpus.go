@@ -8,8 +8,8 @@ package perturber
 import (
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )

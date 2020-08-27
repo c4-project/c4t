@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
 var ErrRemote = errors.New("remote error")

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
-	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
+	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"

@@ -11,15 +11,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
+	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
 // Saver contains the state used when saving 'interesting' subjects.

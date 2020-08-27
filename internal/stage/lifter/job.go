@@ -17,9 +17,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
 // Job is the type of per-subject lifter jobs.

@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 )
 
 var (

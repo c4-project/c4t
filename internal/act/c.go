@@ -12,7 +12,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
 // BinActC is the name of the ACT C services binary.

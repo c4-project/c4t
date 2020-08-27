@@ -17,7 +17,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
@@ -27,15 +27,15 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"golang.org/x/sync/errgroup"
 

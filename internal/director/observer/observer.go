@@ -26,8 +26,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
 // Observer is an interface for types that implement multi-machine test progress observation.

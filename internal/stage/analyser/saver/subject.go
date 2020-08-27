@@ -11,7 +11,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
+	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
 )
 
 // Archiver is the interface of types that can archive subject files.

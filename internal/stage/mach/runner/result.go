@@ -8,9 +8,9 @@ package runner
 import (
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
+	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 )
 
 // Result is the type of results from a single test run.

@@ -33,7 +33,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/director/observer"
 

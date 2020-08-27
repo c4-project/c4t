@@ -15,7 +15,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 )
 
 // ExampleNewPathset is a runnable example for NewPathset.

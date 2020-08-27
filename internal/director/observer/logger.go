@@ -31,9 +31,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
 // TODO(@MattWindsor91): merge this with the singleobs logger?

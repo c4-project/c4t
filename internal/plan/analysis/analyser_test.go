@@ -15,10 +15,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )

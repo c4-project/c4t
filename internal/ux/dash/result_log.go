@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/mum4k/termdash/cell"

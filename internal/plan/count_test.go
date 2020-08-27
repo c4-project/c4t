@@ -8,9 +8,9 @@ package plan_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
 // ExamplePlan_MaxNumRecipes is a testable example for MaxNumRecipes.

@@ -22,7 +22,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
+	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"

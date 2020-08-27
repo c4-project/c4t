@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 

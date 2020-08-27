@@ -12,7 +12,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/stretchr/testify/assert"
 

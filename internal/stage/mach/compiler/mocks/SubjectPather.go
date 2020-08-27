@@ -4,7 +4,7 @@ package mocks
 
 import (
 	id "github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 	mock "github.com/stretchr/testify/mock"
 )
 

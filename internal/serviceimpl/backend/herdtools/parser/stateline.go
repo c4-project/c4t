@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
+	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 )
 
 // StateLine is the struct that an implementation of the Herdtools parser must return when parsing a state line.

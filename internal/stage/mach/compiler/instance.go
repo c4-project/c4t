@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
@@ -22,7 +22,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/1set/gut/ystring"
 
@@ -30,11 +30,11 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
 // Instance represents the state of a single per-subject instance of the batch compiler.

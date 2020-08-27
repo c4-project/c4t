@@ -13,8 +13,8 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 )
 
 const (

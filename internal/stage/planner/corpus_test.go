@@ -21,8 +21,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
 type TestProber struct {

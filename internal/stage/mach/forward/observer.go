@@ -11,7 +11,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
 // Observer wraps a JSON encoder, lifting it to an Observer that sends JSON-encoded Forwards.

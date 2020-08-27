@@ -7,12 +7,12 @@ package singleobs
 
 import (
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/cheggaaa/pb/v3"
 )

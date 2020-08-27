@@ -10,14 +10,14 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/mum4k/termdash/cell"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/text"

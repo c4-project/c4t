@@ -7,8 +7,8 @@
 package observer
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
 // Observer is the interface of anything that observes machine node behaviour.

@@ -19,8 +19,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/herd"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools"
+	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 	"github.com/stretchr/testify/assert"
 )
 

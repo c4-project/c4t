@@ -19,11 +19,11 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 

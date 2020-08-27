@@ -21,7 +21,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
 // ErrNil is an error that can be returned if a tester stage gets a nil plan.

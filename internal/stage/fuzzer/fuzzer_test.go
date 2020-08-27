@@ -27,9 +27,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 	"github.com/MattWindsor91/act-tester/internal/plan"

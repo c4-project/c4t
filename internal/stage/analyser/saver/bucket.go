@@ -10,9 +10,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/status"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 )
 
 // bucketSaver handles the setup of per-status buckets in an analysis save.

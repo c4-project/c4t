@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/status"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
 // ExampleAnalysisWithRun_String is a runnable example for String.

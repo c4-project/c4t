@@ -12,19 +12,19 @@ import (
 	"errors"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 

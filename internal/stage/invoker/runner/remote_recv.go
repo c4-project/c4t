@@ -13,10 +13,10 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
-	"github.com/MattWindsor91/act-tester/internal/model/normaliser"
-	"github.com/MattWindsor91/act-tester/internal/model/subject"
 	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
 )
 
 // Recv copies bits of remp into locp, including run information and any compiler failures.

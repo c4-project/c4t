@@ -12,7 +12,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/model/obs"
+	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 )
 
 // Parse parses an observation from r into o using i.

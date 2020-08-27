@@ -9,7 +9,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 	"github.com/MattWindsor91/act-tester/internal/plan"
@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/model/corpus"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"

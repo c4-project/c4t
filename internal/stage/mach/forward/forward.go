@@ -8,8 +8,8 @@
 package forward
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/corpus/builder"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
 // Forward describes a 'forwarded' message or error.
