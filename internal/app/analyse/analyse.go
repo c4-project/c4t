@@ -39,24 +39,27 @@ const (
    summary of the plan file.  By passing -` + flagSaveDir + `, one can
    archive failing corpora to a directory for later experimentation.`
 
-	flagCsvCompilers       = "csv-compilers"
-	usageCsvCompilers      = "dump CSV of compilers and their run times"
-	flagCsvStages          = "csv-stages"
-	usageCsvStages         = "dump CSV of stages and their run times"
-	flagShowCompilers      = "show-compilers"
-	flagShowCompilersShort = "C"
-	usageShowCompilers     = "show breakdown of compilers and their run times"
-	flagShowOk             = "show-ok"
-	flagShowOkShort        = "O"
-	usageShowOk            = "show subjects that did not have compile or run issues"
-	flagShowPlanInfo       = "show-plan-info"
-	flagShowPlanInfoShort  = "P"
-	usageShowPlanInfo      = "show plan metadata and stage times"
-	flagShowSubjects       = "show-subjects"
-	flagShowSubjectsShort  = "S"
-	usageShowSubjects      = "show subjects by status"
-	flagSaveDir            = "save-dir"
-	usageSaveDir           = "if present, save failing corpora to this `directory`"
+	flagCsvCompilers          = "csv-compilers"
+	usageCsvCompilers         = "dump CSV of compilers and their run times"
+	flagCsvStages             = "csv-stages"
+	usageCsvStages            = "dump CSV of stages and their run times"
+	flagShowCompilers         = "show-compilers"
+	flagShowCompilersShort    = "C"
+	usageShowCompilers        = "show breakdown of compilers and their run times"
+	flagShowCompilerLogs      = "show-compiler-logs"
+	flagShowCompilerLogsShort = "L"
+	usageShowCompilerLogs     = "show breakdown of compiler logs (requires -" + flagShowCompilers + ")"
+	flagShowOk                = "show-ok"
+	flagShowOkShort           = "O"
+	usageShowOk               = "show subjects that did not have compile or run issues"
+	flagShowPlanInfo          = "show-plan-info"
+	flagShowPlanInfoShort     = "P"
+	usageShowPlanInfo         = "show plan metadata and stage times"
+	flagShowSubjects          = "show-subjects"
+	flagShowSubjectsShort     = "S"
+	usageShowSubjects         = "show subjects by status"
+	flagSaveDir               = "save-dir"
+	usageSaveDir              = "if present, save failing corpora to this `directory`"
 )
 
 func App(outw, errw io.Writer) *c.App {
@@ -78,6 +81,7 @@ func flags() []c.Flag {
 		&c.BoolFlag{Name: flagCsvCompilers, Usage: usageCsvCompilers},
 		&c.BoolFlag{Name: flagCsvStages, Usage: usageCsvStages},
 		&c.BoolFlag{Name: flagShowCompilers, Aliases: []string{flagShowCompilersShort}, Usage: usageShowCompilers},
+		&c.BoolFlag{Name: flagShowCompilerLogs, Aliases: []string{flagShowCompilerLogsShort}, Usage: usageShowCompilerLogs},
 		&c.BoolFlag{Name: flagShowOk, Aliases: []string{flagShowOkShort}, Usage: usageShowOk},
 		&c.BoolFlag{Name: flagShowSubjects, Aliases: []string{flagShowSubjectsShort}, Usage: usageShowSubjects},
 		&c.BoolFlag{Name: flagShowPlanInfo, Aliases: []string{flagShowPlanInfoShort}, Usage: usageShowPlanInfo},
@@ -125,6 +129,7 @@ func prettyObserver(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error)
 		po, err := pretty.NewPrinter(
 			pretty.WriteTo(outw),
 			pretty.ShowCompilers(ctx.Bool(flagShowCompilers)),
+			pretty.ShowCompilerLogs(ctx.Bool(flagShowCompilerLogs)),
 			pretty.ShowOk(ctx.Bool(flagShowOk)),
 			pretty.ShowSubjects(ctx.Bool(flagShowSubjects)),
 			pretty.ShowPlanInfo(ctx.Bool(flagShowPlanInfo)),

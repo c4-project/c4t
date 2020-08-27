@@ -19,6 +19,9 @@ type WriteContext struct {
 	// ShowCompilers is true if compiler breakdowns should be shown.
 	ShowCompilers bool
 
+	// ShowCompilerLogs is true if compiler logs should be shown.
+	ShowCompilerLogs bool
+
 	// ShowOk is true if subjects with the 'ok' status should be shown.
 	ShowOk bool
 
@@ -62,6 +65,15 @@ const (
     - opt: {{ if .SelectedOpt -}}{{ if .SelectedOpt.Name }}{{ .SelectedOpt.Name }}{{ else }}none{{ end -}}{{ else }}none{{- end }}
     - mopt: {{ if .SelectedMOpt }}{{ .SelectedMOpt }}{{ else }}none{{ end }}`
 
+	tmplCompilerLogs = `
+{{- range $sname, $log := . }}{{ if $log }}      #### {{ $sname }}
+` + "```" + `
+{{ $log }}
+` + "```" + `
+{{ end -}}
+{{ end }}
+`
+
 	tmplCompilers = `
 {{- range $cname, $compiler := .Analysis.Compilers }}  ## {{ $cname }}
 {{ template "compilerInfo" .Info }}
@@ -69,7 +81,10 @@ const (
       - compile: {{ template "timeset" .Time }}
       - run: {{ template "timeset" .RunTime }}
     ### Results
-{{ template "compilerCounts" .Counts -}}
+{{ template "compilerCounts" .Counts }}
+{{- if $.ShowCompilerLogs }}    ### Logs
+{{ template "compilerLogs" .Logs }}
+{{ end -}}
 {{ end -}}
 `
 
@@ -119,6 +134,7 @@ func getTemplate() (*template.Template, error) {
 		"compilers":      tmplCompilers,
 		"compilerCounts": tmplCompilerCounts,
 		"compilerInfo":   tmplCompilerInfo,
+		"compilerLogs":   tmplCompilerLogs,
 		"obs":            tmplObs,
 		"planInfo":       tmplPlanInfo,
 		"stages":         tmplStages,

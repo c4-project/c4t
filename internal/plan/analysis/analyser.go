@@ -67,7 +67,7 @@ func (a *analyser) analyseCorpus(ctx context.Context) error {
 	ch := make(chan subjectAnalysis)
 	err := a.corpus.Par(ctx, a.nworkers,
 		func(ctx context.Context, named subject.Named) error {
-			classifyAndSend(named, ch)
+			classifyAndSend(ctx, named, ch)
 			return nil
 		},
 		func(ctx context.Context) error {
@@ -104,14 +104,17 @@ func checkPlan(p *plan.Plan) error {
 
 func (a *analyser) initCompilers(cs map[string]compiler.Configuration) {
 	for cn, c := range cs {
-		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Info: c}
+		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Logs: map[string]string{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}
 		a.runTimes[cn] = []time.Duration{}
 	}
 }
 
-func classifyAndSend(named subject.Named, ch chan<- subjectAnalysis) {
-	ch <- analyseSubject(named)
+func classifyAndSend(ctx context.Context, named subject.Named, ch chan<- subjectAnalysis) {
+	select {
+	case ch <- analyseSubject(named):
+	case <-ctx.Done():
+	}
 }
 
 func (a *analyser) build(ctx context.Context, ch <-chan subjectAnalysis) error {
@@ -128,10 +131,25 @@ func (a *analyser) build(ctx context.Context, ch <-chan subjectAnalysis) error {
 
 func (a *analyser) apply(r subjectAnalysis) {
 	a.analysis.Flags |= r.flags
+	a.applyCompilers(r)
+	a.applyTimes(r)
+
 	for i := status.Ok; i <= status.Last; i++ {
 		a.applyByStatus(i, r)
-		a.applyCompilers(i, r)
-		a.applyTimes(r)
+	}
+}
+
+func (a *analyser) applyCompilers(r subjectAnalysis) {
+	for cstr, cflag := range r.cflags {
+		if _, ok := a.analysis.Compilers[cstr]; !ok {
+			// Somehow the analysis is mentioning a compiler whose existence we haven't foreseen.
+			return
+		}
+		a.analysis.Compilers[cstr].Logs[r.sub.Name] = r.clogs[cstr]
+
+		for i := status.Ok; i <= status.Last; i++ {
+			a.applyCompilerStatusCount(i, cflag, cstr)
+		}
 	}
 }
 
@@ -145,17 +163,8 @@ func (a *analyser) applyByStatus(s status.Status, r subjectAnalysis) {
 	a.analysis.ByStatus[s][r.sub.Name] = r.sub.Subject
 }
 
-func (a *analyser) applyCompilers(s status.Status, r subjectAnalysis) {
-	for cstr, f := range r.cflags {
-		a.applyCompiler(s, f, cstr)
-	}
-}
-
-func (a *analyser) applyCompiler(s status.Status, cf status.Flag, cstr string) {
+func (a *analyser) applyCompilerStatusCount(s status.Status, cf status.Flag, cstr string) {
 	if !cf.MatchesStatus(s) {
-		return
-	}
-	if _, ok := a.analysis.Compilers[cstr]; !ok {
 		return
 	}
 	a.analysis.Compilers[cstr].Counts[s]++

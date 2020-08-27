@@ -57,3 +57,9 @@ func ShowPlanInfo(show bool) Option {
 		aw.ctx.ShowPlanInfo = show
 	}
 }
+
+func ShowCompilerLogs(show bool) Option {
+	return func(aw *Printer) {
+		aw.ctx.ShowCompilerLogs = show
+	}
+}

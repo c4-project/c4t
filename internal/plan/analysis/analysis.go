@@ -41,6 +41,9 @@ type Compiler struct {
 	// Counts maps each status to the number of times it was observed across the corpus.
 	Counts map[status.Status]int
 
+	// Logs maps each subject name to its compiler log.
+	Logs map[string]string
+
 	// Time gathers statistics about how long, on average, this compiler took to compile corpus subjects.
 	// It doesn't contain information about failed compilations.
 	Time *TimeSet

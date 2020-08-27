@@ -29,15 +29,27 @@ func TestAnalyse_errors(t *testing.T) {
 
 	cases := map[string]struct {
 		p   *plan.Plan
+		ctx func() context.Context
 		err error
 	}{
 		"no-plan": {
 			p:   nil,
+			ctx: context.Background,
 			err: plan.ErrNil,
 		},
 		"no-corpus": {
 			p:   &plan.Plan{Metadata: plan.Metadata{Version: plan.CurrentVer}},
+			ctx: context.Background,
 			err: corpus.ErrNone,
+		},
+		"done-context": {
+			p: plan.Mock(),
+			ctx: func() context.Context {
+				wc, cf := context.WithCancel(context.Background())
+				cf()
+				return wc
+			},
+			err: context.Canceled,
 		},
 	}
 
@@ -46,7 +58,7 @@ func TestAnalyse_errors(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, err := analysis.Analyse(context.Background(), c.p, 10)
+			_, err := analysis.Analyse(c.ctx(), c.p, 10)
 			testhelp.ExpectErrorIs(t, err, c.err, "analysing broken plan")
 		})
 	}
