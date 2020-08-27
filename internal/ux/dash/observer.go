@@ -162,7 +162,7 @@ func (o *Observer) sendStatusCount(i status.Status, n int) {
 }
 
 func (o *Observer) logAnalysis(a analysis.Analysis) error {
-	sc := analysis.AnalysisWithRun{
+	sc := analysis.WithRun{
 		Run:      o.run.last,
 		Analysis: a,
 	}

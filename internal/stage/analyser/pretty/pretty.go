@@ -50,7 +50,7 @@ func (p *Printer) OnAnalysis(a analysis.Analysis) {
 }
 
 // WriteSourced writes a sourced analysis a to this printer.
-func (p *Printer) WriteSourced(a analysis.AnalysisWithRun) error {
+func (p *Printer) WriteSourced(a analysis.WithRun) error {
 	if _, err := fmt.Fprintf(p.w, "# %s #\n\n", &a.Run); err != nil {
 		return err
 	}

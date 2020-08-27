@@ -9,8 +9,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 )
 
-// AnalysisWithRun contains a corpus collation and its parent run.
-type AnalysisWithRun struct {
+// WithRun contains a corpus collation and its parent run.
+type WithRun struct {
 	// Run contains information about the run that produced this collation.
 	Run run.Run
 
@@ -18,7 +18,7 @@ type AnalysisWithRun struct {
 	Analysis
 }
 
-// String formats a log header for this sourced collation.
-func (s *AnalysisWithRun) String() string {
+// String formats a log header for this sourced analysis.
+func (s *WithRun) String() string {
 	return s.Run.String() + " " + s.Analysis.String()
 }

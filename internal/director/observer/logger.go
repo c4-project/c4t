@@ -46,7 +46,7 @@ type Logger struct {
 	// aw is the analyser writer used for outputting sourced analyses.
 	aw *pretty.Printer
 	// anaCh is used to send sourced analyses for logging.
-	anaCh chan analysis.AnalysisWithRun
+	anaCh chan analysis.WithRun
 	// compCh is used to send compilers for logging.
 	compCh chan compilerSet
 	// saveCh is used to send save actions for logging.
@@ -66,7 +66,7 @@ func NewLogger(w io.WriteCloser) (*Logger, error) {
 	return &Logger{
 		out:    w,
 		aw:     aw,
-		anaCh:  make(chan analysis.AnalysisWithRun),
+		anaCh:  make(chan analysis.WithRun),
 		compCh: make(chan compilerSet),
 		saveCh: make(chan archiveMessage),
 	}, nil
@@ -115,7 +115,7 @@ func (j *Logger) Instance(id.ID) (Instance, error) {
 }
 
 // logAnalysis logs s to this logger's file.
-func (j *Logger) logAnalysis(s analysis.AnalysisWithRun) error {
+func (j *Logger) logAnalysis(s analysis.WithRun) error {
 	return j.aw.WriteSourced(s)
 }
 
@@ -152,7 +152,7 @@ type InstanceLogger struct {
 	// compCh is the channel used to send compiler sets for logging.
 	compCh chan<- compilerSet
 	// anaCh is the channel used to send sourced analyses for logging.
-	anaCh chan<- analysis.AnalysisWithRun
+	anaCh chan<- analysis.WithRun
 	// saveCh is the channel used to send save actions for logging.
 	saveCh chan<- archiveMessage
 	// run contains information about the current iteration.
@@ -232,8 +232,8 @@ func (l *InstanceLogger) OnArchive(s saver.ArchiveMessage) {
 	}
 }
 
-func (l *InstanceLogger) addSource(c analysis.Analysis) analysis.AnalysisWithRun {
-	return analysis.AnalysisWithRun{
+func (l *InstanceLogger) addSource(c analysis.Analysis) analysis.WithRun {
+	return analysis.WithRun{
 		Run:      l.run,
 		Analysis: c,
 	}

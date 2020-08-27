@@ -38,14 +38,14 @@ func NewResultLog() (*ResultLog, error) {
 }
 
 // Log logs a sourced collation sc.
-func (r *ResultLog) Log(sc analysis.AnalysisWithRun) error {
+func (r *ResultLog) Log(sc analysis.WithRun) error {
 	if err := r.LogHeader(sc); err != nil {
 		return err
 	}
 	return r.logBuckets(sc)
 }
 
-func (r *ResultLog) logBuckets(s analysis.AnalysisWithRun) error {
+func (r *ResultLog) logBuckets(s analysis.WithRun) error {
 	sc := s.Analysis.ByStatus
 	for i := status.FirstBad; i <= status.Last; i++ {
 		if err := r.logBucket(i, sc[i]); err != nil {
@@ -71,7 +71,7 @@ func (r *ResultLog) logBucket(s status.Status, bucket corpus.Corpus) error {
 }
 
 // LogHeader logs the header of a sourced collation sc.
-func (r *ResultLog) LogHeader(sc analysis.AnalysisWithRun) error {
+func (r *ResultLog) LogHeader(sc analysis.WithRun) error {
 	if err := r.maybeOverflow(); err != nil {
 		return err
 	}

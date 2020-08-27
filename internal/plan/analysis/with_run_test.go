@@ -18,9 +18,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
-// ExampleAnalysisWithRun_String is a runnable example for String.
-func ExampleAnalysisWithRun_String() {
-	sc := analysis.AnalysisWithRun{
+// ExampleWithRun_String is a runnable example for WithRun.String.
+func ExampleWithRun_String() {
+	sc := analysis.WithRun{
 		Run: run.Run{
 			MachineID: id.FromString("foo.bar.baz"),
 			Iter:      42,
