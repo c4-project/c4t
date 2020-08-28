@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/act-tester/internal/subject/normpath"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
@@ -88,7 +88,7 @@ func runRoot(root string, iterTime time.Time) string {
 
 // SubjectTarFile gets the path to which a tarball for subject sname should be saved.
 func (s *RunPathset) SubjectTarFile(sname string) string {
-	return s.subjectFile(sname + compilation.TarSuffix)
+	return s.subjectFile(sname + normpath.TarSuffix)
 }
 
 func (s *RunPathset) subjectFile(fname string) string {

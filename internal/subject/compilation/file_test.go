@@ -6,6 +6,7 @@
 package compilation_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
@@ -36,7 +37,7 @@ func TestCompileFileset_ReadCompilerLog(t *testing.T) {
 			t.Parallel()
 
 			cr := compilation.CompileFileset{Log: c.path}
-			bs, err := cr.ReadLog("testdata")
+			bs, err := cr.ReadLog(filepath.Join("testdata", "read_log"))
 			require.NoError(t, err, "reading plain compiler log")
 			assert.Equal(t, c.want, string(bs), "incorrect compiler log contents")
 		})

@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/MattWindsor91/act-tester/internal/subject/normpath"
+
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
@@ -50,7 +52,7 @@ func New(root string) *Normaliser {
 func (n *Normaliser) Normalise(s subject.Subject) (*subject.Subject, error) {
 	n.err = nil
 
-	s.Source.Path = n.replaceAndAdd(s.Source.Path, filekind.Litmus, filekind.InOrig, FileOrigLitmus)
+	s.Source.Path = n.replaceAndAdd(s.Source.Path, filekind.Litmus, filekind.InOrig, normpath.FileOrigLitmus)
 	s.Fuzz = n.fuzz(s.Fuzz)
 	s.Compiles = n.compiles(s.Compiles)
 	s.Recipes = n.recipes(s.Recipes)
@@ -63,8 +65,8 @@ func (n *Normaliser) fuzz(of *subject.Fuzz) *subject.Fuzz {
 		return nil
 	}
 	f := *of
-	f.Litmus.Path = n.replaceAndAdd(f.Litmus.Path, filekind.Litmus, filekind.InFuzz, FileFuzzLitmus)
-	f.Trace = n.replaceAndAdd(f.Trace, filekind.Trace, filekind.InFuzz, FileFuzzTrace)
+	f.Litmus.Path = n.replaceAndAdd(f.Litmus.Path, filekind.Litmus, filekind.InFuzz, normpath.FileFuzzLitmus)
+	f.Trace = n.replaceAndAdd(f.Trace, filekind.Trace, filekind.InFuzz, normpath.FileFuzzTrace)
 	return &f
 }
 
@@ -82,7 +84,7 @@ func (n *Normaliser) recipes(rs map[string]recipe.Recipe) map[string]recipe.Reci
 
 func (n *Normaliser) recipe(archstr string, h recipe.Recipe) recipe.Recipe {
 	oldPaths := h.Paths()
-	h.Dir = RecipeDir(n.root, archstr)
+	h.Dir = normpath.RecipeDir(n.root, archstr)
 	for i, np := range h.Paths() {
 		n.add(oldPaths[i], np, filekind.GuessFromFile(np), filekind.InRecipe)
 	}
@@ -101,8 +103,8 @@ func (n *Normaliser) compiles(cs map[string]compilation.CompileResult) map[strin
 }
 
 func (n *Normaliser) compile(cidstr string, c compilation.CompileResult) compilation.CompileResult {
-	c.Files.Bin = n.replaceAndAdd(c.Files.Bin, filekind.Bin, filekind.InCompile, DirCompiles, cidstr, FileBin)
-	c.Files.Log = n.replaceAndAdd(c.Files.Log, filekind.Log, filekind.InCompile, DirCompiles, cidstr, FileCompileLog)
+	c.Files.Bin = n.replaceAndAdd(c.Files.Bin, filekind.Bin, filekind.InCompile, normpath.DirCompiles, cidstr, normpath.FileBin)
+	c.Files.Log = n.replaceAndAdd(c.Files.Log, filekind.Log, filekind.InCompile, normpath.DirCompiles, cidstr, normpath.FileCompileLog)
 	return c
 }
 

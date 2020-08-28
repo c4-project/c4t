@@ -9,6 +9,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/subject/normpath"
+
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
@@ -41,7 +43,7 @@ var testSubjects = map[string]func(root string) testCase{
 		}
 	},
 	"litmus": func(root string) testCase {
-		olit := path.Join(root, normaliser.FileOrigLitmus)
+		olit := path.Join(root, normpath.FileOrigLitmus)
 		return testCase{
 			in:  *subject.NewOrPanic(litmus.New(path.Join("foo", "bar", "baz.litmus"))),
 			out: *subject.NewOrPanic(litmus.New(olit)),
@@ -61,18 +63,18 @@ var testSubjects = map[string]func(root string) testCase{
 			},
 			out: subject.Subject{
 				Fuzz: &subject.Fuzz{
-					Litmus: *litmus.New(r(normaliser.FileFuzzLitmus)),
-					Trace:  r(normaliser.FileFuzzTrace),
+					Litmus: *litmus.New(r(normpath.FileFuzzLitmus)),
+					Trace:  r(normpath.FileFuzzTrace),
 				},
 			},
 			maps: normaliser.Map{
-				r(normaliser.FileFuzzLitmus): normaliser.NewEntry(filekind.Litmus, filekind.InFuzz, "barbaz", "baz.1.litmus"),
-				r(normaliser.FileFuzzTrace):  normaliser.NewEntry(filekind.Trace, filekind.InFuzz, "barbaz", "baz.1.trace"),
+				r(normpath.FileFuzzLitmus): normaliser.NewEntry(filekind.Litmus, filekind.InFuzz, "barbaz", "baz.1.litmus"),
+				r(normpath.FileFuzzTrace):  normaliser.NewEntry(filekind.Trace, filekind.InFuzz, "barbaz", "baz.1.trace"),
 			},
 		}
 	},
 	"recipe": func(root string) testCase {
-		h := func(arch, file string) string { return path.Join(root, normaliser.DirRecipes, arch, file) }
+		h := func(arch, file string) string { return path.Join(root, normpath.DirRecipes, arch, file) }
 		return testCase{
 			in: subject.Subject{
 				Recipes: map[string]recipe.Recipe{
@@ -89,11 +91,11 @@ var testSubjects = map[string]func(root string) testCase{
 			out: subject.Subject{
 				Recipes: map[string]recipe.Recipe{
 					"arm": {
-						Dir:   normaliser.RecipeDir(root, "arm"),
+						Dir:   normpath.RecipeDir(root, "arm"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 					"x86": {
-						Dir:   normaliser.RecipeDir(root, "x86"),
+						Dir:   normpath.RecipeDir(root, "x86"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 				},
@@ -107,7 +109,7 @@ var testSubjects = map[string]func(root string) testCase{
 		}
 	},
 	"compile": func(root string) testCase {
-		c := func(comp, file string) string { return path.Join(root, normaliser.DirCompiles, comp, file) }
+		c := func(comp, file string) string { return path.Join(root, normpath.DirCompiles, comp, file) }
 		return testCase{
 			in: subject.Subject{
 				Compiles: map[string]compilation.CompileResult{
@@ -132,24 +134,24 @@ var testSubjects = map[string]func(root string) testCase{
 					"clang": {
 						Result: compilation.Result{Status: status.Ok},
 						Files: compilation.CompileFileset{
-							Bin: c("clang", normaliser.FileBin),
-							Log: c("clang", normaliser.FileCompileLog),
+							Bin: c("clang", normpath.FileBin),
+							Log: c("clang", normpath.FileCompileLog),
 						},
 					},
 					"gcc": {
 						Result: compilation.Result{Status: status.Ok},
 						Files: compilation.CompileFileset{
-							Bin: c("gcc", normaliser.FileBin),
-							Log: c("gcc", normaliser.FileCompileLog),
+							Bin: c("gcc", normpath.FileBin),
+							Log: c("gcc", normpath.FileCompileLog),
 						},
 					},
 				},
 			},
 			maps: map[string]normaliser.Entry{
-				c("clang", normaliser.FileBin):        normaliser.NewEntry(filekind.Bin, filekind.InCompile, "foobaz", "clang", "a.out"),
-				c("gcc", normaliser.FileBin):          normaliser.NewEntry(filekind.Bin, filekind.InCompile, "foobaz", "gcc", "a.out"),
-				c("clang", normaliser.FileCompileLog): normaliser.NewEntry(filekind.Log, filekind.InCompile, "foobaz", "clang", "errors"),
-				c("gcc", normaliser.FileCompileLog):   normaliser.NewEntry(filekind.Log, filekind.InCompile, "foobaz", "gcc", "errors"),
+				c("clang", normpath.FileBin):        normaliser.NewEntry(filekind.Bin, filekind.InCompile, "foobaz", "clang", "a.out"),
+				c("gcc", normpath.FileBin):          normaliser.NewEntry(filekind.Bin, filekind.InCompile, "foobaz", "gcc", "a.out"),
+				c("clang", normpath.FileCompileLog): normaliser.NewEntry(filekind.Log, filekind.InCompile, "foobaz", "clang", "errors"),
+				c("gcc", normpath.FileCompileLog):   normaliser.NewEntry(filekind.Log, filekind.InCompile, "foobaz", "gcc", "errors"),
 			},
 		}
 	},

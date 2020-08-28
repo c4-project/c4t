@@ -8,6 +8,8 @@ package saver_test
 import (
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/subject/normpath"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
@@ -25,27 +27,27 @@ func TestArchiveSubject(t *testing.T) {
 	)
 
 	nm := normaliser.Map{
-		normaliser.FileBin: normaliser.Entry{
+		normpath.FileBin: normaliser.Entry{
 			Original: "output.exe",
 			Kind:     filekind.Bin,
 			Loc:      filekind.InCompile,
 		},
-		normaliser.FileCompileLog: normaliser.Entry{
+		normpath.FileCompileLog: normaliser.Entry{
 			Original: "output.log",
 			Kind:     filekind.Log,
 			Loc:      filekind.InCompile,
 		},
-		normaliser.FileOrigLitmus: normaliser.Entry{
+		normpath.FileOrigLitmus: normaliser.Entry{
 			Original: "foo.litmus",
 			Kind:     filekind.Litmus,
 			Loc:      filekind.InOrig,
 		},
-		normaliser.FileFuzzLitmus: normaliser.Entry{
+		normpath.FileFuzzLitmus: normaliser.Entry{
 			Original: "foo_9.litmus",
 			Kind:     filekind.Litmus,
 			Loc:      filekind.InFuzz,
 		},
-		normaliser.FileFuzzTrace: normaliser.Entry{
+		normpath.FileFuzzTrace: normaliser.Entry{
 			Original: "foo_9.trace",
 			Kind:     filekind.Trace,
 			Loc:      filekind.InFuzz,

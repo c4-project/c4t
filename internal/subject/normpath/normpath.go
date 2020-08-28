@@ -3,7 +3,10 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package normaliser
+// Package normpath contains various 'normalised path' fragments, and functions for constructing them.
+// These are used by both the normaliser (which rewrites a plan to use normalised paths) and various other parts of
+// the tooling (which assumes the use of normalised paths).
+package normpath
 
 import "path"
 
@@ -22,6 +25,9 @@ const (
 	DirCompiles = "compiles"
 	// DirRecipes is the normalised directory for recipe results.
 	DirRecipes = "recipes"
+
+	// TarSuffix is the extension used by the saver when saving tarballs, and presumed by archive-transparent file readers.
+	TarSuffix = ".tar.gz"
 )
 
 // RecipeDir gets the normalised recipe directory under root and for architecture ID-string arch.
