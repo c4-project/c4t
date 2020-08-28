@@ -98,3 +98,11 @@ func (i Status) IsInBounds() bool {
 func (i Status) IsBad() bool {
 	return FirstBad <= i && i <= Last
 }
+
+// CountsForTiming is true if this status should be logged in compiler/run timing data.
+//
+// Any compile or run that is not filtered and executes to completion counts for timing purposes (so, ok or flagged
+// compiles/runs).
+func (i Status) CountsForTiming() bool {
+	return !(FlagFail | FlagTimeout).MatchesStatus(i)
+}

@@ -1,0 +1,1 @@
+error: invalid memory model for ‘__atomic_exchange’

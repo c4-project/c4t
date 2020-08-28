@@ -7,6 +7,7 @@ package analysis_test
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
@@ -91,4 +92,21 @@ func TestAnalyse_mock(t *testing.T) {
 			assert.Equal(t, c.wantSubjects, got, "wrong subjects")
 		})
 	}
+}
+
+// TestAnalyse_filtered tests that adding a filtered plan situation to the mock plan works properly.
+func TestAnalyse_filtered(t *testing.T) {
+	t.Parallel()
+
+	m := plan.Mock()
+	cgcc := m.Corpus["bar"].Compiles["gcc"]
+	cgcc.Files.Log = filepath.Join("testdata", "filter_trip.log")
+	m.Corpus["bar"].Compiles["gcc"] = cgcc
+
+	crp, err := analysis.Analyse(context.Background(), m, analysis.WithFiltersFromFile(filepath.Join("testdata", "filters.yaml")))
+	require.NoError(t, err, "unexpected error analysing")
+
+	assert.Equal(t, "error: invalid memory model for ‘__atomic_exchange’\n", crp.Compilers["gcc"].Logs["bar"], "log not as expected")
+	assert.Contains(t, crp.ByStatus[status.Filtered], "bar", "bar should have been filtered")
+	assert.NotContains(t, crp.ByStatus[status.CompileFail], "bar", "bar should have been filtered out of compilefail")
 }

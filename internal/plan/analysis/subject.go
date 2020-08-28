@@ -57,7 +57,7 @@ func (c *subjectAnalysis) classifyCompiles(crs map[string]compilation.CompileRes
 		}
 		c.logCompileStatus(st, n)
 
-		if cm.Duration != 0 && !(status.FlagFiltered | status.FlagFail | status.FlagTimeout).MatchesStatus(st) {
+		if cm.Duration != 0 && st.CountsForTiming() {
 			c.ctimes[n] = append(c.ctimes[n], cm.Duration)
 		}
 	}
@@ -73,9 +73,11 @@ func (c *subjectAnalysis) compileLog(cm compilation.CompileResult) string {
 
 func (c *subjectAnalysis) classifyRuns(rs map[string]compilation.RunResult) {
 	for n, r := range rs {
-		c.logCompileStatus(r.Status, n)
-
-		if r.Duration != 0 && !(status.FlagRunFail | status.FlagRunTimeout).MatchesStatus(r.Status) {
+		// If we've already filtered this run out, don't unfilter it.
+		if !(c.cflags[n].MatchesStatus(status.Filtered)) {
+			c.logCompileStatus(r.Status, n)
+		}
+		if r.Duration != 0 && r.Status.CountsForTiming() {
 			c.rtimes[n] = append(c.rtimes[n], r.Duration)
 		}
 	}
