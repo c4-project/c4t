@@ -6,8 +6,11 @@
 package analysis_test
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
@@ -40,6 +43,15 @@ func TestLoadFilterSet(t *testing.T) {
 	assert.ElementsMatch(t, got, want, "filter set not as expected")
 }
 
+// TestLoadFilterSet tests LoadFilterSet on an example filter file that doesn't exist.
+func TestLoadFilterSet_notFound(t *testing.T) {
+	t.Parallel()
+
+	_, err := analysis.LoadFilterSet(filepath.Join("testdata", "nonsuch.yaml"))
+	testhelp.ExpectErrorIs(t, err, os.ErrNotExist, "loading nonexistent filter set")
+}
+
+// TestFilterSet_FilteredStatus tests FilterSet.FilteredStatus with several cases.
 func TestFilterSet_FilteredStatus(t *testing.T) {
 	t.Parallel()
 
@@ -47,10 +59,12 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 	require.NoError(t, err, "loading filter set should not error")
 
 	cases := map[string]struct {
-		inComp   compiler.Configuration
-		inLog    string
-		inResult compilation.CompileResult
-		want     status.Status
+		inComp     compiler.Configuration
+		inLog      string
+		inResult   compilation.CompileResult
+		fsOverride analysis.FilterSet
+		want       status.Status
+		err        error
 	}{
 		"no filtering": {
 			inComp:   compiler.MockX86Gcc(),
@@ -64,6 +78,25 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 			inResult: compilation.CompileResult{Result: compilation.Result{Status: status.Ok}},
 			want:     status.Filtered,
 		},
+		"no filters": {
+			fsOverride: analysis.FilterSet{},
+			inComp:     compiler.MockX86Gcc(),
+			inLog:      "foo error: invalid memory model for ‘__atomic_exchange’ bar",
+			inResult:   compilation.CompileResult{Result: compilation.Result{Status: status.Ok}},
+			want:       status.Ok,
+		},
+		"filtering with a broken filter set": {
+			fsOverride: analysis.FilterSet{
+				{
+					Style:        id.FromString("bad.*.glob.*"),
+					ErrorPattern: "blep",
+				},
+			},
+			inComp:   compiler.MockX86Gcc(),
+			inLog:    "blep",
+			inResult: compilation.CompileResult{Result: compilation.Result{Status: status.Ok}},
+			err:      id.ErrBadGlob,
+		},
 	}
 
 	for name, c := range cases {
@@ -71,7 +104,16 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
+			fs := fs
+			if c.fsOverride != nil {
+				fs = c.fsOverride
+			}
+
 			got, err := fs.FilteredStatus(c.inResult, c.inComp, c.inLog)
+			if c.err != nil {
+				testhelp.ExpectErrorIs(t, err, c.err, "FilteredStatus")
+				return
+			}
 			require.NoError(t, err, "filtering shouldn't error")
 			assert.Equal(t, c.want, got, "wrong status returned")
 		})
