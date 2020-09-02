@@ -31,7 +31,7 @@ const (
 	usageSeed     = "`seed` to use for any randomised components of this test plan"
 )
 
-// App creates the act-tester-plan app.
+// App creates the act-tester-perturb app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  "act-tester-perturb",
