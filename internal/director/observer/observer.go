@@ -50,11 +50,9 @@ type Observer interface {
 	Instance(id id.ID) (Instance, error)
 }
 
-// Instance is an interface for types that observe a director loop.
+// Instance is an interface for types that observe a director instance.
 type Instance interface {
-	// OnIteration lets the observer know that the machine loop has started anew.
-	// iter is, modulo eventual overflow, the current iteration number;
-	// time is the time at which the iteration started.
+	// OnIteration lets the observer know that the instance has started a new cycle.
 	OnIteration(run run.Run)
 
 	// Instance observers can observe plan analyses.
@@ -95,6 +93,15 @@ func LowerToMachine(obs []Observer) []machine.Observer {
 // LowerToAnalyser lowers a slice of instance observers to a slice of analyser observers.
 func LowerToAnalyser(obs []Instance) []analyser.Observer {
 	cos := make([]analyser.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
+}
+
+// LowerToPlanner lowers a slice of instance observers to a slice of planner observers.
+func LowerToPlanner(obs []Instance) []planner.Observer {
+	cos := make([]planner.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}

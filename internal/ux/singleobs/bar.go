@@ -7,8 +7,11 @@ package singleobs
 
 import (
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
@@ -50,6 +53,15 @@ func (p *Bar) OnPlan(planner.Message) {}
 
 // OnMachineNodeAction does nothing.
 func (p *Bar) OnMachineNodeAction(observer.Message) {}
+
+// OnIteration does nothing.
+func (p *Bar) OnIteration(run.Run) {}
+
+// OnAnalysis does nothing.
+func (p *Bar) OnAnalysis(analysis.Analysis) {}
+
+// OnArchive does nothing.
+func (p *Bar) OnArchive(saver.ArchiveMessage) {}
 
 func (p *Bar) onBatch(m observing.Batch) {
 	switch m.Kind {
