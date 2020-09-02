@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+
 	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
@@ -38,6 +40,19 @@ func New(names ...string) Corpus {
 		corpus[n] = subject.Subject{}
 	}
 	return corpus
+}
+
+// FilterToNames filters c to contain only subjects whose names are contained within names.
+func (c Corpus) FilterToNames(names ...string) Corpus {
+	c2 := make(Corpus, len(names))
+	nset := stringhelp.NewSet(names...)
+	for n, s := range c {
+		if _, ok := nset[n]; !ok {
+			continue
+		}
+		c2[n] = s
+	}
+	return c2
 }
 
 // Add tries to add s to the corpus.

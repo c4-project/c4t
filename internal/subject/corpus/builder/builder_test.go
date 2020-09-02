@@ -99,7 +99,6 @@ func TestBuilder_Run_Adds(t *testing.T) {
 		t.Fatal("unexpected error running builder on Adds:", err)
 	}
 
-	//	checkAddObs(t, obs, c)
 	checkAddCorpus(t, adds, got)
 
 	obs.AssertExpectations(t)
@@ -123,17 +122,6 @@ func checkAddCorpus(t *testing.T, adds []subject.Named, got corpus.Corpus) {
 		}
 	}
 }
-
-//func checkAddObs(t *testing.T, obs builder.MockObserver, c builder.Config) {
-//	if obs.Manifest.NReqs != c.NReqs {
-//		t.Helper()
-//		t.Errorf("observer told to expect %d requests; want %d", obs.Manifest.NReqs, c.NReqs)
-//	}
-//	if !obs.Done {
-//		t.Helper()
-//		t.Error("observer not told the builder was done")
-//	}
-//}
 
 func TestBuilderReq_SendTo(t *testing.T) {
 	ch := make(chan builder.Request)

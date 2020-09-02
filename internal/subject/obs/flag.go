@@ -67,10 +67,6 @@ func FlagOfStrings(strs ...string) (Flag, error) {
 	return o, nil
 }
 
-// ObsFlag needs to have both JSON and text (ie TOML) encoding.
-// This is because the OCaml ACT tools export observations as JSON, but act-tester uses TOML.
-// This may change if act-tester ever takes over backend parsing from OCaml ACT.
-
 // MarshalText marshals an observation flag as a space-delimited string list.
 func (o Flag) MarshalText() ([]byte, error) {
 	return []byte(strings.Join(o.Strings(), " ")), nil

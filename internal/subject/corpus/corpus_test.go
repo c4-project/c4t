@@ -32,6 +32,33 @@ func ExampleCorpus_Add() {
 	// duplicate corpus entry: foo
 }
 
+// ExampleCorpus_FilterToNames is a runnable example for Corpus.FilterToNames.
+func ExampleCorpus_FilterToNames() {
+	c := corpus.Mock()
+
+	for _, n := range c.Names() {
+		fmt.Println(n, "is in c")
+	}
+
+	c2 := c.FilterToNames("foo", "bar")
+	for _, n := range c2.Names() {
+		fmt.Println(n, "is in c2")
+	}
+
+	c3 := c.FilterToNames()
+	for _, n := range c3.Names() {
+		fmt.Println(n, "is in c3")
+	}
+
+	// Output:
+	// bar is in c
+	// barbaz is in c
+	// baz is in c
+	// foo is in c
+	// bar is in c2
+	// foo is in c2
+}
+
 func TestCorpus_Copy(t *testing.T) {
 	c := corpus.Mock()
 	cc := c.Copy()

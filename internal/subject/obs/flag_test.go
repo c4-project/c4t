@@ -28,7 +28,7 @@ func ExampleFlagOfStrings() {
 	// true
 }
 
-// ExampleFlag_Strings is a testable example for Strings.
+// ExampleFlag_Strings is a testable example for Flag.Strings.
 func ExampleFlag_Strings() {
 	for _, s := range (obs.Sat | obs.Undef).Strings() {
 		fmt.Println(s)
@@ -39,6 +39,7 @@ func ExampleFlag_Strings() {
 	// undef
 }
 
+// TestFlagOfStrings tests various cases of FlagOfStrings.
 func TestFlagOfStrings(t *testing.T) {
 	t.Parallel()
 

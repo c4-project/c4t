@@ -20,6 +20,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver/mocks"
 )
 
+// TestArchiveSubject tests ArchiveSubject.
 func TestArchiveSubject(t *testing.T) {
 	var (
 		ar  mocks.Archiver

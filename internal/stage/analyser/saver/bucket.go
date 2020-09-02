@@ -28,14 +28,17 @@ func (b *bucketSaver) save(c corpus.Corpus) error {
 	if err := b.paths.Prepare(); err != nil {
 		return err
 	}
-	if err := b.writePlan(); err != nil {
+	if err := b.writePlan(c); err != nil {
 		return err
 	}
 	return b.archiveSubjects(c)
 }
 
-func (b *bucketSaver) writePlan() error {
-	return b.plan.WriteFile(b.paths.FilePlan, plan.WriteCompress|plan.WriteHuman)
+func (b *bucketSaver) writePlan(c corpus.Corpus) error {
+	// TODO(@MattWindsor91): we do this because c has non-normalised names, but it still seems a bit extraneous.
+	pn := *b.plan
+	pn.Corpus = pn.Corpus.FilterToNames(c.Names()...)
+	return pn.WriteFile(b.paths.FilePlan, plan.WriteCompress|plan.WriteHuman)
 }
 
 func (b *bucketSaver) archiveSubjects(corp corpus.Corpus) error {

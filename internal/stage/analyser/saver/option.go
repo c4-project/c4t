@@ -5,6 +5,8 @@
 
 package saver
 
+import "github.com/MattWindsor91/act-tester/internal/observing"
+
 // Option is the type of options to New.
 type Option func(*Saver) error
 
@@ -23,12 +25,10 @@ func Options(ops ...Option) Option {
 // ObserveWith appends obs to the observer list for this saver.
 func ObserveWith(obs ...Observer) Option {
 	return func(s *Saver) error {
-		for _, o := range obs {
-			if o == nil {
-				return ErrObserverNil
-			}
-			s.observers = append(s.observers, o)
+		if err := observing.CheckObservers(obs); err != nil {
+			return err
 		}
+		s.observers = append(s.observers, obs...)
 		return nil
 	}
 }

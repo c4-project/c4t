@@ -34,10 +34,8 @@ type Saver struct {
 	paths *Pathset
 }
 
-var (
-	ErrArchiveMakerNil = errors.New("archive maker function nil")
-	ErrObserverNil     = errors.New("observer nil")
-)
+// ErrArchiveMakerNil is the error produced when the archive maker supplied to New is nil.
+var ErrArchiveMakerNil = errors.New("archive maker function nil")
 
 // New constructs a saver with the pathset paths, archive maker archiveMaker, and options ops.
 func New(paths *Pathset, archiveMaker func(path string) (Archiver, error), ops ...Option) (*Saver, error) {
