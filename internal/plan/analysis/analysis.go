@@ -87,3 +87,8 @@ func (a *Analysis) HasFlagged() bool {
 func (a *Analysis) HasFailures() bool {
 	return a.Flags&(status.FlagFail) != 0
 }
+
+// HasBadOutcomes tests whether a collation has any bad (flagged, failed, or timed-out) cases.
+func (a *Analysis) HasBadOutcomes() bool {
+	return a.Flags&(status.FlagBad) != 0
+}

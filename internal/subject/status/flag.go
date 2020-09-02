@@ -26,6 +26,8 @@ const (
 	FlagFail = FlagCompileFail | FlagRunFail
 	// FlagTimeout is the union of all timeout flags.
 	FlagTimeout = FlagCompileTimeout | FlagRunTimeout
+	// FlagBad is the union of all 'bad' flags; it should match the calculation in Status.IsBad.
+	FlagBad = FlagFail | FlagTimeout | FlagFlagged
 )
 
 // Matches tests whether this Flag has all flag bits in expected present.

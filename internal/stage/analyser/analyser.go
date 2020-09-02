@@ -95,7 +95,7 @@ func (a *Analyser) analyse(ctx context.Context, p *plan.Plan) (*analysis.Analysi
 var ErrBadStatus = errors.New("at least one subject reported a bad status")
 
 func (a *Analyser) statusErr(an *analysis.Analysis) error {
-	if !a.errOnBadStatus && (an.HasFailures() || an.HasFlagged()) {
+	if !a.errOnBadStatus && an.HasBadOutcomes() {
 		return ErrBadStatus
 	}
 	return nil

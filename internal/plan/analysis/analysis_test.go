@@ -57,18 +57,63 @@ func ExampleAnalysis_HasFailures() {
 	var empty analysis.Analysis
 	fmt.Println("empty:", empty.HasFailures())
 
-	cfails := analysis.Analysis{
-		Flags: status.FlagCompileFail,
-	}
+	cfails := analysis.Analysis{Flags: status.FlagCompileFail}
 	fmt.Println("compiler failures:", cfails.HasFailures())
 
-	rfails := analysis.Analysis{
-		Flags: status.FlagRunFail,
-	}
+	rfails := analysis.Analysis{Flags: status.FlagRunFail}
 	fmt.Println("run failures:", rfails.HasFailures())
+
+	ctos := analysis.Analysis{Flags: status.FlagCompileTimeout}
+	fmt.Println("compiler timeouts:", ctos.HasFailures())
+
+	rtos := analysis.Analysis{Flags: status.FlagRunTimeout}
+	fmt.Println("run timeouts:", rtos.HasFailures())
+
+	flags := analysis.Analysis{Flags: status.FlagFlagged}
+	fmt.Println("flagged:", flags.HasFailures())
+
+	filts := analysis.Analysis{Flags: status.FlagFiltered}
+	fmt.Println("filtered:", filts.HasFailures())
 
 	// Output:
 	// empty: false
 	// compiler failures: true
 	// run failures: true
+	// compiler timeouts: false
+	// run timeouts: false
+	// flagged: false
+	// filtered: false
+}
+
+// ExampleAnalysis_HasBadOutcomes is a runnable example for Analysis.HasBadOutcomes.
+func ExampleAnalysis_HasBadOutcomes() {
+	var empty analysis.Analysis
+	fmt.Println("empty:", empty.HasBadOutcomes())
+
+	cfails := analysis.Analysis{Flags: status.FlagCompileFail}
+	fmt.Println("compiler failures:", cfails.HasBadOutcomes())
+
+	rfails := analysis.Analysis{Flags: status.FlagRunFail}
+	fmt.Println("run failures:", rfails.HasBadOutcomes())
+
+	ctos := analysis.Analysis{Flags: status.FlagCompileTimeout}
+	fmt.Println("compiler timeouts:", ctos.HasBadOutcomes())
+
+	rtos := analysis.Analysis{Flags: status.FlagRunTimeout}
+	fmt.Println("run timeouts:", rtos.HasBadOutcomes())
+
+	flags := analysis.Analysis{Flags: status.FlagFlagged}
+	fmt.Println("flagged:", flags.HasBadOutcomes())
+
+	filts := analysis.Analysis{Flags: status.FlagFiltered}
+	fmt.Println("filtered:", filts.HasBadOutcomes())
+
+	// Output:
+	// empty: false
+	// compiler failures: true
+	// run failures: true
+	// compiler timeouts: true
+	// run timeouts: true
+	// flagged: true
+	// filtered: false
 }
