@@ -29,6 +29,7 @@ const (
 	// FlagCPUProfile is a standard flag for specifying a CPU profile output.
 	FlagCPUProfile = "cpuprofile"
 
+	flagCorpusSize = "corpus-size"
 	// FlagCompilerTimeoutLong is a long flag for compiler timeout.
 	FlagCompilerTimeoutLong = "compiler-timeout"
 	// FlagRunTimeoutLong is a long flag for run timeout.
@@ -40,9 +41,8 @@ const (
 	// FlagRunWorkerCountLong is a long flag for arguments that set a runner worker count.
 	FlagRunWorkerCountLong = "num-run-workers"
 
-	usageConfFile   = "read tester config from this `file`"
-	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
-		"if non-positive, the planner will use all viable provided corpus files"
+	usageConfFile      = "read tester config from this `file`"
+	usageCorpusSize    = "`number` of corpus files to select for this test plan"
 	usageActDuneExec   = "if true, use 'dune exec' to run OCaml ACT binaries"
 	usageOutDir        = "`directory` to which outputs will be written"
 	usageSubjectCycles = "number of `cycles` to run for each subject in the corpus"

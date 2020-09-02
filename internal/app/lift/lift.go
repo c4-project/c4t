@@ -40,6 +40,7 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	fs := []c.Flag{
+		stdflag.VerboseFlag(),
 		stdflag.OutDirCliFlag(defaultOutDir),
 	}
 	return append(fs, stdflag.ActRunnerCliFlags()...)
@@ -63,7 +64,7 @@ func makeLifter(ctx *c.Context, l *log.Logger, errw io.Writer) (*lifter.Lifter, 
 		&backend.BResolve,
 		lifter.NewPathset(stdflag.OutDirFromCli(ctx)),
 		lifter.LogTo(l),
-		lifter.ObserveWith(singleobs.Builder(l)...),
+		lifter.ObserveWith(singleobs.Builder(l, stdflag.Verbose(ctx))...),
 		lifter.SendStderrTo(errw),
 	)
 }

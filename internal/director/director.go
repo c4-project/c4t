@@ -134,7 +134,7 @@ func (d *Director) plan(ctx context.Context) (map[string]plan.Plan, error) {
 func (d *Director) makePlanner() (*planner.Planner, error) {
 	return planner.New(
 		d.env.Planner,
-		planner.ObserveWith(singleobs.Planner(d.l)...),
+		planner.ObserveWith(singleobs.Planner(d.l, true)...),
 		planner.OverrideQuantities(d.quantities.Plan),
 	)
 }

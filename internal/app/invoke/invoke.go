@@ -45,6 +45,7 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	ownFlags := []c.Flag{
+		stdflag.VerboseFlag(),
 		stdflag.ConfFileCliFlag(),
 	}
 	return append(ownFlags, stdflag.MachCliFlags()...)
@@ -68,11 +69,12 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 
 func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.Invoker, error) {
 	l := log.New(errw, "[invoker] ", log.LstdFlags)
+	v := stdflag.Verbose(ctx)
 
 	return invoker.New(stdflag.OutDirFromCli(ctx),
 		&runner.FromPlanFactory{Config: cfg.SSH},
-		invoker.ObserveCopiesWith(singleobs.Copier(l)...),
-		invoker.ObserveMachWith(singleobs.MachNode(l)...),
+		invoker.ObserveCopiesWith(singleobs.Copier(l, v)...),
+		invoker.ObserveMachWith(singleobs.MachNode(l, v)...),
 		// The idea here is that the configuration's quantities should be lowest priority, then those in the plan,
 		// and then those in the command line arguments.
 		invoker.OverrideBaseQuantities(cfg.Quantities.Mach),

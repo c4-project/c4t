@@ -43,6 +43,7 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	fs := []c.Flag{
+		stdflag.VerboseFlag(),
 		stdflag.ConfFileCliFlag(),
 		stdflag.OutDirCliFlag(defaultOutDir),
 		stdflag.CorpusSizeCliFlag(),
@@ -71,7 +72,7 @@ func makeFuzzer(ctx *c.Context, cfg *config.Config, drv fuzzer.Driver, l *log.Lo
 		drv,
 		fuzzer.NewPathset(stdflag.OutDirFromCli(ctx)),
 		fuzzer.LogWith(l),
-		fuzzer.ObserveWith(singleobs.Builder(l)...),
+		fuzzer.ObserveWith(singleobs.Builder(l, stdflag.Verbose(ctx))...),
 		fuzzer.OverrideQuantities(cfg.Quantities.Fuzz),
 		fuzzer.OverrideQuantities(setupQuantityFlags(ctx)),
 	)

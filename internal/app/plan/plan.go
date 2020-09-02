@@ -54,6 +54,7 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	ownFlags := []c.Flag{
+		stdflag.VerboseFlag(),
 		stdflag.ConfFileCliFlag(),
 		&c.StringFlag{
 			Name:        flagCompilerFilter,
@@ -165,7 +166,7 @@ func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.P
 
 	return planner.New(
 		src,
-		planner.ObserveWith(singleobs.Planner(l)...),
+		planner.ObserveWith(singleobs.Planner(l, stdflag.Verbose(ctx))...),
 		planner.OverrideQuantities(qs),
 		planner.FilterCompilers(ctx.String(flagCompilerFilter)),
 	)

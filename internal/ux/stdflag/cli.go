@@ -19,6 +19,20 @@ import (
 	c "github.com/urfave/cli/v2"
 )
 
+// VerboseFlag sets up a verbosity flag.
+func VerboseFlag() c.Flag {
+	return &c.BoolFlag{
+		Name:    "verbose",
+		Aliases: []string{"v"},
+		Usage:   "enables verbose output",
+	}
+}
+
+// Verbose gets the value of the verbosity flag from ctx.
+func Verbose(ctx *c.Context) bool {
+	return ctx.Bool("verbose")
+}
+
 // OutDirCliFlag sets up an 'output directory' cli flag.
 func OutDirCliFlag(defaultdir string) c.Flag {
 	return &c.PathFlag{
@@ -82,12 +96,18 @@ func PlanFileFromCli(ctx *c.Context) (string, error) {
 
 // CorpusSizeCliFlag sets up a 'target corpus size' flag.
 func CorpusSizeCliFlag() c.Flag {
-	return &c.IntFlag{Name: FlagNum, Value: 0, Usage: usageCorpusSize}
+	return &c.IntFlag{
+		Name:        flagCorpusSize,
+		Aliases:     []string{FlagNum},
+		Value:       0,
+		Usage:       usageCorpusSize,
+		DefaultText: "all",
+	}
 }
 
 // CorpusSizeFromCli retrieves a plan file using the file flag set up by CorpusSizeCliFlag.
 func CorpusSizeFromCli(ctx *c.Context) int {
-	return ctx.Int(FlagNum)
+	return ctx.Int(flagCorpusSize)
 }
 
 // SubjectCyclesCliFlag sets up a 'number of cycles' flag.

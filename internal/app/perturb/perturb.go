@@ -25,13 +25,10 @@ import (
 )
 
 const (
-	envSeed         = "ACT_SEED"
-	flagSeed        = "seed"
-	flagSeedShort   = "s"
-	usageSeed       = "`seed` to use for any randomised components of this test plan; -1 uses run time as seed"
-	flagCorpusSize  = "corpus-size"
-	usageCorpusSize = "`number` of corpus files to select for this test plan;\n" +
-		"if positive, the planner will use all viable provided corpus files"
+	envSeed       = "ACT_SEED"
+	flagSeed      = "seed"
+	flagSeedShort = "s"
+	usageSeed     = "`seed` to use for any randomised components of this test plan"
 )
 
 // App creates the act-tester-plan app.
@@ -49,19 +46,17 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	return []c.Flag{
+		stdflag.VerboseFlag(),
 		stdflag.ConfFileCliFlag(),
 		&c.Int64Flag{
-			Name:    flagSeed,
-			Aliases: []string{flagSeedShort},
-			EnvVars: []string{envSeed},
-			Usage:   usageSeed,
-			Value:   plan.UseDateSeed,
+			Name:        flagSeed,
+			Aliases:     []string{flagSeedShort},
+			EnvVars:     []string{envSeed},
+			Usage:       usageSeed,
+			Value:       plan.UseDateSeed,
+			DefaultText: "set seed from time",
 		},
-		&c.IntFlag{
-			Name:    flagCorpusSize,
-			Aliases: []string{stdflag.FlagNum},
-			Usage:   usageCorpusSize,
-		},
+		stdflag.CorpusSizeCliFlag(),
 	}
 }
 
@@ -85,7 +80,7 @@ func makePerturber(ctx *c.Context, errw io.Writer) (*perturber.Perturber, error)
 
 	return perturber.New(
 		&compiler.CResolve,
-		perturber.ObserveWith(singleobs.Perturber(l)...),
+		perturber.ObserveWith(singleobs.Perturber(l, stdflag.Verbose(ctx))...),
 		perturber.OverrideQuantities(qs),
 		perturber.UseSeed(ctx.Int64(flagSeed)),
 	)
@@ -94,7 +89,7 @@ func makePerturber(ctx *c.Context, errw io.Writer) (*perturber.Perturber, error)
 func quantities(ctx *c.Context, cfg *config.Config) quantity.PerturbSet {
 	qs := cfg.Quantities.Perturb
 	qs.Override(quantity.PerturbSet{
-		CorpusSize: ctx.Int(flagCorpusSize),
+		CorpusSize: stdflag.CorpusSizeFromCli(ctx),
 	})
 	return qs
 }
