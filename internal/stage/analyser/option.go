@@ -65,6 +65,14 @@ func ObserveSaveWith(obs ...saver.Observer) Option {
 	}
 }
 
+// ErrorOnBadStatus makes the analyser fail if it observed any 'bad' statuses, if set to true.
+func ErrorOnBadStatus(on bool) Option {
+	return func(a *Analyser) error {
+		a.errOnBadStatus = on
+		return nil
+	}
+}
+
 // SaveToPathset makes this analyser stage save to the given pathset.
 // This can be nil, in which case saving is disabled.
 func SaveToPathset(ps *saver.Pathset) Option {

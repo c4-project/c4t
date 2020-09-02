@@ -9,6 +9,7 @@ package analyser
 
 import (
 	"context"
+	"errors"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
@@ -19,8 +20,11 @@ import (
 
 // Analyser represents the state of the plan analyser stage.
 type Analyser struct {
+	// errOnBadStatus makes the plan stage return an error if the analyser saw 'bad' statuses.
+	errOnBadStatus bool
+	// savePaths is the set of paths to which we save failing corpora.
 	savePaths *saver.Pathset
-	// aopts is the set of options to pass to the underlying analysier.
+	// aopts is the set of options to pass to the underlying analyser.
 	aopts []analysis.Option
 	// observers is the list of observers to which analyses are sent.
 	observers []Observer
@@ -64,7 +68,7 @@ func (a *Analyser) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 		return nil, err
 	}
 
-	return an.Plan, nil
+	return an.Plan, a.statusErr(an)
 }
 
 func checkPlan(p *plan.Plan) error {
@@ -85,4 +89,14 @@ func (a *Analyser) maybeSave(an *analysis.Analysis) error {
 
 func (a *Analyser) analyse(ctx context.Context, p *plan.Plan) (*analysis.Analysis, error) {
 	return analysis.Analyse(ctx, p, a.aopts...)
+}
+
+// ErrBadStatus is the error reported when the analyser is asked to error on a bad status, and one arrives.
+var ErrBadStatus = errors.New("at least one subject reported a bad status")
+
+func (a *Analyser) statusErr(an *analysis.Analysis) error {
+	if !a.errOnBadStatus && (an.HasFailures() || an.HasFlagged()) {
+		return ErrBadStatus
+	}
+	return nil
 }

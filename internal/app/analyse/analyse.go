@@ -41,6 +41,10 @@ const (
    summary of the plan file.  By passing -` + flagSaveDir + `, one can
    archive failing corpora to a directory for later experimentation.`
 
+	// FlagErrorOnBadStatus is used to activate error-on-bad-status.  It is exported for testing purposes.
+	FlagErrorOnBadStatus      = "error-on-bad-status"
+	flagErrorOnBadStatusShort = "e"
+	usageErrorOnBadStatus     = "report an error if plan contains subjects with bad statuses"
 	flagLoadFilters           = "filter-file"
 	usageLoadFilters          = "load compile result filters from this file"
 	flagCsvCompilers          = "csv-compilers"
@@ -82,6 +86,7 @@ func App(outw, errw io.Writer) *c.App {
 func flags() []c.Flag {
 	return []c.Flag{
 		stdflag.WorkerCountCliFlag(),
+		&c.BoolFlag{Name: FlagErrorOnBadStatus, Aliases: []string{flagErrorOnBadStatusShort}, Usage: usageErrorOnBadStatus},
 		&c.BoolFlag{Name: flagCsvCompilers, Usage: usageCsvCompilers},
 		&c.BoolFlag{Name: flagCsvStages, Usage: usageCsvStages},
 		&c.BoolFlag{Name: flagShowCompilers, Aliases: []string{flagShowCompilersShort}, Usage: usageShowCompilers},
@@ -115,6 +120,7 @@ func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 			analysis.WithFiltersFromFile(ctx.Path(flagLoadFilters)),
 			analysis.WithWorkerCount(stdflag.WorkerCountFromCli(ctx)),
 		),
+		analyser.ErrorOnBadStatus(ctx.Bool(FlagErrorOnBadStatus)),
 		analyser.SaveToPathset(savedPaths(ctx)),
 	)
 	if err != nil {
@@ -133,31 +139,30 @@ func observers(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error) {
 
 func prettyObserver(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error) {
 	showCompilers := ctx.Bool(flagShowCompilers)
+	// showCompilerLogs depends on showCompilers
 	showOk := ctx.Bool(flagShowOk)
 	showSubjects := ctx.Bool(flagShowSubjects)
 	showPlanInfo := ctx.Bool(flagShowPlanInfo)
 
-	if showCompilers || showOk || showSubjects || showPlanInfo {
-		po, err := pretty.NewPrinter(
-			pretty.WriteTo(outw),
-			pretty.ShowCompilers(ctx.Bool(flagShowCompilers)),
-			pretty.ShowCompilerLogs(ctx.Bool(flagShowCompilerLogs)),
-			pretty.ShowOk(ctx.Bool(flagShowOk)),
-			pretty.ShowSubjects(ctx.Bool(flagShowSubjects)),
-			pretty.ShowPlanInfo(ctx.Bool(flagShowPlanInfo)),
-		)
-		return []analyser.Observer{po}, err
+	if !(showCompilers || showOk || showSubjects || showPlanInfo) {
+		return nil, nil
 	}
-	return nil, nil
+	po, err := pretty.NewPrinter(
+		pretty.WriteTo(outw),
+		pretty.ShowCompilers(showCompilers),
+		pretty.ShowCompilerLogs(ctx.Bool(flagShowCompilerLogs)),
+		pretty.ShowOk(showOk),
+		pretty.ShowSubjects(showSubjects),
+		pretty.ShowPlanInfo(showPlanInfo),
+	)
+	return []analyser.Observer{po}, err
 }
 
 func csvObserver(ctx *c.Context, outw io.Writer, obs []analyser.Observer) ([]analyser.Observer, error) {
-	showCsvCompilers := ctx.Bool(flagCsvCompilers)
-	if showCsvCompilers {
+	if ctx.Bool(flagCsvCompilers) {
 		obs = append(obs, csvdump.NewCompilerWriter(outw))
 	}
-	showCsvStages := ctx.Bool(flagCsvStages)
-	if showCsvStages {
+	if ctx.Bool(flagCsvStages) {
 		obs = append(obs, csvdump.NewStageWriter(outw))
 	}
 	return obs, nil
