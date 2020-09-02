@@ -26,7 +26,8 @@ import (
 )
 
 const (
-	name  = "act-tester-analyse"
+	// Name is the name of the analyser binary.
+	Name  = "act-tester-analyse"
 	usage = "analyses a plan file"
 
 	readme = `
@@ -72,7 +73,7 @@ const (
 
 func App(outw, errw io.Writer) *c.App {
 	a := &c.App{
-		Name:        name,
+		Name:        Name,
 		Usage:       usage,
 		Description: readme,
 		Flags:       flags(),

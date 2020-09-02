@@ -24,18 +24,30 @@ func TestApp_errorOnBadStatus(t *testing.T) {
 	// The mock plan contains bad statuses!
 	tpath := makeMockPlanFile(t)
 
-	var outb, errb bytes.Buffer
-
-	app := analyse.App(&outb, &errb)
-	argv := []string{
-		"-" + analyse.FlagErrorOnBadStatus,
-		tpath,
+	cases := map[string]struct {
+		flags []string
+		err   error
+	}{
+		"off": {flags: []string{}, err: nil},
+		"on":  {flags: []string{"-" + analyse.FlagErrorOnBadStatus}, err: analyser.ErrBadStatus},
 	}
-	err := app.Run(argv)
-	testhelp.ExpectErrorIs(t, err, analyser.ErrBadStatus, "running analyser on bad status")
 
-	assert.Empty(t, outb.Bytes(), "shouldn't have outputted anything without specific writer flags")
-	assert.Empty(t, errb.Bytes(), "shouldn't have outputted anything without specific writer flags")
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			// TODO(@MattWindsor91): can we parallelise this and the above?
+			var outb, errb bytes.Buffer
+
+			argv := append([]string{analyse.Name}, c.flags...)
+			argv = append(argv, tpath)
+
+			app := analyse.App(&outb, &errb)
+			err := app.Run(argv)
+			testhelp.ExpectErrorIs(t, err, c.err, "running analyser on bad status")
+
+			assert.Empty(t, outb.Bytes(), "shouldn't have outputted anything without specific writer flags")
+			assert.Empty(t, errb.Bytes(), "shouldn't have outputted anything without specific writer flags")
+		})
+	}
 }
 
 func makeMockPlanFile(t *testing.T) string {
