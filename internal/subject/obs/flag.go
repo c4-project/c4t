@@ -81,6 +81,14 @@ func (o Flag) MarshalText() ([]byte, error) {
 	return []byte(strings.Join(o.Strings(), " ")), nil
 }
 
+// IsInteresting gets whether a flag represents an 'interesting' condition.
+func (o Flag) IsInteresting() bool {
+	return (o&(Undef) == Undef) || // Undefined flags are always interesting.
+		(o&(Sat|Exist) == (Sat | Exist)) || // Satisfied flags are interesting if they are existential.
+		(o&(Unsat|Exist) == Unsat) || // Unsatisfied flags are interesting if they are not existential.
+		(o&(Sat|Unsat) == 0) // Flags that are neither sat nor unsat are interesting; they suggest something weird happened.
+}
+
 // UnmarshalText unmarshals an observation flag list from bs by interpreting it as a string list.
 func (o *Flag) UnmarshalText(bs []byte) error {
 	strs := strings.Fields(string(bs))

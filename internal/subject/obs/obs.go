@@ -33,6 +33,11 @@ func (o *Obs) Unsat() bool {
 	return o.Flags.Has(Unsat)
 }
 
+// Existential gets whether the observation's validation was existential rather than universal.
+func (o *Obs) Existential() bool {
+	return o.Flags.Has(Exist)
+}
+
 // AddState adds the state s in accordance with the tag t.
 func (o *Obs) AddState(t Tag, s State) {
 	o.States = append(o.States, s)
@@ -45,9 +50,11 @@ func (o *Obs) AddState(t Tag, s State) {
 }
 
 // Status determines the status of an observation o.
+//
+// Currently, an observation is considered to be 'ok' if it is a satisfied universal or unsatisfied existential,
+// and 'flagged' otherwise.
 func (o *Obs) Status() status.Status {
-	// TODO(@MattWindsor91): allow interestingness criteria
-	if o.Unsat() {
+	if o.Flags.IsInteresting() {
 		return status.Flagged
 	}
 	return status.Ok
