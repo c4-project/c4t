@@ -1,0 +1,3 @@
+Test SBSC Required
+States 4
+0:a=0; 1:a=0;

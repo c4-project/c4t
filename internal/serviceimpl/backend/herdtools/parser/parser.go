@@ -18,18 +18,7 @@ import (
 // Parse parses an observation from r into o using i.
 func Parse(i Impl, r io.Reader, o *obs.Obs) error {
 	p := parser{impl: i, o: o}
-	s := bufio.NewScanner(r)
-	lineno := 1
-	for s.Scan() {
-		if err := p.processLine(s.Text()); err != nil {
-			return fmt.Errorf("line %d: %w", lineno, err)
-		}
-		lineno++
-	}
-	if err := s.Err(); err != nil {
-		return err
-	}
-	return p.checkFinalState()
+	return p.parse(r)
 }
 
 // parser holds the state for a Herdtools parser.
@@ -50,12 +39,28 @@ type parser struct {
 	nstates uint64
 }
 
-// processLine processes a single line of a Herdtools observation.
-func (p *parser) processLine(line string) error {
+// parse parses r into this parser.
+func (p *parser) parse(r io.Reader) error {
 	if p.impl == nil {
 		return ErrNoImpl
 	}
 
+	s := bufio.NewScanner(r)
+	lineno := 1
+	for s.Scan() {
+		if err := p.processLine(s.Text()); err != nil {
+			return fmt.Errorf("line %d: %w", lineno, err)
+		}
+		lineno++
+	}
+	if err := s.Err(); err != nil {
+		return err
+	}
+	return p.checkFinalState()
+}
+
+// processLine processes a single line of a Herdtools observation.
+func (p *parser) processLine(line string) error {
 	fields := strings.Fields(line)
 	switch p.state {
 	case psEmpty:
@@ -135,8 +140,6 @@ func (p *parser) processSummary(fields []string) error {
 // parseFlag parses the summary flag f as an observation flag.
 func parseFlag(f string) (obs.Flag, error) {
 	switch f {
-	case "Yes": // seen in practice?
-		fallthrough
 	case "Ok":
 		return obs.Sat, nil
 	case "No":

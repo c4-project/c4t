@@ -86,12 +86,12 @@ func (p *parser) checkFinalState() error {
 	switch p.state {
 	case psEmpty:
 		return ErrInputEmpty
-	case psState:
-		return fmt.Errorf("%w: %d state(s) remain", ErrNotEnoughStates, p.nstates)
 	case psPreTest:
 		return ErrNoTest
 	case psPreamble:
 		return ErrNoStates
+	case psState:
+		return fmt.Errorf("%w: %d state(s) remain", ErrNotEnoughStates, p.nstates)
 	case psSummary:
 		return ErrNoSummary
 	case psPostamble:
