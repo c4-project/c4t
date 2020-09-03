@@ -1,5 +1,6 @@
 {
   "flags": [
+    "exist",
     "unsat"
   ],
   "states": [

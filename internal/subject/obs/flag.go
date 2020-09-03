@@ -18,11 +18,19 @@ type Flag int
 
 const (
 	// Sat represents a satisfying observation.
+	//
+	// By default, this flag means that all states met the observation criteria.  If the Exist flag is also set,
+	// it means that at least one state met the criteria.
 	Sat Flag = 1 << iota
-	// Unsat represents an unsatisfying observation.
+	// Unsat represents a satisfying observation.
+	//
+	// By default, this flag means that at least one state did not meet the observation criteria.  If the Exist flag is
+	// also set, it means that no states met the criteria.
 	Unsat
 	// Undef represents an undefined-behaviour observation.
 	Undef
+	// Exist represents an existential observation (the default is for-all observations).
+	Exist
 )
 
 var (
@@ -34,6 +42,7 @@ var (
 		"sat":   Sat,
 		"unsat": Unsat,
 		"undef": Undef,
+		"exist": Exist,
 	}
 )
 

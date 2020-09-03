@@ -15,7 +15,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 )
 
-// ExampleFlagOfStrings is a testable example for ObsFlagOfStrings.
+// ExampleFlagOfStrings is a testable example for FlagOfStrings.
 func ExampleFlagOfStrings() {
 	f, _ := obs.FlagOfStrings("unsat", "undef")
 	fmt.Println(f.Has(obs.Sat))
@@ -68,6 +68,14 @@ func TestFlagOfStrings(t *testing.T) {
 			in:  []string{"unsat", "undef"},
 			out: obs.Unsat | obs.Undef,
 		},
+		"sat-exist": {
+			in:  []string{"sat", "exist"},
+			out: obs.Sat | obs.Exist,
+		},
+		"unsat-exist": {
+			in:  []string{"unsat", "exist"},
+			out: obs.Unsat | obs.Exist,
+		},
 		"unknown": {
 			in:  []string{"blurble"},
 			err: obs.ErrBadFlag,
@@ -85,6 +93,29 @@ func TestFlagOfStrings(t *testing.T) {
 					assert.Equal(t, c.out, out, "FlagOfStrings on:", c.in)
 				}
 			}
+		})
+	}
+}
+
+// TestFlag_MarshalJSON_roundTrip tests that Flag.MarshalJSON and Flag.UnmarshalJSON round-trip properly.
+func TestFlag_MarshalJSON_roundTrip(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]obs.Flag{
+		"empty":       0,
+		"sat":         obs.Sat,
+		"unsat":       obs.Unsat,
+		"exist":       obs.Exist,
+		"undef":       obs.Undef,
+		"sat-exist":   obs.Sat | obs.Exist,
+		"unsat-undef": obs.Unsat | obs.Undef,
+		"all":         obs.Sat | obs.Unsat | obs.Exist | obs.Undef,
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			testhelp.TestJSONRoundTrip(t, c, "Flag JSON marshalling")
 		})
 	}
 }

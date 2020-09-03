@@ -45,22 +45,30 @@ func (p *parser) parse(r io.Reader) error {
 		return ErrNoImpl
 	}
 
+	if err := p.parseLines(r); err != nil {
+		return err
+	}
+
+	p.o.Flags |= p.tt.Flags()
+
+	return p.checkFinalState()
+}
+
+// parseLine processes the lines of a Herdtools observation from reader r.
+func (p *parser) parseLines(r io.Reader) error {
 	s := bufio.NewScanner(r)
 	lineno := 1
 	for s.Scan() {
-		if err := p.processLine(s.Text()); err != nil {
+		if err := p.parseLine(s.Text()); err != nil {
 			return fmt.Errorf("line %d: %w", lineno, err)
 		}
 		lineno++
 	}
-	if err := s.Err(); err != nil {
-		return err
-	}
-	return p.checkFinalState()
+	return s.Err()
 }
 
-// processLine processes a single line of a Herdtools observation.
-func (p *parser) processLine(line string) error {
+// parseLine processes a single line of a Herdtools observation.
+func (p *parser) parseLine(line string) error {
 	fields := strings.Fields(line)
 	switch p.state {
 	case psEmpty:

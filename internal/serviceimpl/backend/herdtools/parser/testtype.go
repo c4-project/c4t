@@ -5,7 +5,11 @@
 
 package parser
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+)
 
 // TestType is the type of test we're parsing.
 type TestType int
@@ -29,4 +33,13 @@ func parseTestType(s string) (TestType, error) {
 	default:
 		return None, fmt.Errorf("%w: bad test type name %q", ErrBadTestType, s)
 	}
+}
+
+// Flags returns any observation flags that correspond to this test type.
+func (t TestType) Flags() obs.Flag {
+	var f obs.Flag
+	if t == Allowed {
+		f |= obs.Exist
+	}
+	return f
 }
