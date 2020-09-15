@@ -66,13 +66,19 @@ func (a *Analysis) String() string {
 	var sb strings.Builder
 
 	bf := a.ByStatus
+	first := true
 
 	// We range over this to enforce a deterministic order.
 	for i := status.Ok; i <= status.Last; i++ {
-		if i != status.Ok {
+		l := len(bf[i])
+		if l == 0 {
+			continue
+		}
+		if !first {
 			sb.WriteString(", ")
 		}
-		_, _ = fmt.Fprintf(&sb, "%d %s", len(bf[i]), i.String())
+		first = false
+		_, _ = fmt.Fprintf(&sb, "%d %s", l, i.String())
 	}
 
 	return sb.String()

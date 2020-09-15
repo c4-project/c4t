@@ -31,7 +31,7 @@ func ExampleAnalysis_String() {
 	fmt.Println(&c)
 
 	// Output:
-	// 4 Ok, 5 Filtered, 1 Flagged, 3 CompileFail, 0 CompileTimeout, 2 RunFail, 0 RunTimeout
+	// 4 Ok, 5 Filtered, 1 Flagged, 3 CompileFail, 2 RunFail
 }
 
 // ExampleAnalysis_HasFlagged is a runnable example for Analysis.HasFlagged.
