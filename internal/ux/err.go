@@ -26,16 +26,25 @@ func LogTopError(err error) {
 
 	var perr *exec.ExitError
 	if errors.As(err, &perr) {
-		_, _ = fmt.Fprintln(os.Stderr, "A child process encountered an error:")
-		_, _ = fmt.Fprintln(os.Stderr, err)
-		_, _ = fmt.Fprintln(os.Stderr, "Any captured stderr follows.")
-		_, _ = fmt.Fprintln(os.Stderr, perr.Stderr)
+		logTopExitError(perr)
 		os.Exit(perr.ExitCode())
-		return
 	}
 
+	logTopNormalError(err)
+	os.Exit(1)
+}
+
+func logTopExitError(perr *exec.ExitError) {
+	_, _ = fmt.Fprintln(os.Stderr, "A child process encountered an error:")
+	_, _ = fmt.Fprintln(os.Stderr, perr)
+	if len(perr.Stderr) == 0 {
+		return
+	}
+	_, _ = fmt.Fprintln(os.Stderr, "Any captured stderr follows.")
+	_, _ = fmt.Fprintln(os.Stderr, string(perr.Stderr))
+}
+
+func logTopNormalError(err error) {
 	_, _ = fmt.Fprintln(os.Stderr, "A fatal error has occurred:")
 	_, _ = fmt.Fprintln(os.Stderr, err)
-
-	os.Exit(1)
 }
