@@ -39,23 +39,23 @@ func (d *Dash) updateMachineGrid(nmachines int) error {
 		g   []container.Option
 		err error
 	)
-	if d.obs, g, err = makeMachineGrid(nmachines, d.resultLog); err != nil {
+	if d.obs, g, err = d.makeMachineGrid(nmachines); err != nil {
 		return err
 	}
 	return d.container.Update(idMachines, g...)
 }
 
-func makeMachineGrid(nmachines int, rl *ResultLog) ([]*Observer, []container.Option, error) {
+func (d *Dash) makeMachineGrid(nmachines int) ([]*Observer, []container.Option, error) {
 	gb := grid.New()
 
 	obs := make([]*Observer, nmachines)
 	pc := machineGridPercent(nmachines)
 	for i := range obs {
 		var err error
-		if obs[i], err = NewObserver(rl); err != nil {
+		if obs[i], err = NewObserver(machineContainerID(i), d); err != nil {
 			return nil, nil, err
 		}
-		obs[i].AddToGrid(gb, machineContainerID(i), pc)
+		obs[i].AddToGrid(gb, pc)
 	}
 
 	g, err := gb.Build()

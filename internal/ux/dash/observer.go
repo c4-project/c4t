@@ -22,8 +22,6 @@ import (
 	"github.com/mum4k/termdash/linestyle"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
-
-	"github.com/mum4k/termdash/widgets/text"
 )
 
 const (
@@ -31,54 +29,57 @@ const (
 	headerCurrentActivity = "Current Activity"
 	headerStats           = "Statistics"
 	headerSparks          = "Sparklines"
-	headerCompilers       = "Compilers"
 )
 
 // Observer represents a single machine instance inside a dash.
 type Observer struct {
+	// id is the ID of the container for this machine observer, and also the base for deriving other subcontainer IDs.
+	id string
+
 	run   *runCounter
 	rlog  *ResultLog
 	tally *tally
 
 	sparks *sparkset
 
-	action *actionObserver
-
-	// compilers contains a readout of the currently planned compilers for this instance.
-	compilers *text.Text
+	action    *actionObserver
+	compilers *compilerObserver
 
 	nruns uint64
 }
 
 // NewObserver constructs an Observer, initialising its various widgets.
-func NewObserver(rlog *ResultLog) (*Observer, error) {
+// It accepts the id of the parent container (from which the IDs of various sub-containers can be derived), as well as
+// the parent dash d (used to access the results log and parent container).
+func NewObserver(id string, d *Dash) (*Observer, error) {
 	var err error
 
-	d := Observer{
-		rlog: rlog,
+	o := Observer{
+		id:   id,
+		rlog: d.resultLog,
 	}
 
-	if d.tally, err = newTally(); err != nil {
+	if o.tally, err = newTally(); err != nil {
 		return nil, err
 	}
 
-	if d.run, err = newRunCounter(); err != nil {
+	if o.run, err = newRunCounter(); err != nil {
 		return nil, err
 	}
 
-	if d.sparks, err = newSparkset(); err != nil {
+	if o.sparks, err = newSparkset(); err != nil {
 		return nil, err
 	}
 
-	if d.action, err = NewCorpusObserver(); err != nil {
+	if o.action, err = NewCorpusObserver(); err != nil {
 		return nil, err
 	}
 
-	if d.compilers, err = text.New(text.WrapAtWords()); err != nil {
+	if o.compilers, err = newCompilerObserver(d.container, o.compilersContainerID()); err != nil {
 		return nil, err
 	}
 
-	return &d, nil
+	return &o, nil
 }
 
 const (
@@ -88,11 +89,10 @@ const (
 )
 
 // AddToGrid adds this observer to a grid builder gb with the container ID id..
-func (o *Observer) AddToGrid(gb *grid.Builder, id string, pc int) {
-
+func (o *Observer) AddToGrid(gb *grid.Builder, pc int) {
 	gb.Add(grid.RowHeightPercWithOpts(pc,
 		[]container.Option{
-			container.ID(id),
+			container.ID(o.id),
 			container.Border(linestyle.Double),
 		},
 		grid.ColWidthPerc(percRun,
@@ -104,7 +104,11 @@ func (o *Observer) AddToGrid(gb *grid.Builder, id string, pc int) {
 				},
 				o.run.grid()...,
 			),
-			grid.RowHeightPerc(60, grid.Widget(o.compilers, container.Border(linestyle.Light), container.BorderTitle(headerCompilers))),
+			grid.RowHeightPercWithOpts(
+				60,
+				[]container.Option{container.ID(o.compilersContainerID()), container.Border(linestyle.Light), container.BorderTitle(headerCompilers)},
+				o.compilers.grid()...,
+			),
 		),
 		grid.ColWidthPerc(percStats,
 			grid.RowHeightPercWithOpts(
