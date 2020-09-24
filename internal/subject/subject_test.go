@@ -47,9 +47,15 @@ func ExampleSubject_BestLitmus() {
 
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
-	s := subject.Subject{Compiles: map[string]compilation.CompileResult{
-		"gcc":   {Result: compilation.Result{Status: status.Ok}, Files: compilation.CompileFileset{Bin: "a.out", Log: "gcc.log"}},
-		"clang": {Result: compilation.Result{Status: status.CompileFail}, Files: compilation.CompileFileset{Bin: "a.out", Log: "clang.log"}},
+	s := subject.Subject{Compilations: map[string]compilation.Compilation{
+		"gcc": {
+			Compile: &compilation.CompileResult{
+				Result: compilation.Result{Status: status.Ok}, Files: compilation.CompileFileset{Bin: "a.out", Log: "gcc.log"},
+			}},
+		"clang": {
+			Compile: &compilation.CompileResult{
+				Result: compilation.Result{Status: status.CompileFail}, Files: compilation.CompileFileset{Bin: "a.out", Log: "clang.log"},
+			}},
 	}}
 	gr, _ := s.CompileResult(id.FromString("gcc"))
 	cr, _ := s.CompileResult(id.FromString("clang"))
@@ -84,14 +90,20 @@ func ExampleSubject_Recipe() {
 	// barbaz
 }
 
-// ExampleSubject_RunOf is a testable example for RunOf.
-func ExampleSubject_RunOf() {
-	s := subject.Subject{Runs: map[string]compilation.RunResult{
-		"gcc":   {Result: compilation.Result{Status: status.Ok}},
-		"clang": {Result: compilation.Result{Status: status.RunTimeout}},
+// ExampleSubject_RunResult is a testable example for Subject.RunResult.
+func ExampleSubject_RunResult() {
+	s := subject.Subject{Compilations: map[string]compilation.Compilation{
+		"gcc": {
+			Run: &compilation.RunResult{
+				Result: compilation.Result{Status: status.Ok},
+			}},
+		"clang": {
+			Run: &compilation.RunResult{
+				Result: compilation.Result{Status: status.RunTimeout},
+			}},
 	}}
-	gr, _ := s.RunOf(id.FromString("gcc"))
-	cr, _ := s.RunOf(id.FromString("clang"))
+	gr, _ := s.RunResult(id.FromString("gcc"))
+	cr, _ := s.RunResult(id.FromString("clang"))
 
 	fmt.Println("gcc:", gr.Status)
 	fmt.Println("clang:", cr.Status)
@@ -102,12 +114,16 @@ func ExampleSubject_RunOf() {
 }
 
 // TestSubject_CompileResult_Missing checks that trying to get a compile for a missing compiler triggers
-// the appropriate error.
+// the appropriate errors.
 func TestSubject_CompileResult_Missing(t *testing.T) {
 	t.Parallel()
 
 	var s subject.Subject
 	_, err := s.CompileResult(id.FromString("gcc"))
+	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompilation, "missing compilations")
+
+	s.Compilations = map[string]compilation.Compilation{"gcc": {}}
+	_, err = s.CompileResult(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompile, "missing compile result path")
 }
 
@@ -132,7 +148,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 	t.Run("add-get", func(t *testing.T) {
 		c2, err := s.CompileResult(mcomp)
 		if assert.NoError(t, err, "err when getting added compile") {
-			assert.Equalf(t, c, c2, "added compile (%v) came back wrong (%v)", c2, c)
+			assert.Equalf(t, c, *c2, "added compile (%v) came back wrong (%v)", c2, c)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
@@ -182,8 +198,12 @@ func TestSubject_RunOf_Missing(t *testing.T) {
 	t.Parallel()
 
 	var s subject.Subject
-	_, err := s.RunOf(id.FromString("gcc"))
-	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRun, "missing run result path")
+	_, err := s.RunResult(id.FromString("gcc"))
+	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompilation, "missing compilation")
+
+	s.Compilations = map[string]compilation.Compilation{"gcc": {}}
+	_, err = s.RunResult(id.FromString("gcc"))
+	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRun, "missing run result")
 }
 
 // TestSubject_AddRun checks that AddRun is working properly.
@@ -199,9 +219,9 @@ func TestSubject_AddRun(t *testing.T) {
 		assert.NoError(t, s.AddRun(mcomp, c), "err when adding run to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
-		c2, err := s.RunOf(mcomp)
+		c2, err := s.RunResult(mcomp)
 		if assert.NoError(t, err, "err when getting added run") {
-			assert.Equalf(t, c, c2, "added run (%v) came back wrong (%v)", c2, c)
+			assert.Equalf(t, c, *c2, "added run (%v) came back wrong (%v)", c2, c)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {

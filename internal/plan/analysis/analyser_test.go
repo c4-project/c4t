@@ -99,9 +99,9 @@ func TestAnalyse_filtered(t *testing.T) {
 	t.Parallel()
 
 	m := plan.Mock()
-	cgcc := m.Corpus["bar"].Compiles["gcc"]
-	cgcc.Files.Log = filepath.Join("testdata", "filter_trip.log")
-	m.Corpus["bar"].Compiles["gcc"] = cgcc
+	cgcc := m.Corpus["bar"].Compilations["gcc"]
+	cgcc.Compile.Files.Log = filepath.Join("testdata", "filter_trip.log")
+	m.Corpus["bar"].Compilations["gcc"] = cgcc
 
 	crp, err := analysis.Analyse(context.Background(), m, analysis.WithFiltersFromFile(filepath.Join("testdata", "filters.yaml")))
 	require.NoError(t, err, "unexpected error analysing")

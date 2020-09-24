@@ -29,20 +29,15 @@ type Subject struct {
 	// Source refers to the original litmus test for this subject.
 	Source litmus.Litmus `toml:"source,omitempty" json:"source,omitempty"`
 
-	// Compiles contains information about this subject's compilation attempts.
+	// Compilations contains information about this subject's compilations.
 	// It maps from the string form of each compiler's ID.
 	// If nil, this subject hasn't had any compilations.
-	Compiles map[string]compilation.CompileResult `toml:"compiles,omitempty" json:"compiles,omitempty"`
+	Compilations map[string]compilation.Compilation `toml:"compilations,omitempty" json:"compilations,omitempty"`
 
 	// Recipes contains information about this subject's lifted test recipes.
 	// It maps the string form of each recipe's target architecture's ID.
 	// If nil, this subject hasn't had a recipe generated.
 	Recipes map[string]recipe.Recipe `toml:"recipes,omitempty" json:"recipes,omitempty"`
-
-	// Runs contains information about this subject's runs so far.
-	// It maps from the string form of each compiler's ID.
-	// If nil, this subject hasn't had any runs.
-	Runs map[string]compilation.RunResult `toml:"runs,omitempty" json:"runs,omitempty"`
 }
 
 // BestLitmus tries to get the 'best' litmus test for further development.
@@ -66,35 +61,79 @@ func (s *Subject) HasFuzzFile() bool {
 	return s.Fuzz != nil && s.Fuzz.Litmus.HasPath()
 }
 
-// Note that all of these maps work in basically the same way; their being separate and duplicated is just a
-// consequence of Go not (yet) having generics.
-
-// CompileResult gets the compilation result for the compiler ID cid.
-func (s *Subject) CompileResult(cid id.ID) (compilation.CompileResult, error) {
-	key := cid.String()
-	c, ok := s.Compiles[key]
+// Compilation gets the compilation information for the compiler ID cid.
+func (s *Subject) Compilation(cid id.ID) (compilation.Compilation, error) {
+	c, ok := s.Compilations[cid.String()]
 	if !ok {
-		return compilation.CompileResult{}, fmt.Errorf("%w: compiler=%q", ErrMissingCompile, key)
+		return compilation.Compilation{}, fmt.Errorf("%w: compiler=%q", ErrMissingCompilation, cid)
 	}
 	return c, nil
+}
+
+// CompileResult gets the compilation result for the compiler ID cid.
+func (s *Subject) CompileResult(cid id.ID) (*compilation.CompileResult, error) {
+	c, err := s.Compilation(cid)
+	if err != nil {
+		return nil, err
+	}
+	if c.Compile == nil {
+		return nil, fmt.Errorf("%w: compiler=%q", ErrMissingCompile, cid)
+	}
+	return c.Compile, err
 }
 
 // AddCompileResult sets the compilation information for compiler ID cid to c in this subject.
 // It fails if there already _is_ a compilation.
 func (s *Subject) AddCompileResult(cid id.ID, c compilation.CompileResult) error {
-	s.ensureCompileMap()
-	key := cid.String()
-	if _, ok := s.Compiles[key]; ok {
-		return fmt.Errorf("%w: compiler=%q", ErrDuplicateCompile, key)
+	return s.mapCompilation(cid, func(cc *compilation.Compilation) error {
+		if cc.Compile != nil {
+			return fmt.Errorf("%w: compiler=%q", ErrDuplicateCompile, cid)
+		}
+		cc.Compile = &c
+		return nil
+	})
+}
+
+// RunResult gets the run result for the compiler with id cid.
+func (s *Subject) RunResult(cid id.ID) (*compilation.RunResult, error) {
+	cc, err := s.Compilation(cid)
+	if err != nil {
+		return nil, err
 	}
-	s.Compiles[key] = c
+	if cc.Run == nil {
+		return nil, fmt.Errorf("%w: compiler=%q", ErrMissingRun, cid)
+	}
+	return cc.Run, err
+}
+
+// AddRun sets the run information for cid to r in this subject.
+// It fails if there already _is_ a run for cid.
+func (s *Subject) AddRun(cid id.ID, r compilation.RunResult) error {
+	return s.mapCompilation(cid, func(cc *compilation.Compilation) error {
+		if cc.Run != nil {
+			return fmt.Errorf("%w: compiler=%q", ErrDuplicateRun, cid)
+		}
+		cc.Run = &r
+		return nil
+	})
+}
+
+func (s *Subject) mapCompilation(cid id.ID, f func(cc *compilation.Compilation) error) error {
+	s.ensureCompilationMap()
+	key := cid.String()
+	// Deliberately taking the zero value if the compilation hasn't been seen yet.
+	cc := s.Compilations[key]
+	if err := f(&cc); err != nil {
+		return err
+	}
+	s.Compilations[key] = cc
 	return nil
 }
 
-// ensureCompileMap makes sure this subject has a compile result map.
-func (s *Subject) ensureCompileMap() {
-	if s.Compiles == nil {
-		s.Compiles = make(map[string]compilation.CompileResult)
+// ensureCompilationMap makes sure this subject has a compile result map.
+func (s *Subject) ensureCompilationMap() {
+	if s.Compilations == nil {
+		s.Compilations = make(map[string]compilation.Compilation)
 	}
 }
 
@@ -124,34 +163,5 @@ func (s *Subject) AddRecipe(arch id.ID, r recipe.Recipe) error {
 func (s *Subject) ensureRecipeMap() {
 	if s.Recipes == nil {
 		s.Recipes = make(map[string]recipe.Recipe)
-	}
-}
-
-// RunOf gets the run for the compiler with id cid.
-func (s *Subject) RunOf(cid id.ID) (compilation.RunResult, error) {
-	key := cid.String()
-	h, ok := s.Runs[key]
-	if !ok {
-		return compilation.RunResult{}, fmt.Errorf("%w: compiler=%q", ErrMissingRun, key)
-	}
-	return h, nil
-}
-
-// AddRun sets the run information for cid to r in this subject.
-// It fails if there already _is_ a run for cid.
-func (s *Subject) AddRun(cid id.ID, r compilation.RunResult) error {
-	s.ensureRunMap()
-	key := cid.String()
-	if _, ok := s.Runs[key]; ok {
-		return fmt.Errorf("%w: compiler=%q", ErrDuplicateRun, key)
-	}
-	s.Runs[key] = r
-	return nil
-}
-
-// ensureRunMap makes sure this subject has a run map.
-func (s *Subject) ensureRunMap() {
-	if s.Runs == nil {
-		s.Runs = make(map[string]compilation.RunResult)
 	}
 }

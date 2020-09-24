@@ -12,8 +12,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
-
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
@@ -61,7 +59,7 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 	cases := map[string]struct {
 		inComp     compiler.Configuration
 		inLog      string
-		inResult   compilation.CompileResult
+		inStatus   status.Status
 		fsOverride analysis.FilterSet
 		want       status.Status
 		err        error
@@ -69,20 +67,20 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 		"no filtering": {
 			inComp:   compiler.MockX86Gcc(),
 			inLog:    "blep",
-			inResult: compilation.CompileResult{Result: compilation.Result{Status: status.Ok}},
+			inStatus: status.Ok,
 			want:     status.Ok,
 		},
 		"filtering in middle of string": {
 			inComp:   compiler.MockX86Gcc(),
 			inLog:    "foo error: invalid memory model for ‘__atomic_exchange’ bar",
-			inResult: compilation.CompileResult{Result: compilation.Result{Status: status.Ok}},
+			inStatus: status.Ok,
 			want:     status.Filtered,
 		},
 		"no filters": {
 			fsOverride: analysis.FilterSet{},
 			inComp:     compiler.MockX86Gcc(),
 			inLog:      "foo error: invalid memory model for ‘__atomic_exchange’ bar",
-			inResult:   compilation.CompileResult{Result: compilation.Result{Status: status.Ok}},
+			inStatus:   status.Ok,
 			want:       status.Ok,
 		},
 		"filtering with a broken filter set": {
@@ -94,7 +92,7 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 			},
 			inComp:   compiler.MockX86Gcc(),
 			inLog:    "blep",
-			inResult: compilation.CompileResult{Result: compilation.Result{Status: status.Ok}},
+			inStatus: status.Ok,
 			err:      id.ErrBadGlob,
 		},
 	}
@@ -109,7 +107,7 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 				fs = c.fsOverride
 			}
 
-			got, err := fs.FilteredStatus(c.inResult, c.inComp, c.inLog)
+			got, err := fs.FilteredStatus(c.inStatus, c.inComp, c.inLog)
 			if c.err != nil {
 				testhelp.ExpectErrorIs(t, err, c.err, "FilteredStatus")
 				return

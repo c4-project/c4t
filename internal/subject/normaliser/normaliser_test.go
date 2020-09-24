@@ -112,37 +112,45 @@ var testSubjects = map[string]func(root string) testCase{
 		c := func(comp, file string) string { return path.Join(root, normpath.DirCompiles, comp, file) }
 		return testCase{
 			in: subject.Subject{
-				Compiles: map[string]compilation.CompileResult{
+				Compilations: map[string]compilation.Compilation{
 					"clang": {
-						Result: compilation.Result{Status: status.Ok},
-						Files: compilation.CompileFileset{
-							Bin: path.Join("foobaz", "clang", "a.out"),
-							Log: path.Join("foobaz", "clang", "errors"),
+						Compile: &compilation.CompileResult{
+							Result: compilation.Result{Status: status.Ok},
+							Files: compilation.CompileFileset{
+								Bin: path.Join("foobaz", "clang", "a.out"),
+								Log: path.Join("foobaz", "clang", "errors"),
+							},
 						},
 					},
 					"gcc": {
-						Result: compilation.Result{Status: status.Ok},
-						Files: compilation.CompileFileset{
-							Bin: path.Join("foobaz", "gcc", "a.out"),
-							Log: path.Join("foobaz", "gcc", "errors"),
+						Compile: &compilation.CompileResult{
+							Result: compilation.Result{Status: status.Ok},
+							Files: compilation.CompileFileset{
+								Bin: path.Join("foobaz", "gcc", "a.out"),
+								Log: path.Join("foobaz", "gcc", "errors"),
+							},
 						},
 					},
 				},
 			},
 			out: subject.Subject{
-				Compiles: map[string]compilation.CompileResult{
+				Compilations: map[string]compilation.Compilation{
 					"clang": {
-						Result: compilation.Result{Status: status.Ok},
-						Files: compilation.CompileFileset{
-							Bin: c("clang", normpath.FileBin),
-							Log: c("clang", normpath.FileCompileLog),
+						Compile: &compilation.CompileResult{
+							Result: compilation.Result{Status: status.Ok},
+							Files: compilation.CompileFileset{
+								Bin: c("clang", normpath.FileBin),
+								Log: c("clang", normpath.FileCompileLog),
+							},
 						},
 					},
 					"gcc": {
-						Result: compilation.Result{Status: status.Ok},
-						Files: compilation.CompileFileset{
-							Bin: c("gcc", normpath.FileBin),
-							Log: c("gcc", normpath.FileCompileLog),
+						Compile: &compilation.CompileResult{
+							Result: compilation.Result{Status: status.Ok},
+							Files: compilation.CompileFileset{
+								Bin: c("gcc", normpath.FileBin),
+								Log: c("gcc", normpath.FileCompileLog),
+							},
 						},
 					},
 				},

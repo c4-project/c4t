@@ -54,7 +54,7 @@ func (n *Normaliser) Normalise(s subject.Subject) (*subject.Subject, error) {
 
 	s.Source.Path = n.replaceAndAdd(s.Source.Path, filekind.Litmus, filekind.InOrig, normpath.FileOrigLitmus)
 	s.Fuzz = n.fuzz(s.Fuzz)
-	s.Compiles = n.compiles(s.Compiles)
+	s.Compilations = n.compilations(s.Compilations)
 	s.Recipes = n.recipes(s.Recipes)
 	// No need to normalise runs
 	return &s, n.err
@@ -91,21 +91,28 @@ func (n *Normaliser) recipe(archstr string, h recipe.Recipe) recipe.Recipe {
 	return h
 }
 
-func (n *Normaliser) compiles(cs map[string]compilation.CompileResult) map[string]compilation.CompileResult {
+func (n *Normaliser) compilations(cs map[string]compilation.Compilation) map[string]compilation.Compilation {
 	if cs == nil {
 		return nil
 	}
-	ncs := make(map[string]compilation.CompileResult, len(cs))
+	ncs := make(map[string]compilation.Compilation, len(cs))
 	for cidstr, c := range cs {
-		ncs[cidstr] = n.compile(cidstr, c)
+		ncs[cidstr] = n.compilation(cidstr, c)
 	}
 	return ncs
 }
 
-func (n *Normaliser) compile(cidstr string, c compilation.CompileResult) compilation.CompileResult {
+func (n *Normaliser) compilation(cidstr string, c compilation.Compilation) compilation.Compilation {
+	if c.Compile != nil {
+		c.Compile = n.compile(cidstr, *c.Compile)
+	}
+	return c
+}
+
+func (n *Normaliser) compile(cidstr string, c compilation.CompileResult) *compilation.CompileResult {
 	c.Files.Bin = n.replaceAndAdd(c.Files.Bin, filekind.Bin, filekind.InCompile, normpath.DirCompiles, cidstr, normpath.FileBin)
 	c.Files.Log = n.replaceAndAdd(c.Files.Log, filekind.Log, filekind.InCompile, normpath.DirCompiles, cidstr, normpath.FileCompileLog)
-	return c
+	return &c
 }
 
 // replaceAndAdd adds the path assembled by joining segs together as a mapping from opath.

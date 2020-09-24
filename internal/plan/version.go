@@ -11,10 +11,13 @@ type Version uint32
 // CurrentVer is the current plan version.
 // It changes when the interface between various bits of the tester (generally manifested within the plan version)
 // changes.
-const CurrentVer Version = 2020_08_25
+const CurrentVer Version = 2020_09_24
 
 // Version history since 2020_05_29:
 //
+// 2020_09_24: SSH configuration now uses camel_case tags.  The 'compiles' and 'runs' maps have become one
+//             'compilations' map, with optional 'compile' and 'run' subkeys (these currently contain exactly the same
+//             data as the original map entries).
 // 2020_08_25: Machine configuration in plans now carries machine-specific quantity overrides.
 // 2020_07_30: New 'perturb' stage.  Some changes to observations that may alter the interface with the machine node.
 // 2020_07_28: No changes to the plan per se, but the machine node no longer supports human-readable output, and the

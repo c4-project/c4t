@@ -47,8 +47,7 @@ func (r *RemoteRunner) mergeSubject(ls *subject.Named, rcorp corpus.Corpus) erro
 	if !ok {
 		return fmt.Errorf("subject not in remote corpus: %s", ls.Name)
 	}
-	ls.Runs = rs.Runs
-	ls.Compiles = rs.Compiles
+	ls.Compilations = rs.Compilations
 	return nil
 }
 

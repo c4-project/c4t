@@ -42,28 +42,38 @@ func newSubjectAnalysis(s subject.Named) subjectAnalysis {
 // analyseSubject analyses the named subject s, using the compiler information ccs.
 func (a *analyser) analyseSubject(s subject.Named) subjectAnalysis {
 	c := newSubjectAnalysis(s)
-	c.classifyCompiles(s.Compiles, a.analysis.Plan.Compilers, a.filters)
-	c.classifyRuns(s.Runs)
+	c.classifyCompilations(s.Compilations, a.analysis.Plan.Compilers, a.filters)
 	return c
 }
 
-func (c *subjectAnalysis) classifyCompiles(crs map[string]compilation.CompileResult, ccs map[string]compiler.Configuration, fs FilterSet) {
+func (c *subjectAnalysis) classifyCompilations(crs map[string]compilation.Compilation, ccs map[string]compiler.Configuration, fs FilterSet) {
 	for n, cm := range crs {
-		c.clogs[n] = c.compileLog(cm)
-		st, err := fs.FilteredStatus(cm, ccs[n], c.clogs[n])
-		if err != nil {
-			// TODO(@MattWindsor91): do something about this!!
-			return
-		}
-		c.logCompileStatus(st, n)
+		conf := ccs[n]
 
-		if cm.Duration != 0 && st.CountsForTiming() {
-			c.ctimes[n] = append(c.ctimes[n], cm.Duration)
+		if cm.Compile != nil {
+			c.classifyCompiler(n, cm.Compile, conf, fs)
+		}
+		if cm.Run != nil {
+			c.classifyRun(n, cm.Run)
 		}
 	}
 }
 
-func (c *subjectAnalysis) compileLog(cm compilation.CompileResult) string {
+func (c *subjectAnalysis) classifyCompiler(cidstr string, cm *compilation.CompileResult, conf compiler.Configuration, fs FilterSet) {
+	c.clogs[cidstr] = c.compileLog(cm)
+	st, err := fs.FilteredStatus(cm.Status, conf, c.clogs[cidstr])
+	if err != nil {
+		// TODO(@MattWindsor91): do something about this!!
+		return
+	}
+	c.logCompileStatus(st, cidstr)
+
+	if cm.Duration != 0 && st.CountsForTiming() {
+		c.ctimes[cidstr] = append(c.ctimes[cidstr], cm.Duration)
+	}
+}
+
+func (c *subjectAnalysis) compileLog(cm *compilation.CompileResult) string {
 	log, err := cm.Files.ReadLog("")
 	if err != nil {
 		return fmt.Sprintf("(ERROR GETTING COMPILE LOG: %s)", err)
@@ -71,15 +81,13 @@ func (c *subjectAnalysis) compileLog(cm compilation.CompileResult) string {
 	return string(log)
 }
 
-func (c *subjectAnalysis) classifyRuns(rs map[string]compilation.RunResult) {
-	for n, r := range rs {
-		// If we've already filtered this run out, don't unfilter it.
-		if !(c.cflags[n].MatchesStatus(status.Filtered)) {
-			c.logCompileStatus(r.Status, n)
-		}
-		if r.Duration != 0 && r.Status.CountsForTiming() {
-			c.rtimes[n] = append(c.rtimes[n], r.Duration)
-		}
+func (c *subjectAnalysis) classifyRun(cidstr string, r *compilation.RunResult) {
+	// If we've already filtered this run out, don't unfilter it.
+	if !(c.cflags[cidstr].MatchesStatus(status.Filtered)) {
+		c.logCompileStatus(r.Status, cidstr)
+	}
+	if r.Duration != 0 && r.Status.CountsForTiming() {
+		c.rtimes[cidstr] = append(c.rtimes[cidstr], r.Duration)
 	}
 }
 

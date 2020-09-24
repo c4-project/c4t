@@ -11,7 +11,6 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
@@ -87,10 +86,9 @@ func (f FilterSet) Filter(ci compiler.Configuration, log string) (bool, error) {
 	return false, nil
 }
 
-// FilteredStatus returns cm's status if FilterSet.Filter returns false over ci and log, or Filtered otherwise.
-func (f FilterSet) FilteredStatus(cm compilation.CompileResult, ci compiler.Configuration, log string) (status.Status, error) {
+// FilteredStatus returns s if FilterSet.Filter returns false over ci and log, or Filtered otherwise.
+func (f FilterSet) FilteredStatus(s status.Status, ci compiler.Configuration, log string) (status.Status, error) {
 	filtered, err := f.Filter(ci, log)
-	s := cm.Status
 	if filtered {
 		s = status.Filtered
 	}

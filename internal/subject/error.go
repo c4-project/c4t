@@ -8,6 +8,9 @@ package subject
 import "errors"
 
 var (
+	// ErrMissingCompilation occurs on requests for compile results for a compiler that do not have them.
+	ErrMissingCompilation = errors.New("no such compilation")
+
 	// ErrDuplicateCompile occurs when one tries to insert a compile result that already exists.
 	ErrDuplicateCompile = errors.New("duplicate compile result")
 

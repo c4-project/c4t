@@ -51,10 +51,10 @@ type Instance struct {
 
 // Run runs the instance with context ctx.
 func (n *Instance) Run(ctx context.Context) error {
-	for cidstr, c := range n.subject.Compiles {
+	for cidstr, cc := range n.subject.Compilations {
 		cid := id.FromString(cidstr)
 		name := compilation.Name{CompilerID: cid, SubjectName: n.subject.Name}
-		if err := n.runCompile(ctx, name, &c); err != nil {
+		if err := n.runCompile(ctx, name, cc.Compile); err != nil {
 			return err
 		}
 	}
@@ -62,6 +62,9 @@ func (n *Instance) Run(ctx context.Context) error {
 }
 
 func (n *Instance) runCompile(ctx context.Context, name compilation.Name, c *compilation.CompileResult) error {
+	if c == nil {
+		return fmt.Errorf("%w: %s", subject.ErrMissingCompile, name)
+	}
 	run, err := n.runCompileInner(ctx, name, c)
 	if err != nil {
 		return err
