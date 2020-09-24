@@ -31,8 +31,8 @@ import (
 const (
 	Name = "act-tester-invoke"
 
-	flagForce      = "--force"
-	flagForceShort = "-f"
+	flagForce      = "force"
+	flagForceShort = "f"
 	usageForce     = "allow invoke on plans that have already been invoked"
 )
 
