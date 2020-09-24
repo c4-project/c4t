@@ -11,6 +11,11 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
+
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
@@ -23,7 +28,7 @@ import (
 
 // Run runs the machine invoker stage.
 func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	if err := checkPlan(p); err != nil {
+	if err := m.checkPlan(p); err != nil {
 		return nil, err
 	}
 	return p.RunStage(ctx, stage.Invoke, m.invoke)
@@ -31,37 +36,42 @@ func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 
 // invoke runs the machine binary.
 func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	runner, err := m.rfac.MakeRunner(m.ldir, p, m.copyObservers...)
+	run, err := m.rfac.MakeRunner(m.ldir, p, m.copyObservers...)
 	if err != nil {
 		return nil, fmt.Errorf("while spawning runner: %w", err)
 	}
-
-	rp, err := runner.Send(ctx, p)
+	rp, err := run.Send(ctx, p)
 	if err != nil {
 		return nil, fmt.Errorf("while copying files to machine: %w", err)
 	}
-
-	qs := m.baseQuantities
-	if err := m.pqo.OverrideQuantitiesFromPlan(p, &qs); err != nil {
-		return nil, fmt.Errorf("while extracting quantities from plan: %w", err)
-	}
-	ps, err := runner.Start(ctx, qs)
-	if err != nil {
-		return nil, fmt.Errorf("while starting command: %w", err)
-	}
-
-	np, err := m.runPipework(ctx, rp, ps)
-	// Waiting _should_ close the pipes.
-	werr := runner.Wait()
-
+	qs, err := m.calcQuantities(p)
 	if err != nil {
 		return nil, err
 	}
-	if werr != nil {
-		return nil, werr
+	ps, err := run.Start(ctx, qs)
+	if err != nil {
+		return nil, fmt.Errorf("while starting command: %w", err)
 	}
+	np, err := m.awaitResults(ctx, rp, ps, run)
+	if err != nil {
+		return nil, err
+	}
+	return run.Recv(ctx, p, np)
+}
 
-	return runner.Recv(ctx, p, np)
+func (m *Invoker) awaitResults(ctx context.Context, rp *plan.Plan, ps *remote.Pipeset, runner runner.Runner) (*plan.Plan, error) {
+	np, err := m.runPipework(ctx, rp, ps)
+	// Waiting _should_ close the pipes.
+	werr := runner.Wait()
+	return np, errhelp.FirstError(err, werr)
+}
+
+func (m *Invoker) calcQuantities(p *plan.Plan) (quantity.MachNodeSet, error) {
+	qs := m.baseQuantities
+	if err := m.pqo.OverrideQuantitiesFromPlan(p, &qs); err != nil {
+		return qs, fmt.Errorf("while extracting quantities from plan: %w", err)
+	}
+	return qs, nil
 }
 
 // Close closes any persistent connections used by this invoker.
@@ -69,14 +79,30 @@ func (m *Invoker) Close() error {
 	return m.rfac.Close()
 }
 
-func checkPlan(p *plan.Plan) error {
+func (m *Invoker) checkPlan(p *plan.Plan) error {
 	if p == nil {
 		return plan.ErrNil
 	}
 	if err := p.Check(); err != nil {
 		return err
 	}
-	return p.Metadata.RequireStage(stage.Plan, stage.Lift)
+	if err := p.Metadata.RequireStage(stage.Plan, stage.Lift); err != nil {
+		return err
+	}
+	return m.handlePossibleReinvoke(p)
+}
+
+func (m *Invoker) handlePossibleReinvoke(p *plan.Plan) error {
+	err := p.Metadata.ForbidStage(stage.Invoke)
+	if err == nil {
+		return nil
+	}
+	if m.allowReinvoke {
+		// TODO(@MattWindsor91): strip previous invoke/compile/run metadata?
+		p.Corpus.EraseCompilations()
+		return nil
+	}
+	return err
 }
 
 // runPipework runs the various parallel processes that read to and write from the machine binary via ps.

@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
@@ -59,6 +61,7 @@ func ExampleCorpus_FilterToNames() {
 	// foo is in c2
 }
 
+// TestCorpus_Copy tests that Corpus.Copy performs a sufficiently deep copy of the corpus.
 func TestCorpus_Copy(t *testing.T) {
 	c := corpus.Mock()
 	cc := c.Copy()
@@ -81,8 +84,16 @@ func TestCorpus_Copy(t *testing.T) {
 	}
 
 	for n := range cc {
-		if _, ok := c[n]; !ok {
-			t.Errorf("subject %s appeared in copy", n)
-		}
+		assert.Containsf(t, c, n, "subject %s appeared out of nowhere in copy", n)
+	}
+}
+
+// TestCorpus_EraseCompilations tests that Corpus.EraseCompilations works properly.
+func TestCorpus_EraseCompilations(t *testing.T) {
+	c := corpus.Mock()
+	c.EraseCompilations()
+
+	for _, s := range c {
+		assert.Empty(t, s.Compilations, "compilation should be empty")
 	}
 }

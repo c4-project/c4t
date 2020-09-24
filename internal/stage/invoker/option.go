@@ -70,3 +70,11 @@ func OverrideQuantitiesFromPlanThen(qs quantity.MachNodeSet) Option {
 		return nil
 	}
 }
+
+// AllowReinvoke sets whether the invoker should allow the re-invocation of plans that have already been invoked.
+func AllowReinvoke(allow bool) Option {
+	return func(r *Invoker) error {
+		r.allowReinvoke = allow
+		return nil
+	}
+}

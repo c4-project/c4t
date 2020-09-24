@@ -21,8 +21,11 @@ var (
 	// ErrVersionMismatch occurs when the version of a plan loaded into part of a tester doesn't equal CurrentVer.
 	ErrVersionMismatch = errors.New("bad plan version")
 
+	// ErrForbiddenStage occurs when a plan has confirmation of a stage that should not be confirmed.
+	ErrForbiddenStage = errors.New("expected stage to be absent")
+
 	// ErrMissingStage occurs when a plan is missing confirmation of a stage on which something depends.
-	ErrMissingStage = errors.New("missing stage")
+	ErrMissingStage = errors.New("expected stage to be present")
 )
 
 // Metadata is a grouping of plan metadata.
@@ -64,24 +67,35 @@ func (m *Metadata) ConfirmStage(s stage.Stage, start time.Time, dur time.Duratio
 	m.Stages = append(m.Stages, stage.NewRecord(s, start, dur))
 }
 
-func (m *Metadata) requireOneStage(s stage.Stage) error {
-	for _, r := range m.Stages {
-		if r.Stage == s {
-			return nil
-		}
-	}
-	return fmt.Errorf("%w: %s", ErrMissingStage, s)
-}
-
 // RequireStage checks to see if this metadata has had each given stage marked completed at least once.
 // It returns ErrMissingStage if not.
 func (m *Metadata) RequireStage(stages ...stage.Stage) error {
 	for _, s := range stages {
-		if err := m.requireOneStage(s); err != nil {
-			return err
+		if !m.stageExists(s) {
+			return fmt.Errorf("%w: %s", ErrMissingStage, s)
 		}
 	}
 	return nil
+}
+
+// ForbidStage checks to make sure that this metadata has not had any given stage marked completed at least once.
+// It returns ErrForbiddenStage if not.
+func (m *Metadata) ForbidStage(stages ...stage.Stage) error {
+	for _, s := range stages {
+		if m.stageExists(s) {
+			return fmt.Errorf("%w: %s", ErrForbiddenStage, s)
+		}
+	}
+	return nil
+}
+
+func (m *Metadata) stageExists(s stage.Stage) bool {
+	for _, r := range m.Stages {
+		if r.Stage == s {
+			return true
+		}
+	}
+	return false
 }
 
 // Rand creates a random number generator using this Metadata's seed.

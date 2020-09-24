@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/subject"
@@ -86,4 +88,12 @@ func (c Corpus) Names() []string {
 	}
 	sort.Strings(ns)
 	return ns
+}
+
+// EraseCompilations deletes the compilation entries for each subject in c.
+func (c Corpus) EraseCompilations() {
+	for n, s := range c {
+		s.Compilations = map[string]compilation.Compilation{}
+		c[n] = s
+	}
 }

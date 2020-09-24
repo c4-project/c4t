@@ -34,6 +34,8 @@ type Invoker struct {
 	machObservers []observer.Observer
 	// rfac governs how the invoker will run the machine node when given a plan to invoke.
 	rfac runner.Factory
+	// allowReinvoke permits re-invokation on plans that already have a reinvoke stage.
+	allowReinvoke bool
 }
 
 // New constructs a new Invoker with local directory ldir, runner factory fac, and options o.

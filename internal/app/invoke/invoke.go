@@ -28,7 +28,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/ux"
 )
 
-const Name = "act-tester-invoke"
+const (
+	Name = "act-tester-invoke"
+
+	flagForce      = "--force"
+	flagForceShort = "-f"
+	usageForce     = "allow invoke on plans that have already been invoked"
+)
 
 // App creates the act-tester-invoke app.
 func App(outw, errw io.Writer) *c.App {
@@ -47,6 +53,11 @@ func flags() []c.Flag {
 	ownFlags := []c.Flag{
 		stdflag.VerboseFlag(),
 		stdflag.ConfFileCliFlag(),
+		&c.BoolFlag{
+			Name:    flagForce,
+			Aliases: []string{flagForceShort},
+			Usage:   usageForce,
+		},
 	}
 	return append(ownFlags, stdflag.MachCliFlags()...)
 }
@@ -73,6 +84,7 @@ func makeInvoker(ctx *c.Context, cfg *config.Config, errw io.Writer) (*invoker.I
 
 	return invoker.New(stdflag.OutDirFromCli(ctx),
 		&runner.FromPlanFactory{Config: cfg.SSH},
+		invoker.AllowReinvoke(ctx.Bool(flagForce)),
 		invoker.ObserveCopiesWith(singleobs.Copier(l, v)...),
 		invoker.ObserveMachWith(singleobs.MachNode(l, v)...),
 		// The idea here is that the configuration's quantities should be lowest priority, then those in the plan,
