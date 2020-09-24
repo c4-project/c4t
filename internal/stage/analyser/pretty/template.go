@@ -92,13 +92,14 @@ const (
 {{- range $status, $corpus := .Analysis.ByStatus -}}
 {{- if (and $corpus (or (not $status.IsOk) $.ShowOk)) }}  ## {{ $status }} ({{ len $corpus }})
 {{ range $sname, $subject := $corpus }}    - {{ $sname }}
-{{ range $compiler, $compile := .Runs -}}
-
+{{ range $compiler, $compile := .Compilations -}}
+{{- with .Run -}}
 {{- if eq $status .Status }}      - {{ $compiler }}
 {{ end -}}
 
-{{- if .Obs -}}{{- template "obs" .Obs -}}{{- end -}}
+{{- with .Obs -}}{{- template "obs" . -}}{{- end -}}
 
+{{- end -}}
 {{- end -}}
 {{- end }}
 {{ end -}}
