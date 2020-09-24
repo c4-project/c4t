@@ -24,8 +24,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
-
 	"github.com/MattWindsor91/act-tester/internal/copier"
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
@@ -65,8 +63,8 @@ type Instance struct {
 	MachConfig machine.Config
 	// SSHConfig contains top-level SSH configuration.
 	SSHConfig *remote.Config
-	// StageConfig is the configuration for this instance's stages.
-	StageConfig *StageConfig
+	// stageConfig is the configuration for this instance's stages.
+	stageConfig *StageConfig
 
 	// ID is the ID for this machine.
 	ID id.ID
@@ -107,17 +105,17 @@ func (i *Instance) Run(ctx context.Context) error {
 	}
 
 	i.Logger.Println("creating stage configurations")
-	sc, err := i.makeStageConfig()
-	if err != nil {
+	var err error
+	if i.stageConfig, err = i.makeStageConfig(); err != nil {
 		return err
 	}
 	i.Logger.Println("checking stage configurations")
-	if err := sc.Check(); err != nil {
+	if err := i.stageConfig.Check(); err != nil {
 		return err
 	}
 
 	i.Logger.Println("starting loop")
-	err = i.mainLoop(ctx, sc)
+	err = i.mainLoop(ctx)
 	i.Logger.Println("cleaning up")
 	cerr := i.cleanUp()
 	return errhelp.FirstError(err, cerr)
@@ -125,8 +123,8 @@ func (i *Instance) Run(ctx context.Context) error {
 
 // cleanUp closes things that should be gracefully closed after an instance terminates.
 func (i *Instance) cleanUp() error {
-	if i.StageConfig != nil && i.StageConfig.Invoke != nil {
-		return i.StageConfig.Invoke.Close()
+	if i.stageConfig != nil && i.stageConfig.Invoke != nil {
+		return i.stageConfig.Invoke.Close()
 	}
 	return nil
 }
@@ -147,13 +145,13 @@ func (i *Instance) check() error {
 }
 
 // mainLoop performs the main testing loop for one machine.
-func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
+func (i *Instance) mainLoop(ctx context.Context) error {
 	var (
-		iter    uint64
+		nCycle  uint64
 		nErrors uint
 	)
 	for {
-		if err := i.iterate(ctx, iter, sc); err != nil {
+		if err := i.iterate(ctx, nCycle); err != nil {
 			// This serves to stop the tester if we get stuck in a rapid failure loop on a particular machine.
 			// TODO(@MattWindsor91): ideally this should be timing the gap between errors, so that we stop if there
 			// are too many errors happening too quickly.
@@ -168,42 +166,26 @@ func (i *Instance) mainLoop(ctx context.Context, sc *StageConfig) error {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		iter++
+		nCycle++
 	}
 }
 
-// iterate performs one iteration of the main testing loop (number iter) for one machine.
-func (i *Instance) iterate(ctx context.Context, iter uint64, sc *StageConfig) error {
-	var err error
-
+// iterate performs one iteration of the main testing loop (number ncycle) for one machine.
+func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
+	// Important to _copy_ the plan
 	pcopy := i.InitialPlan
-	p := &pcopy
 
-	r := run.Run{
-		MachineID: i.ID,
-		Iter:      iter,
-		Start:     time.Now(),
+	c := cycle{
+		header: run.Run{
+			MachineID: i.ID,
+			Iter:      nCycle,
+			Start:     time.Now(),
+		},
+		p:  &pcopy,
+		sc: i.stageConfig,
 	}
-	observer.OnIteration(r, i.Observers...)
-
-	for _, s := range Stages {
-		p, err = i.runStage(ctx, sc, s, p)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (i *Instance) runStage(ctx context.Context, sc *StageConfig, s stageRunner, p *plan.Plan) (*plan.Plan, error) {
-	var err error
-	if p, err = s.Run(sc, ctx, p); err != nil {
-		return nil, fmt.Errorf("in %s stage: %w", s.Stage, err)
-	}
-	if err = i.dump(s.Stage, p); err != nil {
-		return nil, fmt.Errorf("when dumping after %s stage: %w", s.Stage, err)
-	}
-	return p, nil
+	observer.OnIteration(c.header, i.Observers...)
+	return c.run(ctx)
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
@@ -287,10 +269,4 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer
 		// targeting without consulting the plan.
 		invoker.OverrideBaseQuantities(i.Quantities.Mach),
 	)
-}
-
-// dump dumps a plan p to its expected plan file given the stage s.
-func (i *Instance) dump(s stage.Stage, p *plan.Plan) error {
-	// TODO(@MattWindsor91): is this really necessary anymore?
-	return p.WriteFile(i.ScratchPaths.PlanForStage(s), plan.WriteHuman)
 }
