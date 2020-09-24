@@ -13,7 +13,20 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 )
 
-// ExampleStage_String is a testable example for String.
+// ExampleFromString is a testable example for FromString.
+func ExampleFromString() {
+	s, err := stage.FromString("Plan")
+	fmt.Println(s, err)
+
+	_, err = stage.FromString("Nonsuch")
+	fmt.Println(err)
+
+	// Output:
+	// Plan <nil>
+	// unknown Stage: "Nonsuch"
+}
+
+// ExampleStage_String is a testable example for Stage.String.
 func ExampleStage_String() {
 	for i := stage.Unknown; i <= stage.Last+1; i++ {
 		fmt.Println(i)
