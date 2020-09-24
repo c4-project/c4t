@@ -18,14 +18,14 @@ import (
 // MachineConfig is SSH configuration for a remote machine.
 type MachineConfig struct {
 	// The host to use when dialing into the machine.
-	Host string `toml:"host"`
+	Host string `json:"host" toml:"host"`
 	// The user to use when dialing into the machine.
-	User string `toml:"user,omitzero"`
+	User string `json:"user,omitempty" toml:"user,omitzero"`
 	// The port to use when dialing into the machine.
 	// If zero, defaults to 22.
-	Port int `toml:"port,omitzero"`
+	Port int `json:"port,omitempty" toml:"port,omitzero"`
 	// The directory to which we shall copy intermediate files.
-	DirCopy string `toml:"copy_dir"`
+	DirCopy string `json:"copy_dir" toml:"copy_dir"`
 }
 
 // MachineRunner encapsulates information about how to run jobs remotely through SSH.
