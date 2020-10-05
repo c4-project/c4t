@@ -13,11 +13,11 @@ import (
 
 // StatDumper is the interface of things that can dump statistics for a litmus test.
 type StatDumper interface {
-	// DumpStats populates s with statistics gleaned from the Litmus file at path.
+	// DumpStats populates s with statistics gleaned from the Litmus file at filepath path.
 	DumpStats(ctx context.Context, s *Statset, path string) error
 }
 
-//go:generate mockery -name StatDumper
+//go:generate mockery --name=StatDumper
 
 // AtomicStatset contains a set of statistics about atomics (expressions or statements).
 type AtomicStatset struct {

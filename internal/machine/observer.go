@@ -11,7 +11,7 @@ type Observer interface {
 	OnMachines(m Message)
 }
 
-//go:generate mockery -name Observer
+//go:generate mockery --name=Observer
 
 // MessageKind is the enumeration of machine observer message kinds.
 type MessageKind uint8

@@ -45,7 +45,7 @@ type Compiler interface {
 	compiler.Driver
 }
 
-//go:generate mockery -name Compiler
+//go:generate mockery --name=Compiler
 
 // Inspector maps compiler styles to compilers.
 type Resolver struct {

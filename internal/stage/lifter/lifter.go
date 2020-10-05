@@ -46,7 +46,7 @@ type SingleLifter interface {
 	Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error)
 }
 
-//go:generate mockery -name SingleLifter
+//go:generate mockery --name=SingleLifter
 
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {

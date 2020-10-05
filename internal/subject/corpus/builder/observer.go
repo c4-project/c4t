@@ -15,7 +15,7 @@ type Observer interface {
 	OnBuild(Message)
 }
 
-//go:generate mockery -name Observer
+//go:generate mockery --name=Observer
 
 // Message is the type of builder observation messages.
 type Message struct {

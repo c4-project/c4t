@@ -31,7 +31,7 @@ type Pather interface {
 	Path(arch id.ID, subject string) (string, error)
 }
 
-//go:generate mockery -name Pather
+//go:generate mockery --name=Pather
 
 // NewPathset makes a pathset under root.
 func NewPathset(root string) *Pathset {

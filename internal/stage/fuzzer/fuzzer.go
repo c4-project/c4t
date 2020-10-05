@@ -37,13 +37,13 @@ const DefaultSubjectCycles = 10
 type SubjectPather interface {
 	// Prepare sets up the directories ready to serve through SubjectPaths.
 	Prepare() error
-	// SubjectLitmus gets the litmus file path for the subject/cycle pair sc.
+	// SubjectLitmus gets the litmus filepath for the subject/cycle pair sc.
 	SubjectLitmus(sc SubjectCycle) string
-	// SubjectTrace gets the trace file path for the subject/cycle pair sc.
+	// SubjectTrace gets the trace filepath for the subject/cycle pair sc.
 	SubjectTrace(sc SubjectCycle) string
 }
 
-//go:generate mockery -name SubjectPather
+//go:generate mockery --name=SubjectPather
 
 // Fuzzer holds the state required for the fuzzing stage of the tester.
 type Fuzzer struct {

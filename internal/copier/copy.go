@@ -26,7 +26,7 @@ type Copier interface {
 	MkdirAll(dir string) error
 }
 
-//go:generate mockery -name Copier
+//go:generate mockery --name=Copier
 
 // SendMapping is shorthand for CopyMapping where the source is a Local.
 func SendMapping(ctx context.Context, dst Copier, mapping map[string]string, o ...Observer) error {
