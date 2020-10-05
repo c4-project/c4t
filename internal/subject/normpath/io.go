@@ -87,10 +87,9 @@ func readSubjectFileFromTarReader(tr *tar.Reader, tarFile, rpath string) ([]byte
 		}
 
 		// TODO(@MattWindsor): case insensitivity?
-		if filepath.Clean(hd.Name) != rpath {
-			continue
+		if filepath.Clean(hd.Name) == rpath {
+			return ioutil.ReadAll(tr)
 		}
-		return ioutil.ReadAll(tr)
 	}
 }
 

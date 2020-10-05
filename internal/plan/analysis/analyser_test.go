@@ -8,6 +8,7 @@ package analysis_test
 import (
 	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
@@ -106,7 +107,12 @@ func TestAnalyse_filtered(t *testing.T) {
 	crp, err := analysis.Analyse(context.Background(), m, analysis.WithFiltersFromFile(filepath.Join("testdata", "filters.yaml")))
 	require.NoError(t, err, "unexpected error analysing")
 
-	assert.Equal(t, "error: invalid memory model for ‘__atomic_exchange’\n", crp.Compilers["gcc"].Logs["bar"], "log not as expected")
+	// We need to trim space because the log may have a trailing newline, which comes across as \n on Unix and \r\n on
+	// Windows.
+	// TODO(@MattWindsor91): consider normalising newlines on compiler logs
+	lg := strings.TrimSpace(crp.Compilers["gcc"].Logs["bar"])
+
+	assert.Equal(t, "error: invalid memory model for ‘__atomic_exchange’", lg, "log not as expected")
 	assert.Contains(t, crp.ByStatus[status.Filtered], "bar", "bar should have been filtered")
 	assert.NotContains(t, crp.ByStatus[status.CompileFail], "bar", "bar should have been filtered out of compilefail")
 }
