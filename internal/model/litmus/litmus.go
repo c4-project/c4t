@@ -42,11 +42,11 @@ func (l *Litmus) HasPath() bool {
 
 // Filepath gets the OS path for this litmus file.
 func (l *Litmus) Filepath() string {
-	return filepath.FromSlash(l.Path)
+	return filepath.Clean(l.Path)
 }
 
 // PopulateStats uses s to populate the statistics for this litmus file,
 func (l *Litmus) PopulateStats(ctx context.Context, s StatDumper) error {
 	l.Stats = &Statset{}
-	return s.DumpStats(ctx, l.Stats, l.Path)
+	return s.DumpStats(ctx, l.Stats, l.Filepath())
 }

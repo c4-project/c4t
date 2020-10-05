@@ -8,7 +8,7 @@ package fuzzer_test
 import (
 	"context"
 	"math/rand"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,7 +40,7 @@ func TestInstance_Fuzz(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		i := i
-		wname := path.Join("test", "litmus", fuzzer.SubjectCycle{Name: "foo", Cycle: i}.String()+".litmus")
+		wname := filepath.Join("test", "litmus", fuzzer.SubjectCycle{Name: "foo", Cycle: i}.String()+".litmus")
 		md.On("DumpStats", mock.Anything, mock.Anything, wname).Return(nil).Once()
 	}
 

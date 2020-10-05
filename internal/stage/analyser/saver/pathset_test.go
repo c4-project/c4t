@@ -23,7 +23,7 @@ func ExampleNewPathset() {
 	p := saver.NewPathset("saved")
 
 	for s := status.FirstBad; s <= status.Last; s++ {
-		fmt.Printf("%s: %s\n", s, p.Dirs[s])
+		fmt.Printf("%s: %s\n", s, filepath.ToSlash(p.Dirs[s]))
 	}
 
 	// Unordered output:

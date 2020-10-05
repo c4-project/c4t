@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"math/rand"
+	"path/filepath"
 	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
@@ -103,11 +104,12 @@ func (j *Instance) fuzzCycle(ctx context.Context, cycle int) error {
 
 func (j *Instance) makeJob(sc SubjectCycle) job.Fuzzer {
 	jb := job.Fuzzer{
-		Seed:      j.Rng.Int31(),
-		In:        j.Subject.Source.Path,
-		OutLitmus: j.Pathset.SubjectLitmus(sc),
-		OutTrace:  j.Pathset.SubjectTrace(sc),
-		Machine:   j.Machine,
+		Seed:    j.Rng.Int31(),
+		In:      j.Subject.Source.Path,
+		Machine: j.Machine,
+		// These two are filepaths, but the job stores slashpaths.
+		OutLitmus: filepath.ToSlash(j.Pathset.SubjectLitmus(sc)),
+		OutTrace:  filepath.ToSlash(j.Pathset.SubjectTrace(sc)),
 	}
 	return jb
 }
