@@ -28,6 +28,8 @@ var ErrMissingFile = errors.New("subject file not available")
 // If the file is present on disk at root/path, this behaves like ioutil.ReadFile.  Otherwise, if the path starts
 // with a directory DIR, it assumes that a file root/DIR.tar.gz exists containing path, and attempts to load the file
 // from there.  (This is the convention used by the saver when saving tarballs of subjects.)
+//
+// path may be a slashpath.
 func ReadSubjectFile(root, path string) ([]byte, error) {
 	// it seems that filepath.Clean subsumes filepath.FromSlash?
 	path = filepath.Clean(path)

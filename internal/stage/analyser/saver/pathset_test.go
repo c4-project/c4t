@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
@@ -82,4 +84,36 @@ func TestPathset_SubjectRun_errors(t *testing.T) {
 			testhelp.ExpectErrorIs(t, err, c.err, "SubjectRun")
 		})
 	}
+}
+
+// TestPathset_Prepare tests that preparing a saver.Pathset works.
+func TestPathset_Prepare(t *testing.T) {
+	ts := t.TempDir()
+	ps := saver.NewPathset(ts)
+
+	for _, d := range ps.DirList() {
+		require.NoDirExists(t, d, "dir claimed to be in pathset shouldn't exist yet")
+	}
+
+	err := ps.Prepare()
+	require.NoError(t, err, "preparing saver pathset in temp dir")
+
+	// TODO(@MattWindsor91): is there anything higher level that can drive this test?
+	for _, d := range ps.DirList() {
+		require.DirExists(t, d, "dir claimed to be in pathset should exist")
+	}
+}
+
+// TestRunPathset_Prepare tests that preparing a saver.RunPathset works.
+func TestRunPathset_Prepare(t *testing.T) {
+	ts := t.TempDir()
+	ps := saver.NewPathset(ts)
+	rs, err := ps.SubjectRun(status.RunFail, time.Date(1997, time.August, 29, 2, 14, 0, 0, time.FixedZone("EDT", -4*60*60)))
+	require.NoError(t, err, "making test subject run shouldn't fail")
+
+	err = rs.Prepare()
+	require.NoError(t, err, "preparing run pathset in temp dir")
+
+	// TODO(@MattWindsor91): is there anything higher level that can drive this test?
+	require.DirExists(t, rs.DirRoot, "run pathset dir should exist")
 }

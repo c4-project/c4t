@@ -7,6 +7,7 @@ package compilation
 
 import (
 	"fmt"
+	"path"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
@@ -23,4 +24,9 @@ type Name struct {
 // String gets a stringified version of the name.
 func (n Name) String() string {
 	return fmt.Sprintf("%s@%s", n.SubjectName, n.CompilerID)
+}
+
+// Path gets a slashpath fragment that can be used to locate this compilation unambiguously in a directory tree.
+func (n Name) Path() string {
+	return path.Join(append(n.CompilerID.Tags(), n.SubjectName)...)
 }

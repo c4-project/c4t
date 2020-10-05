@@ -101,9 +101,7 @@ func TestCompiler_Run(t *testing.T) {
 	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 compile.Single) bool {
 		return j2.SelectedOptName() == cmp.SelectedOpt.Name && j2.SelectedMOptName() == cmp.SelectedMOpt
 	}), mock.Anything).Return(nil)
-	mp.On("Prepare", mock.MatchedBy(func(is []id.ID) bool {
-		return len(is) == 1 && is[0].String() == "gcc"
-	})).Return(nil)
+	mp.On("Prepare", id.FromString("gcc")).Return(nil)
 
 	stage, serr := compiler.New(&mc, &mp)
 	require.NoError(t, serr, "constructing compile job")

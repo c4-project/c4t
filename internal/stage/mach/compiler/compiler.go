@@ -48,11 +48,13 @@ type Driver interface {
 // SubjectPather is the interface of types that can produce path sets for compilations.
 type SubjectPather interface {
 	// Prepare sets up the directories ready to serve through SubjectPaths.
-	// It takes the list of compiler IDs that are to be represented in the pathset.
-	Prepare(compilers []id.ID) error
+	// It takes the compiler IDs that are to be represented in the pathset.
+	Prepare(compilers ...id.ID) error
 
-	// SubjectPaths gets the binary and log file paths for the subject/compiler pair sc.
+	// SubjectPaths gets the filepaths for the compilation with name sc.
 	SubjectPaths(sc compilation.Name) compilation.CompileFileset
+
+	// TODO(@MattWindsor91): should SubjectPaths return an error if the directories are not prepared?
 }
 
 //go:generate mockery --name=SubjectPather
@@ -148,7 +150,7 @@ func (c *Compiler) prepareDirs(p *plan.Plan) error {
 	if err != nil {
 		return err
 	}
-	return c.paths.Prepare(cids)
+	return c.paths.Prepare(cids...)
 }
 
 // instance makes an instance for the named compiler nc, outputting results to resCh.

@@ -7,10 +7,12 @@ package compiler
 
 import (
 	"fmt"
-	"path"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
@@ -67,9 +69,30 @@ func TestPathset_SubjectPaths(t *testing.T) {
 		CompilerID:  cid,
 	})
 
-	wantb := path.Join("bins", "foo", "bar", "baz", "yeet")
+	wantb := filepath.Join("bins", "foo", "bar", "baz", "yeet")
 	assert.Equal(t, wantb, sps.Bin, "bin on SubjectPaths not as expected")
 
-	wantl := path.Join("logs", "foo", "bar", "baz", "yeet")
+	wantl := filepath.Join("logs", "foo", "bar", "baz", "yeet")
 	assert.Equal(t, wantl, sps.Log, "log on SubjectPaths not as expected")
+}
+
+func TestPathset_Prepare(t *testing.T) {
+	td := t.TempDir()
+	ps := NewPathset(td)
+
+	compilers := []id.ID{id.FromString("gcc.4"), id.FromString("gcc.9"), id.FromString("icc")}
+
+	err := ps.Prepare(compilers...)
+	require.NoError(t, err, "preparing compile pathset in temp dir")
+
+	for _, c := range compilers {
+		cfs := ps.SubjectPaths(compilation.Name{
+			SubjectName: "foo",
+			CompilerID:  c,
+		})
+
+		// These will probably be the same directory, but there's no invariant to enforce that.
+		assert.DirExists(t, filepath.Dir(filepath.Clean(cfs.Log)), "log directory should exist")
+		assert.DirExists(t, filepath.Dir(filepath.Clean(cfs.Bin)), "bin directory should exist")
+	}
 }

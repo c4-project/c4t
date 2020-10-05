@@ -16,12 +16,18 @@ type SubjectPather struct {
 }
 
 // Prepare provides a mock function with given fields: compilers
-func (_m *SubjectPather) Prepare(compilers []id.ID) error {
-	ret := _m.Called(compilers)
+func (_m *SubjectPather) Prepare(compilers ...id.ID) error {
+	_va := make([]interface{}, len(compilers))
+	for _i := range compilers {
+		_va[_i] = compilers[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func([]id.ID) error); ok {
-		r0 = rf(compilers)
+	if rf, ok := ret.Get(0).(func(...id.ID) error); ok {
+		r0 = rf(compilers...)
 	} else {
 		r0 = ret.Error(0)
 	}

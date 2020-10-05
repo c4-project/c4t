@@ -20,9 +20,9 @@ type CompileResult struct {
 
 // CompileFileset is the set of file paths associated with a compiler output.
 type CompileFileset struct {
-	// Bin is the path to this subject's compiled binary file.
+	// Bin is the slashpath to this subject's compiled binary file.
 	Bin string `toml:"bin,omitempty" json:"bin,omitempty"`
-	// Log is the path to this subject's compiler stderr log file.
+	// Log is the slashpath to this subject's compiler stderr log file.
 	Log string `toml:"log,omitempty" json:"log,omitempty"`
 }
 
@@ -34,7 +34,7 @@ func (c CompileFileset) StripMissing() CompileFileset {
 }
 
 func stripSingleMissing(f string) string {
-	_, err := os.Stat(filepath.FromSlash(f))
+	_, err := os.Stat(filepath.Clean(f))
 	if os.IsNotExist(err) {
 		return ""
 	}

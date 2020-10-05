@@ -7,6 +7,7 @@ package compiler
 
 import (
 	"path"
+	"path/filepath"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
@@ -32,15 +33,16 @@ type Pathset struct {
 // NewPathset constructs a new pathset from the directory root.
 func NewPathset(root string) *Pathset {
 	return &Pathset{
-		DirBins: path.Join(root, segBins),
-		DirLogs: path.Join(root, segLogs),
+		DirBins: filepath.Join(root, segBins),
+		DirLogs: filepath.Join(root, segLogs),
 	}
 }
 
-// Prepare prepares this pathset by making its directories.
-// It takes a slice of compilers for which directories should be made.
-func (p *Pathset) Prepare(compilers []id.ID) error {
-	return iohelp.Mkdirs(p.Dirs(compilers...)...)
+// Prepare prepares this pathset for compilers cs by making its directories.
+// It takes compilers for which directories should be made.
+func (p *Pathset) Prepare(cs ...id.ID) error {
+	// TODO(@MattWindsor91): make a record of the directories, and error if we try to use different ones in SubjectPaths.
+	return iohelp.Mkdirs(p.Dirs(cs...)...)
 }
 
 // Dirs gets all of the directories involved in a pathset over compiler ID set compilers.
@@ -57,10 +59,10 @@ func (p *Pathset) Dirs(compilers ...id.ID) []string {
 	return dirs
 }
 
-// SubjectPaths gets the binary and log file paths for the subject/compiler pair sc.
+// SubjectPaths gets the compilation fileset for the subject/compiler pair sc.
 func (p *Pathset) SubjectPaths(sc compilation.Name) compilation.CompileFileset {
-	csub := append(sc.CompilerID.Tags(), sc.SubjectName)
-	bpath := append([]string{p.DirBins}, csub...)
-	lpath := append([]string{p.DirLogs}, csub...)
+	csub := sc.Path()
+	bpath := append([]string{filepath.ToSlash(p.DirBins)}, csub)
+	lpath := append([]string{filepath.ToSlash(p.DirLogs)}, csub)
 	return compilation.CompileFileset{Bin: path.Join(bpath...), Log: path.Join(lpath...)}
 }
