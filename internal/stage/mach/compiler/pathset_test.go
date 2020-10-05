@@ -7,6 +7,7 @@ package compiler
 
 import (
 	"fmt"
+	"path"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -69,10 +70,12 @@ func TestPathset_SubjectPaths(t *testing.T) {
 		CompilerID:  cid,
 	})
 
-	wantb := filepath.Join("bins", "foo", "bar", "baz", "yeet")
+	// Bin and Log are slashpaths, perhaps surprisingly.
+
+	wantb := path.Join("bins", "foo", "bar", "baz", "yeet")
 	assert.Equal(t, wantb, sps.Bin, "bin on SubjectPaths not as expected")
 
-	wantl := filepath.Join("logs", "foo", "bar", "baz", "yeet")
+	wantl := path.Join("logs", "foo", "bar", "baz", "yeet")
 	assert.Equal(t, wantl, sps.Log, "log on SubjectPaths not as expected")
 }
 
