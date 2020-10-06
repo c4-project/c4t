@@ -9,26 +9,19 @@ package director
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
-
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 	"github.com/MattWindsor91/act-tester/internal/remote"
-
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -46,7 +39,7 @@ type Director struct {
 	// machines contains the machines that will be used in the test.
 	machines machine.ConfigMap
 	// observers contains multi-machine observers for the director.
-	observers []observer.Observer
+	observers []Observer
 	// env groups together the bits of configuration that pertain to dealing with the environment.
 	env Env
 	// ssh, if present, provides configuration for the director's remote invocation.
@@ -57,8 +50,6 @@ type Director struct {
 	files []string
 	// filters is the set of compiled filter sets to use in analysis.
 	filters analysis.FilterSet
-	// l is the logger for the director.
-	l *log.Logger
 }
 
 // New creates a new Director with driver set e, input paths files, machines ms, and options opt.
@@ -86,7 +77,6 @@ func (d *Director) tidyAfterOptions() error {
 	if d.paths == nil {
 		return iohelp.ErrPathsetNil
 	}
-	d.l = iohelp.EnsureLog(d.l)
 	return nil
 }
 
@@ -95,14 +85,8 @@ func liftInitError(err error) error {
 	return fmt.Errorf("while initialising director: %w", err)
 }
 
-// Direct runs the director d, closing all of its observers on termination.
+// Direct runs the director d.
 func (d *Director) Direct(ctx context.Context) error {
-	err := d.directInner(ctx)
-	cerr := observer.CloseAll(d.observers...)
-	return errhelp.FirstError(err, cerr)
-}
-
-func (d *Director) directInner(ctx context.Context) error {
 	if err := d.prepare(); err != nil {
 		return err
 	}
@@ -117,10 +101,7 @@ func (d *Director) directInner(ctx context.Context) error {
 		return err
 	}
 
-	cctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	return d.runLoops(cctx, cancel, ms)
+	return d.runLoops(ctx, ms)
 }
 
 func (d *Director) plan(ctx context.Context) (map[string]plan.Plan, error) {
@@ -134,33 +115,28 @@ func (d *Director) plan(ctx context.Context) (map[string]plan.Plan, error) {
 func (d *Director) makePlanner() (*planner.Planner, error) {
 	return planner.New(
 		d.env.Planner,
-		planner.ObserveWith(singleobs.Planner(d.l, true)...),
+		planner.ObserveWith(LowerToPlanner(d.observers)...),
 		planner.OverrideQuantities(d.quantities.Plan),
 	)
 }
 
-func (d *Director) runLoops(cctx context.Context, cancel func(), ms []*Instance) error {
-	eg, ectx := errgroup.WithContext(cctx)
+func (d *Director) runLoops(ctx context.Context, ms []*Instance) error {
+	eg, ectx := errgroup.WithContext(ctx)
 	for _, m := range ms {
 		m := m
 		eg.Go(func() error { return m.Run(ectx) })
-	}
-	for _, o := range d.observers {
-		o := o
-		eg.Go(func() error { return o.Run(ectx, cancel) })
 	}
 	return eg.Wait()
 }
 
 func (d *Director) prepare() error {
-	d.quantities.Log(d.l)
+	OnPrepare(d.quantities, *d.paths, d.observers...)
 
-	d.l.Println("making directories")
 	if err := d.paths.Prepare(); err != nil {
 		return err
 	}
 
-	return d.machines.ObserveOn(observer.LowerToMachine(d.observers)...)
+	return d.machines.ObserveOn(LowerToMachine(d.observers)...)
 }
 
 func (d *Director) makeMachines(plans map[string]plan.Plan) ([]*Instance, error) {
@@ -179,7 +155,6 @@ func (d *Director) makeMachines(plans map[string]plan.Plan) ([]*Instance, error)
 }
 
 func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*Instance, error) {
-	l := log.New(d.l.Writer(), logPrefix(midstr), 0)
 	mid, err := id.TryFromString(midstr)
 	if err != nil {
 		return nil, err
@@ -198,7 +173,6 @@ func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*I
 		Observers:    obs,
 		ScratchPaths: sps,
 		SavedPaths:   vps,
-		Logger:       l,
 		Quantities:   d.machineQuantities(&c),
 		InitialPlan:  p,
 		Filters:      d.filters,
@@ -215,17 +189,13 @@ func (d *Director) machineQuantities(c *machine.Config) quantity.MachineSet {
 	return qs
 }
 
-func (d *Director) instanceObservers(mid id.ID) ([]observer.Instance, error) {
+func (d *Director) instanceObservers(mid id.ID) ([]InstanceObserver, error) {
 	var err error
-	ios := make([]observer.Instance, len(d.observers))
+	ios := make([]InstanceObserver, len(d.observers))
 	for i, o := range d.observers {
 		if ios[i], err = o.Instance(mid); err != nil {
 			return nil, err
 		}
 	}
 	return ios, nil
-}
-
-func logPrefix(midstr string) string {
-	return midstr + ": "
 }

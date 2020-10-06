@@ -11,6 +11,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+
+	"github.com/MattWindsor91/act-tester/internal/director"
+
+	"github.com/MattWindsor91/act-tester/internal/director/pathset"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
+
 	"github.com/mum4k/termdash/keyboard"
 
 	"github.com/mum4k/termdash/cell"
@@ -18,8 +28,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/mum4k/termdash/linestyle"
-
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -45,10 +53,10 @@ type Dash struct {
 
 	// machines maps from stringified machine IDs to their observers.
 	// (There is a display order for the machines, but we don't track it ourselves.)
-	machines map[string]*Observer
+	machines map[string]*Instance
 
 	// obs contains the observer records used to populate machines.
-	obs []*Observer
+	obs []*Instance
 }
 
 const (
@@ -193,10 +201,32 @@ func (d *Dash) Close() error {
 }
 
 // Instance locates the observer for the machine with ID mid.
-func (d *Dash) Instance(mid id.ID) (observer.Instance, error) {
+func (d *Dash) Instance(mid id.ID) (director.InstanceObserver, error) {
 	o := d.machines[mid.String()]
 	if o == nil {
 		return nil, fmt.Errorf("instance not prepared for machine %s", mid.String())
 	}
 	return o, nil
+}
+
+// OnPrepare (currently) does nothing.
+func (_ *Dash) OnPrepare(_ quantity.RootSet, _ pathset.Pathset) {
+	// TODO(@MattWindsor91): broadcast the quantities somewhere
+}
+
+// OnCompilerConfig (currently) does nothing.
+func (d *Dash) OnCompilerConfig(compiler.Message) {
+	// NB: this version of OnCompilerConfig gets triggered by planner messages;
+	// the one in Instance is the one thar gets triggered by perturber messages.
+}
+
+// OnBuild (currently) does nothing.
+func (d *Dash) OnBuild(builder.Message) {
+	// NB: this version of OnBuild gets triggered by planner messages;
+	// the one in Instance is the one thar gets triggered by perturber messages.
+}
+
+// OnPlan (currently) does nothing.
+func (d *Dash) OnPlan(m planner.Message) {
+	// TODO(@MattWindsor91): do something here
 }

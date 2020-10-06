@@ -9,7 +9,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
@@ -34,8 +33,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
-
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 
@@ -75,11 +72,8 @@ type Instance struct {
 	// Env contains the parts of the director's config that tell it how to do various environmental tasks.
 	Env *Env
 
-	// Logger points to a logger for this machine's loop.
-	Logger *log.Logger
-
 	// Observers is this machine's observer set.
-	Observers []observer.Instance
+	Observers []InstanceObserver
 
 	// SavedPaths contains the save pathset for this machine.
 	SavedPaths *saver.Pathset
@@ -94,29 +88,29 @@ type Instance struct {
 
 // Run runs this machine's testing loop.
 func (i *Instance) Run(ctx context.Context) error {
-	i.Logger = iohelp.EnsureLog(i.Logger)
+	//i.Logger = iohelp.EnsureLog(i.Logger)
 	if err := i.check(); err != nil {
 		return err
 	}
 
-	i.Logger.Println("preparing scratch directories")
+	//i.Logger.Println("preparing scratch directories")
 	if err := i.ScratchPaths.Prepare(); err != nil {
 		return err
 	}
 
-	i.Logger.Println("creating stage configurations")
+	//i.Logger.Println("creating stage configurations")
 	var err error
 	if i.stageConfig, err = i.makeStageConfig(); err != nil {
 		return err
 	}
-	i.Logger.Println("checking stage configurations")
+	//i.Logger.Println("checking stage configurations")
 	if err := i.stageConfig.Check(); err != nil {
 		return err
 	}
 
-	i.Logger.Println("starting loop")
+	//i.Logger.Println("starting loop")
 	err = i.mainLoop(ctx)
-	i.Logger.Println("cleaning up")
+	//i.Logger.Println("cleaning up")
 	cerr := i.cleanUp()
 	return errhelp.FirstError(err, cerr)
 }
@@ -159,7 +153,7 @@ func (i *Instance) mainLoop(ctx context.Context) error {
 			if maxConsecutiveErrors < nErrors {
 				return fmt.Errorf("too many consecutive errors; last error was: %w", err)
 			}
-			i.Logger.Println("ERROR:", err)
+			//i.Logger.Println("ERROR:", err)
 		} else {
 			nErrors = 0
 		}
@@ -184,20 +178,20 @@ func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
 		p:  &pcopy,
 		sc: i.stageConfig,
 	}
-	observer.OnIteration(c.header, i.Observers...)
+	OnIteration(c.header, i.Observers...)
 	return c.run(ctx)
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
-	bobs := observer.LowerToBuilder(i.Observers)
-	cobs := observer.LowerToCopy(i.Observers)
+	bobs := LowerToBuilder(i.Observers)
+	cobs := LowerToCopy(i.Observers)
 
 	var (
 		err error
 		sc  StageConfig
 	)
 
-	if sc.Perturb, err = i.makePerturber(observer.LowerToPerturber(i.Observers)); err != nil {
+	if sc.Perturb, err = i.makePerturber(LowerToPerturber(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
 	}
 	if sc.Fuzz, err = i.makeFuzzer(bobs); err != nil {
@@ -206,10 +200,10 @@ func (i *Instance) makeStageConfig() (*StageConfig, error) {
 	if sc.Lift, err = i.makeLifter(bobs); err != nil {
 		return nil, fmt.Errorf("when making lifter config: %w", err)
 	}
-	if sc.Invoke, err = i.makeInvoker(cobs, observer.LowerToMach(i.Observers)); err != nil {
+	if sc.Invoke, err = i.makeInvoker(cobs, LowerToMach(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making machine invoker: %w", err)
 	}
-	if sc.Analyser, err = i.makeAnalyser(observer.LowerToAnalyser(i.Observers), observer.LowerToSaver(i.Observers)); err != nil {
+	if sc.Analyser, err = i.makeAnalyser(LowerToAnalyser(i.Observers), LowerToSaver(i.Observers)); err != nil {
 		return nil, fmt.Errorf("when making analysis: %w", err)
 	}
 	return &sc, nil
@@ -240,7 +234,8 @@ func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {
 		i.Env.Fuzzer,
 		fuzzer.NewPathset(i.ScratchPaths.DirFuzz),
 		fuzzer.ObserveWith(obs...),
-		fuzzer.LogWith(i.Logger),
+		// TODO(@MattWindsor91): why does the fuzzer still take a logger?
+		//fuzzer.LogWith(i.Logger),
 		fuzzer.OverrideQuantities(i.Quantities.Fuzz),
 	)
 }
@@ -249,7 +244,8 @@ func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 	return lifter.New(
 		i.Env.Lifter,
 		lifter.NewPathset(i.ScratchPaths.DirLift),
-		lifter.LogTo(i.Logger),
+		// TODO(@MattWindsor91): why does the lifter still take a logger?
+		//lifter.LogTo(i.Logger),
 		lifter.ObserveWith(obs...),
 	)
 }

@@ -27,7 +27,7 @@ const (
 
 // compilersContainerID calculates the container ID of the compiler section of the machine at location i.
 // This is used to rename the container to account for the number of compilers.
-func (o *Observer) compilersContainerID() string {
+func (o *Instance) compilersContainerID() string {
 	return o.id + compilersContainerIDSuffix
 }
 
@@ -52,7 +52,7 @@ func newCompilerObserver(parent *container.Container, id string) (*compilerObser
 }
 
 // OnCompilerConfig forwards a build observation.
-func (o *Observer) OnCompilerConfig(m compiler.Message) {
+func (o *Instance) OnCompilerConfig(m compiler.Message) {
 	if o.compilers == nil {
 		return
 	}

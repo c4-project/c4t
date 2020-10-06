@@ -10,7 +10,6 @@ package fuzzer
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
@@ -47,8 +46,6 @@ type SubjectPather interface {
 
 // Fuzzer holds the state required for the fuzzing stage of the tester.
 type Fuzzer struct {
-	// l is the logger for this fuzzer.
-	l *log.Logger
 	// driver holds the fuzzer's low-level implementation structs.
 	driver Driver
 	// observers observe the fuzzer's progress across a corpus.
@@ -71,7 +68,6 @@ func New(d Driver, ps SubjectPather, o ...Option) (*Fuzzer, error) {
 	if err := Options(o...)(&f); err != nil {
 		return nil, err
 	}
-	f.l = iohelp.EnsureLog(f.l)
 	return &f, f.check()
 }
 
@@ -98,12 +94,10 @@ func (f *Fuzzer) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (f *Fuzzer) fuzz(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	f.l.Println("preparing directories")
 	if err := f.paths.Prepare(); err != nil {
 		return nil, err
 	}
 
-	f.l.Println("now fuzzing")
 	rng := p.Metadata.Rand()
 	fcs, ferr := f.fuzzCorpus(ctx, rng, p.Corpus, p.Machine.Machine)
 	if ferr != nil {
@@ -115,13 +109,12 @@ func (f *Fuzzer) fuzz(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 
 // sampleAndUpdatePlan samples fcs, updates the fresh plan copy p with it, and returns a pointer to it.
 func (f *Fuzzer) sampleAndUpdatePlan(fcs corpus.Corpus, rng *rand.Rand, p plan.Plan) (*plan.Plan, error) {
-	f.l.Println("sampling corpus")
+	// TODO(@MattWindsor91): add some observer calls here?
 	scs, err := fcs.Sample(rng, f.quantities.CorpusSize)
 	if err != nil {
 		return nil, err
 	}
 
-	f.l.Println("updating plan")
 	p.Corpus = scs
 	// Previously, we reset the plan creation date and seed here.  This seems a little arbitrary in hindsight,
 	// so we no longer do so.
@@ -138,8 +131,6 @@ func (f *Fuzzer) count(c corpus.Corpus) (nsubjects, nruns int) {
 // fuzzCorpus actually does the business of fuzzing.
 func (f *Fuzzer) fuzzCorpus(ctx context.Context, rng *rand.Rand, c corpus.Corpus, m machine.Machine) (corpus.Corpus, error) {
 	_, nfuzzes := f.count(c)
-
-	f.l.Printf("Fuzzing %d inputs\n", len(c))
 
 	seeds := corpusSeeds(rng, c)
 

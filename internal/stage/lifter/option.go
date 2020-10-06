@@ -8,7 +8,6 @@ package lifter
 import (
 	"errors"
 	"io"
-	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
@@ -31,15 +30,6 @@ func Options(os ...Option) Option {
 				return err
 			}
 		}
-		return nil
-	}
-}
-
-// LogTo makes the lifter log its progress to d.
-func LogTo(d *log.Logger) Option {
-	// TODO(@MattWindsor91): as in everywhere else, I'd rather deprecate logging in favour of observers.
-	return func(l *Lifter) error {
-		l.l = iohelp.EnsureLog(d)
 		return nil
 	}
 }

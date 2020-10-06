@@ -12,7 +12,7 @@ import (
 )
 
 func (d *Dash) setupMachineSplit(nmachines int) {
-	d.machines = make(map[string]*Observer, nmachines)
+	d.machines = make(map[string]*Instance, nmachines)
 	if nmachines <= 0 {
 		return
 	}
@@ -45,14 +45,14 @@ func (d *Dash) updateMachineGrid(nmachines int) error {
 	return d.container.Update(idMachines, g...)
 }
 
-func (d *Dash) makeMachineGrid(nmachines int) ([]*Observer, []container.Option, error) {
+func (d *Dash) makeMachineGrid(nmachines int) ([]*Instance, []container.Option, error) {
 	gb := grid.New()
 
-	obs := make([]*Observer, nmachines)
+	obs := make([]*Instance, nmachines)
 	pc := machineGridPercent(nmachines)
 	for i := range obs {
 		var err error
-		if obs[i], err = NewObserver(machineContainerID(i), d); err != nil {
+		if obs[i], err = NewInstance(machineContainerID(i), d); err != nil {
 			return nil, nil, err
 		}
 		obs[i].AddToGrid(gb, pc)

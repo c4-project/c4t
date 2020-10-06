@@ -10,11 +10,13 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
-	"path/filepath"
 	"runtime/pprof"
 	"strings"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/act-tester/internal/ux/directorobs"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
@@ -23,13 +25,10 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/director"
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-	"github.com/MattWindsor91/act-tester/internal/ux/dash"
-	"github.com/mitchellh/go-homedir"
 
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
@@ -129,7 +128,7 @@ func run(ctx *c.Context, errw io.Writer) error {
 		files:   ctx.Args().Slice(),
 	}
 
-	return runWithArgs(cfg, qs, a, args)
+	return runWithArgs(ctx.Context, cfg, qs, a, args)
 }
 
 type args struct {
@@ -154,24 +153,38 @@ func setupPprof(cppath string) (func(), error) {
 	}, nil
 }
 
-func runWithArgs(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args) error {
-	o, lw, err := makeObservers(cfg, args)
+func runWithArgs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args) error {
+	o, err := directorobs.NewObs(cfg, args.dash)
 	if err != nil {
 		return err
 	}
-
-	d, err := makeDirector(cfg, qs, a, args, o, lw)
-	if err != nil {
-		_ = observer.CloseAll(o...)
-		return err
-	}
-
-	// The director will close the observers.
-	return d.Direct(context.Background())
+	err = runWithObs(ctx, cfg, qs, a, args, o)
+	cerr := o.Close()
+	return errhelp.FirstError(err, cerr)
 }
 
-func makeDirector(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args, obs []observer.Observer, lw io.Writer) (*director.Director, error) {
-	opts, err := makeOptions(cfg, qs, args.mfilter, lw, obs...)
+func runWithObs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args, o *directorobs.Obs) error {
+	d, err := makeDirector(cfg, qs, a, args, o)
+	if err != nil {
+		return err
+	}
+
+	cctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// TODO(@MattWindsor91): is this nesting of errgroups inefficient?
+	eg, ectx := errgroup.WithContext(cctx)
+	eg.Go(func() error {
+		return d.Direct(ectx)
+	})
+	eg.Go(func() error {
+		return o.Run(ectx, cancel)
+	})
+	return eg.Wait()
+}
+
+func makeDirector(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args, obs *directorobs.Obs) (*director.Director, error) {
+	glob, err := makeGlob(args.mfilter)
 	if err != nil {
 		return nil, err
 	}
@@ -179,37 +192,12 @@ func makeDirector(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args a
 	if err != nil {
 		return nil, err
 	}
-	return director.New(makeEnv(a, cfg), cfg.Machines, files, opts...)
-}
-
-func createResultLogFile(c *config.Config) (*os.File, error) {
-	logpath, err := homedir.Expand(filepath.Join(c.Paths.OutDir, "results.log"))
-	if err != nil {
-		return nil, fmt.Errorf("expanding result log file path: %w", err)
-	}
-	logw, err := os.Create(logpath)
-	if err != nil {
-		return nil, fmt.Errorf("opening result log file: %w", err)
-	}
-	return logw, nil
-}
-
-func makeOptions(c *config.Config, qs quantity.RootSet, mfilter string, lw io.Writer, o ...observer.Observer) ([]director.Option, error) {
-	glob, err := makeGlob(mfilter)
-	if err != nil {
-		return nil, err
-	}
-
-	l := log.New(lw, "", 0)
-
-	opts := []director.Option{
-		director.ConfigFromGlobal(c),
+	return director.New(makeEnv(a, cfg), cfg.Machines, files,
+		director.ConfigFromGlobal(cfg),
 		director.OverrideQuantities(qs),
 		director.FilterMachines(glob),
-		director.ObserveWith(o...),
-		director.LogWith(l),
-	}
-	return opts, nil
+		director.ObserveWith(obs.Observers()...),
+	)
 }
 
 func makeGlob(mfilter string) (id.ID, error) {
@@ -217,27 +205,6 @@ func makeGlob(mfilter string) (id.ID, error) {
 		return id.ID{}, nil
 	}
 	return id.TryFromString(mfilter)
-}
-
-func makeObservers(cfg *config.Config, args args) ([]observer.Observer, io.Writer, error) {
-	logw, err := createResultLogFile(cfg)
-	if err != nil {
-		return nil, nil, err
-	}
-	lo, err := observer.NewLogger(logw)
-	if err != nil {
-		return nil, nil, err
-	}
-	if !args.dash {
-		return []observer.Observer{lo}, args.errw, nil
-	}
-	do, err := dash.New()
-	if err != nil {
-		_ = lo.Close()
-		return nil, nil, err
-	}
-
-	return []observer.Observer{do, lo}, do, nil
 }
 
 func makeEnv(a *act.Runner, c *config.Config) director.Env {

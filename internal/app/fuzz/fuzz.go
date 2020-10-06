@@ -71,7 +71,6 @@ func makeFuzzer(ctx *c.Context, cfg *config.Config, drv fuzzer.Driver, l *log.Lo
 	return fuzzer.New(
 		drv,
 		fuzzer.NewPathset(stdflag.OutDirFromCli(ctx)),
-		fuzzer.LogWith(l),
 		fuzzer.ObserveWith(singleobs.Builder(l, stdflag.Verbose(ctx))...),
 		fuzzer.OverrideQuantities(cfg.Quantities.Fuzz),
 		fuzzer.OverrideQuantities(setupQuantityFlags(ctx)),

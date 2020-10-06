@@ -4,11 +4,11 @@
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package observer defines interfaces and basic implementations of the director's 'observer' pattern.
-package observer
+package director
 
 import (
-	"context"
-	"io"
+	"github.com/MattWindsor91/act-tester/internal/director/pathset"
+	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
 
@@ -36,49 +36,62 @@ import (
 // observers.  It will call Run for each observer in parallel with the tester instances, and call Close when its
 // observers are no longer needed.
 type Observer interface {
+	// Observers can observe machine configuration.
 	machine.Observer
 
-	// Run runs any runtime required by the observer in a blocking manner using context ctx.
-	// It will use cancel to cancel ctx if needed.
-	Run(ctx context.Context, cancel func()) error
+	// Observers can observe planner operations.
+	planner.Observer
 
-	// The director will Close observers when it is shutting down.
-	io.Closer
+	// OnPrepare lets the observer know that the director is preparing to run on pathset ps with quantities qs.
+	OnPrepare(qs quantity.RootSet, ps pathset.Pathset)
 
-	// Instance gets a sub-observer for the machine with ID id.
+	// InstanceObserver gets a sub-observer for the machine with ID id.
 	// It can fail if no such observer is available.
-	Instance(id id.ID) (Instance, error)
+	Instance(id id.ID) (InstanceObserver, error)
 }
 
-// Instance is an interface for types that observe a director instance.
-type Instance interface {
+// InstanceObserver is an interface for types that observe a director instance.
+type InstanceObserver interface {
 	// OnIteration lets the observer know that the instance has started a new cycle.
 	OnIteration(run run.Run)
 
-	// Instance observers can observe plan analyses.
+	// InstanceObserver observers can observe plan analyses.
 	analyser.Observer
 
-	// Instance observers can observe plan saves.
+	// InstanceObserver observers can observe plan saves.
 	saver.Observer
 
-	// Instance observers can observe perturber operations.
+	// InstanceObserver observers can observe perturber operations.
 	perturber.Observer
 
-	// Instance observers can observe planner operations.
-	planner.Observer
-
-	// Instance observers can observe file copies.
+	// InstanceObserver observers can observe file copies.
 	copier.Observer
 
-	// Instance observers can observe machine node actions.
+	// InstanceObserver observers can observe machine node actions.
 	mach.Observer
 }
 
+// OnPrepare sends OnPrepare to every observer in obs.
+func OnPrepare(qs quantity.RootSet, ps pathset.Pathset, obs ...Observer) {
+	for _, o := range obs {
+		o.OnPrepare(qs, ps)
+	}
+}
+
 // OnIteration sends OnIteration to every instance observer in obs.
-func OnIteration(r run.Run, obs ...Instance) {
+func OnIteration(r run.Run, obs ...InstanceObserver) {
 	for _, o := range obs {
 		o.OnIteration(r)
 	}
+}
+
+// LowerToPlanner lowers a slice of director observers to a slice of planner observers.
+func LowerToPlanner(obs []Observer) []planner.Observer {
+	cos := make([]planner.Observer, len(obs))
+	for i, o := range obs {
+		cos[i] = o
+	}
+	return cos
 }
 
 // LowerToMachine lowers a slice of director observers to a slice of machine observers.
@@ -91,7 +104,7 @@ func LowerToMachine(obs []Observer) []machine.Observer {
 }
 
 // LowerToAnalyser lowers a slice of instance observers to a slice of analyser observers.
-func LowerToAnalyser(obs []Instance) []analyser.Observer {
+func LowerToAnalyser(obs []InstanceObserver) []analyser.Observer {
 	cos := make([]analyser.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
@@ -99,17 +112,8 @@ func LowerToAnalyser(obs []Instance) []analyser.Observer {
 	return cos
 }
 
-// LowerToPlanner lowers a slice of instance observers to a slice of planner observers.
-func LowerToPlanner(obs []Instance) []planner.Observer {
-	cos := make([]planner.Observer, len(obs))
-	for i, o := range obs {
-		cos[i] = o
-	}
-	return cos
-}
-
 // LowerToPerturber lowers a slice of instance observers to a slice of perturber observers.
-func LowerToPerturber(obs []Instance) []perturber.Observer {
+func LowerToPerturber(obs []InstanceObserver) []perturber.Observer {
 	cos := make([]perturber.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
@@ -118,7 +122,7 @@ func LowerToPerturber(obs []Instance) []perturber.Observer {
 }
 
 // LowerToSave lowers a slice of instance observers to a slice of saver observers.
-func LowerToSaver(obs []Instance) []saver.Observer {
+func LowerToSaver(obs []InstanceObserver) []saver.Observer {
 	cos := make([]saver.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
@@ -127,7 +131,7 @@ func LowerToSaver(obs []Instance) []saver.Observer {
 }
 
 // LowerToBuilder lowers a slice of instance observers to a slice of builder observers.
-func LowerToBuilder(obs []Instance) []builder.Observer {
+func LowerToBuilder(obs []InstanceObserver) []builder.Observer {
 	cos := make([]builder.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
@@ -136,7 +140,7 @@ func LowerToBuilder(obs []Instance) []builder.Observer {
 }
 
 // LowerToCopy lowers a slice of instance observers to a slice of copy observers.
-func LowerToCopy(obs []Instance) []copier.Observer {
+func LowerToCopy(obs []InstanceObserver) []copier.Observer {
 	cos := make([]copier.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
@@ -145,19 +149,10 @@ func LowerToCopy(obs []Instance) []copier.Observer {
 }
 
 // LowerToMach lowers a slice of director observers to a slice of machine node observers.
-func LowerToMach(obs []Instance) []mach.Observer {
+func LowerToMach(obs []InstanceObserver) []mach.Observer {
 	cos := make([]mach.Observer, len(obs))
 	for i, o := range obs {
 		cos[i] = o
 	}
 	return cos
-}
-
-// CloseAll closes all observers passed to it, returning the error of the last one (if any).
-func CloseAll(obs ...Observer) error {
-	var err error
-	for _, o := range obs {
-		err = o.Close()
-	}
-	return err
 }

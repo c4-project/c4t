@@ -3,22 +3,23 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package observer_test
+package directorobs_test
 
 import (
 	"context"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/ux/directorobs"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
 // ExampleInstanceLogger_OnArchive is a runnable example for OnArchive.
 func ExampleInstanceLogger_OnArchive() {
-	l, _ := observer.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout})
+	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
 	i, _ := l.Instance(id.FromString("localhost"))
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -29,7 +30,7 @@ func ExampleInstanceLogger_OnArchive() {
 		saver.OnArchiveFinish("subj", i)
 		cancel()
 	}()
-	_ = l.Run(ctx, cancel)
+	_ = l.Run(ctx)
 
 	// Output:
 	// saving (run [ #0 (Jan  1 00:00:00)]) subj to subj.tar.gz

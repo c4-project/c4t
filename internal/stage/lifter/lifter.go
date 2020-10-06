@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log"
 	"math/rand"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
@@ -53,9 +52,6 @@ type Lifter struct {
 	// driver is a single-job lifter.
 	driver SingleLifter
 
-	// l is the logger to use for this lifter.
-	l *log.Logger
-
 	// obs track the lifter's progress across a corpus.
 	obs []builder.Observer
 
@@ -97,7 +93,7 @@ func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (l *Lifter) prepareDirs(p *plan.Plan) error {
-	l.l.Println("preparing directories")
+	// TODO(@MattWindsor91): observe this?
 	return l.paths.Prepare(p.Arches(), p.Corpus.Names())
 }
 
@@ -115,7 +111,6 @@ func checkPlan(p *plan.Plan) error {
 }
 
 func (l *Lifter) lift(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	l.l.Println("preparing directories")
 	if err := l.prepareDirs(p); err != nil {
 		return nil, err
 	}
@@ -127,7 +122,6 @@ func (l *Lifter) lift(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, error) {
-	l.l.Println("now lifting")
 	cfg := builder.Config{
 		Init:      p.Corpus,
 		Observers: l.obs,

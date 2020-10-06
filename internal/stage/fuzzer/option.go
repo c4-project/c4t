@@ -6,8 +6,6 @@
 package fuzzer
 
 import (
-	"log"
-
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
@@ -32,15 +30,6 @@ func Options(ops ...Option) Option {
 func ObserveWith(obs ...builder.Observer) Option {
 	return func(r *Fuzzer) error {
 		r.observers = append(r.observers, obs...)
-		return nil
-	}
-}
-
-// LogWith sets the fuzzer's logger to l.
-func LogWith(l *log.Logger) Option {
-	// TODO(@MattWindsor91): replace logger with observer
-	return func(f *Fuzzer) error {
-		f.l = l
 		return nil
 	}
 }

@@ -63,7 +63,6 @@ func makeLifter(ctx *c.Context, l *log.Logger, errw io.Writer) (*lifter.Lifter, 
 	return lifter.New(
 		&backend.BResolve,
 		lifter.NewPathset(stdflag.OutDirFromCli(ctx)),
-		lifter.LogTo(l),
 		lifter.ObserveWith(singleobs.Builder(l, stdflag.Verbose(ctx))...),
 		lifter.SendStderrTo(errw),
 	)

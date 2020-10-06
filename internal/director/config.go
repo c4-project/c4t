@@ -7,7 +7,6 @@ package director
 
 import (
 	"errors"
-	"log"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
@@ -21,8 +20,6 @@ import (
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/remote"
-
-	"github.com/MattWindsor91/act-tester/internal/director/observer"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 
@@ -64,7 +61,7 @@ func Options(ops ...Option) Option {
 }
 
 // ObserveWith adds obs to the director's observer pool.
-func ObserveWith(obs ...observer.Observer) Option {
+func ObserveWith(obs ...Observer) Option {
 	return func(d *Director) error {
 		for _, o := range obs {
 			if o == nil {
@@ -72,15 +69,6 @@ func ObserveWith(obs ...observer.Observer) Option {
 			}
 			d.observers = append(d.observers, o)
 		}
-		return nil
-	}
-}
-
-// LogWith sets the director's logger to l.
-func LogWith(l *log.Logger) Option {
-	// TODO(@MattWindsor91): replace logger with observer
-	return func(d *Director) error {
-		d.l = l
 		return nil
 	}
 }

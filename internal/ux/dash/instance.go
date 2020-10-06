@@ -12,7 +12,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
@@ -31,8 +30,8 @@ const (
 	headerSparks          = "Sparklines"
 )
 
-// Observer represents a single machine instance inside a dash.
-type Observer struct {
+// Instance represents a single machine instance inside a dash.
+type Instance struct {
 	// id is the ID of the container for this machine observer, and also the base for deriving other subcontainer IDs.
 	id string
 
@@ -48,38 +47,40 @@ type Observer struct {
 	nruns uint64
 }
 
-// NewObserver constructs an Observer, initialising its various widgets.
+// NewInstance constructs an Instance, initialising its various widgets.
 // It accepts the id of the parent container (from which the IDs of various sub-containers can be derived), as well as
 // the parent dash d (used to access the results log and parent container).
-func NewObserver(id string, d *Dash) (*Observer, error) {
-	var err error
-
-	o := Observer{
+func NewInstance(id string, d *Dash) (*Instance, error) {
+	o := Instance{
 		id:   id,
 		rlog: d.resultLog,
 	}
 
-	if o.tally, err = newTally(); err != nil {
-		return nil, err
-	}
-
-	if o.run, err = newRunCounter(); err != nil {
-		return nil, err
-	}
-
-	if o.sparks, err = newSparkset(); err != nil {
-		return nil, err
-	}
-
-	if o.action, err = NewCorpusObserver(); err != nil {
-		return nil, err
-	}
-
-	if o.compilers, err = newCompilerObserver(d.container, o.compilersContainerID()); err != nil {
+	if err := o.setup(d); err != nil {
 		return nil, err
 	}
 
 	return &o, nil
+}
+
+func (o *Instance) setup(d *Dash) error {
+	var err error
+	if o.tally, err = newTally(); err != nil {
+		return err
+	}
+	if o.run, err = newRunCounter(); err != nil {
+		return err
+	}
+	if o.sparks, err = newSparkset(); err != nil {
+		return err
+	}
+	if o.action, err = NewCorpusObserver(); err != nil {
+		return err
+	}
+	if o.compilers, err = newCompilerObserver(d.container, o.compilersContainerID()); err != nil {
+		return err
+	}
+	return nil
 }
 
 const (
@@ -89,7 +90,7 @@ const (
 )
 
 // AddToGrid adds this observer to a grid builder gb with the container ID id..
-func (o *Observer) AddToGrid(gb *grid.Builder, pc int) {
+func (o *Instance) AddToGrid(gb *grid.Builder, pc int) {
 	gb.Add(grid.RowHeightPercWithOpts(pc,
 		[]container.Option{
 			container.ID(o.id),
@@ -124,7 +125,7 @@ func (o *Observer) AddToGrid(gb *grid.Builder, pc int) {
 	))
 }
 
-func (o *Observer) currentRunColumn() grid.Element {
+func (o *Instance) currentRunColumn() grid.Element {
 	return grid.ColWidthPercWithOpts(percActions,
 		[]container.Option{
 			container.Border(linestyle.Light),
@@ -135,14 +136,14 @@ func (o *Observer) currentRunColumn() grid.Element {
 }
 
 // OnIteration logs that a new iteration has begun.
-func (o *Observer) OnIteration(r run.Run) {
+func (o *Instance) OnIteration(r run.Run) {
 	o.nruns = r.Iter
 	_ = o.run.onIteration(r)
 	o.action.reset()
 }
 
 // OnAnalysis observes an analysis by adding failure/timeout/flag rates to the sparklines.
-func (o *Observer) OnAnalysis(a analysis.Analysis) {
+func (o *Instance) OnAnalysis(a analysis.Analysis) {
 	for i := status.Ok; i <= status.Last; i++ {
 		o.sendStatusCount(i, len(a.ByStatus[i]))
 	}
@@ -152,11 +153,11 @@ func (o *Observer) OnAnalysis(a analysis.Analysis) {
 }
 
 // OnArchive currently ignores a save observation.
-func (o *Observer) OnArchive(saver.ArchiveMessage) {
+func (o *Instance) OnArchive(saver.ArchiveMessage) {
 	// TODO(@MattWindsor91): do something with this?
 }
 
-func (o *Observer) sendStatusCount(i status.Status, n int) {
+func (o *Instance) sendStatusCount(i status.Status, n int) {
 	if err := o.tally.tallyStatus(i, n); err != nil {
 		o.logError(err)
 	}
@@ -165,7 +166,7 @@ func (o *Observer) sendStatusCount(i status.Status, n int) {
 	}
 }
 
-func (o *Observer) logAnalysis(a analysis.Analysis) error {
+func (o *Instance) logAnalysis(a analysis.Analysis) error {
 	sc := analysis.WithRun{
 		Run:      o.run.last,
 		Analysis: a,
@@ -174,7 +175,7 @@ func (o *Observer) logAnalysis(a analysis.Analysis) error {
 }
 
 // OnBuild forwards a build observation.
-func (o *Observer) OnBuild(m builder.Message) {
+func (o *Instance) OnBuild(m builder.Message) {
 	switch m.Kind {
 	case observing.BatchStart:
 		o.action.OnBuildStart(builder.Manifest{
@@ -189,12 +190,12 @@ func (o *Observer) OnBuild(m builder.Message) {
 }
 
 // OnCopyStart forwards a copy start observation.
-func (o *Observer) OnCopyStart(nfiles int) {
+func (o *Instance) OnCopyStart(nfiles int) {
 	o.action.OnCopyStart(nfiles)
 }
 
 // OnCopy forwards a copy observation.
-func (o *Observer) OnCopy(m copy2.Message) {
+func (o *Instance) OnCopy(m copy2.Message) {
 	switch m.Kind {
 	case observing.BatchStart:
 		o.action.OnCopyStart(m.Num)
@@ -205,16 +206,13 @@ func (o *Observer) OnCopy(m copy2.Message) {
 	}
 }
 
-// OnPlan does nothing, at the moment.
-func (o *Observer) OnPlan(planner.Message) {}
-
 // OnPerturb does nothing, at the moment.
-func (o *Observer) OnPerturb(perturber.Message) {}
+func (o *Instance) OnPerturb(perturber.Message) {}
 
 // OnMachineNodeAction does nothing, at the moment.
-func (o *Observer) OnMachineNodeAction(observer.Message) {}
+func (o *Instance) OnMachineNodeAction(observer.Message) {}
 
-func (o *Observer) logError(err error) {
+func (o *Instance) logError(err error) {
 	// For want of better location.
 	o.action.logError(err)
 }
