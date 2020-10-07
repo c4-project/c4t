@@ -6,42 +6,44 @@
 package corpus_test
 
 import (
-	"errors"
 	"math/rand"
 	"reflect"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
-// smallCorpi contains test cases for the overly-small-corpus error handling of SampleCorpus.
-var smallCorpi = map[string]struct {
+// emptyCorpora contains test cases for the overly-small-corpus error handling of SampleCorpus.
+var emptyCorpora = map[string]int{
+	"empty+cap":     10,
+	"empty":         0,
+	"empty+bad-cap": -10,
+}
+
+// exactCorpora contains test cases for the pass-through behaviour of SampleCorpus.
+var exactCorpora = map[string]struct {
 	corpus corpus.Corpus
 	want   int
 }{
-	"empty+cap": {corpus.Corpus{}, 10},
-	"empty":     {corpus.Corpus{}, 0},
-	"small1":    {corpus.New("foo"), 2},
-	"small2":    {corpus.New("foo", "bar", "baz"), 10},
+	"nocap1":   {corpus.New("foo"), 0},
+	"nocap2":   {corpus.New("foo", "bar"), 0},
+	"nocap3":   {corpus.New("foo", "bar", "baz"), 0},
+	"nocap4":   {corpus.New("you're", "going", "to", "have", "a", "bad", "time"), 0},
+	"cap1":     {corpus.New("foo"), 1},
+	"cap2":     {corpus.New("foo", "bar"), 2},
+	"cap3":     {corpus.New("foo", "bar", "baz"), 3},
+	"cap4":     {corpus.New("you're", "going", "to", "have", "a", "bad", "time"), 7},
+	"overcap1": {corpus.New("foo"), 9},
+	"overcap2": {corpus.New("foo", "bar"), 9},
+	"overcap3": {corpus.New("foo", "bar", "baz"), 9},
+	"overcap4": {corpus.New("you're", "going", "to", "have", "a", "bad", "time"), 9},
 }
 
-// exactCorpi contains test cases for the pass-through behaviour of SampleCorpus.
-var exactCorpi = map[string]struct {
-	corpus corpus.Corpus
-	want   int
-}{
-	"nocap1": {corpus.New("foo"), 0},
-	"nocap2": {corpus.New("foo", "bar"), 0},
-	"nocap3": {corpus.New("foo", "bar", "baz"), 0},
-	"nocap4": {corpus.New("you're", "going", "to", "have", "a", "bad", "time"), 0},
-	"cap1":   {corpus.New("foo"), 1},
-	"cap2":   {corpus.New("foo", "bar"), 2},
-	"cap3":   {corpus.New("foo", "bar", "baz"), 3},
-	"cap4":   {corpus.New("you're", "going", "to", "have", "a", "bad", "time"), 7},
-}
-
-// sampleCorpi contains test cases for the 'actually sample' behaviour of SampleCorpus.
-var sampleCorpi = map[string]struct {
+// sampleCorpora contains test cases for the 'actually sample' behaviour of SampleCorpus.
+var sampleCorpora = map[string]struct {
 	corpus corpus.Corpus
 	want   int
 }{
@@ -52,43 +54,45 @@ var sampleCorpi = map[string]struct {
 	"sample5": {corpus.New("you're", "going", "to", "have", "a", "bad", "time"), 5},
 }
 
-// TestCorpus_Sample_SmallErrors tests that various 'overly small corpus' situations produce an error.
-func TestCorpus_Sample_SmallErrors(t *testing.T) {
-	for name, c := range smallCorpi {
+// TestCorpus_Sample_emptyErrors tests that empty corpus situations produce an error.
+func TestCorpus_Sample_emptyErrors(t *testing.T) {
+	t.Parallel()
+	for name, want := range emptyCorpora {
+		want := want
 		t.Run(name, func(t *testing.T) {
-			_, err := c.corpus.Sample(rand.New(rand.NewSource(1)), c.want)
-			if err == nil {
-				t.Errorf("no error when sampling small corpus (%v, want %d)", c.corpus, c.want)
-			} else if !errors.Is(err, corpus.ErrSmall) {
-				t.Errorf("wrong error when sampling small corpus (%v, want %d): %v", c.corpus, c.want, err)
-			}
+			t.Parallel()
+			_, err := corpus.Corpus{}.Sample(rand.New(rand.NewSource(1)), want)
+			testhelp.ExpectErrorIs(t, err, corpus.ErrNone, "sampling empty corpus")
 		})
 	}
 }
 
-// TestCorpus_Sample_PassThrough tests that various cases that shouldn't cause sampling don't.
-func TestCorpus_Sample_PassThrough(t *testing.T) {
-	for name, c := range exactCorpi {
+// TestCorpus_Sample_passThrough tests that various cases that shouldn't cause sampling don't.
+func TestCorpus_Sample_passThrough(t *testing.T) {
+	t.Parallel()
+	for name, c := range exactCorpora {
+		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			smp, err := c.corpus.Sample(rand.New(rand.NewSource(1)), c.want)
-			if err != nil {
-				t.Errorf("error when sampling exact corpus (%v, want %d): %v", c.corpus, c.want, err)
-			} else if !reflect.DeepEqual(smp, c.corpus) {
-				t.Errorf("bad sample of exact corpus (%v, want %d): %v", c.corpus, c.want, smp)
+			if assert.NoError(t, err, "error when sampling exact corpus") {
+				assert.Equal(t, c.corpus, smp, "should pass through exact corpus")
 			}
 		})
 	}
 }
 
-// TestCorpus_Sample_ActuallySample tests that sampling behaves correctly.
-func TestCorpus_Sample_ActuallySample(t *testing.T) {
+// TestCorpus_Sample_actuallySample tests that sampling behaves correctly.
+func TestCorpus_Sample_actuallySample(t *testing.T) {
+	t.Parallel()
 	var i int64
-	for name, c := range sampleCorpi {
+	for name, c := range sampleCorpora {
+		c := c
+		j := i
 		t.Run(name, func(t *testing.T) {
-			smp, err := c.corpus.Sample(rand.New(rand.NewSource(i)), c.want)
-			if err != nil {
-				t.Errorf("error when sampling corpus (%v, want %d): %v", c.corpus, c.want, err)
-			} else {
+			t.Parallel()
+			smp, err := c.corpus.Sample(rand.New(rand.NewSource(j)), c.want)
+			if assert.NoError(t, err, "error when sampling corpus") {
 				checkCorpusIsSample(t, c.corpus, smp)
 			}
 		})
