@@ -226,6 +226,7 @@ func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber
 		i.Env.CInspector,
 		perturber.ObserveWith(obs...),
 		perturber.OverrideQuantities(i.Quantities.Perturb),
+		perturber.UseFullCompilerIDs(true),
 	)
 }
 

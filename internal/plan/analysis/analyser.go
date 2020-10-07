@@ -58,12 +58,25 @@ func (a *analyser) analyse(ctx context.Context) (*Analysis, error) {
 	if err := a.analyseCorpus(ctx); err != nil {
 		return nil, err
 	}
+	if err := a.analyseCompilers(ctx); err != nil {
+		return nil, err
+	}
+
+	return a.analysis, nil
+}
+
+func (a *analyser) analyseCompilers(ctx context.Context) error {
 	for n, c := range a.analysis.Compilers {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+
 		c.Time = NewTimeSet(a.compilerTimes[n]...)
 		c.RunTime = NewTimeSet(a.runTimes[n]...)
+
 		a.analysis.Compilers[n] = c
 	}
-	return a.analysis, nil
+	return nil
 }
 
 func (a *analyser) analyseCorpus(ctx context.Context) error {
@@ -96,8 +109,8 @@ func newAnalyser(p *plan.Plan, opts ...Option) (*analyser, error) {
 	if err := Options(opts...)(&a); err != nil {
 		return nil, err
 	}
-	a.initCompilers(p.Compilers)
-	return &a, nil
+	err := a.initCompilers(p.Compilers)
+	return &a, err
 }
 
 func checkPlan(p *plan.Plan) error {
@@ -107,12 +120,13 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (a *analyser) initCompilers(cs map[string]compiler.Configuration) {
+func (a *analyser) initCompilers(cs map[string]compiler.Configuration) error {
 	for cn, c := range cs {
 		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Logs: map[string]string{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}
 		a.runTimes[cn] = []time.Duration{}
 	}
+	return nil
 }
 
 func (a *analyser) analyseAndSend(ctx context.Context, named subject.Named, ch chan<- subjectAnalysis) {

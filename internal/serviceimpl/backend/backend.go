@@ -54,7 +54,7 @@ type Backend interface {
 	runner.ObsParser
 }
 
-// Inspector maps compiler styles to compilers.
+// Resolver maps backend styles to backends.
 type Resolver struct {
 	// Compilers is the raw map from style strings to backend runners.
 	Backends map[string]Backend

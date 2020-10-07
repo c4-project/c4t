@@ -47,7 +47,7 @@ type Compiler interface {
 
 //go:generate mockery --name=Compiler
 
-// Inspector maps compiler styles to compilers.
+// Resolver maps compiler styles to compilers.
 type Resolver struct {
 	// Compilers is the raw map from style strings to compiler runners.
 	Compilers map[string]Compiler

@@ -28,6 +28,8 @@ type Perturber struct {
 	ci compiler.Inspector
 	// observers contains the set of observers used to get feedback on the planning action as it completes.
 	observers []Observer
+	// useFullIDs tells the perturber whether to promote the compiler IDs to full IDs after perturbance.
+	useFullIDs bool
 	// quantities contains quantity information for this planner.
 	quantities quantity.PerturbSet
 	seed       int64

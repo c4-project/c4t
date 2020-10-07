@@ -26,7 +26,7 @@ type Analysis struct {
 	// ByStatus maps each status to the corpus of subjects that fall into it.
 	ByStatus map[status.Status]corpus.Corpus
 
-	// Compilers maps each compiler ID to an analysis of that compiler.
+	// Compilers maps each compiler ID (or full-ID, depending on configuration) to an analysis of that compiler.
 	Compilers map[string]Compiler
 
 	// Flags aggregates all flags found during the analysis.

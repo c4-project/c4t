@@ -21,6 +21,8 @@ type Observer interface {
 	OnPerturb(m Message)
 }
 
+//go:generate mockery --name=Observer
+
 // Kind is the enumeration of kinds of perturber message.
 type Kind uint8
 

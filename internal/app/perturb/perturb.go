@@ -25,10 +25,13 @@ import (
 )
 
 const (
-	envSeed       = "ACT_SEED"
-	flagSeed      = "seed"
-	flagSeedShort = "s"
-	usageSeed     = "`seed` to use for any randomised components of this test plan"
+	envSeed          = "ACT_SEED"
+	flagSeed         = "seed"
+	flagSeedShort    = "s"
+	usageSeed        = "`seed` to use for any randomised components of this test plan"
+	flagFullIDs      = "full-ids"
+	flagFullIDsShort = "I"
+	usageFullIDs     = "map compilers to their 'full' IDs on perturbance"
 )
 
 // App creates the act-tester-perturb app.
@@ -56,6 +59,7 @@ func flags() []c.Flag {
 			Value:       plan.UseDateSeed,
 			DefaultText: "set seed from time",
 		},
+		&c.BoolFlag{Name: flagFullIDs, Aliases: []string{flagFullIDsShort}, Usage: usageFullIDs},
 		stdflag.CorpusSizeCliFlag(),
 	}
 }
@@ -83,6 +87,7 @@ func makePerturber(ctx *c.Context, errw io.Writer) (*perturber.Perturber, error)
 		perturber.ObserveWith(singleobs.Perturber(l, stdflag.Verbose(ctx))...),
 		perturber.OverrideQuantities(qs),
 		perturber.UseSeed(ctx.Int64(flagSeed)),
+		perturber.UseFullCompilerIDs(ctx.Bool(flagFullIDs)),
 	)
 }
 

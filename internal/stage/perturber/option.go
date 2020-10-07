@@ -52,3 +52,12 @@ func UseSeed(seed int64) Option {
 		return nil
 	}
 }
+
+// UseFullCompilerIDs sets whether the perturber should name compilers with their 'full ID'.
+// By default, it preserves their original IDs.
+func UseFullCompilerIDs(use bool) Option {
+	return func(p *Perturber) error {
+		p.useFullIDs = use
+		return nil
+	}
+}
