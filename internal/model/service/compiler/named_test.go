@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -67,4 +69,18 @@ func TestConfiguration_AddNameString_error(t *testing.T) {
 	}
 	_, err := c.AddNameString("foo..bar")
 	testhelp.ExpectErrorIs(t, err, id.ErrTagEmpty, "AddNameString with empty-tag id")
+}
+
+// ExampleNamed_FullID is a runnable example for Named.FullID.
+func ExampleNamed_FullID() {
+	c := compiler.Configuration{SelectedMOpt: "arch=skylake", SelectedOpt: &optlevel.Named{
+		Name:  "3",
+		Level: optlevel.Level{},
+	}}
+	n, _ := c.AddNameString("gcc.4")
+	i, _ := n.FullID()
+	fmt.Println(i)
+
+	// Output:
+	// gcc.4.o3.march=skylake
 }

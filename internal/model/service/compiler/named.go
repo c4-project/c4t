@@ -30,3 +30,9 @@ func (c Configuration) AddNameString(name string) (*Named, error) {
 	}
 	return c.AddName(nid), err
 }
+
+// FullID gets a fully qualified identifier for this configuration, consisting of the compiler name, followed by
+// 'oOpt' where 'Opt' is its selected optimisation name, and 'mMopt' where 'Mopt' is its selected machine profile.
+func (n Named) FullID() (id.ID, error) {
+	return id.New(append(n.ID.Tags(), "o"+n.SelectedOptName(), "m"+n.SelectedMOpt)...)
+}

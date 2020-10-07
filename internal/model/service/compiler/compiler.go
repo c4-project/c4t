@@ -48,6 +48,14 @@ type Configuration struct {
 	Compiler
 }
 
+// SelectedOptName returns the name of the selected optimisation level, or the empty string if there isn't one.
+func (c Configuration) SelectedOptName() string {
+	if c.SelectedOpt == nil {
+		return ""
+	}
+	return c.SelectedOpt.Name
+}
+
 // String outputs a human-readable but machine-separable summary of this compiler configuration.
 func (c Configuration) String() string {
 	s, err := c.stringErr()
@@ -67,8 +75,9 @@ func (c Configuration) stringErr() (string, error) {
 			return "", err
 		}
 	}
-	if c.SelectedOpt != nil {
-		if _, err := fmt.Fprintf(&sb, " opt %q", c.SelectedOpt.Name); err != nil {
+	oname := c.SelectedOptName()
+	if !ystring.IsBlank(oname) {
+		if _, err := fmt.Fprintf(&sb, " opt %q", oname); err != nil {
 			return "", err
 		}
 	}
