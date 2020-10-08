@@ -1,0 +1,11 @@
+out_dir = "~/coverage_out"  # Output here
+
+[quantities]
+  count = 100_000  # Do 100,000 tests per profile
+  divisions = [ 10, 10 ]  # Subdivide into 10 buckets (of 10,000), then subdivide the first into 10 buckets (of 1,000)
+
+[profiles.simple]
+
+[profiles.smart]
+
+[profiles.csmith]

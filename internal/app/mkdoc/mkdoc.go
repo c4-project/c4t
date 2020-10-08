@@ -11,6 +11,8 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/app/coverage"
+
 	"github.com/MattWindsor91/act-tester/internal/app/analyse"
 	"github.com/MattWindsor91/act-tester/internal/app/invoke"
 	"github.com/MattWindsor91/act-tester/internal/app/perturb"
@@ -62,6 +64,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 
 var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	analyse.App,
+	coverage.App,
 	director.App,
 	fuzz.App,
 	gccnt.App,

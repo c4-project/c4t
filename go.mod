@@ -10,11 +10,10 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gdamore/tcell v1.4.0 // indirect
-	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mum4k/termdash v0.12.2
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pelletier/go-toml v1.8.1
 	github.com/pkg/sftp v1.12.0
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/stretchr/testify v1.6.1
