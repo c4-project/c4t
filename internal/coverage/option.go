@@ -27,12 +27,22 @@ func Options(opts ...Option) Option {
 	}
 }
 
+// OverrideQuantities overrides the maker's quantity set with qs.
+func OverrideQuantities(qs QuantitySet) Option {
+	return func(maker *Maker) error {
+		maker.qs.Override(qs)
+		return nil
+	}
+}
+
 // OptionsFromConfig sets various options according to the values in Config.
 func OptionsFromConfig(cfg *Config) Option {
 	return func(maker *Maker) error {
 		if cfg == nil {
 			return ErrConfigNil
 		}
-		return nil
+		return Options(
+			OverrideQuantities(cfg.Quantities),
+		)(maker)
 	}
 }

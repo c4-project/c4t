@@ -17,10 +17,12 @@ import (
 	c "github.com/urfave/cli/v2"
 )
 
-var (
+const (
 	flagConfigFile      = "config"
 	flagConfigFileShort = "c"
 	usageConfigFile     = "Path to config file for coverage (not the tester config file!)"
+
+	defaultOutDir = "coverage"
 )
 
 // App creates the act-tester-coverage app.
@@ -38,13 +40,14 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	return []c.Flag{
-		stdflag.VerboseFlag(),
+		//stdflag.VerboseFlag(),
 		&c.StringFlag{
 			Name:      flagConfigFile,
 			Aliases:   []string{flagConfigFileShort},
 			Usage:     usageConfigFile,
 			TakesFile: true,
 		},
+		stdflag.OutDirCliFlag(defaultOutDir),
 	}
 }
 
@@ -54,7 +57,7 @@ func run(ctx *c.Context, outw, _errw io.Writer) error {
 		return err
 	}
 
-	cm, err := coverage.NewMaker(coverage.OptionsFromConfig(ccfg))
+	cm, err := coverage.NewMaker(ccfg.Profiles, coverage.OptionsFromConfig(ccfg))
 	if err != nil {
 		return err
 	}
