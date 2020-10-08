@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestLoad_direct tests Load with a directly provided filename.
+// TestLoad_direct tests config.Load with a directly provided filename.
 func TestLoad_direct(t *testing.T) {
 	conf, err := config.Load(filepath.Join("testdata", "tester.toml"))
 	require.NoError(t, err, "error loading config file")
@@ -26,4 +26,10 @@ func TestLoad_direct(t *testing.T) {
 	assert.NotNil(t, conf.Fuzz, "Fuzz not present")
 
 	assert.ElementsMatch(t, []string{"/home/example/inputs", "/home/example/standalone.litmus"}, conf.Paths.Inputs, "Inputs not set correctly")
+}
+
+// TestLoad_broken tests config.Load with a bogus filename.
+func TestLoad_broken(t *testing.T) {
+	_, err := config.Load(filepath.Join("testdata", "broken.toml"))
+	require.Error(t, err, "should error")
 }
