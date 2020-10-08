@@ -5,10 +5,18 @@
 
 package coverage
 
-import toml "github.com/pelletier/go-toml"
+import (
+	"github.com/MattWindsor91/act-tester/internal/model/service"
+	toml "github.com/pelletier/go-toml"
+)
 
 // Profile tells the coverage generator how to set up a particular coverage profile.
 type Profile struct {
+	// Kind specifies the type of fuzzer profile this is.
+	Kind ProfileKind `toml:"kind"`
+
+	// Run specifies, if this is a standalone profile, how to run the generator.
+	Run *service.RunInfo `toml:"run"`
 }
 
 // QuantitySet contains the quantities tracked by the coverage generator.

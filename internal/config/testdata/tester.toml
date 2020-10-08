@@ -3,3 +3,7 @@
 out_dir = "/home/example/test_out"
 inputs = ["/home/example/inputs", "/home/example/standalone.litmus"]
 filter_file = "/home/example/filters.yaml"
+
+[fuzz.params]
+  "int.action.cap.lower" = "20"
+  "bool.action.enable" = "2:1"  # in act-fuzz, this would mean 'randomise with ratio of 2 for to 1 against'

@@ -10,10 +10,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pelletier/go-toml"
+
 	"github.com/1set/gut/yos"
 	"github.com/1set/gut/ystring"
-
-	"github.com/BurntSushi/toml"
 )
 
 const (
@@ -35,9 +35,12 @@ func Load(override string) (*Config, error) {
 }
 
 func tryLoad(f string) (*Config, error) {
+	t, err := toml.LoadFile(f)
+	if err != nil {
+		return nil, err
+	}
 	var c Config
-	_, derr := toml.DecodeFile(f, &c)
-	return &c, derr
+	return &c, t.Unmarshal(&c)
 }
 
 // FilePath resolves the config file path file using hooks.

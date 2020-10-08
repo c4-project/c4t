@@ -22,5 +22,8 @@ func TestLoad_direct(t *testing.T) {
 
 	assert.Equal(t, "/home/example/test_out", conf.Paths.OutDir, "OutDir not set correctly")
 	assert.Equal(t, "/home/example/filters.yaml", conf.Paths.FilterFile, "FilterFile not set correctly")
+
+	assert.NotNil(t, conf.Fuzz, "Fuzz not present")
+
 	assert.ElementsMatch(t, []string{"/home/example/inputs", "/home/example/standalone.litmus"}, conf.Paths.Inputs, "Inputs not set correctly")
 }

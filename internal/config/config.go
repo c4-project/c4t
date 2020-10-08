@@ -12,6 +12,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
@@ -33,6 +35,9 @@ type Config struct {
 
 	// Quantities gives the default quantities for the director.
 	Quantities quantity.RootSet `toml:"quantities,omitempty"`
+
+	// Fuzz contains fuzzer config overrides.
+	Fuzz *fuzzer.Config `toml:"fuzz,omitempty"`
 
 	// SSH contains top-level SSH configuration.
 	SSH *remote.Config `toml:"ssh,omitempty"`
