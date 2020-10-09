@@ -18,7 +18,7 @@ import (
 // BinActFuzz is the name of the ACT fuzzer binary.
 const BinActFuzz = "act-fuzz"
 
-// FuzzSingle wraps the ACT one-file fuzzer, supplying the given seed.
+// Fuzz wraps the ACT one-file fuzzer, supplying the given seed.
 func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
 	sargs := StandardArgs{Verbose: false}
 	seedStr := strconv.Itoa(int(j.Seed))

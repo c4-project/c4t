@@ -5,7 +5,10 @@
 
 package job
 
-import "github.com/MattWindsor91/act-tester/internal/machine"
+import (
+	"github.com/MattWindsor91/act-tester/internal/machine"
+	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+)
 
 // Fuzzer contains information on how to fuzz a litmus file.
 type Fuzzer struct {
@@ -23,4 +26,7 @@ type Fuzzer struct {
 
 	// Machine is, optionally, the machine that is the target of the fuzzed output.
 	Machine *machine.Machine
+
+	// Config is the configuration for the fuzzer, if any.
+	Config *fuzzer2.Configuration
 }

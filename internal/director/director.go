@@ -10,6 +10,8 @@ import (
 	"context"
 	"fmt"
 
+	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
@@ -44,6 +46,8 @@ type Director struct {
 	env Env
 	// ssh, if present, provides configuration for the director's remote invocation.
 	ssh *remote.Config
+	// fcfg, if present, provides fuzzer configuration.
+	fcfg *fuzzer2.Configuration
 	// quantities contains various tunable quantities for the director's stages.
 	quantities quantity.RootSet
 	// files is the input file set.
@@ -176,6 +180,7 @@ func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*I
 		Quantities:   d.machineQuantities(&c),
 		InitialPlan:  p,
 		Filters:      d.filters,
+		FuzzerConfig: d.fcfg,
 	}
 	return &m, nil
 }

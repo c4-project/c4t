@@ -6,6 +6,7 @@
 package fuzzer
 
 import (
+	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
@@ -38,6 +39,15 @@ func ObserveWith(obs ...builder.Observer) Option {
 func OverrideQuantities(qs quantity.FuzzSet) Option {
 	return func(f *Fuzzer) error {
 		f.quantities.Override(qs)
+		return nil
+	}
+}
+
+// UseConfig populates settings for the fuzzer from the configuration cfg.
+func UseConfig(cfg *fuzzer.Configuration) Option {
+	// TODO(@MattWindsor91): this should probably install specific settings instead of copying itself.
+	return func(f *Fuzzer) error {
+		f.config = cfg
 		return nil
 	}
 }

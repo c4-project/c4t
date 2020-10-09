@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
@@ -54,6 +56,8 @@ type Fuzzer struct {
 	paths SubjectPather
 	// quantities sets the quantities for this batch fuzzer run.
 	quantities quantity.FuzzSet
+	// config sets various options on the fuzzer itself.
+	config *fuzzer.Configuration
 }
 
 // New constructs a fuzzer with the config c and plan p.
@@ -152,6 +156,7 @@ func corpusSeeds(rng *rand.Rand, c corpus.Corpus) map[string]int64 {
 
 func (f *Fuzzer) makeInstance(s subject.Named, seed int64, m machine.Machine, resCh chan<- builder.Request) *Instance {
 	return &Instance{
+		Config:        f.config,
 		Driver:        f.driver,
 		Subject:       s,
 		SubjectCycles: f.quantities.SubjectCycles,

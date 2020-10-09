@@ -8,6 +8,8 @@ package director
 import (
 	"errors"
 
+	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
@@ -139,6 +141,14 @@ func FiltersFromFile(path string) Option {
 	}
 }
 
+// FuzzerConfig sets the fuzzer configuration to cfg.
+func FuzzerConfig(cfg *fuzzer2.Configuration) Option {
+	return func(d *Director) error {
+		d.fcfg = cfg
+		return nil
+	}
+}
+
 // Env groups together the bits of configuration that pertain to dealing with the environment.
 type Env struct {
 	// Fuzzer is a single-shot fuzzing driver.
@@ -175,6 +185,7 @@ func ConfigFromGlobal(g *config.Config) Option {
 		FiltersFromFile(g.Paths.FilterFile),
 		OutDir(g.Paths.OutDir),
 		OverrideQuantities(g.Quantities),
+		FuzzerConfig(g.Fuzz),
 		SSH(g.SSH),
 	)
 }

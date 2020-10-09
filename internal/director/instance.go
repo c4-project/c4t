@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"time"
 
+	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
@@ -60,6 +62,8 @@ type Instance struct {
 	MachConfig machine.Config
 	// SSHConfig contains top-level SSH configuration.
 	SSHConfig *remote.Config
+	// FuzzerConfig contains the fuzzer config for this machine.
+	FuzzerConfig *fuzzer2.Configuration
 	// stageConfig is the configuration for this instance's stages.
 	stageConfig *StageConfig
 

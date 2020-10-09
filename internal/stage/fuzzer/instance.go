@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
@@ -38,6 +40,9 @@ type Instance struct {
 	// Machine is the machine, if any, being targeted by the fuzzer.
 	// Knowledge of the machine can be used to shape things like thread counts.
 	Machine *machine.Machine
+
+	// Config is the specific configuration, if any, for the fuzzer.
+	Config *fuzzer.Configuration
 
 	// Pathset points to the pathset to use to work out where to store fuzz output.
 	Pathset SubjectPather
@@ -107,6 +112,7 @@ func (j *Instance) makeJob(sc SubjectCycle) job.Fuzzer {
 		Seed:    j.Rng.Int31(),
 		In:      j.Subject.Source.Path,
 		Machine: j.Machine,
+		Config:  j.Config,
 		// These two are filepaths, but the job stores slashpaths.
 		OutLitmus: filepath.ToSlash(j.Pathset.SubjectLitmus(sc)),
 		OutTrace:  filepath.ToSlash(j.Pathset.SubjectTrace(sc)),
