@@ -5,12 +5,7 @@
 
 package coverage
 
-import "errors"
-
-var (
-	// ErrConfigNil is produced when we supply a null pointer to OptionsFromConfig.
-	ErrConfigNil = errors.New("supplied config is nil")
-)
+import "github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
 // Option is the type of options to supply to the coverage testbed maker's constructor.
 type Option func(*Maker) error
@@ -35,14 +30,14 @@ func OverrideQuantities(qs QuantitySet) Option {
 	}
 }
 
-// OptionsFromConfig sets various options according to the values in Config.
-func OptionsFromConfig(cfg *Config) Option {
+func AddInputs(paths ...string) Option {
 	return func(maker *Maker) error {
-		if cfg == nil {
-			return ErrConfigNil
+		ps, err := iohelp.ExpandMany(paths)
+		if err != nil {
+			return err
 		}
-		return Options(
-			OverrideQuantities(cfg.Quantities),
-		)(maker)
+		maker.inputs = append(maker.inputs, ps...)
+
+		return nil
 	}
 }

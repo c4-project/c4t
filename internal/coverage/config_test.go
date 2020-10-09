@@ -20,6 +20,9 @@ func TestLoadConfigFromFile(t *testing.T) {
 	cfg, err := coverage.LoadConfigFromFile(filepath.Join("testdata", "coverage.toml"))
 	require.NoError(t, err, "loading coverage file from testdata")
 
+	assert.Equal(t, "~/coverage_out", cfg.Paths.OutDir, "outputs not as expected")
+	assert.ElementsMatch(t, []string{"~/input"}, cfg.Paths.Inputs, "inputs not as expected")
+
 	assert.Equal(t, 100_000, cfg.Quantities.Count, "count not as expected")
 	assert.ElementsMatch(t, []int{10, 10}, cfg.Quantities.Divisions, "divisions not as expected")
 }

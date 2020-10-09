@@ -13,6 +13,9 @@ type Pathset struct {
 	OutDir string `toml:"out_dir,omitempty,omitzero"`
 	// Inputs is the default set of inputs (files and/or directories) for the test director.
 	Inputs []string `toml:"inputs,omitempty,omitzero"`
+
+	// TODO(@MattWindsor91): delete FilterFile, turn it into convention over configuration?
+
 	// FilterFile is, if present, a path pointing to a YAML file containing analysis filter definitions.
 	FilterFile string `toml:"filter_file,omitempty,omitzero"`
 }

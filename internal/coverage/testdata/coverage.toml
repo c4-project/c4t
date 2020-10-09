@@ -1,4 +1,6 @@
-out_dir = "~/coverage_out"  # Output here
+[paths]
+  inputs = ["~/input"]
+  out_dir = "~/coverage_out"  # Output here
 
 [quantities]
   count = 100_000  # Do 100,000 tests per profile

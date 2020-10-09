@@ -9,10 +9,8 @@ package coverage
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/MattWindsor91/act-tester/internal/coverage"
-	"github.com/MattWindsor91/act-tester/internal/ux"
 
 	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
@@ -34,7 +32,7 @@ func App(outw, errw io.Writer) *c.App {
 		Usage: "makes a coverage testbed using a plan",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
-			return run(ctx, os.Stdout, os.Stderr)
+			return run(ctx)
 		},
 	}
 	return stdflag.SetCommonAppSettings(&a, outw, errw)
@@ -54,14 +52,14 @@ func flags() []c.Flag {
 	}
 }
 
-func run(ctx *c.Context, outw, _ io.Writer) error {
+func run(ctx *c.Context) error {
 	ccfg, err := coverage.LoadConfigFromFile(ctx.String(flagConfigFile))
 	if err != nil {
 		return fmt.Errorf("opening coverage config file: %w", err)
 	}
-	cm, err := coverage.NewMaker(ccfg.Profiles, coverage.OptionsFromConfig(ccfg))
+	cm, err := ccfg.MakeMaker()
 	if err != nil {
 		return fmt.Errorf("setting up the coverage maker: %w", err)
 	}
-	return ux.RunOnCliPlan(ctx, cm, outw)
+	return cm.Run(ctx.Context)
 }

@@ -6,9 +6,15 @@
 package coverage
 
 import (
+	"errors"
+
+	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
-	toml "github.com/pelletier/go-toml"
+	"github.com/pelletier/go-toml"
 )
+
+// ErrConfigNil is produced when we supply a null pointer to OptionsFromConfig.
+var ErrConfigNil = errors.New("supplied config is nil")
 
 // Profile tells the coverage generator how to set up a particular coverage profile.
 type Profile struct {
@@ -21,6 +27,9 @@ type Profile struct {
 
 // Config gathers the configuration present in coverage generator config files.
 type Config struct {
+	// Paths contains the input and output pathsets for the coverage generator.
+	Paths config.Pathset `toml:"paths"`
+
 	// Quantities contains quantities for the coverage generator.
 	Quantities QuantitySet `toml:"quantities"`
 
@@ -37,4 +46,15 @@ func LoadConfigFromFile(path string) (*Config, error) {
 	var c Config
 	err = tree.Unmarshal(&c)
 	return &c, err
+}
+
+// MakeMaker makes a maker using the configuration in cfg.
+func (cfg *Config) MakeMaker() (*Maker, error) {
+	if cfg == nil {
+		return nil, ErrConfigNil
+	}
+	return NewMaker(cfg.Paths.OutDir, cfg.Profiles,
+		OverrideQuantities(cfg.Quantities),
+		AddInputs(cfg.Paths.Inputs...),
+	)
 }

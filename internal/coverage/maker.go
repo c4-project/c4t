@@ -12,8 +12,6 @@ import (
 	"path/filepath"
 
 	"github.com/1set/gut/yos"
-
-	"github.com/MattWindsor91/act-tester/internal/plan"
 )
 
 // Maker contains state used by the coverage testbed maker.
@@ -26,29 +24,32 @@ type Maker struct {
 
 	// qs is the calculated quantity set for the coverage testbed maker.
 	qs QuantitySet
+
+	// inputs contains the filepaths to each input subject to use for fuzzing profiles that need them.
+	inputs []string
 }
 
 // NewMaker constructs a new coverage testbed maker.
-func NewMaker(profiles map[string]Profile, opts ...Option) (*Maker, error) {
-	m := &Maker{profiles: profiles}
+func NewMaker(outDir string, profiles map[string]Profile, opts ...Option) (*Maker, error) {
+	m := &Maker{outDir: outDir, profiles: profiles}
 	if err := Options(opts...)(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (m *Maker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
+func (m *Maker) Run(ctx context.Context) error {
 	buckets := m.qs.Buckets()
 	if buckets == nil {
-		return nil, errors.New("bucket calculation failed")
+		return errors.New("bucket calculation failed")
 	}
 
 	if err := m.prepare(buckets); m != nil {
-		return nil, err
+		return err
 	}
 
 	// for now
-	return p, nil
+	return nil
 }
 
 func (m *Maker) prepare(buckets map[string]int) error {
