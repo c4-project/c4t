@@ -9,6 +9,9 @@ package coverage
 import (
 	"fmt"
 	"io"
+	"log"
+
+	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
 
 	"github.com/MattWindsor91/act-tester/internal/coverage"
 
@@ -32,7 +35,7 @@ func App(outw, errw io.Writer) *c.App {
 		Usage: "makes a coverage testbed using a plan",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
-			return run(ctx)
+			return run(ctx, errw)
 		},
 	}
 	return stdflag.SetCommonAppSettings(&a, outw, errw)
@@ -40,7 +43,7 @@ func App(outw, errw io.Writer) *c.App {
 
 func flags() []c.Flag {
 	return []c.Flag{
-		//stdflag.VerboseFlag(),
+		stdflag.VerboseFlag(),
 		&c.StringFlag{
 			Name:      flagConfigFile,
 			Aliases:   []string{flagConfigFileShort},
@@ -52,12 +55,16 @@ func flags() []c.Flag {
 	}
 }
 
-func run(ctx *c.Context) error {
+func run(ctx *c.Context, errw io.Writer) error {
+	l := log.New(errw, "", log.LstdFlags)
 	ccfg, err := coverage.LoadConfigFromFile(ctx.String(flagConfigFile))
 	if err != nil {
 		return fmt.Errorf("opening coverage config file: %w", err)
 	}
-	cm, err := ccfg.MakeMaker()
+	cm, err := ccfg.MakeMaker(
+		coverage.SendStderrTo(errw),
+		coverage.ObserveWith(singleobs.Coverage(l, stdflag.Verbose(ctx))...),
+	)
 	if err != nil {
 		return fmt.Errorf("setting up the coverage maker: %w", err)
 	}

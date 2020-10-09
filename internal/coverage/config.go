@@ -23,6 +23,9 @@ type Profile struct {
 
 	// Run specifies, if this is a standalone profile, how to run the generator.
 	Run *service.RunInfo `toml:"run"`
+
+	// Runner specifies an overridden runner for the profile; this is basically useful only for testing.
+	Runner Runner
 }
 
 // Config gathers the configuration present in coverage generator config files.
@@ -49,12 +52,13 @@ func LoadConfigFromFile(path string) (*Config, error) {
 }
 
 // MakeMaker makes a maker using the configuration in cfg.
-func (cfg *Config) MakeMaker() (*Maker, error) {
+func (cfg *Config) MakeMaker(o ...Option) (*Maker, error) {
 	if cfg == nil {
 		return nil, ErrConfigNil
 	}
 	return NewMaker(cfg.Paths.OutDir, cfg.Profiles,
 		OverrideQuantities(cfg.Quantities),
 		AddInputs(cfg.Paths.Inputs...),
+		Options(o...),
 	)
 }

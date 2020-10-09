@@ -9,6 +9,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/coverage"
+
 	"github.com/MattWindsor91/act-tester/internal/director"
 
 	"github.com/MattWindsor91/act-tester/internal/copier"
@@ -64,4 +66,13 @@ func Copier(l *log.Logger, verbose bool) []copier.Observer {
 // Mach builds a list of observers suitable for observing machine node actions in single-shot binaries.
 func MachNode(l *log.Logger, verbose bool) []observer.Observer {
 	return director.LowerToMach(DirectorInstance(l, verbose))
+}
+
+// Coverage builds a list of observers suitable for observing coverage testbed generation.
+func Coverage(l *log.Logger, verbose bool) []coverage.Observer {
+	// TODO(@MattWindsor91): add bar support?
+	if !verbose {
+		return []coverage.Observer{}
+	}
+	return []coverage.Observer{(*Logger)(l)}
 }

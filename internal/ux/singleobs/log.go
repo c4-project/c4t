@@ -8,6 +8,8 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/coverage"
+
 	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
@@ -141,3 +143,27 @@ func (l *Logger) OnAnalysis(analysis.Analysis) {}
 
 // OnArchive does nothing, for now.
 func (l *Logger) OnArchive(saver.ArchiveMessage) {}
+
+// OnCoverageRun logs information about a coverage run in progress according to rm.
+func (l *Logger) OnCoverageRun(rm coverage.RunMessage) {
+	switch rm.Kind {
+	case observing.BatchStart:
+		l.onCoverageRunStart(rm.ProfileName, rm.Num)
+	case observing.BatchStep:
+		l.onCoverageRunStep(rm.ProfileName, rm.Num)
+	case observing.BatchEnd:
+		l.onCoverageRunEnd(rm.ProfileName)
+	}
+}
+
+func (l *Logger) onCoverageRunStart(name string, num int) {
+	(*log.Logger)(l).Printf("starting coverage profile %s (%d runs)...\n", name, num)
+}
+
+func (l *Logger) onCoverageRunStep(name string, num int) {
+	(*log.Logger)(l).Printf("- coverage profile %s: run %d\n", name, num)
+}
+
+func (l *Logger) onCoverageRunEnd(name string) {
+	(*log.Logger)(l).Printf("finished coverage profile %s\n", name)
+}
