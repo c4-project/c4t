@@ -7,6 +7,7 @@
 package coverage
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -22,7 +23,8 @@ const (
 	flagConfigFileShort = "c"
 	usageConfigFile     = "Path to config file for coverage (not the tester config file!)"
 
-	defaultOutDir = "coverage"
+	defaultConfigFile = "coverage.toml"
+	defaultOutDir     = "coverage"
 )
 
 // App creates the act-tester-coverage app.
@@ -46,20 +48,20 @@ func flags() []c.Flag {
 			Aliases:   []string{flagConfigFileShort},
 			Usage:     usageConfigFile,
 			TakesFile: true,
+			Value:     defaultConfigFile,
 		},
 		stdflag.OutDirCliFlag(defaultOutDir),
 	}
 }
 
-func run(ctx *c.Context, outw, _errw io.Writer) error {
+func run(ctx *c.Context, outw, _ io.Writer) error {
 	ccfg, err := coverage.LoadConfigFromFile(ctx.String(flagConfigFile))
 	if err != nil {
-		return err
+		return fmt.Errorf("opening coverage config file: %w", err)
 	}
-
 	cm, err := coverage.NewMaker(ccfg.Profiles, coverage.OptionsFromConfig(ccfg))
 	if err != nil {
-		return err
+		return fmt.Errorf("setting up the coverage maker: %w", err)
 	}
 	return ux.RunOnCliPlan(ctx, cm, outw)
 }
