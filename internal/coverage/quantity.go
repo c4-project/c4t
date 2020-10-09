@@ -37,6 +37,11 @@ func (q *QuantitySet) Override(other QuantitySet) {
 func (q *QuantitySet) Buckets() map[string]int {
 	buckets := map[string]int{}
 
+	// This doesn't have particularly elegant properties, but it seems like it's the most obvious result.
+	if q.Count <= 0 {
+		return buckets
+	}
+
 	// No divisions should be the same as a single all-encompassing division.
 	divs := q.Divisions
 	if len(divs) == 0 {
