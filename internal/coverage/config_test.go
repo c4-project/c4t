@@ -25,4 +25,13 @@ func TestLoadConfigFromFile(t *testing.T) {
 
 	assert.Equal(t, 100_000, cfg.Quantities.Count, "count not as expected")
 	assert.ElementsMatch(t, []int{10, 10}, cfg.Quantities.Divisions, "divisions not as expected")
+
+	if assert.Contains(t, cfg.Profiles, "csmith", "profiles should contain csmith") {
+		p := cfg.Profiles["csmith"]
+		assert.Equal(t, coverage.Standalone, p.Kind, "csmith profile kind not as expected")
+		if assert.NotNil(t, p.Run, "csmith run info not present") {
+			assert.Equal(t, "csmith", p.Run.Cmd, "csmith command not as expected")
+			assert.ElementsMatch(t, []string{"-s", "${seed}", "-o", "${outputDir}/${i}.c", "${input}"}, p.Run.Args, "csmith args not as expected")
+		}
+	}
 }

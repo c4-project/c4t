@@ -8,6 +8,10 @@ package coverage
 import (
 	"errors"
 
+	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 	"github.com/pelletier/go-toml"
@@ -23,6 +27,9 @@ type Profile struct {
 
 	// Run specifies, if this is a standalone profile, how to run the generator.
 	Run *service.RunInfo `toml:"run"`
+
+	// Fuzz specifies a fuzzer configuration to use if this is an known-fuzzer profile.
+	Fuzz *fuzzer2.Configuration `toml:"fuzz"`
 
 	// Runner specifies an overridden runner for the profile; this is basically useful only for testing.
 	Runner Runner
@@ -51,14 +58,29 @@ func LoadConfigFromFile(path string) (*Config, error) {
 	return &c, err
 }
 
+func OptionsFromConfig(cfg *Config) Option {
+	return Options(
+		OverrideQuantities(cfg.Quantities),
+		AddInputs(cfg.Paths.Inputs...),
+	)
+}
+
+// UseFuzzer adds support for f as a 'known' fuzzer.
+func UseFuzzer(f fuzzer.SingleFuzzer) Option {
+	return func(maker *Maker) error {
+		// TODO(@MattWindsor91): multiple known fuzzers
+		maker.fuzz = f
+		return nil
+	}
+}
+
 // MakeMaker makes a maker using the configuration in cfg.
 func (cfg *Config) MakeMaker(o ...Option) (*Maker, error) {
 	if cfg == nil {
 		return nil, ErrConfigNil
 	}
 	return NewMaker(cfg.Paths.OutDir, cfg.Profiles,
-		OverrideQuantities(cfg.Quantities),
-		AddInputs(cfg.Paths.Inputs...),
+		OptionsFromConfig(cfg),
 		Options(o...),
 	)
 }

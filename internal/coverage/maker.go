@@ -14,11 +14,11 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"golang.org/x/sync/errgroup"
-
-	"github.com/1set/gut/yos"
 )
 
 // Maker contains state used by the coverage testbed maker.
@@ -28,6 +28,11 @@ type Maker struct {
 
 	// profiles contains the map of profiles available to the coverage testbed maker.
 	profiles map[string]Profile
+
+	// TODO(@MattWindsor91): Add multiple fuzzers
+
+	// fuzz tells the maker how to run act-fuzz.
+	fuzz fuzzer.SingleFuzzer
 
 	// qs is the calculated quantity set for the coverage testbed maker.
 	qs QuantitySet
@@ -59,11 +64,6 @@ func (m *Maker) Run(ctx context.Context) error {
 	if buckets == nil {
 		return errors.New("bucket calculation failed")
 	}
-
-	if err := m.prepare(buckets); err != nil {
-		return err
-	}
-
 	return m.runProfiles(ctx, buckets)
 }
 
@@ -77,28 +77,34 @@ func (m *Maker) runProfiles(ctx context.Context, buckets map[string]int) error {
 		if err != nil {
 			return err
 		}
+
 		eg.Go(func() error {
 			return pm.run(ectx)
 		})
 	}
 	eg.Go(func() error {
-		want := len(m.profiles)
-		for {
-			select {
-			case <-ectx.Done():
-				return ectx.Err()
-			case rm := <-obs:
-				OnCoverageRun(rm, m.observers...)
-				if rm.Kind == observing.BatchEnd {
-					want--
-					if want == 0 {
-						return nil
-					}
+		return m.fanInObservations(ectx, obs)
+	})
+	return eg.Wait()
+}
+
+func (m *Maker) fanInObservations(ectx context.Context, obs <-chan RunMessage) error {
+	// TODO(@MattWindsor91): consider generalising/replicating this fan-in pattern
+	want := len(m.profiles)
+	for {
+		select {
+		case <-ectx.Done():
+			return ectx.Err()
+		case rm := <-obs:
+			OnCoverageRun(rm, m.observers...)
+			if rm.Kind == observing.BatchEnd {
+				want--
+				if want == 0 {
+					return nil
 				}
 			}
 		}
-	})
-	return eg.Wait()
+	}
 }
 
 func (m *Maker) makeProfileMaker(pname string, p Profile, buckets map[string]int, obsCh chan<- RunMessage) (*profileMaker, error) {
@@ -107,7 +113,7 @@ func (m *Maker) makeProfileMaker(pname string, p Profile, buckets map[string]int
 		return nil, err
 	}
 
-	return &profileMaker{
+	pm := &profileMaker{
 		name:    pname,
 		dir:     filepath.Join(m.outDir, pname),
 		profile: p,
@@ -116,20 +122,10 @@ func (m *Maker) makeProfileMaker(pname string, p Profile, buckets map[string]int
 		runner:  runner,
 		obsCh:   obsCh,
 		rng:     rand.New(rand.NewSource(m.rng.Int63())),
-	}, nil
-}
-
-func (m *Maker) prepare(buckets map[string]int) error {
-	for pname := range m.profiles {
-		for suffix := range buckets {
-			if err := yos.MakeDir(m.bucketDir(pname, suffix)); err != nil {
-				return fmt.Errorf("preparing directory for profile %q bucket %q: %w", pname, suffix, err)
-			}
-		}
 	}
-	return nil
-}
 
-func (m *Maker) bucketDir(pname string, suffix string) string {
-	return filepath.Join(m.outDir, pname, suffix)
+	if err := pm.mkdirs(); err != nil {
+		return nil, fmt.Errorf("preparing directories for profile %q: %w", pname, err)
+	}
+	return pm, nil
 }

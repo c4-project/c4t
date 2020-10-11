@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 	"github.com/MattWindsor91/act-tester/internal/subject"
@@ -51,32 +52,19 @@ func (r RunnerContext) inputPath() string {
 	return filepath.Clean(l.Path)
 }
 
-// outputPath gets the filepath to which the runner should output one C file.
-func (r RunnerContext) outputPath() string {
-	return filepath.Join(r.BucketDir, fmt.Sprintf("%d.c", r.NumInBucket))
-}
-
 // ExpandArgs expands various special identifiers in args to parts of the runner context.
 func (r RunnerContext) ExpandArgs(arg ...string) []string {
+	replacer := strings.NewReplacer(
+		"${seed}", strconv.Itoa(int(r.Seed)),
+		"${input}", r.inputPath(),
+		"${outputDir}", r.BucketDir,
+		"${i}", strconv.Itoa(r.NumInBucket),
+	)
 	nargs := make([]string, len(arg))
 	for i, a := range arg {
-		nargs[i] = r.expandArg(a)
-
+		nargs[i] = replacer.Replace(a)
 	}
 	return nargs
-}
-
-func (r RunnerContext) expandArg(arg string) string {
-	switch arg {
-	case "$seed":
-		return strconv.Itoa(int(r.Seed))
-	case "$input":
-		return r.inputPath()
-	case "$output":
-		return r.outputPath()
-	default:
-		return arg
-	}
 }
 
 // Runner is the interface of things that can be run to generate coverage testbeds.

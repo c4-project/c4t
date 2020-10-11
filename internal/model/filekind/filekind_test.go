@@ -27,6 +27,19 @@ func ExampleKind_Strings() {
 	// trace
 }
 
+// ExampleKindFromStrings is a runnable example for KindFromStrings.
+func ExampleKindFromStrings() {
+	k, err := filekind.KindFromStrings("other", "c")
+	if err != nil {
+		fmt.Println("ERROR:", err)
+	} else {
+		fmt.Println(k.String())
+	}
+
+	// Output:
+	// other|c
+}
+
 // TestKind_Matches tests various combinations of kind matching.
 func TestKind_Matches(t *testing.T) {
 	t.Parallel()

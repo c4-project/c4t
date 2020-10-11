@@ -22,7 +22,7 @@ func ExampleRunnerContext_ExpandArgs() {
 		NumInBucket: 42,
 		Input:       subject.NewOrPanic(litmus.New("foo/bar.litmus")),
 	}
-	args := rc.ExpandArgs("-seed", "$seed", "-o", "$output", "$input")
+	args := rc.ExpandArgs("-seed", "${seed}", "-o", "${outputDir}/${i}.c", "${input}")
 	for _, arg := range args {
 		fmt.Println(filepath.ToSlash(arg))
 	}

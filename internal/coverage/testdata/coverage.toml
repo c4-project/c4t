@@ -15,4 +15,4 @@
 [profiles.csmith]
   kind = "Standalone"  # This fuzzer is one that the tester framework doesn't know about
   run.cmd = "csmith"
-  run.args = ["-s", "$SEED"]
+  run.args = ["-s", "${seed}", "-o", "${outputDir}/${i}.c", "${input}"]

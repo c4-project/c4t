@@ -17,6 +17,8 @@ type SingleFuzzer interface {
 	Fuzz(context.Context, job.Fuzzer) error
 }
 
+//go:generate mockery --name=SingleFuzzer
+
 // NopFuzzer is a single-fuzzer that does nothing.
 type NopFuzzer struct{}
 

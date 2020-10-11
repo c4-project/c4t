@@ -7,8 +7,11 @@ package coverage
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"path/filepath"
+
+	"github.com/1set/gut/yos"
 )
 
 // profileMaker governs the making of a testbed under one particular coverage profile.
@@ -61,4 +64,18 @@ func (p *profileMaker) makeRunContext(suffix string, i int) RunnerContext {
 		NumInBucket: i,
 		Input:       nil,
 	}
+}
+
+func (p *profileMaker) mkdirs() error {
+	for suffix := range p.buckets {
+		bdir := p.bucketDir(suffix)
+		if err := yos.MakeDir(bdir); err != nil {
+			return fmt.Errorf("preparing directory for profile %q bucket %q: %w", p.name, suffix, err)
+		}
+	}
+	return nil
+}
+
+func (p *profileMaker) bucketDir(suffix string) string {
+	return filepath.Join(p.dir, suffix)
 }

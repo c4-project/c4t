@@ -42,7 +42,7 @@ func App(outw, errw io.Writer) *c.App {
 }
 
 func flags() []c.Flag {
-	return []c.Flag{
+	ownFlags := []c.Flag{
 		stdflag.VerboseFlag(),
 		&c.StringFlag{
 			Name:      flagConfigFile,
@@ -53,6 +53,7 @@ func flags() []c.Flag {
 		},
 		stdflag.OutDirCliFlag(defaultOutDir),
 	}
+	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, errw io.Writer) error {
@@ -63,6 +64,7 @@ func run(ctx *c.Context, errw io.Writer) error {
 	}
 	cm, err := ccfg.MakeMaker(
 		coverage.SendStderrTo(errw),
+		coverage.UseFuzzer(stdflag.ActRunnerFromCli(ctx, errw)),
 		coverage.ObserveWith(singleobs.Coverage(l, stdflag.Verbose(ctx))...),
 	)
 	if err != nil {
