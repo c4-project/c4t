@@ -8,6 +8,11 @@ package coverage
 import (
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/mitchellh/go-homedir"
+
+	"github.com/MattWindsor91/act-tester/internal/model/id"
+
 	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
@@ -24,6 +29,12 @@ var ErrConfigNil = errors.New("supplied config is nil")
 type Profile struct {
 	// Kind specifies the type of fuzzer profile this is.
 	Kind ProfileKind `toml:"kind"`
+
+	// Arch is the target architecture for the profile, if it uses one.
+	Arch id.ID `toml:"arch"`
+
+	// Backend directly feeds in the target backend for the profile, if it uses one.
+	Backend *service.Backend `toml:"backend"`
 
 	// Run specifies, if this is a standalone profile, how to run the generator.
 	Run *service.RunInfo `toml:"run"`
@@ -74,12 +85,24 @@ func UseFuzzer(f fuzzer.SingleFuzzer) Option {
 	}
 }
 
+// UseLifter adds support for l as the source of lifters.
+func UseLifter(l lifter.SingleLifter) Option {
+	return func(maker *Maker) error {
+		maker.lift = l
+		return nil
+	}
+}
+
 // MakeMaker makes a maker using the configuration in cfg.
 func (cfg *Config) MakeMaker(o ...Option) (*Maker, error) {
 	if cfg == nil {
 		return nil, ErrConfigNil
 	}
-	return NewMaker(cfg.Paths.OutDir, cfg.Profiles,
+	od, err := homedir.Expand(cfg.Paths.OutDir)
+	if err != nil {
+		return nil, err
+	}
+	return NewMaker(od, cfg.Profiles,
 		OptionsFromConfig(cfg),
 		Options(o...),
 	)

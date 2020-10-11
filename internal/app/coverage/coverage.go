@@ -11,6 +11,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
 
 	"github.com/MattWindsor91/act-tester/internal/coverage"
@@ -62,9 +64,11 @@ func run(ctx *c.Context, errw io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("opening coverage config file: %w", err)
 	}
+	a := stdflag.ActRunnerFromCli(ctx, errw)
 	cm, err := ccfg.MakeMaker(
 		coverage.SendStderrTo(errw),
-		coverage.UseFuzzer(stdflag.ActRunnerFromCli(ctx, errw)),
+		coverage.UseFuzzer(a),
+		coverage.UseLifter(&backend.BResolve),
 		coverage.ObserveWith(singleobs.Coverage(l, stdflag.Verbose(ctx))...),
 	)
 	if err != nil {

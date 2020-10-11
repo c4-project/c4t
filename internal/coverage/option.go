@@ -8,6 +8,8 @@ package coverage
 import (
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 )
@@ -53,7 +55,12 @@ func AddInputs(paths ...string) Option {
 		if err != nil {
 			return err
 		}
-		maker.inputs = append(maker.inputs, ps...)
+		// TODO(@MattWindsor91): handle the other uses of this expansion at the option level?
+		fs, err := planner.ExpandLitmusInputs(ps)
+		if err != nil {
+			return err
+		}
+		maker.inputs = append(maker.inputs, fs...)
 
 		return nil
 	}

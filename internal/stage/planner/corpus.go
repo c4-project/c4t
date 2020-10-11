@@ -26,7 +26,7 @@ type SubjectProber interface {
 }
 
 func (p *Planner) planCorpus(ctx context.Context, fs ...string) (corpus.Corpus, error) {
-	files, err := expandFiles(fs)
+	files, err := ExpandLitmusInputs(fs)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,10 @@ func (p *CorpusPlanner) makeBuilderConfig() builder.Config {
 	}
 }
 
-func expandFiles(in []string) ([]string, error) {
+// ExpandLitmusInputs expands a list of possible Litmus files or containing directories into a flat file list.
+func ExpandLitmusInputs(in []string) ([]string, error) {
+	// TODO(@MattWindsor91): abstract this properly, it's only exposed because the coverage thing uses it too.
+
 	files := make([]string, 0, len(in))
 	var err error
 	for _, f := range in {

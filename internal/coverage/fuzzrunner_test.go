@@ -6,11 +6,16 @@
 package coverage_test
 
 import (
+	"bytes"
 	"context"
-	"fmt"
-	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+
+	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/act-tester/internal/model/service"
+	mocks2 "github.com/MattWindsor91/act-tester/internal/stage/lifter/mocks"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/stretchr/testify/mock"
@@ -30,27 +35,45 @@ import (
 func TestFuzzRunner_Run(t *testing.T) {
 	td := t.TempDir()
 
-	var m mocks.SingleFuzzer
+	var (
+		f mocks.SingleFuzzer
+		l mocks2.SingleLifter
+		b bytes.Buffer
+	)
 
 	conf := fuzzer.Configuration{Params: map[string]string{"fus": "ro dah"}}
-	fr := coverage.FuzzRunner{Fuzzer: &m, Config: &conf}
+	fr := coverage.FuzzRunner{
+		Fuzzer:  &f,
+		Lifter:  &l,
+		Config:  &conf,
+		Arch:    id.ArchX86,
+		Backend: &service.Backend{Style: id.FromString("litmus")},
+		ErrW:    &b,
+	}
 	sub := subject.NewOrPanic(litmus.New("foo.litmus"))
-	rc := coverage.RunnerContext{
+	rc := coverage.RunContext{
 		Seed:        4321,
 		BucketDir:   td,
 		NumInBucket: 1,
 		Input:       sub,
 	}
 
-	m.On("Fuzz", mock.Anything, mock.MatchedBy(func(f job.Fuzzer) bool {
+	f.On("Fuzz", mock.Anything, mock.MatchedBy(func(f job.Fuzzer) bool {
 		return f.Seed == rc.Seed &&
-			f.OutLitmus == filepath.Join(td, fmt.Sprintf("%d.litmus", rc.NumInBucket)) &&
+			f.OutLitmus == rc.OutLitmus() &&
 			f.Config != nil &&
 			reflect.DeepEqual(conf, *(f.Config))
 	})).Return(nil).Once()
+	l.On("Lift", mock.Anything, mock.MatchedBy(func(l job.Lifter) bool {
+		return l.Arch.Equal(fr.Arch) &&
+			l.Backend == fr.Backend &&
+			l.In.Filepath() == rc.OutLitmus() &&
+			l.OutDir == rc.LiftOutDir()
+	}), &b).Return(recipe.Recipe{}, nil).Once()
 
 	err := fr.Run(context.Background(), rc)
 	require.NoError(t, err, "mock fuzz run shouldn't error")
 
-	m.AssertExpectations(t)
+	f.AssertExpectations(t)
+	l.AssertExpectations(t)
 }

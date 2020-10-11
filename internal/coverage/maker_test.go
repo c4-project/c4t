@@ -65,7 +65,7 @@ func TestMaker_Run(t *testing.T) {
 func mockRun(mr *mocks.Runner, pname, rootdir, bdir string, bsize int) {
 	for i := 0; i < bsize; i++ {
 		i := i
-		mr.On("Run", mock.Anything, mock.MatchedBy(func(mr coverage.RunnerContext) bool {
+		mr.On("Run", mock.Anything, mock.MatchedBy(func(mr coverage.RunContext) bool {
 			return mr.NumInBucket == i && mr.BucketDir == filepath.Join(rootdir, pname, bdir)
 		})).Return(nil).Once()
 	}

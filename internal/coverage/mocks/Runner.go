@@ -15,11 +15,11 @@ type Runner struct {
 }
 
 // Run provides a mock function with given fields: ctx, rc
-func (_m *Runner) Run(ctx context.Context, rc coverage.RunnerContext) error {
+func (_m *Runner) Run(ctx context.Context, rc coverage.RunContext) error {
 	ret := _m.Called(ctx, rc)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, coverage.RunnerContext) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, coverage.RunContext) error); ok {
 		r0 = rf(ctx, rc)
 	} else {
 		r0 = ret.Error(0)

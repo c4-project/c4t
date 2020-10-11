@@ -10,6 +10,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/1set/gut/ystring"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job"
@@ -28,7 +30,11 @@ func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
 		return err
 	}
 
-	args := []string{"-config", cf, "-seed", seedStr, "-o", j.OutLitmus, "-trace-output", j.OutTrace, j.In}
+	args := []string{"-config", cf, "-seed", seedStr, "-o", j.OutLitmus}
+	if ystring.IsNotEmpty(j.OutTrace) {
+		args = append(args, "-trace-output", j.OutTrace, j.In)
+	}
+	args = append(args, j.In)
 	cmd := a.CommandContext(ctx, BinActFuzz, "run", sargs, args...)
 
 	cerr := cmd.Run()

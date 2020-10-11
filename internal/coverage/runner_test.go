@@ -14,9 +14,9 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
-// ExampleRunnerContext_ExpandArgs is a runnable example for RunnerContext.ExpandArgs.
-func ExampleRunnerContext_ExpandArgs() {
-	rc := coverage.RunnerContext{
+// ExampleRunContext_ExpandArgs is a runnable example for RunContext.ExpandArgs.
+func ExampleRunContext_ExpandArgs() {
+	rc := coverage.RunContext{
 		Seed:        8675309,
 		BucketDir:   "bucket1,1",
 		NumInBucket: 42,

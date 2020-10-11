@@ -107,6 +107,7 @@ func (j *Logger) Close() error {
 }
 
 func (j *Logger) runStep(ctx context.Context) error {
+	// TODO(@MattWindsor91): fix blocking writes on these channels.
 	select {
 	case <-ctx.Done():
 		return ctx.Err()

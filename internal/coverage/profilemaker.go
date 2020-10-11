@@ -11,6 +11,9 @@ import (
 	"math/rand"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/act-tester/internal/subject"
+
 	"github.com/1set/gut/yos"
 )
 
@@ -20,6 +23,7 @@ type profileMaker struct {
 	dir     string
 	profile Profile
 	buckets map[string]int
+	inputs  []string
 	total   int
 	runner  Runner
 	rng     *rand.Rand
@@ -34,6 +38,9 @@ func (p *profileMaker) run(ctx context.Context) error {
 
 	p.nstep = 0
 	for suffix, bsize := range p.buckets {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		if err := p.runBucket(ctx, bsize, suffix); err != nil {
 			return err
 		}
@@ -45,10 +52,16 @@ func (p *profileMaker) run(ctx context.Context) error {
 
 func (p *profileMaker) runBucket(ctx context.Context, bsize int, suffix string) error {
 	for i := 0; i < bsize; i++ {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		p.nstep++
 
-		rc := p.makeRunContext(suffix, i)
-		p.obsCh <- RunStep(p.nstep, rc)
+		rc, err := p.makeRunContext(suffix, i)
+		if err != nil {
+			return err
+		}
+		p.obsCh <- RunStep(p.name, p.nstep, rc)
 		if err := p.runner.Run(ctx, rc); err != nil {
 			return err
 		}
@@ -56,14 +69,15 @@ func (p *profileMaker) runBucket(ctx context.Context, bsize int, suffix string) 
 	return nil
 }
 
-func (p *profileMaker) makeRunContext(suffix string, i int) RunnerContext {
-	return RunnerContext{
+func (p *profileMaker) makeRunContext(suffix string, i int) (RunContext, error) {
+	in, err := p.randomInput()
+	return RunContext{
 		// Using 32-bit seed for compatibility with things like act-fuzz.
 		Seed:        p.rng.Int31(),
 		BucketDir:   filepath.Join(p.dir, suffix),
 		NumInBucket: i,
-		Input:       nil,
-	}
+		Input:       in,
+	}, err
 }
 
 func (p *profileMaker) mkdirs() error {
@@ -78,4 +92,14 @@ func (p *profileMaker) mkdirs() error {
 
 func (p *profileMaker) bucketDir(suffix string) string {
 	return filepath.Join(p.dir, suffix)
+}
+
+func (p *profileMaker) randomInput() (*subject.Subject, error) {
+	nin := len(p.inputs)
+	// TODO(@MattWindsor91): probe the subject properly?
+	if nin == 0 {
+		return nil, nil
+	}
+	input := p.inputs[p.rng.Intn(nin)]
+	return subject.New(litmus.New(filepath.ToSlash(input)))
 }

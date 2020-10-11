@@ -5,7 +5,9 @@
 
 package coverage
 
-import "github.com/MattWindsor91/act-tester/internal/observing"
+import (
+	"github.com/MattWindsor91/act-tester/internal/observing"
+)
 
 // Observer is the interface of types that can observe the progress of a coverage testbed generator.
 type Observer interface {
@@ -26,7 +28,7 @@ type RunMessage struct {
 	Profile *Profile
 
 	// Context contains the runner context on step messages.
-	Context *RunnerContext
+	Context *RunContext
 }
 
 // OnCoverageRun broadcasts run message rm to all observers o.
@@ -48,14 +50,15 @@ func RunStart(pname string, p Profile, nruns int) RunMessage {
 	}
 }
 
-// RunStep announces that a coverage run instance, number i, with runner context rc, is starting.
-func RunStep(i int, rc RunnerContext) RunMessage {
+// RunStep announces that a coverage run instance, number i, in profile pname and with runner context rc, is starting.
+func RunStep(pname string, i int, rc RunContext) RunMessage {
 	return RunMessage{
 		Batch: observing.Batch{
 			Kind: observing.BatchStep,
 			Num:  i,
 		},
-		Context: &rc,
+		ProfileName: pname,
+		Context:     &rc,
 	}
 }
 
