@@ -12,6 +12,8 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/1set/gut/yos"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	litmus2 "github.com/MattWindsor91/act-tester/internal/model/litmus"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -25,6 +27,7 @@ import (
 
 var (
 	// TODO(@MattWindsor91): this feels like it's duplicating a lot of logic elsewhere in the tester.
+	// TODO(@MattWindsor91): this actually feels like a good starting point for a single-file runner for bisection etc.
 
 	// ErrNoArch occurs when we try to run a lifted fuzzer for coverage and haven't a target architecture.
 	ErrNoArch = errors.New("this runner needs an architecture set, but got none")
@@ -32,16 +35,21 @@ var (
 	ErrNoFuzzer = errors.New("this runner needs a fuzzer, but got none")
 	// ErrNoLifter occurs when we try to run a lifted fuzzer for coverage but the lifter is nil.
 	ErrNoLifter = errors.New("this runner needs a lifter, but got none")
+	// ErrNoStatDumper occurs when we try to run a lifted fuzzer for coverage but the statistic dumper is nil.
+	ErrNoStatDumper = errors.New("this runner needs a lifter, but got none")
 	// ErrNoInput occurs when we try to run a mutating fuzzer for coverage and haven't any input to feed it.
 	ErrNoInput = errors.New("this runner needs input testcases, but got none")
 )
 
 // FuzzRunner is a coverage runner that uses the act fuzzer.
 type FuzzRunner struct {
+	// TODO(@MattWindsor91): this overlaps with Env in director.
 	// Fuzzer is the fuzzer this fuzz runner uses.
 	Fuzzer fuzzer.SingleFuzzer
-	// Lifter is the lifter this lifter uses.
+	// Lifter is the lifter this fuzz runner uses.
 	Lifter lifter.SingleLifter
+	// StatDumper is the statistics dumper this fuzz runner uses between fuzzing and lifting.
+	StatDumper litmus2.StatDumper
 	// Config is the configuration to pass to the fuzz runner.
 	Config *fuzzer2.Configuration
 
@@ -73,6 +81,9 @@ func (f *FuzzRunner) check() error {
 	if f.Lifter == nil {
 		return ErrNoLifter
 	}
+	if f.StatDumper == nil {
+		return ErrNoStatDumper
+	}
 	if f.Arch.IsEmpty() {
 		return ErrNoArch
 	}
@@ -101,17 +112,24 @@ func (f *FuzzRunner) fuzzJob(rc RunContext) (job.Fuzzer, error) {
 	}, nil
 }
 
-func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, litmus string) error {
+func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, lpath string) error {
+	if err := yos.MakeDir(rc.LiftOutDir()); err != nil {
+		return fmt.Errorf("making dir for lift output: %w", err)
+	}
+	litmus, err := litmus2.NewWithStats(ctx, lpath, f.StatDumper)
+	if err != nil {
+		return fmt.Errorf("getting stats of generated litmus file %q: %w", lpath, err)
+	}
 	// TODO(@MattWindsor91): do something with the recipe
-	_, err := f.Lifter.Lift(ctx, f.liftJob(litmus, rc), f.ErrW)
+	_, err = f.Lifter.Lift(ctx, f.liftJob(litmus, rc), f.ErrW)
 	return err
 }
 
-func (f *FuzzRunner) liftJob(litmus string, rc RunContext) job.Lifter {
+func (f *FuzzRunner) liftJob(litmus *litmus2.Litmus, rc RunContext) job.Lifter {
 	return job.Lifter{
 		Backend: f.Backend,
 		Arch:    f.Arch,
-		In:      *litmus2.New(filepath.ToSlash(litmus)),
+		In:      *litmus,
 		OutDir:  rc.LiftOutDir(),
 	}
 }

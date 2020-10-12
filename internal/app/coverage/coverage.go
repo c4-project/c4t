@@ -68,6 +68,7 @@ func run(ctx *c.Context, errw io.Writer) error {
 	cm, err := ccfg.MakeMaker(
 		coverage.SendStderrTo(errw),
 		coverage.UseFuzzer(a),
+		coverage.UseStatDumper(a),
 		coverage.UseLifter(&backend.BResolve),
 		coverage.ObserveWith(singleobs.Coverage(l, stdflag.Verbose(ctx))...),
 	)

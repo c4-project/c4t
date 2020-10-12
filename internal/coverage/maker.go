@@ -15,6 +15,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
@@ -50,6 +52,9 @@ type Maker struct {
 
 	// lift tells the maker how to run its internal lifter.
 	lift lifter.SingleLifter
+
+	// sdump tells the maker how to dump statistics.
+	sdump litmus.StatDumper
 
 	// qs is the calculated quantity set for the coverage testbed maker.
 	qs QuantitySet
@@ -198,11 +203,12 @@ func (m *Maker) knownRunner(p Profile) (Runner, error) {
 		return nil, ErrNeedBackend
 	}
 	return &FuzzRunner{
-		Fuzzer:  m.fuzz,
-		Lifter:  m.lift,
-		Config:  p.Fuzz,
-		Arch:    p.Arch,
-		Backend: p.Backend,
-		ErrW:    m.errw,
+		Fuzzer:     m.fuzz,
+		Lifter:     m.lift,
+		StatDumper: m.sdump,
+		Config:     p.Fuzz,
+		Arch:       p.Arch,
+		Backend:    p.Backend,
+		ErrW:       m.errw,
 	}, nil
 }

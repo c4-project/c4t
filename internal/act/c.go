@@ -20,6 +20,7 @@ const BinActC = "act-c"
 
 // ProbeSubject probes the litmus test at path, returning a named subject record.
 func (a *Runner) ProbeSubject(ctx context.Context, path string) (*subject.Named, error) {
+	// TODO(@MattWindsor91): stat dumping and subject probing should likely be two separate things.
 	var h Header
 	if err := a.DumpHeader(ctx, &h, path); err != nil {
 		return nil, fmt.Errorf("header read on %s failed: %w", path, err)

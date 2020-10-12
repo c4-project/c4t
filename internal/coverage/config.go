@@ -8,6 +8,8 @@ package coverage
 import (
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 	"github.com/mitchellh/go-homedir"
 
@@ -81,6 +83,14 @@ func UseFuzzer(f fuzzer.SingleFuzzer) Option {
 	return func(maker *Maker) error {
 		// TODO(@MattWindsor91): multiple known fuzzers
 		maker.fuzz = f
+		return nil
+	}
+}
+
+// UseStatDumper adds support for d as the statistics dumper.
+func UseStatDumper(d litmus.StatDumper) Option {
+	return func(maker *Maker) error {
+		maker.sdump = d
 		return nil
 	}
 }

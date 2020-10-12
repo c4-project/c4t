@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"testing"
 
+	mocks3 "github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
+
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -38,17 +40,19 @@ func TestFuzzRunner_Run(t *testing.T) {
 	var (
 		f mocks.SingleFuzzer
 		l mocks2.SingleLifter
+		s mocks3.StatDumper
 		b bytes.Buffer
 	)
 
 	conf := fuzzer.Configuration{Params: map[string]string{"fus": "ro dah"}}
 	fr := coverage.FuzzRunner{
-		Fuzzer:  &f,
-		Lifter:  &l,
-		Config:  &conf,
-		Arch:    id.ArchX86,
-		Backend: &service.Backend{Style: id.FromString("litmus")},
-		ErrW:    &b,
+		Fuzzer:     &f,
+		Lifter:     &l,
+		StatDumper: &s,
+		Config:     &conf,
+		Arch:       id.ArchX86,
+		Backend:    &service.Backend{Style: id.FromString("litmus")},
+		ErrW:       &b,
 	}
 	sub := subject.NewOrPanic(litmus.New("foo.litmus"))
 	rc := coverage.RunContext{
@@ -70,10 +74,12 @@ func TestFuzzRunner_Run(t *testing.T) {
 			l.In.Filepath() == rc.OutLitmus() &&
 			l.OutDir == rc.LiftOutDir()
 	}), &b).Return(recipe.Recipe{}, nil).Once()
+	s.On("DumpStats", mock.Anything, mock.AnythingOfType("*litmus.Statset"), rc.OutLitmus()).Return(nil).Once()
 
 	err := fr.Run(context.Background(), rc)
 	require.NoError(t, err, "mock fuzz run shouldn't error")
 
 	f.AssertExpectations(t)
 	l.AssertExpectations(t)
+	s.AssertExpectations(t)
 }
