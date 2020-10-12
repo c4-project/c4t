@@ -122,7 +122,7 @@ func (j *Logger) runStep(ctx context.Context) error {
 }
 
 // OnPrepare logs the preparation attempts of a director.
-func (j *Logger) OnPrepare(qs quantity.RootSet, ps pathset.Pathset) {
+func (j *Logger) OnPrepare(qs quantity.RootSet, _ pathset.Pathset) {
 	qs.Log(j.l)
 }
 

@@ -22,7 +22,7 @@ import (
 func TestNew_errors(t *testing.T) {
 	t.Parallel()
 
-	opterr := errors.New("oopsie!")
+	opterr := errors.New("oopsie")
 
 	cases := map[string]struct {
 		// ddelta modifies the driver from a known-working value.

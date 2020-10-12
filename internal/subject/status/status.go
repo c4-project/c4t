@@ -78,7 +78,7 @@ func statusOfError(err error, timeout, fail Status) (Status, error) {
 func FromString(s string) (Status, error) {
 	for i := Unknown; i <= Last; i++ {
 		if strings.EqualFold(s, i.String()) {
-			return Status(i), nil
+			return i, nil
 		}
 	}
 	return Unknown, fmt.Errorf("%w: %q", ErrBad, s)

@@ -10,7 +10,4 @@ import "errors"
 var (
 	// ErrDirEmpty occurs when the local directory filepath is empty.
 	ErrDirEmpty = errors.New("local dir is empty string")
-
-	// ErrInvokerNil occurs when the invocation getter is nil.
-	ErrInvokerNil = errors.New("invocation getter nil")
 )

@@ -227,6 +227,6 @@ func (d *Dash) OnBuild(builder.Message) {
 }
 
 // OnPlan (currently) does nothing.
-func (d *Dash) OnPlan(m planner.Message) {
+func (d *Dash) OnPlan(planner.Message) {
 	// TODO(@MattWindsor91): do something here
 }

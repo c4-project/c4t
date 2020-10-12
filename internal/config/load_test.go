@@ -30,6 +30,6 @@ func TestLoad_direct(t *testing.T) {
 
 // TestLoad_broken tests config.Load with a bogus filename.
 func TestLoad_broken(t *testing.T) {
-	_, err := config.Load(filepath.Join("testdata", "broken.toml"))
+	_, err := config.Load(filepath.Join("testdata", "not_toml.txt"))
 	require.Error(t, err, "should error")
 }
