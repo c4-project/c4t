@@ -30,6 +30,7 @@ import (
 // TestBuilder_Run_Adds is a long-form test for exercising a corpus builder on an add run.
 func TestBuilder_Run_Adds(t *testing.T) {
 	var obs mocks.Observer
+	obs.Test(t)
 
 	adds := []subject.Named{
 		{

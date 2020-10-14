@@ -36,8 +36,12 @@ import (
 
 // TestCompiler_Run tests running a compile job.
 func TestCompiler_Run(t *testing.T) {
-	var mc mocks.Driver
-	var mp mocks.SubjectPather
+	var (
+		mc mocks.Driver
+		mp mocks.SubjectPather
+	)
+	mc.Test(t)
+	mp.Test(t)
 
 	names := []string{"foo", "bar", "baz"}
 	c := corpus.New(names...)

@@ -38,6 +38,8 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 		ml mocks.CompilerLister
 		mo cmocks.Observer
 	)
+	ml.Test(t)
+	mo.Test(t)
 
 	ctx := context.Background()
 	mid := id.FromString("localhost")

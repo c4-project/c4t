@@ -67,6 +67,7 @@ func TestConfigMap_ObserveOn(t *testing.T) {
 	}
 
 	var mk mocks.Observer
+	mk.Test(t)
 	mk.On("OnMachines", mock.MatchedBy(func(m machine.Message) bool {
 		return m.Kind == machine.MessageStart && m.Index == len(cm)
 	})).Return().Once()

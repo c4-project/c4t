@@ -43,6 +43,8 @@ func TestPerturber_Run(t *testing.T) {
 		mi mocks.Inspector
 		mo mocks2.Observer
 	)
+	mi.Test(t)
+	mo.Test(t)
 
 	dls := stringhelp.NewSet("0", "2", "fast")
 	dms := stringhelp.NewSet("march=armv7-a")

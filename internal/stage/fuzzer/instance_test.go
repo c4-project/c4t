@@ -28,6 +28,7 @@ func TestInstance_Fuzz(t *testing.T) {
 	resCh := make(chan builder.Request)
 
 	var md mocks.StatDumper
+	md.Test(t)
 
 	j := fuzzer.Instance{
 		Subject:       subject.Named{Name: "foo"},

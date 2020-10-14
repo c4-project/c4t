@@ -68,6 +68,8 @@ func TestNew_errors(t *testing.T) {
 				mpl mocks.Pather
 				pl  lifter.Pather
 			)
+			msl.Test(t)
+			mpl.Test(t)
 
 			if f := c.ddelta; f != nil {
 				sl = f(&msl)

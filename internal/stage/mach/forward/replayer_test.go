@@ -76,7 +76,7 @@ func TestReplayer_Run_roundTripBuilder(t *testing.T) {
 			Result: compilation.Result{Status: status.Flagged},
 		})
 
-	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {
+	tobs, err := roundTrip(t, context.Background(), func(obs *forward.Observer) {
 		builder.OnBuildStart(m, obs)
 		builder.OnBuildRequest(0, add, obs)
 		builder.OnBuildRequest(1, rec, obs)
@@ -123,7 +123,7 @@ func TestReplayer_Run_roundTripMachNode(t *testing.T) {
 		},
 	}
 
-	tobs, err := roundTrip(context.Background(), func(obs *forward.Observer) {
+	tobs, err := roundTrip(t, context.Background(), func(obs *forward.Observer) {
 		observer.OnCompileStart(qs.Compiler, obs)
 		observer.OnRunStart(qs.Runner, obs)
 	}, func(obs *mocks.Observer) {
@@ -145,7 +145,7 @@ func TestReplayer_Run_roundTripError(t *testing.T) {
 
 	e := fmt.Errorf("it's the end of the world as we know it")
 
-	_, err := roundTrip(context.Background(), func(obs *forward.Observer) {
+	_, err := roundTrip(t, context.Background(), func(obs *forward.Observer) {
 		obs.Error(e)
 	}, func(*mocks.Observer) {})
 
@@ -161,7 +161,7 @@ func TestReplayer_Run_immediateCancel(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	_, err := roundTrip(ctx, func(*forward.Observer) {}, func(*mocks.Observer) {})
+	_, err := roundTrip(t, ctx, func(*forward.Observer) {}, func(*mocks.Observer) {})
 	testhelp.ExpectErrorIs(t, err, ctx.Err(), "replay with immediate cancel")
 }
 
@@ -177,8 +177,8 @@ func onMachNode(m *mocks.Observer, k observer.MessageKind, f func(set *quantity.
 	}))
 }
 
-func roundTrip(ctx context.Context, input func(*forward.Observer), obsf func(*mocks.Observer)) (*mocks.Observer, error) {
-	pw, obs, tobs, rep := roundTripPipe()
+func roundTrip(t *testing.T, ctx context.Context, input func(*forward.Observer), obsf func(*mocks.Observer)) (*mocks.Observer, error) {
+	pw, obs, tobs, rep := roundTripPipe(t)
 	obsf(tobs)
 	eg, ectx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
@@ -191,10 +191,11 @@ func roundTrip(ctx context.Context, input func(*forward.Observer), obsf func(*mo
 	return tobs, eg.Wait()
 }
 
-func roundTripPipe() (io.Closer, *forward.Observer, *mocks.Observer, forward.Replayer) {
+func roundTripPipe(t *testing.T) (io.Closer, *forward.Observer, *mocks.Observer, forward.Replayer) {
 	pr, pw := io.Pipe()
 	obs := forward.NewObserver(pw)
 	tobs := mocks.Observer{}
+	tobs.Test(t)
 	rep := forward.Replayer{Decoder: json.NewDecoder(pr), Observers: []observer.Observer{&tobs}}
 	return pw, obs, &tobs, rep
 }

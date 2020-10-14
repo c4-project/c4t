@@ -53,7 +53,9 @@ func TestNew_error(t *testing.T) {
 	t.Parallel()
 
 	md := new(mocks2.StatDumper)
+	md.Test(t)
 	mp := new(mocks.SubjectPather)
+	mp.Test(t)
 
 	opterr := errors.New("sup")
 
@@ -118,7 +120,9 @@ func TestFuzzer_Run_error(t *testing.T) {
 	t.Parallel()
 
 	md := new(mocks2.StatDumper)
+	md.Test(t)
 	mp := new(mocks.SubjectPather)
+	mp.Test(t)
 
 	cases := map[string]struct {
 		pdelta func(*plan.Plan) *plan.Plan
@@ -186,7 +190,10 @@ func TestFuzzer_Run_nop(t *testing.T) {
 	t.Parallel()
 
 	md := new(mocks2.StatDumper)
+	md.Test(t)
 	mp := new(mocks.SubjectPather)
+	mp.Test(t)
+
 	f, err := fuzzer.New(
 		fuzzer.AggregateDriver{Single: fuzzer.NopFuzzer{}, Stat: md},
 		mp,

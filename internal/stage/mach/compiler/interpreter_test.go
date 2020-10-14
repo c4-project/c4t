@@ -103,8 +103,6 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 	t.Parallel()
 
-	var mc mocks.Compiler
-
 	cases := map[string]struct {
 		in  []recipe.Instruction
 		err error
@@ -127,6 +125,9 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
+			var mc mocks.Compiler
+			mc.Test(t)
 
 			r := recipe.New(
 				"in",
@@ -152,6 +153,7 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 	t.Parallel()
 
 	var mc mocks.Compiler
+	mc.Test(t)
 
 	r := recipe.New(
 		"in",
@@ -182,7 +184,6 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 func TestNewInterpreter_errors(t *testing.T) {
 	t.Parallel()
 
-	var mc mocks.Compiler
 	r := recipe.New(
 		"in",
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
@@ -192,23 +193,23 @@ func TestNewInterpreter_errors(t *testing.T) {
 	cmp := mdl.Configuration{}
 
 	cases := map[string]struct {
-		d   compiler.Driver
-		j   compile.Recipe
-		err error
+		useDriver bool
+		j         compile.Recipe
+		err       error
 	}{
 		"no-driver": {
-			d:   nil,
-			j:   compile.FromRecipe(&cmp, r, "a.out"),
-			err: compiler.ErrDriverNil,
+			useDriver: false,
+			j:         compile.FromRecipe(&cmp, r, "a.out"),
+			err:       compiler.ErrDriverNil,
 		},
 		"no-compiler-cfg": {
-			d:   &mc,
-			j:   compile.FromRecipe(nil, r, "a.out"),
-			err: compiler.ErrCompilerConfigNil,
+			useDriver: true,
+			j:         compile.FromRecipe(nil, r, "a.out"),
+			err:       compiler.ErrCompilerConfigNil,
 		},
 		"ok": {
-			d: &mc,
-			j: compile.FromRecipe(&cmp, r, "a.out"),
+			useDriver: true,
+			j:         compile.FromRecipe(&cmp, r, "a.out"),
 		},
 	}
 
@@ -217,7 +218,14 @@ func TestNewInterpreter_errors(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, err := compiler.NewInterpreter(c.d, c.j)
+			var mc mocks.Compiler
+			mc.Test(t)
+			var d compiler.Driver
+			if c.useDriver {
+				d = &mc
+			}
+
+			_, err := compiler.NewInterpreter(d, c.j)
 			testhelp.ExpectErrorIs(t, err, c.err, "constructing new interpreter")
 		})
 	}

@@ -26,6 +26,8 @@ func TestArchiveSubject(t *testing.T) {
 		ar  mocks.Archiver
 		obs mocks.Observer
 	)
+	ar.Test(t)
+	obs.Test(t)
 
 	nm := normaliser.Map{
 		normpath.FileBin: normaliser.Entry{

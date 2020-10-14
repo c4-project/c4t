@@ -45,6 +45,7 @@ func TestSendMapping(t *testing.T) {
 	}
 
 	var m mocks.Copier
+	m.Test(t)
 
 	for _, d := range []string{"bin", "include", path.Join("src", "blah")} {
 		m.On("MkdirAll", path.Join("remote", d)).Return(nil).Once()
@@ -57,6 +58,7 @@ func TestSendMapping(t *testing.T) {
 	}
 
 	var o mocks.Observer
+	o.Test(t)
 
 	onCopy(&o, observing.BatchStart, func(i int, s string, s2 string) bool {
 		return i == len(mapping)
