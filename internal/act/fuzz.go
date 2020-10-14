@@ -22,16 +22,14 @@ const BinActFuzz = "act-fuzz"
 
 // Fuzz wraps the ACT one-file fuzzer, supplying the given seed.
 func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
-	seedStr := strconv.Itoa(int(j.Seed))
-
 	cf, err := MakeFuzzConfFile(j)
 	if err != nil {
 		return err
 	}
 
-	args := []string{"-config", cf, "-seed", seedStr, "-o", j.OutLitmus}
+	args := []string{"-config", cf, "-seed", strconv.Itoa(int(j.Seed)), "-o", j.OutLitmus}
 	if ystring.IsNotEmpty(j.OutTrace) {
-		args = append(args, "-trace-output", j.OutTrace, j.In)
+		args = append(args, "-trace-output", j.OutTrace)
 	}
 	args = append(args, j.In)
 
