@@ -90,7 +90,7 @@ func (d DelitmusJob) Args() []string {
 	if ystring.IsNotBlank(d.OutC) {
 		args = append(args, "-output", d.OutC)
 	}
-	return args
+	return append(args, d.InLitmus)
 }
 
 // Delitmus runs act-c delitmus as directed by d.

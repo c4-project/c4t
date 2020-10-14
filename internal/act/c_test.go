@@ -26,7 +26,7 @@ func TestRunner_Delitmus(t *testing.T) {
 	m.On("Run", mock.Anything, act.CmdSpec{
 		Cmd:    act.BinActC,
 		Subcmd: "delitmus",
-		Args:   []string{"-aux-output", "aux.json", "-output", "c.json"},
+		Args:   []string{"-aux-output", "aux.json", "-output", "c.json", "in.litmus"},
 	}).Return(nil).Once()
 
 	dj := act.DelitmusJob{
