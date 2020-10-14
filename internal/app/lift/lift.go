@@ -10,7 +10,8 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
@@ -61,7 +62,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 
 func makeLifter(ctx *c.Context, l *log.Logger, errw io.Writer) (*lifter.Lifter, error) {
 	return lifter.New(
-		&backend.BResolve,
+		&resolver.Resolve,
 		lifter.NewPathset(stdflag.OutDirFromCli(ctx)),
 		lifter.ObserveWith(singleobs.Builder(l, stdflag.Verbose(ctx))...),
 		lifter.SendStderrTo(errw),

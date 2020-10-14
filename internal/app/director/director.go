@@ -26,7 +26,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/config"
 	"github.com/MattWindsor91/act-tester/internal/director"
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+	br "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
@@ -210,7 +210,7 @@ func makeGlob(mfilter string) (id.ID, error) {
 func makeEnv(a *act.Runner, c *config.Config) director.Env {
 	return director.Env{
 		Fuzzer:     a,
-		Lifter:     &backend.BResolve,
+		Lifter:     &br.Resolve,
 		CInspector: &compiler.CResolve,
 		Planner: planner.Source{
 			BProbe:  c,

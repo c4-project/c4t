@@ -10,6 +10,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/1set/gut/ystring"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/subject"
@@ -40,29 +42,63 @@ func (a *Runner) ProbeSubject(ctx context.Context, path string) (*subject.Named,
 // DumpHeader runs act-c dump-header on the subject at path, writing the results to h.
 func (a *Runner) DumpHeader(ctx context.Context, h *Header, path string) error {
 	var obuf bytes.Buffer
-	sargs := StandardArgs{Verbose: false}
-
-	cmd := a.CommandContext(ctx, BinActC, "dump-header", sargs, path)
-	cmd.Stdout = &obuf
-
-	if err := cmd.Run(); err != nil {
+	cs := CmdSpec{
+		Cmd:    BinActC,
+		Subcmd: "dump-header",
+		Args:   []string{path},
+		Stdout: &obuf,
+	}
+	if err := a.Run(ctx, cs); err != nil {
 		return err
 	}
-
 	return h.Read(&obuf)
 }
 
 // DumpStats runs act-c dump-stats on the subject at path, writing the stats to s.
 func (a *Runner) DumpStats(ctx context.Context, s *litmus.Statset, path string) error {
 	var obuf bytes.Buffer
-	sargs := StandardArgs{Verbose: false}
-
-	cmd := a.CommandContext(ctx, BinActC, "dump-stats", sargs, path)
-	cmd.Stdout = &obuf
-
-	if err := cmd.Run(); err != nil {
+	cs := CmdSpec{
+		Cmd:    BinActC,
+		Subcmd: "dump-stats",
+		Args:   []string{path},
+		Stdout: &obuf,
+	}
+	if err := a.Run(ctx, cs); err != nil {
 		return err
 	}
-
 	return ParseStats(s, &obuf)
+}
+
+// DelitmusJob holds information about a single delitmus run.
+type DelitmusJob struct {
+	// InLitmus is the filepath of the input litmus file.
+	InLitmus string
+	// OutAux is the filepath to which the delitmusifier should write the auxiliary file.
+	OutAux string
+	// OutC is the filepath to which the delitmusifier should write the output file.
+	OutC string
+	// TODO(@MattWindsor91): impl-suffix, no-qualify-locals, style, etc.
+}
+
+// Args gets the argument vector for DelitmusJob.
+func (d DelitmusJob) Args() []string {
+	// TODO(@MattWindsor91): hook up style etc.
+	var args []string
+	if ystring.IsNotBlank(d.OutAux) {
+		args = append(args, "-aux-output", d.OutAux)
+	}
+	if ystring.IsNotBlank(d.OutC) {
+		args = append(args, "-output", d.OutC)
+	}
+	return args
+}
+
+// Delitmus runs act-c delitmus as directed by d.
+func (a *Runner) Delitmus(ctx context.Context, d DelitmusJob) error {
+	cs := CmdSpec{
+		Cmd:    BinActC,
+		Subcmd: "delitmus",
+		Args:   d.Args(),
+	}
+	return a.Run(ctx, cs)
 }

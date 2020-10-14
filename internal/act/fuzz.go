@@ -22,7 +22,6 @@ const BinActFuzz = "act-fuzz"
 
 // Fuzz wraps the ACT one-file fuzzer, supplying the given seed.
 func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
-	sargs := StandardArgs{Verbose: false}
 	seedStr := strconv.Itoa(int(j.Seed))
 
 	cf, err := MakeFuzzConfFile(j)
@@ -35,9 +34,13 @@ func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
 		args = append(args, "-trace-output", j.OutTrace, j.In)
 	}
 	args = append(args, j.In)
-	cmd := a.CommandContext(ctx, BinActFuzz, "run", sargs, args...)
 
-	cerr := cmd.Run()
+	cs := CmdSpec{
+		Cmd:    BinActFuzz,
+		Subcmd: "run",
+		Args:   args,
+	}
+	cerr := a.Run(ctx, cs)
 	rerr := os.Remove(cf)
 	return errhelp.FirstError(cerr, rerr)
 }

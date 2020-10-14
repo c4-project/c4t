@@ -14,7 +14,7 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
 
-	bimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+	br "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
 	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
@@ -70,7 +70,7 @@ func makeMach(ctx *c.Context, errw io.Writer) (*mach.Mach, error) {
 	fwd := forward.NewObserver(errw)
 	return mach.New(
 		&cimpl.CResolve,
-		&bimpl.BResolve,
+		&br.Resolve,
 		mach.OutputDir(stdflag.OutDirFromCli(ctx)),
 		mach.OverrideQuantities(stdflag.MachNodeQuantitySetFromCli(ctx)),
 		mach.ForwardTo(fwd),
