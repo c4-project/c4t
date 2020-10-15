@@ -13,15 +13,12 @@ import (
 	"math/rand"
 	"path/filepath"
 	"reflect"
-	"time"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
-
-	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -62,9 +59,6 @@ type Maker struct {
 	// inputs contains the filepaths to each input subject to use for fuzzing profiles that need them.
 	inputs []string
 
-	// rng is the random number generator used to seed the various profile makers.
-	rng *rand.Rand
-
 	// errw is the writer to which we send stderr from standalone coverage makers.
 	errw io.Writer
 
@@ -72,9 +66,24 @@ type Maker struct {
 	observers []Observer
 }
 
+const (
+	// DefaultCount is the default value for the Count quantity.
+	DefaultCount = 1000
+	// DefaultNWorkers is the default value for the NWorkers quantity.
+	DefaultNWorkers = 10
+)
+
 // NewMaker constructs a new coverage testbed maker.
 func NewMaker(outDir string, profiles map[string]Profile, opts ...Option) (*Maker, error) {
-	m := &Maker{outDir: outDir, profiles: profiles, rng: rand.New(rand.NewSource(time.Now().UnixNano()))}
+	m := &Maker{
+		outDir:   outDir,
+		profiles: profiles,
+		qs: QuantitySet{
+			Count:     DefaultCount,
+			Divisions: nil,
+			NWorkers:  DefaultNWorkers,
+		},
+	}
 	if err := Options(opts...)(m); err != nil {
 		return nil, err
 	}
@@ -89,26 +98,22 @@ func (m *Maker) Run(ctx context.Context) error {
 	return m.runProfiles(ctx, buckets)
 }
 
-func (m *Maker) runProfiles(ctx context.Context, buckets map[string]int) error {
-	obsChs := make(map[string]<-chan RunMessage, len(m.profiles))
+func (m *Maker) runProfiles(ctx context.Context, buckets []Bucket) error {
+	obsChs := make([]<-chan RunMessage, m.qs.NWorkers)
+	// TODO(@MattWindsor91): I'm not sure what the correct value here should be.
+	jobCh := make(chan workerJob, m.qs.NWorkers)
 
 	// TODO(@MattWindsor91): worker queue
 	eg, ectx := errgroup.WithContext(ctx)
-	for pname, p := range m.profiles {
+	eg.Go(func() error {
+		return m.feeder(ctx, buckets, jobCh)
+	})
+	for i := 0; i < m.qs.NWorkers; i++ {
 		obsCh := make(chan RunMessage)
-
-		pm, err := m.makeProfileMaker(pname, p, buckets, obsCh)
-		if err != nil {
-			return err
-		}
-
 		eg.Go(func() error {
-			err := pm.run(ectx)
-			close(obsCh)
-			return err
+			return m.worker(ctx, obsCh, jobCh)
 		})
-
-		obsChs[pname] = obsCh
+		obsChs[i] = obsCh
 	}
 	eg.Go(func() error {
 		return m.fanInObservations(ectx, obsChs)
@@ -116,17 +121,76 @@ func (m *Maker) runProfiles(ctx context.Context, buckets map[string]int) error {
 	return eg.Wait()
 }
 
-func (m *Maker) fanInObservations(ectx context.Context, obsChs map[string]<-chan RunMessage) error {
+type workerJob struct {
+	pname   string
+	profile Profile
+	nrun    int
+	rc      RunContext
+	r       Runner
+}
+
+func (m *Maker) feeder(ctx context.Context, buckets []Bucket, jobCh chan<- workerJob) error {
+	// This errgroup nesting mainly exists so we only need one job channel.
+	// TODO(@MattWindsor91): can we do better here?
+	defer close(jobCh)
+
+	eg, ectx := errgroup.WithContext(ctx)
+	for pname, p := range m.profiles {
+		pm, err := m.makeProfileMaker(pname, p, buckets, jobCh)
+		if err != nil {
+			return err
+		}
+		eg.Go(func() error {
+			return pm.run(ectx)
+		})
+	}
+	return eg.Wait()
+}
+
+func (m *Maker) worker(ctx context.Context, obsCh chan<- RunMessage, jobCh <-chan workerJob) error {
+	defer close(obsCh)
+
+	for {
+		select {
+		case <-ctx.Done():
+			for range jobCh {
+			}
+			return ctx.Err()
+		case j, ok := <-jobCh:
+			if !ok {
+				return nil
+			}
+			if err := m.workerJob(ctx, obsCh, j); err != nil {
+				return err
+			}
+		}
+	}
+}
+
+func (m *Maker) workerJob(ctx context.Context, obsCh chan<- RunMessage, j workerJob) error {
+	// nrun is 1-indexed
+	if j.nrun == 1 {
+		obsCh <- RunStart(j.pname, j.profile, m.qs.Count)
+	}
+	obsCh <- RunStep(j.pname, j.nrun, j.rc)
+	if err := j.r.Run(ctx, j.rc); err != nil {
+		return err
+	}
+	if j.nrun == m.qs.Count {
+		obsCh <- RunEnd(j.pname)
+	}
+	return nil
+}
+
+func (m *Maker) fanInObservations(ectx context.Context, obsChs []<-chan RunMessage) error {
 	cs := make([]reflect.SelectCase, len(obsChs)+1)
 	cs[0] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ectx.Done())}
-	i := 1
-	for _, och := range obsChs {
-		cs[i] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(och)}
-		i++
+	for i, och := range obsChs {
+		cs[i+1] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(och)}
 	}
+	nLiveChs := len(obsChs)
 
 	// TODO(@MattWindsor91): consider generalising/replicating this fan-in pattern
-	want := len(m.profiles)
 	for {
 		chosen, recv, recvOK := reflect.Select(cs)
 		if chosen == 0 {
@@ -138,24 +202,29 @@ func (m *Maker) fanInObservations(ectx context.Context, obsChs map[string]<-chan
 			return ectx.Err()
 		}
 		if !recvOK {
+			// Obs channel has closed, stop listening on it; if all such channels have closed then we're done observing.
+			cs[chosen].Chan = reflect.Value{}
+			nLiveChs--
+			if nLiveChs == 0 {
+				return nil
+			}
 			continue
 		}
 		rm := recv.Interface().(RunMessage)
 		OnCoverageRun(rm, m.observers...)
-		if rm.Kind == observing.BatchEnd {
-			want--
-			if want == 0 {
-				return nil
-			}
-		}
 	}
 }
 
-func (m *Maker) makeProfileMaker(pname string, p Profile, buckets map[string]int, obsCh chan<- RunMessage) (*profileMaker, error) {
+func (m *Maker) makeProfileMaker(pname string, p Profile, buckets []Bucket, jobCh chan<- workerJob) (*profileMaker, error) {
 	runner, err := m.makeRunner(p)
 	if err != nil {
 		return nil, err
 	}
+
+	// The idea here is to have something that is technically deterministic, but tours the input space in a seemingly
+	// random order.  Why?  Because for inputs like Memalloy, input number tends to correlate with input complexity,
+	// and we don't want to give all the simple inputs to the first runs and the complex ones to the later ones.
+	rng := rand.New(rand.NewSource(0))
 
 	pm := &profileMaker{
 		name:    pname,
@@ -164,8 +233,8 @@ func (m *Maker) makeProfileMaker(pname string, p Profile, buckets map[string]int
 		buckets: buckets,
 		total:   m.qs.Count,
 		runner:  runner,
-		obsCh:   obsCh,
-		rng:     rand.New(rand.NewSource(m.rng.Int63())),
+		jobCh:   jobCh,
+		rng:     rng,
 		inputs:  m.inputs,
 	}
 
