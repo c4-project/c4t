@@ -109,7 +109,8 @@ func (m *Maker) runProfiles(ctx context.Context, buckets []Bucket) error {
 		return m.feeder(ctx, buckets, jobCh)
 	})
 	for i := 0; i < m.qs.NWorkers; i++ {
-		obsCh := make(chan RunMessage)
+		// TODO(@MattWindsor91): sensible buffer size?
+		obsCh := make(chan RunMessage, m.qs.NWorkers)
 		eg.Go(func() error {
 			return m.worker(ctx, obsCh, jobCh)
 		})

@@ -86,7 +86,8 @@ func (c Corpus) parDirect(eg *errgroup.Group, ectx context.Context, f func(conte
 }
 
 func (c Corpus) parWorkers(eg *errgroup.Group, ectx context.Context, nworkers int, f func(context.Context, subject.Named) error) {
-	wch := make(chan subject.Named)
+	// TODO(@MattWindsor91): is this a decent buffer number?
+	wch := make(chan subject.Named, nworkers)
 
 	eg.Go(func() error {
 		return c.workerSource(wch, ectx)
