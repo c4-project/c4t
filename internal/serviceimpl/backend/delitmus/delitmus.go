@@ -40,7 +40,9 @@ const (
 // compiling that C file as an object.
 // At time of writing, there is no way to specify how to delitmusify the file.
 func (d Delitmus) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error) {
-	a := act.Runner{DuneExec: false, Stderr: errw}
+	// This is a fairly clunky way of injecting errw, but I can't think of anything better.
+	a := d.BaseRunner
+	a.Stderr = errw
 
 	dj := act.DelitmusJob{
 		InLitmus: j.In.Filepath(),
