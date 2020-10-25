@@ -7,7 +7,7 @@ package singleobs
 
 import (
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/model/run"
+	"github.com/MattWindsor91/act-tester/internal/director"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
@@ -55,7 +55,7 @@ func (p *Bar) OnPlan(planner.Message) {}
 func (p *Bar) OnMachineNodeAction(observer.Message) {}
 
 // OnIteration does nothing.
-func (p *Bar) OnIteration(run.Run) {}
+func (p *Bar) OnIteration(director.Cycle) {}
 
 // OnAnalysis does nothing.
 func (p *Bar) OnAnalysis(analysis.Analysis) {}

@@ -3,25 +3,25 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis_test
+package director_test
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/status"
+	"github.com/MattWindsor91/act-tester/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/model/run"
+	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 )
 
-// ExampleWithRun_String is a runnable example for WithRun.String.
-func ExampleWithRun_String() {
-	sc := analysis.WithRun{
-		Run: run.Run{
+// ExampleCycleAnalysis_String is a runnable example for CycleAnalysis.String.
+func ExampleCycleAnalysis_String() {
+	sc := director.CycleAnalysis{
+		Run: director.Cycle{
 			MachineID: id.FromString("foo.bar.baz"),
 			Iter:      42,
 			Start:     time.Date(1997, time.May, 1, 10, 0, 0, 0, time.FixedZone("BST", 60*60)),

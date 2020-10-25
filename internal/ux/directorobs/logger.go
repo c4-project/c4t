@@ -32,8 +32,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/model/run"
-
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -52,7 +50,7 @@ type Logger struct {
 	// aw is the analyser writer used for outputting sourced analyses.
 	aw *pretty.Printer
 	// anaCh is used to send sourced analyses for logging.
-	anaCh chan analysis.WithRun
+	anaCh chan director.CycleAnalysis
 	// compCh is used to send compilers for logging.
 	compCh chan compilerSet
 	// saveCh is used to send save actions for logging.
@@ -86,7 +84,7 @@ func NewLogger(w io.WriteCloser, lflag int) (*Logger, error) {
 		out:    w,
 		l:      log.New(w, "", lflag),
 		aw:     aw,
-		anaCh:  make(chan analysis.WithRun),
+		anaCh:  make(chan director.CycleAnalysis),
 		compCh: make(chan compilerSet),
 		saveCh: make(chan archiveMessage),
 	}, nil
@@ -143,7 +141,7 @@ func (j *Logger) Instance(id.ID) (director.InstanceObserver, error) {
 }
 
 // logAnalysis logs s to this logger's file.
-func (j *Logger) logAnalysis(s analysis.WithRun) error {
+func (j *Logger) logAnalysis(s director.CycleAnalysis) error {
 	return j.aw.WriteSourced(s)
 }
 
@@ -173,11 +171,11 @@ type InstanceLogger struct {
 	// compCh is the channel used to send compiler sets for logging.
 	compCh chan<- compilerSet
 	// anaCh is the channel used to send sourced analyses for logging.
-	anaCh chan<- analysis.WithRun
+	anaCh chan<- director.CycleAnalysis
 	// saveCh is the channel used to send save actions for logging.
 	saveCh chan<- archiveMessage
 	// run contains information about the current iteration.
-	run run.Run
+	run director.Cycle
 	// compilers stores the current, if any, compiler set.
 	compilers []compiler.Named
 	// icompiler stores the index of the compiler being received.
@@ -185,12 +183,12 @@ type InstanceLogger struct {
 }
 
 type compilerSet struct {
-	run       run.Run
+	run       director.Cycle
 	compilers []compiler.Named
 }
 
 type archiveMessage struct {
-	run  run.Run
+	run  director.Cycle
 	body saver.ArchiveMessage
 }
 
@@ -230,7 +228,7 @@ func (l *InstanceLogger) makeCompilerSet() compilerSet {
 }
 
 // OnIteration notes that the instance's iteration has changed.
-func (l *InstanceLogger) OnIteration(r run.Run) {
+func (l *InstanceLogger) OnIteration(r director.Cycle) {
 	l.run = r
 }
 
@@ -253,8 +251,8 @@ func (l *InstanceLogger) OnArchive(s saver.ArchiveMessage) {
 	}
 }
 
-func (l *InstanceLogger) addSource(c analysis.Analysis) analysis.WithRun {
-	return analysis.WithRun{
+func (l *InstanceLogger) addSource(c analysis.Analysis) director.CycleAnalysis {
+	return director.CycleAnalysis{
 		Run:      l.run,
 		Analysis: c,
 	}

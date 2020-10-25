@@ -8,9 +8,10 @@ package singleobs
 import (
 	"log"
 
+	"github.com/MattWindsor91/act-tester/internal/director"
+
 	"github.com/MattWindsor91/act-tester/internal/coverage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
@@ -136,7 +137,7 @@ func (l *Logger) OnMachineNodeAction(m observer.Message) {
 }
 
 // OnIteration does nothing, for now.
-func (l *Logger) OnIteration(run.Run) {}
+func (l *Logger) OnIteration(director.Cycle) {}
 
 // OnAnalysis does nothing, for now.
 func (l *Logger) OnAnalysis(analysis.Analysis) {}

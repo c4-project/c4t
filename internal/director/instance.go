@@ -32,8 +32,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/model/run"
-
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
@@ -173,8 +171,8 @@ func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
 	// Important to _copy_ the plan
 	pcopy := i.InitialPlan
 
-	c := cycle{
-		header: run.Run{
+	c := cycleInstance{
+		cycle: Cycle{
 			MachineID: i.ID,
 			Iter:      nCycle,
 			Start:     time.Now(),
@@ -182,7 +180,7 @@ func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
 		p:  &pcopy,
 		sc: i.stageConfig,
 	}
-	OnIteration(c.header, i.Observers...)
+	OnIteration(c.cycle, i.Observers...)
 	return c.run(ctx)
 }
 

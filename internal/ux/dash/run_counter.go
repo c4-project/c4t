@@ -9,9 +9,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/director"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/run"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"
 	"github.com/mum4k/termdash/widgets/text"
@@ -19,7 +20,7 @@ import (
 
 // runCounter holds the current run information, as well as a sparkline of previous run times.
 type runCounter struct {
-	last run.Run
+	last director.Cycle
 
 	text  *text.Text
 	spark *sparkline.SparkLine
@@ -48,18 +49,18 @@ func (r *runCounter) grid() []grid.Element {
 	}
 }
 
-func (r *runCounter) onIteration(run run.Run) error {
+func (r *runCounter) onIteration(run director.Cycle) error {
 	err := errhelp.FirstError(r.updateText(run), r.updateSpark(run))
 	r.last = run
 	return err
 }
 
-func (r *runCounter) updateText(run run.Run) error {
+func (r *runCounter) updateText(run director.Cycle) error {
 	txt := fmt.Sprintf("#%d %s", run.Iter, run.Start.Format(time.Stamp))
 	return r.text.Write(txt, text.WriteReplace())
 }
 
-func (r *runCounter) updateSpark(run run.Run) error {
+func (r *runCounter) updateSpark(run director.Cycle) error {
 	if r.last.Start.IsZero() {
 		return nil
 	}

@@ -12,6 +12,8 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/MattWindsor91/act-tester/internal/director"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 )
 
@@ -50,7 +52,7 @@ func (p *Printer) OnAnalysis(a analysis.Analysis) {
 }
 
 // WriteSourced writes a sourced analysis a to this printer.
-func (p *Printer) WriteSourced(a analysis.WithRun) error {
+func (p *Printer) WriteSourced(a director.CycleAnalysis) error {
 	if _, err := fmt.Fprintf(p.w, "# %s #\n\n", &a.Run); err != nil {
 		return err
 	}

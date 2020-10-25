@@ -9,11 +9,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/director"
+
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/widgets/text"
 )
@@ -38,14 +39,14 @@ func NewResultLog() (*ResultLog, error) {
 }
 
 // Log logs a sourced collation sc.
-func (r *ResultLog) Log(sc analysis.WithRun) error {
+func (r *ResultLog) Log(sc director.CycleAnalysis) error {
 	if err := r.LogHeader(sc); err != nil {
 		return err
 	}
 	return r.logBuckets(sc)
 }
 
-func (r *ResultLog) logBuckets(s analysis.WithRun) error {
+func (r *ResultLog) logBuckets(s director.CycleAnalysis) error {
 	sc := s.Analysis.ByStatus
 	for i := status.FirstBad; i <= status.Last; i++ {
 		if err := r.logBucket(i, sc[i]); err != nil {
@@ -71,7 +72,7 @@ func (r *ResultLog) logBucket(s status.Status, bucket corpus.Corpus) error {
 }
 
 // LogHeader logs the header of a sourced collation sc.
-func (r *ResultLog) LogHeader(sc analysis.WithRun) error {
+func (r *ResultLog) LogHeader(sc director.CycleAnalysis) error {
 	if err := r.maybeOverflow(); err != nil {
 		return err
 	}

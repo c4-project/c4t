@@ -7,7 +7,7 @@ package dash
 
 import (
 	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/model/run"
+	"github.com/MattWindsor91/act-tester/internal/director"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
@@ -136,7 +136,7 @@ func (o *Instance) currentRunColumn() grid.Element {
 }
 
 // OnIteration logs that a new iteration has begun.
-func (o *Instance) OnIteration(r run.Run) {
+func (o *Instance) OnIteration(r director.Cycle) {
 	o.nruns = r.Iter
 	_ = o.run.onIteration(r)
 	o.action.reset()
@@ -167,7 +167,7 @@ func (o *Instance) sendStatusCount(i status.Status, n int) {
 }
 
 func (o *Instance) logAnalysis(a analysis.Analysis) error {
-	sc := analysis.WithRun{
+	sc := director.CycleAnalysis{
 		Run:      o.run.last,
 		Analysis: a,
 	}

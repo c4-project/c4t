@@ -3,22 +3,20 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package analysis
+package director
 
-import (
-	"github.com/MattWindsor91/act-tester/internal/model/run"
-)
+import "github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
-// WithRun contains a corpus collation and its parent run.
-type WithRun struct {
+// CycleAnalysis contains an analysis as well as the cycle that produced it.
+type CycleAnalysis struct {
 	// Run contains information about the run that produced this collation.
-	Run run.Run
+	Run Cycle
 
 	// Analysis is the collation proper.
-	Analysis
+	analysis.Analysis
 }
 
 // String formats a log header for this sourced analysis.
-func (s *WithRun) String() string {
+func (s *CycleAnalysis) String() string {
 	return s.Run.String() + " " + s.Analysis.String()
 }

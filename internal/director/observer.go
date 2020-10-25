@@ -22,8 +22,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/model/run"
-
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -53,7 +51,7 @@ type Observer interface {
 // InstanceObserver is an interface for types that observe a director instance.
 type InstanceObserver interface {
 	// OnIteration lets the observer know that the instance has started a new cycle.
-	OnIteration(run run.Run)
+	OnIteration(run Cycle)
 
 	// InstanceObserver observers can observe plan analyses.
 	analyser.Observer
@@ -79,7 +77,7 @@ func OnPrepare(qs quantity.RootSet, ps pathset.Pathset, obs ...Observer) {
 }
 
 // OnIteration sends OnIteration to every instance observer in obs.
-func OnIteration(r run.Run, obs ...InstanceObserver) {
+func OnIteration(r Cycle, obs ...InstanceObserver) {
 	for _, o := range obs {
 		o.OnIteration(r)
 	}

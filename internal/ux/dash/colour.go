@@ -6,8 +6,8 @@
 package dash
 
 import (
+	"github.com/MattWindsor91/act-tester/internal/director"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/subject/status"
 	"github.com/mum4k/termdash/cell"
 )
@@ -59,7 +59,7 @@ func optColour(o *optlevel.Named) cell.Color {
 }
 
 // summaryColor retrieves a colour to use for the log header of sc, according to a 'traffic lights' system.
-func summaryColor(sc analysis.WithRun) cell.Color {
+func summaryColor(sc director.CycleAnalysis) cell.Color {
 	switch {
 	case sc.Analysis.HasFailures():
 		return colourCompileFail
