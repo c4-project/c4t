@@ -43,6 +43,9 @@ func TestFuzzRunner_Run(t *testing.T) {
 		s mocks3.StatDumper
 		b bytes.Buffer
 	)
+	f.Test(t)
+	l.Test(t)
+	s.Test(t)
 
 	conf := fuzzer.Configuration{Params: map[string]string{"fus": "ro dah"}}
 	fr := coverage.FuzzRunner{

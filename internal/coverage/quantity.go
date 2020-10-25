@@ -80,7 +80,7 @@ func (q *QuantitySet) Buckets() []Bucket {
 		brem := bsize % nbuckets
 		bsize /= nbuckets
 
-		prefix := strings.Repeat("1,", i)
+		prefix := strings.Repeat("1_", i)
 		for j := nbuckets; j >= 2; j-- {
 			buckets = append(buckets, Bucket{Name: fmt.Sprintf("%s%d", prefix, j), Size: bsize})
 		}

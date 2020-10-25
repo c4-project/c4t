@@ -25,9 +25,13 @@ import (
 func TestMaker_Run(t *testing.T) {
 	td := t.TempDir()
 
-	var mr1, mr2 mocks.Runner
-
-	var mo mocks.Observer
+	var (
+		mr1, mr2 mocks.Runner
+		mo       mocks.Observer
+	)
+	mr1.Test(t)
+	mr2.Test(t)
+	mo.Test(t)
 
 	p1 := coverage.Profile{Kind: coverage.Known, Runner: &mr1}
 	p2 := coverage.Profile{Kind: coverage.Standalone, Runner: &mr2}
@@ -46,8 +50,8 @@ func TestMaker_Run(t *testing.T) {
 	mockObs(&mo, "p2", 12)
 
 	for i := 1; i <= 2; i++ {
-		mockRun(&mr1, "p1", td, fmt.Sprintf("1,%d", i), 2)
-		mockRun(&mr2, "p2", td, fmt.Sprintf("1,%d", i), 2)
+		mockRun(&mr1, "p1", td, fmt.Sprintf("1_%d", i), 2)
+		mockRun(&mr2, "p2", td, fmt.Sprintf("1_%d", i), 2)
 	}
 	for i := 2; i <= 3; i++ {
 		mockRun(&mr1, "p1", td, fmt.Sprintf("%d", i), 4)
