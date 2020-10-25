@@ -53,7 +53,7 @@ func (p *Printer) OnAnalysis(a analysis.Analysis) {
 
 // WriteSourced writes a sourced analysis a to this printer.
 func (p *Printer) WriteSourced(a director.CycleAnalysis) error {
-	if _, err := fmt.Fprintf(p.w, "# %s #\n\n", &a.Run); err != nil {
+	if _, err := fmt.Fprintf(p.w, "# %s #\n\n", &a.Cycle); err != nil {
 		return err
 	}
 	return p.Write(a.Analysis)

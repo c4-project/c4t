@@ -33,6 +33,6 @@ func ExampleInstanceLogger_OnArchive() {
 	_ = l.Run(ctx)
 
 	// Output:
-	// saving (run [ #0 (Jan  1 00:00:00)]) subj to subj.tar.gz
-	// when saving (run [ #0 (Jan  1 00:00:00)]) subj: missing file compile.log
+	// saving (cycle [ #0 (Jan  1 00:00:00)]) subj to subj.tar.gz
+	// when saving (cycle [ #0 (Jan  1 00:00:00)]) subj: missing file compile.log
 }

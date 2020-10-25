@@ -149,9 +149,9 @@ func (j *Logger) logAnalysis(s director.CycleAnalysis) error {
 func (j *Logger) logSaving(s archiveMessage) {
 	switch s.body.Kind {
 	case saver.ArchiveStart:
-		j.l.Printf("saving (run %s) %s to %s\n", s.run, s.body.SubjectName, s.body.File)
+		j.l.Printf("saving (cycle %s) %s to %s\n", s.run, s.body.SubjectName, s.body.File)
 	case saver.ArchiveFileMissing:
-		j.l.Printf("when saving (run %s) %s: missing file %s\n", s.run, s.body.SubjectName, s.body.File)
+		j.l.Printf("when saving (cycle %s) %s: missing file %s\n", s.run, s.body.SubjectName, s.body.File)
 	}
 }
 
@@ -174,8 +174,8 @@ type InstanceLogger struct {
 	anaCh chan<- director.CycleAnalysis
 	// saveCh is the channel used to send save actions for logging.
 	saveCh chan<- archiveMessage
-	// run contains information about the current iteration.
-	run director.Cycle
+	// cycle contains information about the current iteration.
+	cycle director.Cycle
 	// compilers stores the current, if any, compiler set.
 	compilers []compiler.Named
 	// icompiler stores the index of the compiler being received.
@@ -222,14 +222,14 @@ func (l *InstanceLogger) onCompilerPlanFinish() {
 
 func (l *InstanceLogger) makeCompilerSet() compilerSet {
 	return compilerSet{
-		run:       l.run,
+		run:       l.cycle,
 		compilers: l.compilers,
 	}
 }
 
 // OnIteration notes that the instance's iteration has changed.
 func (l *InstanceLogger) OnIteration(r director.Cycle) {
-	l.run = r
+	l.cycle = r
 }
 
 // OnCollation logs a collation to this logger.
@@ -242,7 +242,7 @@ func (l *InstanceLogger) OnAnalysis(c analysis.Analysis) {
 
 func (l *InstanceLogger) OnArchive(s saver.ArchiveMessage) {
 	msg := archiveMessage{
-		run:  l.run,
+		run:  l.cycle,
 		body: s,
 	}
 	select {
@@ -253,7 +253,7 @@ func (l *InstanceLogger) OnArchive(s saver.ArchiveMessage) {
 
 func (l *InstanceLogger) addSource(c analysis.Analysis) director.CycleAnalysis {
 	return director.CycleAnalysis{
-		Run:      l.run,
+		Cycle:    l.cycle,
 		Analysis: c,
 	}
 }

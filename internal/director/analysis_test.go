@@ -21,7 +21,7 @@ import (
 // ExampleCycleAnalysis_String is a runnable example for CycleAnalysis.String.
 func ExampleCycleAnalysis_String() {
 	sc := director.CycleAnalysis{
-		Run: director.Cycle{
+		Cycle: director.Cycle{
 			MachineID: id.FromString("foo.bar.baz"),
 			Iter:      42,
 			Start:     time.Date(1997, time.May, 1, 10, 0, 0, 0, time.FixedZone("BST", 60*60)),

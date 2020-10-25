@@ -29,10 +29,6 @@ import (
 )
 
 // Observer is an interface for types that implement multi-machine test progress observation.
-//
-// Unlike most observer patterns in the tester, the director takes a degree of control over the lifecycle of its
-// observers.  It will call Run for each observer in parallel with the tester instances, and call Close when its
-// observers are no longer needed.
 type Observer interface {
 	// Observers can observe machine configuration.
 	machine.Observer
@@ -51,7 +47,7 @@ type Observer interface {
 // InstanceObserver is an interface for types that observe a director instance.
 type InstanceObserver interface {
 	// OnIteration lets the observer know that the instance has started a new cycle.
-	OnIteration(run Cycle)
+	OnIteration(c Cycle)
 
 	// InstanceObserver observers can observe plan analyses.
 	analyser.Observer

@@ -168,7 +168,7 @@ func (o *Instance) sendStatusCount(i status.Status, n int) {
 
 func (o *Instance) logAnalysis(a analysis.Analysis) error {
 	sc := director.CycleAnalysis{
-		Run:      o.run.last,
+		Cycle:    o.run.last,
 		Analysis: a,
 	}
 	return o.rlog.Log(sc)

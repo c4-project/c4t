@@ -9,8 +9,8 @@ import "github.com/MattWindsor91/act-tester/internal/plan/analysis"
 
 // CycleAnalysis contains an analysis as well as the cycle that produced it.
 type CycleAnalysis struct {
-	// Run contains information about the run that produced this collation.
-	Run Cycle
+	// Cycle contains information about the run that produced this collation.
+	Cycle Cycle
 
 	// Analysis is the collation proper.
 	analysis.Analysis
@@ -18,5 +18,5 @@ type CycleAnalysis struct {
 
 // String formats a log header for this sourced analysis.
 func (s *CycleAnalysis) String() string {
-	return s.Run.String() + " " + s.Analysis.String()
+	return s.Cycle.String() + " " + s.Analysis.String()
 }
