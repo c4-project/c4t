@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
-
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 )
 
@@ -28,16 +26,4 @@ func ExampleNewScratch() {
 	// lift: scratch/lift
 	// fuzz: scratch/fuzz
 	// plan: scratch/plan
-}
-
-// ExampleScratch_PlanForStage is a runnable example for PlanForStage.
-func ExampleScratch_PlanForStage() {
-	mp := pathset.Scratch{
-		DirPlan: filepath.FromSlash("foo/plan"),
-		DirFuzz: filepath.FromSlash("foo/fuzz"),
-		DirLift: filepath.FromSlash("foo/lift"),
-	}
-	fmt.Print(filepath.ToSlash(mp.PlanForStage(stage.Fuzz)))
-	// Output:
-	// foo/plan/plan.fuzz.json
 }

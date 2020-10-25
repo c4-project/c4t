@@ -22,3 +22,13 @@ func Mkdirs(ps ...string) error {
 	}
 	return nil
 }
+
+// Rmdirs tries to remove each directory in the directory set d.
+func Rmdirs(ps ...string) error {
+	for _, dir := range ps {
+		if err := os.RemoveAll(dir); err != nil {
+			return err
+		}
+	}
+	return nil
+}

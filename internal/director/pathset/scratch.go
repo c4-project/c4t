@@ -43,3 +43,8 @@ func (p *Scratch) PlanForStage(s stage.Stage) string {
 	file := fmt.Sprintf("plan.%s%s", strings.ToLower(s.String()), plan.Ext)
 	return filepath.Join(p.DirPlan, file)
 }
+
+// Dirs gets all of the directories in this pathset, which is useful for making and removing directories.
+func (p *Scratch) Dirs() []string {
+	return []string{p.DirFuzz, p.DirLift, p.DirPlan, p.DirRun}
+}

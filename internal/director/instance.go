@@ -181,7 +181,12 @@ func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
 		sc: i.stageConfig,
 	}
 	OnIteration(c.cycle, i.Observers...)
-	return c.run(ctx)
+	if err := c.run(ctx); err != nil {
+		return err
+	}
+	// Don't clean up scratch after a failing iteration;
+	// we might need the information in the scratch
+	return i.cleanUpCycle()
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
@@ -268,4 +273,8 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer
 		// targeting without consulting the plan.
 		invoker.OverrideBaseQuantities(i.Quantities.Mach),
 	)
+}
+
+func (i *Instance) cleanUpCycle() error {
+	return iohelp.Rmdirs(i.ScratchPaths.Dirs()...)
 }
