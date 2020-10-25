@@ -16,10 +16,6 @@ import (
 )
 
 const (
-	segFuzz    = "fuzz"
-	segLift    = "lift"
-	segPlan    = "plan"
-	segRun     = "run"
 	segSaved   = "saved"
 	segScratch = "scratch"
 )
@@ -41,14 +37,14 @@ func New(root string) *Pathset {
 	}
 }
 
-// MachineSave gets the saved-subjects pathset for a machine with ID mid.
-func (p *Pathset) MachineSaved(mid id.ID) *saver.Pathset {
-	segs := append([]string{p.DirSaved}, mid.Tags()...)
-	return saver.NewPathset(filepath.Join(segs...))
-}
-
-// MachineScratch gets the scratch pathset for a machine with ID mid.
-func (p *Pathset) MachineScratch(mid id.ID) *Scratch {
-	segs := append([]string{p.DirScratch}, mid.Tags()...)
-	return NewScratch(filepath.Join(segs...))
+// Instance gets the instance pathset for a machine with ID mid.
+func (p Pathset) Instance(mid id.ID) *Instance {
+	tags := mid.Tags()
+	saved := append([]string{p.DirSaved}, tags...)
+	scratch := append([]string{p.DirScratch}, tags...)
+	// TODO(@MattWindsor91): the pointer soup here needs simplifying
+	return &Instance{
+		Saved:   *saver.NewPathset(filepath.Join(saved...)),
+		Scratch: *NewScratch(filepath.Join(scratch...)),
+	}
 }

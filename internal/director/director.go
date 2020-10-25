@@ -167,16 +167,13 @@ func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*I
 	if err != nil {
 		return nil, err
 	}
-	sps := d.paths.MachineScratch(mid)
-	vps := d.paths.MachineSaved(mid)
 	m := Instance{
 		MachConfig:   c,
 		SSHConfig:    d.ssh,
-		Env:          &d.env,
+		Env:          d.env,
 		ID:           mid,
 		Observers:    obs,
-		ScratchPaths: sps,
-		SavedPaths:   vps,
+		Pathset:      d.paths.Instance(mid),
 		Quantities:   d.machineQuantities(&c),
 		InitialPlan:  p,
 		Filters:      d.filters,

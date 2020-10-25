@@ -8,6 +8,10 @@ package pathset_test
 import (
 	"fmt"
 	"path/filepath"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 )
@@ -19,11 +23,24 @@ func ExampleNewScratch() {
 	fmt.Println("run: ", filepath.ToSlash(p.DirRun))
 	fmt.Println("lift:", filepath.ToSlash(p.DirLift))
 	fmt.Println("fuzz:", filepath.ToSlash(p.DirFuzz))
-	fmt.Println("plan:", filepath.ToSlash(p.DirPlan))
 
 	// Output:
 	// run:  scratch/run
 	// lift: scratch/lift
 	// fuzz: scratch/fuzz
-	// plan: scratch/plan
+}
+
+// TestScratch_Prepare tests Scratch.Prepare.
+func TestScratch_Prepare(t *testing.T) {
+	// Probably can't parallelise this - affects the filesystem?
+	root := t.TempDir()
+	p := pathset.NewScratch(root)
+
+	for _, d := range p.Dirs() {
+		assert.NoDirExists(t, d, "dir shouldn't exist yet")
+	}
+	require.NoError(t, p.Prepare(), "prepare shouldn't error on temp dir")
+	for _, d := range p.Dirs() {
+		assert.DirExists(t, d, "dir should now exist")
+	}
 }

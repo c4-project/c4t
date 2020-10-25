@@ -8,6 +8,10 @@ package pathset_test
 import (
 	"fmt"
 	"path/filepath"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/director/pathset"
 
@@ -26,17 +30,23 @@ func ExampleNew() {
 	// tests/saved
 }
 
-// ExamplePathset_MachineSaved is a runnable example for MachineSaved.
-func ExamplePathset_MachineSaved() {
+// ExamplePathset_Instance is a runnable example for Pathset.Instance.
+func ExamplePathset_Instance() {
 	p := pathset.Pathset{DirSaved: "saved", DirScratch: "scratch"}
 	mid := id.FromString("foo.bar.baz")
-	mp := p.MachineSaved(mid)
+	mi := p.Instance(mid)
 
-	for _, path := range mp.DirList() {
+	for _, path := range mi.Scratch.Dirs() {
+		fmt.Println(filepath.ToSlash(path))
+	}
+	for _, path := range mi.Saved.DirList() {
 		fmt.Println(filepath.ToSlash(path))
 	}
 
 	// Output:
+	// scratch/foo/bar/baz/fuzz
+	// scratch/foo/bar/baz/lift
+	// scratch/foo/bar/baz/run
 	// saved/foo/bar/baz/flagged
 	// saved/foo/bar/baz/compile_fail
 	// saved/foo/bar/baz/compile_timeout
@@ -44,20 +54,15 @@ func ExamplePathset_MachineSaved() {
 	// saved/foo/bar/baz/run_timeout
 }
 
-// ExamplePathset_MachineScratch is a runnable example for MachineScratch.
-func ExamplePathset_MachineScratch() {
-	p := pathset.Pathset{DirSaved: "saved", DirScratch: "scratch"}
-	mid := id.FromString("foo.bar.baz")
-	mp := p.MachineScratch(mid)
+// TestPathset_Prepare tests Scratch.Prepare.
+func TestPathset_Prepare(t *testing.T) {
+	// Probably can't parallelise this - affects the filesystem?
+	root := t.TempDir()
+	p := pathset.New(root)
 
-	fmt.Println(filepath.ToSlash(mp.DirFuzz))
-	fmt.Println(filepath.ToSlash(mp.DirLift))
-	fmt.Println(filepath.ToSlash(mp.DirPlan))
-	fmt.Println(filepath.ToSlash(mp.DirRun))
-
-	// Output:
-	// scratch/foo/bar/baz/fuzz
-	// scratch/foo/bar/baz/lift
-	// scratch/foo/bar/baz/plan
-	// scratch/foo/bar/baz/run
+	assert.NoDirExists(t, p.DirSaved, "saved dir shouldn't exist yet")
+	assert.NoDirExists(t, p.DirScratch, "saved dir shouldn't exist yet")
+	require.NoError(t, p.Prepare(), "prepare shouldn't error on temp dir")
+	assert.DirExists(t, p.DirSaved, "saved dir should now exist")
+	assert.DirExists(t, p.DirScratch, "saved dir should now exist")
 }

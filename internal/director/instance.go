@@ -7,7 +7,6 @@ package director
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -72,15 +71,13 @@ type Instance struct {
 	InitialPlan plan.Plan
 
 	// Env contains the parts of the director's config that tell it how to do various environmental tasks.
-	Env *Env
+	Env Env
 
 	// Observers is this machine's observer set.
 	Observers []InstanceObserver
 
-	// SavedPaths contains the save pathset for this machine.
-	SavedPaths *saver.Pathset
-	// ScratchPaths contains the scratch pathset for this machine.
-	ScratchPaths *pathset.Scratch
+	// Pathset contains the pathset for this instance.
+	Pathset *pathset.Instance
 
 	// Quantities contains the quantity set for this machine.
 	Quantities quantity.MachineSet
@@ -96,7 +93,7 @@ func (i *Instance) Run(ctx context.Context) error {
 	}
 
 	//i.Logger.Println("preparing scratch directories")
-	if err := i.ScratchPaths.Prepare(); err != nil {
+	if err := i.Pathset.Scratch.Prepare(); err != nil {
 		return err
 	}
 
@@ -127,17 +124,13 @@ func (i *Instance) cleanUp() error {
 
 // check makes sure this machine has a valid configuration before starting loops.
 func (i *Instance) check() error {
-	if i.ScratchPaths == nil {
+	if i.Pathset == nil {
 		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, i.ID.String())
-	}
-
-	if i.Env == nil {
-		return errors.New("no environment configuration")
 	}
 
 	// TODO(@MattWindsor): check SSHConfig?
 
-	return nil
+	return i.Env.Check()
 }
 
 // mainLoop performs the main testing loop for one machine.
@@ -224,7 +217,7 @@ func (i *Instance) makeAnalyser(aobs []analyser.Observer, sobs []saver.Observer)
 			analysis.WithWorkerCount(10), // TODO(@MattWindsor91): get this from somewhere
 			analysis.WithFilters(i.Filters),
 		),
-		analyser.SaveToPathset(i.SavedPaths),
+		analyser.SaveToPathset(&i.Pathset.Saved),
 	)
 }
 
@@ -240,7 +233,7 @@ func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber
 func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {
 	return fuzzer.New(
 		i.Env.Fuzzer,
-		fuzzer.NewPathset(i.ScratchPaths.DirFuzz),
+		fuzzer.NewPathset(i.Pathset.Scratch.DirFuzz),
 		fuzzer.ObserveWith(obs...),
 		// TODO(@MattWindsor91): why does the fuzzer still take a logger?
 		//fuzzer.LogWith(i.Logger),
@@ -251,7 +244,7 @@ func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {
 func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 	return lifter.New(
 		i.Env.Lifter,
-		lifter.NewPathset(i.ScratchPaths.DirLift),
+		lifter.NewPathset(i.Pathset.Scratch.DirLift),
 		// TODO(@MattWindsor91): why does the lifter still take a logger?
 		//lifter.LogTo(i.Logger),
 		lifter.ObserveWith(obs...),
@@ -265,7 +258,7 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer
 	if err != nil {
 		return nil, err
 	}
-	return invoker.New(i.ScratchPaths.DirRun,
+	return invoker.New(i.Pathset.Scratch.DirRun,
 		f,
 		invoker.ObserveCopiesWith(cobs...),
 		invoker.ObserveMachWith(mobs...),
@@ -276,5 +269,5 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer
 }
 
 func (i *Instance) cleanUpCycle() error {
-	return iohelp.Rmdirs(i.ScratchPaths.Dirs()...)
+	return iohelp.Rmdirs(i.Pathset.Scratch.Dirs()...)
 }
