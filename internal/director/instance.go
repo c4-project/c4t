@@ -87,27 +87,22 @@ type Instance struct {
 
 // Run runs this instance's testing loop.
 func (i *Instance) Run(ctx context.Context) error {
-	//i.Logger = iohelp.EnsureLog(i.Logger)
 	if err := i.check(); err != nil {
 		return err
 	}
 
-	//i.Logger.Println("preparing scratch directories")
 	if err := i.Pathset.Scratch.Prepare(); err != nil {
 		return err
 	}
 
-	//i.Logger.Println("creating stage configurations")
 	var err error
 	if i.stageConfig, err = i.makeStageConfig(); err != nil {
 		return err
 	}
-	//i.Logger.Println("checking stage configurations")
 	if err := i.stageConfig.Check(); err != nil {
 		return err
 	}
 
-	//i.Logger.Println("starting loop")
 	err = i.mainLoop(ctx)
 
 	OnInstanceClose(i.Observers...)
@@ -150,7 +145,6 @@ func (i *Instance) mainLoop(ctx context.Context) error {
 			if maxConsecutiveErrors < nErrors {
 				return fmt.Errorf("too many consecutive errors; last error was: %w", err)
 			}
-			//i.Logger.Println("ERROR:", err)
 		} else {
 			nErrors = 0
 		}

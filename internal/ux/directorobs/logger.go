@@ -15,14 +15,9 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
 
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
@@ -35,7 +30,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 )
 
@@ -136,14 +130,11 @@ func (j *Logger) OnMachines(m machine.Message) {
 	}
 }
 
-// Instance creates an instance logger.
+// Instance creates an instance observer that forwards to this logger.
 func (j *Logger) Instance(id.ID) (director.InstanceObserver, error) {
 	ch := make(chan Forward)
 	j.fwd.Add(ch)
-	return &InstanceLogger{
-		done: j.done,
-		fwd:  ch,
-	}, nil
+	return &ForwardingInstanceObserver{done: j.done, fwd: ch}, nil
 }
 
 // logAnalysis logs s to this logger's file.
@@ -181,64 +172,5 @@ func (j *Logger) logCompilers(c director.Cycle, cs []compiler.Named) {
 	j.l.Printf("%s compilers %d:\n", c, len(cs))
 	for _, c := range cs {
 		j.l.Printf("- %s: %s\n", c.ID, c.Configuration)
-	}
-}
-
-// InstanceLogger holds state for logging a particular instance.
-type InstanceLogger struct {
-	// done is a channel closed when the instance can no longer log.
-	done <-chan struct{}
-	// fwd is a channel to which the instance forwards messages to the main logger.
-	fwd chan<- Forward
-	// cycle contains information about the current iteration.
-	cycle director.Cycle
-}
-
-func (l *InstanceLogger) OnCompilerConfig(m compiler.Message) {
-	l.forward(ForwardCompilerMessage(l.cycle, m))
-}
-
-// OnIteration notes that the instance's iteration has changed.
-func (l *InstanceLogger) OnCycle(r director.CycleMessage) {
-	if r.Kind == director.CycleStart {
-		l.cycle = r.Cycle
-	}
-	l.forward(ForwardCycleMessage(r))
-}
-
-// OnCollation logs a collation to this logger.
-func (l *InstanceLogger) OnAnalysis(c analysis.Analysis) {
-	l.forward(ForwardAnalysisMessage(l.cycle, c))
-}
-
-func (l *InstanceLogger) OnArchive(s saver.ArchiveMessage) {
-	l.forward(ForwardSaveMessage(l.cycle, s))
-}
-
-// OnPerturb does nothing, at the moment.
-func (l *InstanceLogger) OnPerturb(perturber.Message) {}
-
-// OnPlan does nothing, at the moment.
-func (l *InstanceLogger) OnPlan(planner.Message) {}
-
-// OnBuild does nothing.
-func (l *InstanceLogger) OnBuild(builder.Message) {}
-
-// OnCopy does nothing.
-func (l *InstanceLogger) OnCopy(copier.Message) {}
-
-// OnMachineNodeMessage does nothing.
-func (l *InstanceLogger) OnMachineNodeAction(observer.Message) {}
-
-// OnInstanceClose doesn't (yet) log the instance closure, but closes the forwarding channel.
-func (l *InstanceLogger) OnInstanceClose() {
-	// TODO(@MattWindsor91): forward a message about this?
-	close(l.fwd)
-}
-
-func (l *InstanceLogger) forward(f Forward) {
-	select {
-	case <-l.done:
-	case l.fwd <- f:
 	}
 }

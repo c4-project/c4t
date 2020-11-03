@@ -8,6 +8,12 @@ package directorobs
 import (
 	"context"
 
+	"github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/MattWindsor91/act-tester/internal/director"
@@ -87,4 +93,63 @@ func (r *ForwardReceiver) Add(c <-chan Forward) {
 // Run runs the forward receiver.
 func (r *ForwardReceiver) Run(ctx context.Context) error {
 	return (*observing.FanIn)(r).Run(ctx)
+}
+
+// ForwardingInstanceObserver is an instance observer that just forwards every observation to a director observer.
+type ForwardingInstanceObserver struct {
+	// done is a channel closed when the instance can no longer log.
+	done <-chan struct{}
+	// fwd is a channel to which the instance forwards messages to the main logger.
+	fwd chan<- Forward
+	// cycle contains information about the current iteration.
+	cycle director.Cycle
+}
+
+func (l *ForwardingInstanceObserver) OnCompilerConfig(m compiler.Message) {
+	l.forward(ForwardCompilerMessage(l.cycle, m))
+}
+
+// OnIteration notes that the instance's iteration has changed.
+func (l *ForwardingInstanceObserver) OnCycle(r director.CycleMessage) {
+	if r.Kind == director.CycleStart {
+		l.cycle = r.Cycle
+	}
+	l.forward(ForwardCycleMessage(r))
+}
+
+// OnCollation logs a collation to this logger.
+func (l *ForwardingInstanceObserver) OnAnalysis(c analysis.Analysis) {
+	l.forward(ForwardAnalysisMessage(l.cycle, c))
+}
+
+func (l *ForwardingInstanceObserver) OnArchive(s saver.ArchiveMessage) {
+	l.forward(ForwardSaveMessage(l.cycle, s))
+}
+
+// OnPerturb does nothing, at the moment.
+func (l *ForwardingInstanceObserver) OnPerturb(perturber.Message) {}
+
+// OnPlan does nothing, at the moment.
+func (l *ForwardingInstanceObserver) OnPlan(planner.Message) {}
+
+// OnBuild does nothing.
+func (l *ForwardingInstanceObserver) OnBuild(builder.Message) {}
+
+// OnCopy does nothing.
+func (l *ForwardingInstanceObserver) OnCopy(copier.Message) {}
+
+// OnMachineNodeMessage does nothing.
+func (l *ForwardingInstanceObserver) OnMachineNodeAction(observer.Message) {}
+
+// OnInstanceClose doesn't (yet) log the instance closure, but closes the forwarding channel.
+func (l *ForwardingInstanceObserver) OnInstanceClose() {
+	// TODO(@MattWindsor91): forward a message about this?
+	close(l.fwd)
+}
+
+func (l *ForwardingInstanceObserver) forward(f Forward) {
+	select {
+	case <-l.done:
+	case l.fwd <- f:
+	}
 }

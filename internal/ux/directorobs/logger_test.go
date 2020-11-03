@@ -20,8 +20,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
 
-// ExampleInstanceLogger_OnArchive is a runnable example for OnArchive.
-func ExampleInstanceLogger_OnArchive() {
+// ExampleLogger_Instance_onArchive is a runnable example for Instance that exercises sending archive messages.
+func ExampleLogger_Instance_onArchive() {
 	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
 	i, _ := l.Instance(id.FromString("localhost"))
 
