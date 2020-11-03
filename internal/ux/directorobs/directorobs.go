@@ -23,6 +23,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// Obs is the standard top-level director observer.
 type Obs struct {
 	dash      *dash.Dash
 	resultLog *Logger

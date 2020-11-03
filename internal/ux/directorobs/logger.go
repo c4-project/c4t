@@ -75,10 +75,11 @@ func NewLogger(w io.WriteCloser, lflag int) (*Logger, error) {
 		return nil, err
 	}
 	l := &Logger{
-		done: make(chan struct{}),
-		out:  w,
-		l:    log.New(w, "", lflag),
-		aw:   aw,
+		done:      make(chan struct{}),
+		out:       w,
+		l:         log.New(w, "", lflag),
+		aw:        aw,
+		compilers: map[string][]compiler.Named{},
 	}
 	// TODO(@MattWindsor91): plumb in a capacity somehow
 	l.fwd = NewForwardReceiver(l.runStep, 0)
