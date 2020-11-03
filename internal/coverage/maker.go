@@ -12,9 +12,9 @@ import (
 	"io"
 	"math/rand"
 	"path/filepath"
-	"reflect"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/act-tester/internal/observing"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
@@ -64,6 +64,9 @@ type Maker struct {
 
 	// observers contains the observers being used by the maker.  Each is accessed in at most one thread at a time.
 	observers []Observer
+
+	// fanIn handles fan-in for observers across other threads.
+	fanIn *observing.FanIn
 }
 
 const (
@@ -87,6 +90,10 @@ func NewMaker(outDir string, profiles map[string]Profile, opts ...Option) (*Make
 	if err := Options(opts...)(m); err != nil {
 		return nil, err
 	}
+	m.fanIn = observing.NewFanIn(func(_ int, input interface{}) error {
+		OnCoverageRun(input.(RunMessage), m.observers...)
+		return nil
+	}, m.qs.NWorkers)
 	return m, nil
 }
 
@@ -99,7 +106,6 @@ func (m *Maker) Run(ctx context.Context) error {
 }
 
 func (m *Maker) runProfiles(ctx context.Context, buckets []Bucket) error {
-	obsChs := make([]<-chan RunMessage, m.qs.NWorkers)
 	// TODO(@MattWindsor91): I'm not sure what the correct value here should be.
 	jobCh := make(chan workerJob, m.qs.NWorkers)
 
@@ -114,10 +120,10 @@ func (m *Maker) runProfiles(ctx context.Context, buckets []Bucket) error {
 		eg.Go(func() error {
 			return m.worker(ctx, obsCh, jobCh)
 		})
-		obsChs[i] = obsCh
+		m.fanIn.Add(obsCh)
 	}
 	eg.Go(func() error {
-		return m.fanInObservations(ectx, obsChs)
+		return m.fanIn.Run(ectx)
 	})
 	return eg.Wait()
 }
@@ -181,39 +187,6 @@ func (m *Maker) workerJob(ctx context.Context, obsCh chan<- RunMessage, j worker
 		obsCh <- RunEnd(j.pname)
 	}
 	return nil
-}
-
-func (m *Maker) fanInObservations(ectx context.Context, obsChs []<-chan RunMessage) error {
-	cs := make([]reflect.SelectCase, len(obsChs)+1)
-	cs[0] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ectx.Done())}
-	for i, och := range obsChs {
-		cs[i+1] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(och)}
-	}
-	nLiveChs := len(obsChs)
-
-	// TODO(@MattWindsor91): consider generalising/replicating this fan-in pattern
-	for {
-		chosen, recv, recvOK := reflect.Select(cs)
-		if chosen == 0 {
-			// Drain every channel.
-			for _, och := range obsChs {
-				for range och {
-				}
-			}
-			return ectx.Err()
-		}
-		if !recvOK {
-			// Obs channel has closed, stop listening on it; if all such channels have closed then we're done observing.
-			cs[chosen].Chan = reflect.Value{}
-			nLiveChs--
-			if nLiveChs == 0 {
-				return nil
-			}
-			continue
-		}
-		rm := recv.Interface().(RunMessage)
-		OnCoverageRun(rm, m.observers...)
-	}
 }
 
 func (m *Maker) makeProfileMaker(pname string, p Profile, buckets []Bucket, jobCh chan<- workerJob) (*profileMaker, error) {
