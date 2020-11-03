@@ -46,8 +46,12 @@ type Observer interface {
 
 // InstanceObserver is an interface for types that observe a director instance.
 type InstanceObserver interface {
-	// OnIteration lets the observer know that the instance has started a new cycle.
-	OnIteration(c Cycle)
+	// OnCycle observes a message relating to this instance's current cycle.
+	OnCycle(m CycleMessage)
+
+	// OnInstanceClose observes that the instance this observer is observing has closed.
+	// This gives the observer the opportunity to free any resources.
+	OnInstanceClose()
 
 	// InstanceObserver observers can observe plan analyses.
 	analyser.Observer
@@ -65,6 +69,44 @@ type InstanceObserver interface {
 	mach.Observer
 }
 
+// OnInstanceClose sends OnInstanceClose to each observer in obs.
+func OnInstanceClose(obs ...InstanceObserver) {
+	for _, o := range obs {
+		o.OnInstanceClose()
+	}
+}
+
+type CycleMessage struct {
+	// Cycle names the cycle on which this message is occurring.
+	Cycle Cycle
+	// Kind gives the kind of message.
+	Kind CycleMessageKind
+	// Err holds the error if Kind is CycleError.
+	Err error
+}
+
+// CycleMessageKind is the enumeration of kinds of cycle message.
+type CycleMessageKind uint8
+
+const (
+	// CycleStart denotes the start of a cycle.
+	// Future messages from an InstanceObserver should be ascribed to this cycle, until another CycleStart.
+	CycleStart CycleMessageKind = iota
+	// CycleError denotes a message carrying an error from a cycle.
+	// Errors in cycles generally cause the cycle to restart, maybe with backoff.
+	CycleError
+)
+
+// CycleStartMessage constructs a CycleStart message with cycle c.
+func CycleStartMessage(c Cycle) CycleMessage {
+	return CycleMessage{Cycle: c, Kind: CycleStart}
+}
+
+// CycleErrorMessage constructs a CycleError message with cycle c and error err.
+func CycleErrorMessage(c Cycle, err error) CycleMessage {
+	return CycleMessage{Cycle: c, Kind: CycleError, Err: err}
+}
+
 // OnPrepare sends OnPrepare to every observer in obs.
 func OnPrepare(qs quantity.RootSet, ps pathset.Pathset, obs ...Observer) {
 	for _, o := range obs {
@@ -72,10 +114,10 @@ func OnPrepare(qs quantity.RootSet, ps pathset.Pathset, obs ...Observer) {
 	}
 }
 
-// OnIteration sends OnIteration to every instance observer in obs.
-func OnIteration(r Cycle, obs ...InstanceObserver) {
+// OnCycle sends a cycle message to every instance observer in obs.
+func OnCycle(m CycleMessage, obs ...InstanceObserver) {
 	for _, o := range obs {
-		o.OnIteration(r)
+		o.OnCycle(m)
 	}
 }
 

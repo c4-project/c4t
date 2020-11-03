@@ -136,10 +136,21 @@ func (o *Instance) currentRunColumn() grid.Element {
 }
 
 // OnIteration logs that a new iteration has begun.
-func (o *Instance) OnIteration(r director.Cycle) {
+func (o *Instance) OnCycle(r director.CycleMessage) {
+	switch r.Kind {
+	case director.CycleStart:
+		o.onCycleStart(r.Cycle)
+	}
+}
+
+func (o *Instance) onCycleStart(r director.Cycle) {
 	o.nruns = r.Iter
-	_ = o.run.onIteration(r)
+	_ = o.run.onCycleStart(r)
 	o.action.reset()
+}
+
+func (o *Instance) OnInstanceClose() {
+	o.action.onInstanceClose()
 }
 
 // OnAnalysis observes an analysis by adding failure/timeout/flag rates to the sparklines.

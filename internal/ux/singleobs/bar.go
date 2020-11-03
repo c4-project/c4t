@@ -54,8 +54,11 @@ func (p *Bar) OnPlan(planner.Message) {}
 // OnMachineNodeAction does nothing.
 func (p *Bar) OnMachineNodeAction(observer.Message) {}
 
-// OnIteration does nothing.
-func (p *Bar) OnIteration(director.Cycle) {}
+// OnCycle does nothing.
+func (p *Bar) OnCycle(director.CycleMessage) {}
+
+// OnInstanceClose does nothing.
+func (p *Bar) OnInstanceClose() {}
 
 // OnAnalysis does nothing.
 func (p *Bar) OnAnalysis(analysis.Analysis) {}

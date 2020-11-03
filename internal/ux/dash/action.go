@@ -173,3 +173,8 @@ func (o *actionObserver) stepGauge(c cell.Color) error {
 func idQualSubjectDesc(sname string, id id.ID) string {
 	return fmt.Sprintf("%s (@%s)", sname, id)
 }
+
+func (o *actionObserver) onInstanceClose() {
+	err := o.log.Write("-- INSTANCE CLOSED --\n")
+	o.logError(err)
+}

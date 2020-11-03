@@ -49,7 +49,7 @@ func (r *runCounter) grid() []grid.Element {
 	}
 }
 
-func (r *runCounter) onIteration(run director.Cycle) error {
+func (r *runCounter) onCycleStart(run director.Cycle) error {
 	err := errhelp.FirstError(r.updateText(run), r.updateSpark(run))
 	r.last = run
 	return err

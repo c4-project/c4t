@@ -85,7 +85,7 @@ type Instance struct {
 	Filters analysis.FilterSet
 }
 
-// Run runs this machine's testing loop.
+// Run runs this instance's testing loop.
 func (i *Instance) Run(ctx context.Context) error {
 	//i.Logger = iohelp.EnsureLog(i.Logger)
 	if err := i.check(); err != nil {
@@ -109,8 +109,10 @@ func (i *Instance) Run(ctx context.Context) error {
 
 	//i.Logger.Println("starting loop")
 	err = i.mainLoop(ctx)
-	//i.Logger.Println("cleaning up")
+
+	OnInstanceClose(i.Observers...)
 	cerr := i.cleanUp()
+
 	return errhelp.FirstError(err, cerr)
 }
 
@@ -173,8 +175,9 @@ func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
 		p:  &pcopy,
 		sc: i.stageConfig,
 	}
-	OnIteration(c.cycle, i.Observers...)
+	OnCycle(CycleStartMessage(c.cycle), i.Observers...)
 	if err := c.run(ctx); err != nil {
+		OnCycle(CycleErrorMessage(c.cycle, err), i.Observers...)
 		return err
 	}
 	// Don't clean up scratch after a failing iteration;

@@ -136,8 +136,11 @@ func (l *Logger) OnMachineNodeAction(m observer.Message) {
 	}
 }
 
-// OnIteration does nothing, for now.
-func (l *Logger) OnIteration(director.Cycle) {}
+// OnCycle does nothing, for now.
+func (l *Logger) OnCycle(director.CycleMessage) {}
+
+// OnInstanceClose does nothing.
+func (l *Logger) OnInstanceClose() {}
 
 // OnAnalysis does nothing, for now.
 func (l *Logger) OnAnalysis(analysis.Analysis) {}
