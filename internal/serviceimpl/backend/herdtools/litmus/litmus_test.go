@@ -9,12 +9,13 @@ import (
 	"context"
 	"os"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	mdl "github.com/MattWindsor91/act-tester/internal/model/litmus"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
@@ -22,7 +23,7 @@ import (
 // ExampleInstance_Run is a testable example for Run.
 func ExampleInstance_Run() {
 	i := litmus.Instance{
-		Job: job.Lifter{
+		Job: backend.LiftJob{
 			Arch:   id.ArchX8664,
 			In:     *mdl.New("in.litmus"),
 			OutDir: "out",

@@ -11,6 +11,8 @@ import (
 	"os/exec"
 	"time"
 
+	backend3 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
@@ -18,8 +20,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/status"
-
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -34,7 +34,7 @@ import (
 type Instance struct {
 	// backend is the backend used to produce the recipes being run.
 	// We retain the backend to be able to work out how to parse the run results.
-	backend *service.Backend
+	backend *backend3.Spec
 
 	// parser is the observation parser used to interpret the results of a run.
 	parser ObsParser

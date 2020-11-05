@@ -10,18 +10,18 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
-
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 )
 
 // BinActFuzz is the name of the ACT fuzzer binary.
 const BinActFuzz = "act-fuzz"
 
 // Fuzz wraps the ACT one-file fuzzer, supplying the given seed.
-func (a *Runner) Fuzz(ctx context.Context, j job.Fuzzer) error {
+func (a *Runner) Fuzz(ctx context.Context, j fuzzer.Job) error {
 	cf, err := MakeFuzzConfFile(j)
 	if err != nil {
 		return err

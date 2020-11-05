@@ -19,14 +19,13 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/act/mocks"
 	"github.com/MattWindsor91/act-tester/internal/machine"
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
 )
 
 // TestRunner_Fuzz tests the happy path of Runner.Fuzz using a mock command runner.
 func TestRunner_Fuzz(t *testing.T) {
 	// TODO(@MattWindsor91): This affects the filesystem, so I'm unsure as to whether it can be parallel
-	j1 := job.Fuzzer{
+	j1 := fuzzer.Job{
 		Seed:      8675309,
 		In:        "foo.litmus",
 		OutLitmus: "foo.fuzz.litmus",
@@ -42,7 +41,7 @@ func TestRunner_Fuzz(t *testing.T) {
 	j2 := j1
 	j2.OutLitmus = ""
 
-	cases := map[string]job.Fuzzer{
+	cases := map[string]fuzzer.Job{
 		"with-trace":    j1,
 		"without-trace": j2,
 	}
@@ -66,7 +65,7 @@ func TestRunner_Fuzz(t *testing.T) {
 	}
 }
 
-func checkFuzzCmdSpec(c act.CmdSpec, j job.Fuzzer) bool {
+func checkFuzzCmdSpec(c act.CmdSpec, j fuzzer.Job) bool {
 	haveTrace := ystring.IsNotEmpty(j.OutTrace)
 	wantLen := 7
 	if haveTrace {

@@ -12,15 +12,14 @@ import (
 	"io"
 	"path/filepath"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/1set/gut/yos"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	litmus2 "github.com/MattWindsor91/act-tester/internal/model/litmus"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
-
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 )
@@ -56,7 +55,7 @@ type FuzzRunner struct {
 	// Arch is the architecture that the lifting process should target.
 	Arch id.ID
 	// Backend can point to the backend information for the lifter.
-	Backend *service.Backend
+	Backend *backend2.Spec
 	// ErrW can point to a writer that should receive stderr from any external programs.
 	ErrW io.Writer
 }
@@ -98,13 +97,13 @@ func (f *FuzzRunner) fuzz(ctx context.Context, rc RunContext) (string, error) {
 	return j.OutLitmus, f.Fuzzer.Fuzz(ctx, j)
 }
 
-func (f *FuzzRunner) fuzzJob(rc RunContext) (job.Fuzzer, error) {
+func (f *FuzzRunner) fuzzJob(rc RunContext) (fuzzer2.Job, error) {
 	in, err := rc.inputPath()
 	if err != nil {
-		return job.Fuzzer{}, err
+		return fuzzer2.Job{}, err
 	}
 
-	return job.Fuzzer{
+	return fuzzer2.Job{
 		Seed:      rc.Seed,
 		In:        filepath.ToSlash(in),
 		OutLitmus: rc.OutLitmus(),
@@ -125,8 +124,8 @@ func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, lpath string) erro
 	return err
 }
 
-func (f *FuzzRunner) liftJob(litmus *litmus2.Litmus, rc RunContext) job.Lifter {
-	return job.Lifter{
+func (f *FuzzRunner) liftJob(litmus *litmus2.Litmus, rc RunContext) backend2.LiftJob {
+	return backend2.LiftJob{
 		Backend: f.Backend,
 		Arch:    f.Arch,
 		In:      *litmus,

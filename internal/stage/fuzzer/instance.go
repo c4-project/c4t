@@ -16,7 +16,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
@@ -107,8 +106,8 @@ func (j *Instance) fuzzCycle(ctx context.Context, cycle int) error {
 	return builder.AddRequest(&nsub).SendTo(ctx, j.ResCh)
 }
 
-func (j *Instance) makeJob(sc SubjectCycle) job.Fuzzer {
-	jb := job.Fuzzer{
+func (j *Instance) makeJob(sc SubjectCycle) fuzzer.Job {
+	jb := fuzzer.Job{
 		Seed:    j.Rng.Int31(),
 		In:      j.Subject.Source.Path,
 		Machine: j.Machine,

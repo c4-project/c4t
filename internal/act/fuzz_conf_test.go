@@ -18,12 +18,11 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/machine"
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 )
 
 // ExampleWriteFuzzConf_empty is a testable example for WriteFuzzConf, showing an empty config.
 func ExampleWriteFuzzConf_empty() {
-	if err := act.WriteFuzzConf(os.Stdout, (job.Fuzzer{})); err != nil {
+	if err := act.WriteFuzzConf(os.Stdout, (fuzzer.Job{})); err != nil {
 		fmt.Println("ERROR:", err)
 	}
 
@@ -35,7 +34,7 @@ func ExampleWriteFuzzConf_empty() {
 
 // ExampleWriteFuzzConf_machine is a testable example for WriteFuzzConf, showing the effect of adding a machine.
 func ExampleWriteFuzzConf_machine() {
-	f := job.Fuzzer{Machine: &machine.Machine{Cores: 4}}
+	f := fuzzer.Job{Machine: &machine.Machine{Cores: 4}}
 	if err := act.WriteFuzzConf(os.Stdout, f); err != nil {
 		fmt.Println("ERROR:", err)
 	}
@@ -52,7 +51,7 @@ func ExampleWriteFuzzConf_machine() {
 // ExampleWriteFuzzConf_params is a testable example for WriteFuzzConf, showing the effect of adding parameters.
 func ExampleWriteFuzzConf_params() {
 	// These will be output in ascending alphabetical order of keys.
-	f := job.Fuzzer{Config: &fuzzer.Configuration{Params: map[string]string{
+	f := fuzzer.Job{Config: &fuzzer.Configuration{Params: map[string]string{
 		"int.action.cap.upper":          "1000",
 		"int.this.will.not.parse":       "six",
 		"bool.mem.unsafe-weaken-orders": "true",
@@ -90,7 +89,7 @@ func ExampleWriteFuzzConf_params() {
 func TestMakeFuzzConfFile(t *testing.T) {
 	t.Parallel()
 
-	cases := map[string]job.Fuzzer{
+	cases := map[string]fuzzer.Job{
 		"no-machine": {Machine: nil},
 		"machine":    {Machine: &machine.Machine{Cores: 4}},
 	}

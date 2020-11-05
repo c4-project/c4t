@@ -8,6 +8,8 @@ package coverage
 import (
 	"errors"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
@@ -36,7 +38,7 @@ type Profile struct {
 	Arch id.ID `toml:"arch"`
 
 	// Backend directly feeds in the target backend for the profile, if it uses one.
-	Backend *service.Backend `toml:"backend"`
+	Backend *backend2.Spec `toml:"backend"`
 
 	// Run specifies, if this is a standalone profile, how to run the generator.
 	Run *service.RunInfo `toml:"run"`

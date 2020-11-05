@@ -8,7 +8,7 @@ package planner
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
@@ -17,10 +17,10 @@ import (
 type BackendFinder interface {
 	// FindBackend asks for a backend with the given style on any one of machines,
 	// or a default machine if none have such a backend.
-	FindBackend(ctx context.Context, style id.ID, machines ...id.ID) (*service.Backend, error)
+	FindBackend(ctx context.Context, style id.ID, machines ...id.ID) (*backend2.Spec, error)
 }
 
-func (p *Planner) planBackend(ctx context.Context, mid id.ID) (*service.Backend, error) {
+func (p *Planner) planBackend(ctx context.Context, mid id.ID) (*backend2.Spec, error) {
 	// TODO(@MattWindsor91): fix this pointer awfulness.
 	return p.source.BProbe.FindBackend(ctx, id.FromString("litmus"), mid)
 }

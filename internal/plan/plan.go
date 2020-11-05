@@ -11,13 +11,13 @@ import (
 	"errors"
 	"time"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -37,7 +37,7 @@ type Plan struct {
 	Machine machine.Named `json:"machine"`
 
 	// Backend represents the backend targeted by this plan.
-	Backend *service.Backend `json:"backend,omitempty"`
+	Backend *backend2.Spec `json:"backend,omitempty"`
 
 	// Compilers represents the compilers to be targeted by this plan.
 	// Each compiler's key is a stringified form of its machine CompilerID.

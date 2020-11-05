@@ -11,9 +11,7 @@ import (
 	"io"
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
-
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -28,7 +26,7 @@ type Job struct {
 	Arches []id.ID
 
 	// Backend is the backend that this job will use.
-	Backend *service.Backend
+	Backend *backend2.Spec
 
 	// Driver is the single-lift driver for this job.
 	Driver SingleLifter
@@ -87,7 +85,7 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 		return perr
 	}
 
-	spec := job.Lifter{
+	spec := backend2.LiftJob{
 		Backend: j.Backend,
 		Arch:    arch,
 		In:      *lit,

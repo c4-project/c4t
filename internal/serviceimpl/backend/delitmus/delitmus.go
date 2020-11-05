@@ -11,12 +11,12 @@ import (
 	"io"
 	"path/filepath"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 )
 
@@ -36,7 +36,7 @@ type Delitmus struct {
 }
 
 // Capabilities reports that this backend can lift (and nothing else).
-func (d Delitmus) Capabilities(_ *service.Backend) backend.Capability {
+func (d Delitmus) Capabilities(_ *backend2.Spec) backend.Capability {
 	return backend.CanLift
 }
 
@@ -44,7 +44,7 @@ func (d Delitmus) Capabilities(_ *service.Backend) backend.Capability {
 // It outputs a delitmusified C file and auxiliary file to j's output directory, and produces a recipe that suggests
 // compiling that C file as an object.
 // At time of writing, there is no way to specify how to delitmusify the file.
-func (d Delitmus) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error) {
+func (d Delitmus) Lift(ctx context.Context, j backend2.LiftJob, errw io.Writer) (recipe.Recipe, error) {
 	// This is a fairly clunky way of injecting errw, but I can't think of anything better.
 	a := d.BaseRunner
 	a.Stderr = errw
@@ -65,6 +65,6 @@ func (d Delitmus) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recip
 }
 
 // ParseObs errors, for we cannot parse the observations of a delitmus run.
-func (d Delitmus) ParseObs(_ context.Context, _ *service.Backend, _ io.Reader, _ *obs.Obs) error {
+func (d Delitmus) ParseObs(_ context.Context, _ *backend2.Spec, _ io.Reader, _ *obs.Obs) error {
 	return backend.ErrNotSupported
 }

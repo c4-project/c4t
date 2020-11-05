@@ -10,10 +10,11 @@ import (
 	"context"
 	"io"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -30,7 +31,7 @@ import (
 type ObsParser interface {
 	// ParseObs parses the observation in reader r into o according to the backend configuration in b.
 	// The backend described by b must have been used to produce the testcase outputting r.
-	ParseObs(ctx context.Context, b *service.Backend, r io.Reader, o *obs.Obs) error
+	ParseObs(ctx context.Context, b *backend2.Spec, r io.Reader, o *obs.Obs) error
 }
 
 // Runner contains information necessary to run a plan's compiled test cases.

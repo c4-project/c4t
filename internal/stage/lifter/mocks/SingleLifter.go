@@ -6,7 +6,7 @@ import (
 	context "context"
 	io "io"
 
-	job "github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -19,18 +19,18 @@ type SingleLifter struct {
 }
 
 // Lift provides a mock function with given fields: ctx, j, errw
-func (_m *SingleLifter) Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error) {
+func (_m *SingleLifter) Lift(ctx context.Context, j backend.LiftJob, errw io.Writer) (recipe.Recipe, error) {
 	ret := _m.Called(ctx, j, errw)
 
 	var r0 recipe.Recipe
-	if rf, ok := ret.Get(0).(func(context.Context, job.Lifter, io.Writer) recipe.Recipe); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, backend.LiftJob, io.Writer) recipe.Recipe); ok {
 		r0 = rf(ctx, j, errw)
 	} else {
 		r0 = ret.Get(0).(recipe.Recipe)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, job.Lifter, io.Writer) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, backend.LiftJob, io.Writer) error); ok {
 		r1 = rf(ctx, j, errw)
 	} else {
 		r1 = ret.Error(1)

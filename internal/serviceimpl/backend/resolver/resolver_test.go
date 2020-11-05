@@ -8,8 +8,9 @@ package resolver_test
 import (
 	"testing"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +31,7 @@ func TestResolver_Capabilities(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			assert.Equal(t, c, resolver.Resolve.Capabilities(&service.Backend{Style: id.FromString(name)}))
+			assert.Equal(t, c, resolver.Resolve.Capabilities(&backend2.Spec{Style: id.FromString(name)}))
 		})
 	}
 }

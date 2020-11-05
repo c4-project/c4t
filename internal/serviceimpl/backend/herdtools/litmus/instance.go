@@ -9,7 +9,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
@@ -17,7 +17,7 @@ import (
 // Instance holds all state needed to do one run of Litmus.
 type Instance struct {
 	// Job contains the lifting job being processed.
-	Job job.Lifter
+	Job backend.LiftJob
 
 	// RunInfo contains the appropriately resolved run info for running Litmus.
 	RunInfo service.RunInfo

@@ -8,11 +8,11 @@ package plan
 import (
 	"time"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
-
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
@@ -34,7 +34,7 @@ func Mock() *Plan {
 		Machine: machine.Named{
 			ID: id.FromString("localhost"),
 		},
-		Backend: &service.Backend{
+		Backend: &backend2.Spec{
 			Style: id.FromString("litmus"),
 		},
 		Compilers: compiler.MockSet(),

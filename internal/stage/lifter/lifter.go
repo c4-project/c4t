@@ -12,6 +12,8 @@ import (
 	"io"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
@@ -19,8 +21,6 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/subject"
-
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
 
@@ -42,7 +42,7 @@ type SingleLifter interface {
 	// Lift performs the lifting described by j.
 	// It returns a recipe describing the files (C files, header files, etc.) created and how to use them, or an error.
 	// Any error output from child processes should be sent to errw, if it is non-nil.
-	Lift(ctx context.Context, j job.Lifter, errw io.Writer) (recipe.Recipe, error)
+	Lift(ctx context.Context, j backend.LiftJob, errw io.Writer) (recipe.Recipe, error)
 }
 
 //go:generate mockery --name=SingleLifter

@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
@@ -19,7 +21,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/MattWindsor91/act-tester/internal/act/mocks"
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/delitmus"
 )
@@ -29,7 +30,7 @@ func TestDelitmus_Lift(t *testing.T) {
 	cr := new(mocks.CmdRunner)
 	cr.Test(t)
 
-	j := job.Lifter{
+	j := backend.LiftJob{
 		In:     *litmus.New(path.Join("in", "foo.litmus")),
 		OutDir: "out",
 	}

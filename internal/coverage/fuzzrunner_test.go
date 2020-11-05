@@ -11,15 +11,15 @@ import (
 	"reflect"
 	"testing"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	mocks3 "github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 	mocks2 "github.com/MattWindsor91/act-tester/internal/stage/lifter/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
@@ -54,7 +54,7 @@ func TestFuzzRunner_Run(t *testing.T) {
 		StatDumper: &s,
 		Config:     &conf,
 		Arch:       id.ArchX86,
-		Backend:    &service.Backend{Style: id.FromString("litmus")},
+		Backend:    &backend2.Spec{Style: id.FromString("litmus")},
 		ErrW:       &b,
 	}
 	sub := subject.NewOrPanic(litmus.New("foo.litmus"))
@@ -65,13 +65,13 @@ func TestFuzzRunner_Run(t *testing.T) {
 		Input:       sub,
 	}
 
-	f.On("Fuzz", mock.Anything, mock.MatchedBy(func(f job.Fuzzer) bool {
+	f.On("Fuzz", mock.Anything, mock.MatchedBy(func(f fuzzer.Job) bool {
 		return f.Seed == rc.Seed &&
 			f.OutLitmus == rc.OutLitmus() &&
 			f.Config != nil &&
 			reflect.DeepEqual(conf, *(f.Config))
 	})).Return(nil).Once()
-	l.On("Lift", mock.Anything, mock.MatchedBy(func(l job.Lifter) bool {
+	l.On("Lift", mock.Anything, mock.MatchedBy(func(l backend2.LiftJob) bool {
 		return l.Arch.Equal(fr.Arch) &&
 			l.Backend == fr.Backend &&
 			l.In.Filepath() == rc.OutLitmus() &&

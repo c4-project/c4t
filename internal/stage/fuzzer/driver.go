@@ -8,7 +8,8 @@ package fuzzer
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 )
 
@@ -27,7 +28,7 @@ type AggregateDriver struct {
 }
 
 // Fuzz delegates to the fuzzer.
-func (a AggregateDriver) Fuzz(ctx context.Context, job job.Fuzzer) error {
+func (a AggregateDriver) Fuzz(ctx context.Context, job fuzzer.Job) error {
 	return a.Single.Fuzz(ctx, job)
 }
 

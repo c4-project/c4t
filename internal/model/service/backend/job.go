@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package job
+package backend
 
 import (
 	"errors"
@@ -12,8 +12,6 @@ import (
 	"github.com/1set/gut/ystring"
 
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
-
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 )
@@ -25,10 +23,10 @@ var (
 	ErrOutDirBlank = errors.New("output directory path blank")
 )
 
-// Lifter is a specification of how to lift a test into a compilable recipe.
-type Lifter struct {
+// LiftJob is a specification of how to lift a test into a compilable recipe.
+type LiftJob struct {
 	// Backend is the backend to use to perform the lifting.
-	Backend *service.Backend
+	Backend *Spec
 
 	// Arch is the ID of the architecture for which a recipe should be prepared.
 	Arch id.ID
@@ -41,7 +39,7 @@ type Lifter struct {
 }
 
 // Check performs several in-flight checks on a lifter job.
-func (l *Lifter) Check() error {
+func (l *LiftJob) Check() error {
 	if !l.In.HasPath() {
 		return ErrInLitmusBlank
 	}
@@ -53,7 +51,7 @@ func (l *Lifter) Check() error {
 
 // OutFiles reads s.OutDir as a directory and returns its contents as qualified paths.
 // This is useful for using a recipe job to feed a compiler job.
-func (l *Lifter) OutFiles() ([]string, error) {
+func (l *LiftJob) OutFiles() ([]string, error) {
 	fs, err := ioutil.ReadDir(l.OutDir)
 	if err != nil {
 		return nil, err

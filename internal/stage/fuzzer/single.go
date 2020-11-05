@@ -8,13 +8,13 @@ package fuzzer
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
+	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
 )
 
 // SingleFuzzer represents types that can commune with a C litmus test fuzzer.
 type SingleFuzzer interface {
 	// Fuzz carries out the given fuzzing job.
-	Fuzz(context.Context, job.Fuzzer) error
+	Fuzz(context.Context, fuzzer.Job) error
 }
 
 //go:generate mockery --name=SingleFuzzer
@@ -23,6 +23,6 @@ type SingleFuzzer interface {
 type NopFuzzer struct{}
 
 // FuzzSingle does nothing, but pretends to fuzz a file.
-func (n NopFuzzer) Fuzz(context.Context, job.Fuzzer) error {
+func (n NopFuzzer) Fuzz(context.Context, fuzzer.Job) error {
 	return nil
 }

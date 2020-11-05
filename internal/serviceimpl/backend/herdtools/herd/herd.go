@@ -10,9 +10,10 @@ import (
 	"context"
 	"fmt"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
 
@@ -20,7 +21,7 @@ import (
 type Herd struct{}
 
 // Run fails to run Herd (for now).
-func (h Herd) Run(_ context.Context, _ job.Lifter, _ service.RunInfo, _ service.Runner) error {
+func (h Herd) Run(_ context.Context, _ backend2.LiftJob, _ service.RunInfo, _ service.Runner) error {
 	// TODO(@MattWindsor91): once we extend this to deal with non-harness jobs, add functionality here.
 	return fmt.Errorf("%w: harness making", backend.ErrNotSupported)
 }

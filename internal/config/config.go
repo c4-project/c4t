@@ -12,13 +12,13 @@ import (
 	"errors"
 	"fmt"
 
+	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+
 	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
-
-	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 
@@ -28,7 +28,7 @@ import (
 // Config is a top-level tester config struct.
 type Config struct {
 	// Backend contains information about the backend being used to generate recipes.
-	Backend *service.Backend `toml:"backend,omitempty"`
+	Backend *backend2.Spec `toml:"backend,omitempty"`
 
 	// Machines enumerates the machines available for testing.
 	Machines machine.ConfigMap `toml:"machines,omitempty"`
@@ -47,7 +47,7 @@ type Config struct {
 }
 
 // FindBackend uses the configuration to find a backend with style style.
-func (c *Config) FindBackend(_ context.Context, style id.ID, _ ...id.ID) (*service.Backend, error) {
+func (c *Config) FindBackend(_ context.Context, style id.ID, _ ...id.ID) (*backend2.Spec, error) {
 	// TODO(@MattWindsor91): this needs rearranging a bit.
 	if c.Backend == nil {
 		return nil, errors.New("backend nil")
