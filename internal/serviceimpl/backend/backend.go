@@ -9,13 +9,22 @@ package backend
 import (
 	"errors"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
 )
 
 // Backend contains the various interfaces that a backend can implement.
 type Backend interface {
+	// Capabilities gets the capability set reported for this backend.
+	Capabilities(b *service.Backend) Capability
+
+	// Some backends can lift test-cases into recipes (capability CanLift).
 	lifter.SingleLifter
+
+	// Backends that can be run standalone or produce executables (capability CanRunStandalone|CanProduceExecutables)
+	// must give an observation parser for interpreting their stdout as observations.
 	runner.ObsParser
 }
 

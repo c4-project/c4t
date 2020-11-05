@@ -28,9 +28,6 @@ type Instance struct {
 	// Fixset is the set of enabled fixes.
 	// It is part of the config to allow the forcing of fixes that the shim would otherwise deem unnecessary.
 	Fixset Fixset
-
-	// Verbose toggles various 'verbose' dumping actions.
-	Verbose bool
 }
 
 // Run runs the litmus wrapper according to the configuration c.

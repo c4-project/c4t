@@ -29,14 +29,16 @@ var (
 	// ErrUnknownStyle occurs when we ask the resolver for a backend style of which it isn't aware.
 	ErrUnknownStyle = errors.New("unknown backend style")
 
-	// Resolve is a pre-populated compiler resolver.
+	// Resolve is a pre-populated backend resolver.
 	Resolve = Resolver{Backends: map[string]backend.Backend{
 		"delitmus": delitmus.Delitmus{},
 		"herd": herdtools.Backend{
+			Capability: backend.CanRunStandalone,
 			DefaultRun: service.RunInfo{Cmd: "herd7"},
 			Impl:       herd.Herd{},
 		},
 		"litmus": herdtools.Backend{
+			Capability: backend.CanRunStandalone | backend.CanLift | backend.CanProduceExecutables,
 			DefaultRun: service.RunInfo{Cmd: "litmus7"},
 			Impl:       litmus.Litmus{},
 		},
@@ -47,6 +49,16 @@ var (
 type Resolver struct {
 	// Backends is the raw map from style strings to backend runners.
 	Backends map[string]backend.Backend
+}
+
+// Capabilities delegates capability handling to the appropriate backend for b.
+func (r *Resolver) Capabilities(b *service.Backend) backend.Capability {
+	bi, err := r.Get(b)
+	if err != nil {
+		// TODO(@MattWindsor91): return something specifically stating there is no backend?
+		return 0
+	}
+	return bi.Capabilities(b)
 }
 
 // Lift delegates lifting to the appropriate maker for j.

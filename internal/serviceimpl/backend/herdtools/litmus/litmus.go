@@ -17,11 +17,6 @@ import (
 type Litmus struct{}
 
 func (l Litmus) Run(ctx context.Context, j job.Lifter, r service.RunInfo, x service.Runner) error {
-	i := Instance{
-		Job:     j,
-		RunInfo: r,
-		Runner:  x,
-		Verbose: false,
-	}
+	i := Instance{Job: j, RunInfo: r, Runner: x}
 	return i.Run(ctx)
 }

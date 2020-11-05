@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/parser"
@@ -22,13 +24,21 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 )
 
-// Backend represents Backend-style backends such as Herd and Litmus.
+// Backend represents herdtools-style backends such as Herd and Litmus.
 type Backend struct {
+	// Capability contains the capability flags for this backend.
+	Capability backend.Capability
+
 	// DefaultRun is the default run information for the particular backend.
 	DefaultRun service.RunInfo
 
 	// Impl provides parts of the Backend backend setup that differ between the various tools.
 	Impl BackendImpl
+}
+
+// Capabilities returns Capability, to satisfy the backend interface.
+func (h Backend) Capabilities(_ *service.Backend) backend.Capability {
+	return h.Capability
 }
 
 // ParseObs parses an observation from r into o.

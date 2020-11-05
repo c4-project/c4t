@@ -20,6 +20,11 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject/obs"
 )
 
+const (
+	outAux = "aux.json"
+	outC   = "delitmus.c"
+)
+
 // Delitmus partially implements the backend specification by delegating to ACT's delitmusifier.
 //
 // The delitmus backend can't actually produce standalone C code, and, at time of writing, there is no way to get
@@ -30,10 +35,10 @@ type Delitmus struct {
 	BaseRunner act.Runner
 }
 
-const (
-	outAux = "aux.json"
-	outC   = "delitmus.c"
-)
+// Capabilities reports that this backend can lift (and nothing else).
+func (d Delitmus) Capabilities(_ *service.Backend) backend.Capability {
+	return backend.CanLift
+}
 
 // Lift delitmusifies the litmus file specified in j, using errw for standard output.
 // It outputs a delitmusified C file and auxiliary file to j's output directory, and produces a recipe that suggests
