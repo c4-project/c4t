@@ -7,26 +7,27 @@ package act_test
 
 import (
 	"context"
+	"io"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/act-tester/internal/model/service/mocks"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
 	"github.com/stretchr/testify/require"
-
-	"github.com/MattWindsor91/act-tester/internal/act/mocks"
 )
 
 // TestRunner_Delitmus tests the happy path of Delitmus using a mock runner.
 func TestRunner_Delitmus(t *testing.T) {
 	t.Parallel()
 
-	var m mocks.CmdRunner
+	var m mocks.Runner
 	m.Test(t)
-	m.On("Run", mock.Anything, act.CmdSpec{
-		Cmd:    act.BinActC,
-		Subcmd: "delitmus",
-		Args:   []string{"-aux-output", "aux.json", "-output", "c.json", "in.litmus"},
+	m.On("Run", mock.Anything, service.RunInfo{
+		Cmd:  act.BinActC,
+		Args: []string{"delitmus", "-aux-output", "aux.json", "-output", "c.json", "in.litmus"},
 	}).Return(nil).Once()
 
 	dj := act.DelitmusJob{
@@ -35,7 +36,7 @@ func TestRunner_Delitmus(t *testing.T) {
 		OutC:     "c.json",
 	}
 
-	a := act.Runner{CmdRunner: &m}
+	a := act.Runner{RunnerFactory: func(io.Writer, io.Writer) service.Runner { return &m }}
 	err := a.Delitmus(context.Background(), dj)
 	require.NoError(t, err, "mocked delitmus shouldn't error")
 

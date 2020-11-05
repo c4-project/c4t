@@ -53,11 +53,9 @@ func StderrTo(w io.Writer) ExecOption {
 	}
 }
 
-/*
 // StdoutTo redirects standard output of any commands run by the runner to w.
 func StdoutTo(w io.Writer) ExecOption {
 	return func(l *ExecRunner) {
 		l.outw = w
 	}
 }
-*/

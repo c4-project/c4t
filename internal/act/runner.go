@@ -8,7 +8,9 @@ package act
 import (
 	"context"
 	"io"
-	"os/exec"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
+	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
 
 // Runner stores information about how to run the core ACT binaries.
@@ -19,19 +21,9 @@ type Runner struct {
 	DuneExec bool
 	// Stderr is the destination for any error output from ACT commands.
 	Stderr io.Writer
-	// CmdRunner lets one mock out the low-level ACT command runner.
-	CmdRunner CmdRunner
+	// RunnerFactory lets one mock out the low-level ACT command runner.
+	RunnerFactory func(outw, errw io.Writer) service.Runner
 }
-
-// CmdRunner is the type of low-level ACT command runners.
-type CmdRunner interface {
-	// TODO(@MattWindsor91): harmonise with srvrun.ExecRunner?  The two seem to have slightly different purposes.
-
-	// Run runs s; the command will terminate if ctx is cancelled.
-	Run(ctx context.Context, s CmdSpec) error
-}
-
-//go:generate mockery --name=CmdRunner
 
 // CmdSpec holds all information about the invocation of an ACT command.
 type CmdSpec struct {
@@ -53,26 +45,28 @@ func (c CmdSpec) FullArgv() []string {
 	return append(fargv, c.Args...)
 }
 
+func execRunner(outw, errw io.Writer) service.Runner {
+	return srvrun.NewExecRunner(srvrun.StdoutTo(outw), srvrun.StderrTo(errw))
+}
+
 func (a *Runner) Run(ctx context.Context, s CmdSpec) error {
+	rf := execRunner
 	// Mocking opportunity.
-	if a.CmdRunner != nil {
-		return a.CmdRunner.Run(ctx, s)
+	if a.RunnerFactory != nil {
+		rf = a.RunnerFactory
 	}
-	return a.runInner(ctx, s)
+	return a.runInner(ctx, s, rf)
 }
 
-func (a *Runner) runInner(ctx context.Context, s CmdSpec) error {
+func (a *Runner) runInner(ctx context.Context, s CmdSpec, rf func(io.Writer, io.Writer) service.Runner) error {
 	fargv := s.FullArgv()
-	dcmd, dargv := liftDuneExec(a.DuneExec, s.Cmd, fargv)
-	c := exec.CommandContext(ctx, dcmd, dargv...)
-	c.Stderr = a.Stderr
-	c.Stdout = s.Stdout
-	return c.Run()
+	ri := liftDuneExec(a.DuneExec, s.Cmd, fargv)
+	return rf(a.Stderr, s.Stdout).Run(ctx, ri)
 }
 
-func liftDuneExec(duneExec bool, cmd string, argv []string) (string, []string) {
+func liftDuneExec(duneExec bool, cmd string, argv []string) service.RunInfo {
 	if duneExec {
-		return "dune", append([]string{"exec", cmd, "--"}, argv...)
+		cmd, argv = "dune", append([]string{"exec", cmd, "--"}, argv...)
 	}
-	return cmd, argv
+	return *service.NewRunInfo(cmd, argv...)
 }

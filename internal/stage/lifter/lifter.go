@@ -41,7 +41,7 @@ var (
 type SingleLifter interface {
 	// Lift performs the lifting described by j.
 	// It returns a recipe describing the files (C files, header files, etc.) created and how to use them, or an error.
-	// Any error output from child processes should be sent to errw, if it is non-nil.
+	// Any external service running should happen by sr.
 	Lift(ctx context.Context, j backend.LiftJob, errw io.Writer) (recipe.Recipe, error)
 }
 

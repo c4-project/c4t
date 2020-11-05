@@ -16,6 +16,8 @@ type Runner interface {
 	Run(ctx context.Context, r RunInfo) error
 }
 
+//go:generate mockery --name=Runner
+
 // RunInfo gives hints as to how to run a service.
 type RunInfo struct {
 	// Cmd overrides the command for the service.
