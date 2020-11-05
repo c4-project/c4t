@@ -14,8 +14,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
-
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/parser"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
@@ -46,7 +44,7 @@ func (h Backend) ParseObs(_ context.Context, _ *backend2.Spec, r io.Reader, o *o
 	return parser.Parse(h.Impl, r, o)
 }
 
-func (h Backend) Lift(ctx context.Context, j backend2.LiftJob, errw io.Writer) (recipe.Recipe, error) {
+func (h Backend) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runner) (recipe.Recipe, error) {
 	b := j.Backend
 
 	if b == nil {
@@ -58,7 +56,6 @@ func (h Backend) Lift(ctx context.Context, j backend2.LiftJob, errw io.Writer) (
 		r.Override(*b.Run)
 	}
 
-	sr := srvrun.NewExecRunner(srvrun.StderrTo(errw))
 	if err := h.Impl.Run(ctx, j, r, sr); err != nil {
 		return recipe.Recipe{}, fmt.Errorf("running %s: %w", r.Cmd, err)
 	}

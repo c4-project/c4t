@@ -6,9 +6,7 @@
 package delitmus_test
 
 import (
-	"bytes"
 	"context"
-	"io"
 	"path"
 	"path/filepath"
 	"testing"
@@ -38,9 +36,6 @@ func TestDelitmus_Lift(t *testing.T) {
 		OutDir: "out",
 	}
 
-	// We don't actually use this, but it helps us check the runner construction.
-	errw := new(bytes.Buffer)
-
 	cr.On("Run", mock.Anything, service.RunInfo{
 		Cmd: act.BinActC,
 		Args: []string{
@@ -51,12 +46,12 @@ func TestDelitmus_Lift(t *testing.T) {
 		},
 	}).Return(nil).Once()
 
-	dl := delitmus.Delitmus{BaseRunner: act.Runner{RunnerFactory: func(io.Writer, io.Writer) service.Runner { return cr }}}
-	recipe, err := dl.Lift(context.Background(), j, errw)
+	dl := delitmus.Delitmus{BaseRunner: act.Runner{}}
+	recipe, err := dl.Lift(context.Background(), j, cr)
 	require.NoError(t, err, "lifting with mock delitmus run")
 
 	assert.Equal(t, j.OutDir, recipe.Dir, "recipe should output to job output directory")
-	assert.Nil(t, dl.BaseRunner.Stderr, "should not have overwritten the base runner")
+	assert.Nil(t, dl.BaseRunner.Base, "should not have changed base of original runner")
 
 	cr.AssertExpectations(t)
 }

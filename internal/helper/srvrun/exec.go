@@ -26,6 +26,16 @@ func NewExecRunner(os ...ExecOption) *ExecRunner {
 	return e
 }
 
+// WithStderr returns a new ExecRunner with standard error rerouted to w.
+func (e ExecRunner) WithStderr(w io.Writer) service.Runner {
+	return ExecRunner{outw: e.outw, errw: w}
+}
+
+// WithStdout returns a new ExecRunner with standard output rerouted to w.
+func (e ExecRunner) WithStdout(w io.Writer) service.Runner {
+	return ExecRunner{outw: w, errw: e.errw}
+}
+
 // Run runs the command specified by r using exec, on context ctx.
 func (e ExecRunner) Run(ctx context.Context, r service.RunInfo) error {
 	c := exec.CommandContext(ctx, r.Cmd, r.Args...)
@@ -50,12 +60,5 @@ func ExecOptions(os ...ExecOption) ExecOption {
 func StderrTo(w io.Writer) ExecOption {
 	return func(l *ExecRunner) {
 		l.errw = w
-	}
-}
-
-// StdoutTo redirects standard output of any commands run by the runner to w.
-func StdoutTo(w io.Writer) ExecOption {
-	return func(l *ExecRunner) {
-		l.outw = w
 	}
 }

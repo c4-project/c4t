@@ -7,11 +7,18 @@ package service
 
 import (
 	"context"
+	"io"
 	"strings"
 )
 
 // Runner is the interface of things that can run, or pretend to run, services.
 type Runner interface {
+	// WithStdout should return a new runner with the standard output overridden to w.
+	WithStdout(w io.Writer) Runner
+
+	// WithStderr should return a new runner with the standard error overridden to w.
+	WithStderr(w io.Writer) Runner
+
 	// Run runs r using context ctx.
 	Run(ctx context.Context, r RunInfo) error
 }

@@ -8,8 +8,9 @@ package lifter
 import (
 	"context"
 	"fmt"
-	"io"
 	"math/rand"
+
+	"github.com/MattWindsor91/act-tester/internal/model/service"
 
 	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
@@ -20,8 +21,8 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/subject"
 )
 
-// Job is the type of per-subject lifter jobs.
-type Job struct {
+// Instance is the type of per-subject lifter jobs.
+type Instance struct {
 	// Arches is the list of architectures for which this job is responsible.
 	Arches []id.ID
 
@@ -34,8 +35,8 @@ type Job struct {
 	// Paths is the path resolver for this job.
 	Paths Pather
 
-	// Stderr is the writer to which lifter stderr should be redirected.
-	Stderr io.Writer
+	// Stderr is the runner on which the lifter should be run.
+	Runner service.Runner
 
 	// Normalise is the subject that we are trying to lift.
 	Subject subject.Named
@@ -48,7 +49,7 @@ type Job struct {
 }
 
 // Lift performs this lifting job.
-func (j *Job) Lift(ctx context.Context) error {
+func (j *Instance) Lift(ctx context.Context) error {
 	if err := j.check(); err != nil {
 		return err
 	}
@@ -62,8 +63,8 @@ func (j *Job) Lift(ctx context.Context) error {
 	return nil
 }
 
-// check does some basic checking on the Job before starting to run it.
-func (j *Job) check() error {
+// check does some basic checking on the Instance before starting to run it.
+func (j *Instance) check() error {
 	if j.Backend == nil {
 		return ErrNoBackend
 	}
@@ -74,7 +75,7 @@ func (j *Job) check() error {
 	return nil
 }
 
-func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
+func (j *Instance) liftArch(ctx context.Context, arch id.ID) error {
 	dir, derr := j.Paths.Path(arch, j.Subject.Name)
 	if derr != nil {
 		return fmt.Errorf("when getting subject dir: %w", derr)
@@ -92,7 +93,7 @@ func (j *Job) liftArch(ctx context.Context, arch id.ID) error {
 		OutDir:  dir,
 	}
 
-	r, err := j.Driver.Lift(ctx, spec, j.Stderr)
+	r, err := j.Driver.Lift(ctx, spec, j.Runner)
 	if err != nil {
 		return fmt.Errorf("when lifting %s (arch %s): %w", j.Subject.Name, arch, err)
 	}

@@ -63,12 +63,12 @@ func (r *Resolver) Capabilities(b *backend2.Spec) backend.Capability {
 }
 
 // Lift delegates lifting to the appropriate maker for j.
-func (r *Resolver) Lift(ctx context.Context, j backend2.LiftJob, errw io.Writer) (recipe.Recipe, error) {
+func (r *Resolver) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runner) (recipe.Recipe, error) {
 	bi, err := r.Get(j.Backend)
 	if err != nil {
 		return recipe.Recipe{}, err
 	}
-	return bi.Lift(ctx, j, errw)
+	return bi.Lift(ctx, j, sr)
 }
 
 // ParseObs delegates observation parsing to the appropriate implementation for the backend referenced by b.

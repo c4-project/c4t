@@ -13,6 +13,8 @@ import (
 	"math/rand"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
+
 	"github.com/MattWindsor91/act-tester/internal/model/litmus"
 	"github.com/MattWindsor91/act-tester/internal/observing"
 
@@ -252,6 +254,7 @@ func (m *Maker) knownRunner(p Profile) (Runner, error) {
 		Config:     p.Fuzz,
 		Arch:       p.Arch,
 		Backend:    p.Backend,
-		ErrW:       m.errw,
+		// TODO(@MattWindsor91): push this up somehow
+		Runner: srvrun.NewExecRunner(srvrun.StderrTo(m.errw)),
 	}, nil
 }

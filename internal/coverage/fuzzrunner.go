@@ -9,9 +9,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service"
 	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
 	"github.com/1set/gut/yos"
@@ -56,8 +56,8 @@ type FuzzRunner struct {
 	Arch id.ID
 	// Backend can point to the backend information for the lifter.
 	Backend *backend2.Spec
-	// ErrW can point to a writer that should receive stderr from any external programs.
-	ErrW io.Writer
+	// Runner should be the service runner to use when invoking the lifter.
+	Runner service.Runner
 }
 
 func (f *FuzzRunner) Run(ctx context.Context, rc RunContext) error {
@@ -120,7 +120,7 @@ func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, lpath string) erro
 		return fmt.Errorf("getting stats of generated litmus file %q: %w", lpath, err)
 	}
 	// TODO(@MattWindsor91): do something with the recipe
-	_, err = f.Lifter.Lift(ctx, f.liftJob(litmus, rc), f.ErrW)
+	_, err = f.Lifter.Lift(ctx, f.liftJob(litmus, rc), f.Runner)
 	return err
 }
 

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
 	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
 
 	"github.com/MattWindsor91/act-tester/internal/act"
@@ -56,7 +57,7 @@ func ActRunnerCliFlags() []c.Flag {
 func ActRunnerFromCli(ctx *c.Context, errw io.Writer) *act.Runner {
 	return &act.Runner{
 		DuneExec: ctx.Bool(flagActDuneExec),
-		Stderr:   errw,
+		Base:     srvrun.NewExecRunner(srvrun.StderrTo(errw)),
 	}
 }
 

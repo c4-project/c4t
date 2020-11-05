@@ -7,22 +7,22 @@ package act
 
 import (
 	"context"
+	"errors"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
 	"github.com/MattWindsor91/act-tester/internal/model/service"
 )
 
+// ErrNoBaseRunner occurs if we try to use a Runner that has no Runner.Base set.
+var ErrNoBaseRunner = errors.New("no base runner supplied")
+
 // Runner stores information about how to run the core ACT binaries.
 type Runner struct {
-	// TODO(@MattWindsor91): consider turning DuneExec into a CmdRunner.
-
 	// DuneExec toggles whether ACT should be run through dune.
 	DuneExec bool
-	// Stderr is the destination for any error output from ACT commands.
-	Stderr io.Writer
-	// RunnerFactory lets one mock out the low-level ACT command runner.
-	RunnerFactory func(outw, errw io.Writer) service.Runner
+
+	// Base is the basic service runner the ACT runner is using to run binaries.
+	Base service.Runner
 }
 
 // CmdSpec holds all information about the invocation of an ACT command.
@@ -45,23 +45,16 @@ func (c CmdSpec) FullArgv() []string {
 	return append(fargv, c.Args...)
 }
 
-func execRunner(outw, errw io.Writer) service.Runner {
-	return srvrun.NewExecRunner(srvrun.StdoutTo(outw), srvrun.StderrTo(errw))
-}
-
 func (a *Runner) Run(ctx context.Context, s CmdSpec) error {
-	rf := execRunner
-	// Mocking opportunity.
-	if a.RunnerFactory != nil {
-		rf = a.RunnerFactory
+	r := a.Base
+	if r == nil {
+		return ErrNoBaseRunner
 	}
-	return a.runInner(ctx, s, rf)
-}
+	if s.Stdout != nil {
+		r = r.WithStdout(s.Stdout)
+	}
 
-func (a *Runner) runInner(ctx context.Context, s CmdSpec, rf func(io.Writer, io.Writer) service.Runner) error {
-	fargv := s.FullArgv()
-	ri := liftDuneExec(a.DuneExec, s.Cmd, fargv)
-	return rf(a.Stderr, s.Stdout).Run(ctx, ri)
+	return r.Run(ctx, liftDuneExec(a.DuneExec, s.Cmd, s.FullArgv()))
 }
 
 func liftDuneExec(duneExec bool, cmd string, argv []string) service.RunInfo {

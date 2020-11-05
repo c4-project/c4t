@@ -7,7 +7,6 @@ package act_test
 
 import (
 	"context"
-	"io"
 	"strconv"
 	"testing"
 
@@ -58,7 +57,7 @@ func TestRunner_Fuzz(t *testing.T) {
 				return checkFuzzCmdSpec(c, j)
 			})).Return(nil).Once()
 
-			a := act.Runner{RunnerFactory: func(io.Writer, io.Writer) service.Runner { return cr }}
+			a := act.Runner{Base: cr}
 
 			err := a.Fuzz(context.Background(), j)
 			require.NoError(t, err, "mocked fuzzing should succeed")

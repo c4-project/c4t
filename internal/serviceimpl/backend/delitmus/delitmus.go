@@ -11,6 +11,8 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/MattWindsor91/act-tester/internal/model/service"
+
 	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
@@ -44,10 +46,10 @@ func (d Delitmus) Capabilities(_ *backend2.Spec) backend.Capability {
 // It outputs a delitmusified C file and auxiliary file to j's output directory, and produces a recipe that suggests
 // compiling that C file as an object.
 // At time of writing, there is no way to specify how to delitmusify the file.
-func (d Delitmus) Lift(ctx context.Context, j backend2.LiftJob, errw io.Writer) (recipe.Recipe, error) {
-	// This is a fairly clunky way of injecting errw, but I can't think of anything better.
+func (d Delitmus) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runner) (recipe.Recipe, error) {
+	// Copying here is important; BaseRunner shouldn't have its service.Runner replaced
 	a := d.BaseRunner
-	a.Stderr = errw
+	a.Base = sr
 
 	dj := act.DelitmusJob{
 		InLitmus: j.In.Filepath(),

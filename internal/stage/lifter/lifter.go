@@ -12,6 +12,10 @@ import (
 	"io"
 	"math/rand"
 
+	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
+
+	"github.com/MattWindsor91/act-tester/internal/model/service"
+
 	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
@@ -42,7 +46,7 @@ type SingleLifter interface {
 	// Lift performs the lifting described by j.
 	// It returns a recipe describing the files (C files, header files, etc.) created and how to use them, or an error.
 	// Any external service running should happen by sr.
-	Lift(ctx context.Context, j backend.LiftJob, errw io.Writer) (recipe.Recipe, error)
+	Lift(ctx context.Context, j backend.LiftJob, sr service.Runner) (recipe.Recipe, error)
 }
 
 //go:generate mockery --name=SingleLifter
@@ -138,8 +142,8 @@ func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, e
 	})
 }
 
-func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, mrng *rand.Rand, resCh chan<- builder.Request) Job {
-	return Job{
+func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, mrng *rand.Rand, resCh chan<- builder.Request) Instance {
+	return Instance{
 		Arches:  p.Arches(),
 		Backend: p.Backend,
 		Paths:   l.paths,
@@ -147,6 +151,7 @@ func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, mrng *rand.Rand, resCh c
 		Subject: s,
 		Rng:     rand.New(rand.NewSource(mrng.Int63())),
 		ResCh:   resCh,
-		Stderr:  l.errw,
+		// TODO(@MattWindsor91): push this further up
+		Runner: srvrun.NewExecRunner(srvrun.StderrTo(l.errw)),
 	}
 }

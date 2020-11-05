@@ -6,10 +6,11 @@
 package coverage_test
 
 import (
-	"bytes"
 	"context"
 	"reflect"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
 
 	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
@@ -38,10 +39,10 @@ func TestFuzzRunner_Run(t *testing.T) {
 	td := t.TempDir()
 
 	var (
-		f mocks.SingleFuzzer
-		l mocks2.SingleLifter
-		s mocks3.StatDumper
-		b bytes.Buffer
+		f  mocks.SingleFuzzer
+		l  mocks2.SingleLifter
+		s  mocks3.StatDumper
+		dr srvrun.DryRunner
 	)
 	f.Test(t)
 	l.Test(t)
@@ -55,7 +56,7 @@ func TestFuzzRunner_Run(t *testing.T) {
 		Config:     &conf,
 		Arch:       id.ArchX86,
 		Backend:    &backend2.Spec{Style: id.FromString("litmus")},
-		ErrW:       &b,
+		Runner:     dr,
 	}
 	sub := subject.NewOrPanic(litmus.New("foo.litmus"))
 	rc := coverage.RunContext{
@@ -76,7 +77,7 @@ func TestFuzzRunner_Run(t *testing.T) {
 			l.Backend == fr.Backend &&
 			l.In.Filepath() == rc.OutLitmus() &&
 			l.OutDir == rc.LiftOutDir()
-	}), &b).Return(recipe.Recipe{}, nil).Once()
+	}), dr).Return(recipe.Recipe{}, nil).Once()
 	s.On("DumpStats", mock.Anything, mock.AnythingOfType("*litmus.Statset"), rc.OutLitmus()).Return(nil).Once()
 
 	err := fr.Run(context.Background(), rc)

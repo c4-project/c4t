@@ -7,7 +7,6 @@ package act_test
 
 import (
 	"context"
-	"io"
 	"testing"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
@@ -23,7 +22,7 @@ import (
 func TestRunner_Delitmus(t *testing.T) {
 	t.Parallel()
 
-	var m mocks.Runner
+	m := new(mocks.Runner)
 	m.Test(t)
 	m.On("Run", mock.Anything, service.RunInfo{
 		Cmd:  act.BinActC,
@@ -36,7 +35,7 @@ func TestRunner_Delitmus(t *testing.T) {
 		OutC:     "c.json",
 	}
 
-	a := act.Runner{RunnerFactory: func(io.Writer, io.Writer) service.Runner { return &m }}
+	a := act.Runner{Base: m}
 	err := a.Delitmus(context.Background(), dj)
 	require.NoError(t, err, "mocked delitmus shouldn't error")
 
