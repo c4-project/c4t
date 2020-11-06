@@ -128,7 +128,10 @@ func (f *FuzzRunner) liftJob(litmus *litmus2.Litmus, rc RunContext) backend2.Lif
 	return backend2.LiftJob{
 		Backend: f.Backend,
 		Arch:    f.Arch,
-		In:      *litmus,
-		OutDir:  rc.LiftOutDir(),
+		In:      backend2.LiftLitmusInput(*litmus),
+		Out: backend2.LiftOutput{
+			Dir:    rc.LiftOutDir(),
+			Target: backend2.ToDefault,
+		},
 	}
 }

@@ -9,10 +9,12 @@ package backend
 type Capability uint8
 
 const (
-	// This backend can lift test-cases into recipes.
-	CanLift Capability = 1 << iota
-	// This backend can be run without a compile/
-	CanRunStandalone
-	// This backend's recipes can produce executable harnesses.
-	CanProduceExecutables
+	// CanRunStandalone states that the backend can produce ToStandalone targets.
+	CanRunStandalone = 1 << iota
+	// CanProduceObj states that the backend's recipes can ToObjRecipe targets.
+	CanProduceObj
+	// CanProduceExe states that the backend's recipes can produce ToExeRecipe targets.
+	CanProduceExe
+	// CanLiftLitmus states that the backend can consume LiftLitmus sources.
+	CanLiftLitmus
 )

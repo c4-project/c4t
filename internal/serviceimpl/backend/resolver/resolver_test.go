@@ -22,9 +22,9 @@ func TestResolver_Capabilities(t *testing.T) {
 
 	cases := map[string]backend.Capability{
 		"nope":     0,
-		"delitmus": backend.CanLift,
-		"herd":     backend.CanRunStandalone,
-		"litmus":   backend.CanLift | backend.CanRunStandalone | backend.CanProduceExecutables,
+		"delitmus": backend.CanLiftLitmus | backend.CanProduceObj,
+		"herd":     backend.CanLiftLitmus | backend.CanRunStandalone,
+		"litmus":   backend.CanLiftLitmus | backend.CanRunStandalone | backend.CanProduceExe,
 	}
 	for name, c := range cases {
 		name, c := name, c

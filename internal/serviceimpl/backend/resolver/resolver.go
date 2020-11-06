@@ -34,12 +34,12 @@ var (
 	Resolve = Resolver{Backends: map[string]backend.Backend{
 		"delitmus": delitmus.Delitmus{},
 		"herd": herdtools.Backend{
-			Capability: backend.CanRunStandalone,
+			Capability: backend.CanLiftLitmus | backend.CanRunStandalone,
 			DefaultRun: service.RunInfo{Cmd: "herd7"},
 			Impl:       herd.Herd{},
 		},
 		"litmus": herdtools.Backend{
-			Capability: backend.CanRunStandalone | backend.CanLift | backend.CanProduceExecutables,
+			Capability: backend.CanRunStandalone | backend.CanLiftLitmus | backend.CanProduceExe,
 			DefaultRun: service.RunInfo{Cmd: "litmus7"},
 			Impl:       litmus.Litmus{},
 		},

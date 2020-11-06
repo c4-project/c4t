@@ -24,9 +24,12 @@ import (
 func ExampleInstance_Run() {
 	i := litmus.Instance{
 		Job: backend.LiftJob{
-			Arch:   id.ArchX8664,
-			In:     *mdl.New("in.litmus"),
-			OutDir: "out",
+			Arch: id.ArchX8664,
+			In:   backend.LiftLitmusInput(*mdl.New("in.litmus")),
+			Out: backend.LiftOutput{
+				Dir:    "out",
+				Target: backend.ToExeRecipe,
+			},
 		},
 		RunInfo: service.RunInfo{
 			Cmd:  "litmus7",

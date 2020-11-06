@@ -38,7 +38,7 @@ func (l *Instance) Run(ctx context.Context) error {
 		return err
 	}
 
-	l.Fixset.PopulateFromStats(l.Job.In.Stats)
+	l.Fixset.PopulateFromStats(l.Job.In.Litmus.Stats)
 
 	ji, err := l.jobRunInfo()
 	if err != nil {
@@ -75,6 +75,6 @@ func (l *Instance) litmusArgs() ([]string, error) {
 	}
 
 	args := l.Fixset.Args()
-	args = append(args, "-o", l.Job.OutDir, "-carch", carch, "-c11", "true", l.Job.In.Path)
+	args = append(args, "-o", l.Job.Out.Dir, "-carch", carch, "-c11", "true", l.Job.In.Litmus.Path)
 	return args, nil
 }

@@ -8,6 +8,7 @@ package delitmus
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"path/filepath"
 
@@ -39,7 +40,7 @@ type Delitmus struct {
 
 // Capabilities reports that this backend can lift (and nothing else).
 func (d Delitmus) Capabilities(_ *backend2.Spec) backend.Capability {
-	return backend.CanLift
+	return backend.CanLiftLitmus | backend.CanProduceObj
 }
 
 // Lift delitmusifies the litmus file specified in j, using errw for standard output.
@@ -47,23 +48,39 @@ func (d Delitmus) Capabilities(_ *backend2.Spec) backend.Capability {
 // compiling that C file as an object.
 // At time of writing, there is no way to specify how to delitmusify the file.
 func (d Delitmus) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runner) (recipe.Recipe, error) {
+	if err := checkAndAmendJob(&j); err != nil {
+		return recipe.Recipe{}, err
+	}
+
 	// Copying here is important; BaseRunner shouldn't have its service.Runner replaced
 	a := d.BaseRunner
 	a.Base = sr
 
 	dj := act.DelitmusJob{
-		InLitmus: j.In.Filepath(),
-		OutAux:   filepath.Join(j.OutDir, outAux),
-		OutC:     filepath.Join(j.OutDir, outC),
+		InLitmus: j.In.Litmus.Filepath(),
+		OutAux:   filepath.Join(j.Out.Dir, outAux),
+		OutC:     filepath.Join(j.Out.Dir, outC),
 	}
 	if err := a.Delitmus(ctx, dj); err != nil {
 		return recipe.Recipe{}, err
 	}
-	return recipe.New(j.OutDir,
+	return recipe.New(j.Out.Dir,
 		recipe.AddFiles(dj.OutC),
 		recipe.AddInstructions(recipe.CompileObjInst(1)),
 		// TODO(@MattWindsor91): deal with the fact that this ends in an obj compile
 	), nil
+}
+
+func checkAndAmendJob(j *backend2.LiftJob) error {
+	if j.In.Source != backend2.LiftLitmus {
+		return fmt.Errorf("%w: source must be litmus", backend.ErrNotSupported)
+	}
+	if j.Out.Target == backend2.ToDefault {
+		j.Out.Target = backend2.ToObjRecipe
+	} else if j.Out.Target != backend2.ToObjRecipe {
+		return fmt.Errorf("%w: output must be object", backend.ErrNotSupported)
+	}
+	return nil
 }
 
 // ParseObs errors, for we cannot parse the observations of a delitmus run.

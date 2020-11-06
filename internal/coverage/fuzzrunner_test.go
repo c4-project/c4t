@@ -75,8 +75,10 @@ func TestFuzzRunner_Run(t *testing.T) {
 	l.On("Lift", mock.Anything, mock.MatchedBy(func(l backend2.LiftJob) bool {
 		return l.Arch.Equal(fr.Arch) &&
 			l.Backend == fr.Backend &&
-			l.In.Filepath() == rc.OutLitmus() &&
-			l.OutDir == rc.LiftOutDir()
+			l.In.Source == backend2.LiftLitmus &&
+			l.In.Litmus.Filepath() == rc.OutLitmus() &&
+			l.Out.Target == backend2.ToDefault &&
+			l.Out.Dir == rc.LiftOutDir()
 	}), dr).Return(recipe.Recipe{}, nil).Once()
 	s.On("DumpStats", mock.Anything, mock.AnythingOfType("*litmus.Statset"), rc.OutLitmus()).Return(nil).Once()
 

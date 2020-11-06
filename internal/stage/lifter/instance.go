@@ -86,11 +86,15 @@ func (j *Instance) liftArch(ctx context.Context, arch id.ID) error {
 		return perr
 	}
 
+	// TODO(@MattWindsor91): don't hardcode this
 	spec := backend2.LiftJob{
 		Backend: j.Backend,
 		Arch:    arch,
-		In:      *lit,
-		OutDir:  dir,
+		In:      backend2.LiftLitmusInput(*lit),
+		Out: backend2.LiftOutput{
+			Dir:    dir,
+			Target: backend2.ToExeRecipe,
+		},
 	}
 
 	r, err := j.Driver.Lift(ctx, spec, j.Runner)

@@ -64,11 +64,11 @@ func (h Backend) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runner
 }
 
 func (h Backend) makeRecipe(j backend2.LiftJob) (recipe.Recipe, error) {
-	fs, err := j.OutFiles()
+	fs, err := j.Out.Files()
 	if err != nil {
 		return recipe.Recipe{}, err
 	}
-	return recipe.New(j.OutDir,
+	return recipe.New(j.Out.Dir,
 		recipe.AddFiles(fs...),
 		// TODO(@MattWindsor91): delitmus support
 		recipe.CompileAllCToExe(),

@@ -49,8 +49,8 @@ func (l *Instance) patch() error {
 
 // mainCFile guesses where Litmus is going to put the main file in its generated harness.
 func (l *Instance) mainCFile() string {
-	file := iohelp.ExtlessFile(l.Job.In.Path) + ".c"
-	return filepath.Join(l.Job.OutDir, file)
+	file := iohelp.ExtlessFile(l.Job.In.Litmus.Path) + ".c"
+	return filepath.Join(l.Job.Out.Dir, file)
 }
 
 func (l *Instance) patchToTemp(rpath string) (wpath string, err error) {

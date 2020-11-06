@@ -32,8 +32,8 @@ func TestDelitmus_Lift(t *testing.T) {
 	cr.Test(t)
 
 	j := backend.LiftJob{
-		In:     *litmus.New(path.Join("in", "foo.litmus")),
-		OutDir: "out",
+		In:  backend.LiftLitmusInput(*litmus.New(path.Join("in", "foo.litmus"))),
+		Out: backend.LiftOutput{Dir: "out", Target: backend.ToDefault},
 	}
 
 	cr.On("Run", mock.Anything, service.RunInfo{
@@ -42,7 +42,7 @@ func TestDelitmus_Lift(t *testing.T) {
 			"delitmus",
 			"-aux-output", filepath.Join("out", "aux.json"),
 			"-output", filepath.Join("out", "delitmus.c"),
-			j.In.Filepath(),
+			j.In.Litmus.Filepath(),
 		},
 	}).Return(nil).Once()
 
@@ -50,7 +50,7 @@ func TestDelitmus_Lift(t *testing.T) {
 	recipe, err := dl.Lift(context.Background(), j, cr)
 	require.NoError(t, err, "lifting with mock delitmus run")
 
-	assert.Equal(t, j.OutDir, recipe.Dir, "recipe should output to job output directory")
+	assert.Equal(t, j.Out.Dir, recipe.Dir, "recipe should output to job output directory")
 	assert.Nil(t, dl.BaseRunner.Base, "should not have changed base of original runner")
 
 	cr.AssertExpectations(t)
