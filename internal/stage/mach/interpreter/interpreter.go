@@ -50,7 +50,7 @@ type Interpreter struct {
 	// inPool maps each input file to a Boolean that is true if it hasn't been consumed yet.
 	inPool map[string]bool
 	// fileStack is the file stack.
-	fileStack []string
+	fileStack stack
 }
 
 var (
@@ -64,7 +64,7 @@ var (
 	ErrObjOverflow = errors.New("object file count overflow")
 )
 
-// NewInterpreter creates a new recipe processor using the compiler driver d and job j.
+// NewInterpreter creates a new recipe processor using the compiler driver d, runner r, and job j.
 func NewInterpreter(d Driver, j compile.Recipe, os ...Option) (*Interpreter, error) {
 	if d == nil {
 		return nil, ErrDriverNil
@@ -132,7 +132,7 @@ func (p *Interpreter) pushInputs(kind filekind.Kind) error {
 
 func (p *Interpreter) pushInputRaw(file string) {
 	p.inPool[file] = false
-	p.fileStack = append(p.fileStack, file)
+	p.fileStack.push(file)
 }
 
 func (p *Interpreter) compileObj(ctx context.Context, npops int) error {
@@ -163,26 +163,11 @@ func (p *Interpreter) compileExe(ctx context.Context, npops int) error {
 }
 
 func (p *Interpreter) compile(ctx context.Context, out string, kind compile.Kind, npops int) error {
-	if err := p.driver.RunCompiler(ctx, p.singleCompile(out, kind, npops), p.logw); err != nil {
-		return err
-	}
-	return nil
+	return p.driver.RunCompiler(ctx, p.singleCompile(out, kind, npops), p.logw)
 }
 
 func (p *Interpreter) singleCompile(out string, kind compile.Kind, npops int) compile.Single {
-	return compile.New(p.job.Compiler, out, p.popStack(npops)...).Single(kind)
-}
-
-func (p *Interpreter) popStack(npops int) []string {
-	lfs := len(p.fileStack)
-	if npops <= 0 || lfs < npops {
-		npops = lfs
-	}
-	cut := lfs - npops
-
-	var fs []string
-	fs, p.fileStack = p.fileStack[cut:], p.fileStack[:cut]
-	return fs
+	return compile.New(p.job.Compiler, out, p.fileStack.pop(npops)...).Single(kind)
 }
 
 // initPool creates a pool with each path in paths set as available.

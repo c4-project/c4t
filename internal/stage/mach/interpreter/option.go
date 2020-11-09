@@ -23,7 +23,7 @@ func Options(os ...Option) Option {
 	}
 }
 
-// LogTo logs compiler output to w.
+// LogTo logs compiler error output to w.
 func LogTo(w io.Writer) Option {
 	return func(i *Interpreter) { i.logw = iohelp.EnsureWriter(w) }
 }
