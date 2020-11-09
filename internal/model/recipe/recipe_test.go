@@ -29,6 +29,7 @@ func ExampleRecipe_Paths() {
 	// foo/bar/foobar
 }
 
+// TestOp_UnmarshalJSON_error tests error cases of Op.UnmarshalJSON.
 func TestOp_UnmarshalJSON_error(t *testing.T) {
 	t.Parallel()
 
