@@ -28,6 +28,8 @@ type Interpreter struct {
 	driver Driver
 	job    compile.Recipe
 
+	// pc is the program counter.
+	pc int
 	// nobjs is the number of object files created so far by the processor.
 	nobjs uint64
 	// maxobjs is the maximum permitted number of object files.
@@ -63,6 +65,10 @@ func NewInterpreter(d Driver, j compile.Recipe, os ...IOption) (*Interpreter, er
 	p := Interpreter{driver: d, job: j, logw: ioutil.Discard, maxobjs: math.MaxUint64}
 	IOptions(os...)(&p)
 
+	p.inPool = initPool(p.job.In)
+	// Assuming that the usual case is that every file in the pool gets put in the stack.
+	p.fileStack = make([]string, 0, len(p.inPool))
+
 	return &p, nil
 }
 
@@ -89,17 +95,15 @@ func SetMaxObjs(cap uint64) IOption {
 }
 
 // Interpret processes this processor's compilation recipe using ctx for timeout and cancellation.
+// It resumes from the last position where interpretation halted.
 func (p *Interpreter) Interpret(ctx context.Context) error {
-	p.inPool = initPool(p.job.In)
-	// Assuming that the usual case is that every file in the pool gets put in the stack.
-	p.fileStack = make([]string, 0, len(p.inPool))
-
-	for _, i := range p.job.Recipe.Instructions {
-		if err := p.processInstruction(ctx, i); err != nil {
+	ninst := len(p.job.Recipe.Instructions)
+	for p.pc < ninst {
+		if err := p.processInstruction(ctx, p.job.Recipe.Instructions[p.pc]); err != nil {
 			return err
 		}
+		p.pc++
 	}
-
 	return nil
 }
 
