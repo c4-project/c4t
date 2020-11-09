@@ -3,16 +3,16 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package compile
+package compiler
 
-// Kind is the enumeration of kinds of single-file compilation output.
-type Kind uint8
+// Target is the enumeration of kinds of single-file compilation output.
+type Target uint8
 
 const (
 	// Exe refers to executable binary compilations.
-	Exe Kind = iota
+	Exe Target = iota
 	// Obj refers to object file compilations.
 	Obj
 )
 
-//go:generate stringer -type Kind
+//go:generate stringer -type Target

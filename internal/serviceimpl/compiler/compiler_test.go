@@ -10,8 +10,6 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
-
 	"github.com/MattWindsor91/act-tester/internal/model/id"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
 	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/mocks"
@@ -26,8 +24,8 @@ func TestResolver_RunCompiler(t *testing.T) {
 	r := compiler.Resolver{Compilers: map[string]compiler.Compiler{"gcc": &mc}}
 
 	ctx := context.Background()
-	j := *compile.New(
-		compile.Exe,
+	j := *mdl.NewJob(
+		mdl.Exe,
 		&mdl.Configuration{
 			SelectedMOpt: "plop",
 			Compiler: mdl.Compiler{

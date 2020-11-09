@@ -11,7 +11,7 @@ import (
 	"io"
 	"os/exec"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/1set/gut/ystring"
 
@@ -25,7 +25,7 @@ type GCC struct {
 }
 
 // RunCompiler compiles j using a GCC-friendly invocation.
-func (g GCC) RunCompiler(ctx context.Context, j compile.Compile, errw io.Writer) error {
+func (g GCC) RunCompiler(ctx context.Context, j compiler.Job, errw io.Writer) error {
 	run := g.DefaultRun
 	if nr := j.CompilerRun(); nr != nil {
 		run.Override(*nr)
@@ -37,7 +37,7 @@ func (g GCC) RunCompiler(ctx context.Context, j compile.Compile, errw io.Writer)
 
 // Args computes the arguments to pass to GCC for running job j with run info run.
 // It does not take j's run info into consideration, and assumes this has already been done.
-func Args(run service.RunInfo, j compile.Compile) []string {
+func Args(run service.RunInfo, j compiler.Job) []string {
 	args := run.Args
 	args = AddStringArg(args, "O", j.SelectedOptName())
 	args = AddStringArg(args, "m", j.SelectedMOptName())
@@ -48,9 +48,9 @@ func Args(run service.RunInfo, j compile.Compile) []string {
 }
 
 // AddKindArg adds to args the appropriate GCC argument for achieving the compile kind mentioned in k.
-func AddKindArg(args []string, k compile.Kind) []string {
+func AddKindArg(args []string, k compiler.Target) []string {
 	switch k {
-	case compile.Obj:
+	case compiler.Obj:
 		return append(args, "-c")
 	default:
 		return args

@@ -18,8 +18,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
-
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/stretchr/testify/assert"
@@ -105,7 +103,7 @@ func TestCompiler_Run(t *testing.T) {
 	}
 
 	// not necessarily the same context
-	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 compile.Compile) bool {
+	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 mdl.Job) bool {
 		return j2.SelectedOptName() == cmp.SelectedOpt.Name && j2.SelectedMOptName() == cmp.SelectedMOpt
 	}), mock.Anything).Return(nil)
 	mp.On("Prepare", id.FromString("gcc")).Return(nil)

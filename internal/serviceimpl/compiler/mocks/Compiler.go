@@ -3,7 +3,6 @@
 package mocks
 
 import (
-	compile "github.com/MattWindsor91/act-tester/internal/model/job/compile"
 	compiler "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	context "context"
@@ -92,11 +91,11 @@ func (_m *Compiler) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, 
 }
 
 // RunCompiler provides a mock function with given fields: ctx, j, errw
-func (_m *Compiler) RunCompiler(ctx context.Context, j compile.Compile, errw io.Writer) error {
+func (_m *Compiler) RunCompiler(ctx context.Context, j compiler.Job, errw io.Writer) error {
 	ret := _m.Called(ctx, j, errw)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, compile.Compile, io.Writer) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, compiler.Job, io.Writer) error); ok {
 		r0 = rf(ctx, j, errw)
 	} else {
 		r0 = ret.Error(0)

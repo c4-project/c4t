@@ -4,17 +4,16 @@
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package compile describes compilation jobs.
-package compile
+package compiler
 
 import (
 	"github.com/MattWindsor91/act-tester/internal/model/service"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
-// Compile represents a request to compile a list of files to a particular target given a particular compiler.
-type Compile struct {
+// Job represents a request to compile a list of files to a particular target given a particular compiler.
+type Job struct {
 	// Compiler describes the compiler to use for the compilation.
-	Compiler *compiler.Configuration
+	Compiler *Configuration
 
 	// In is the list of files to be sent to the compiler.
 	In []string
@@ -22,12 +21,12 @@ type Compile struct {
 	Out string
 
 	// Kind is the kind of file being produced by this compile.
-	Kind Kind
+	Kind Target
 }
 
-// New is a convenience constructor for compiles.
-func New(k Kind, c *compiler.Configuration, out string, in ...string) *Compile {
-	return &Compile{
+// NewJob is a convenience constructor for compiles.
+func NewJob(k Target, c *Configuration, out string, in ...string) *Job {
+	return &Job{
 		Kind:     k,
 		Compiler: c,
 		In:       in,
@@ -36,7 +35,7 @@ func New(k Kind, c *compiler.Configuration, out string, in ...string) *Compile {
 }
 
 // CompilerRun gets the job's compiler run information if present; else, nil.
-func (j *Compile) CompilerRun() *service.RunInfo {
+func (j *Job) CompilerRun() *service.RunInfo {
 	if j.Compiler == nil {
 		return nil
 	}
@@ -44,7 +43,7 @@ func (j *Compile) CompilerRun() *service.RunInfo {
 }
 
 // SelectedOptName gets the name of this job's compiler's selected optimisation level, if present; else, "".
-func (j *Compile) SelectedOptName() string {
+func (j *Job) SelectedOptName() string {
 	if j.Compiler == nil || j.Compiler.SelectedOpt == nil {
 		return ""
 	}
@@ -52,7 +51,7 @@ func (j *Compile) SelectedOptName() string {
 }
 
 // SelectedMOptName gets the name of this job's compiler's selected machine optimisation profile, if present; else, "".
-func (j *Compile) SelectedMOptName() string {
+func (j *Job) SelectedMOptName() string {
 	if j.Compiler == nil {
 		return ""
 	}

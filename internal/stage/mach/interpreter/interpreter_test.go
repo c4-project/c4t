@@ -20,7 +20,6 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/stretchr/testify/require"
@@ -48,11 +47,11 @@ func TestInterpreter_Interpret(t *testing.T) {
 
 	mc.On("RunCompiler",
 		mock.Anything,
-		*compile.New(compile.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
+		*mdl.NewJob(mdl.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
 		ioutil.Discard,
 	).Return(nil).Once().On("RunCompiler",
 		mock.Anything,
-		*compile.New(compile.Exe, &c, "a.out", path.Join("in", "obj_0.o"), path.Join("in", "harness.c")),
+		*mdl.NewJob(mdl.Exe, &c, "a.out", path.Join("in", "obj_0.o"), path.Join("in", "harness.c")),
 		ioutil.Discard,
 	).Return(nil).Once()
 
@@ -84,7 +83,7 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 
 	mc.On("RunCompiler",
 		mock.Anything,
-		*compile.New(compile.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
+		*mdl.NewJob(mdl.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
 		ioutil.Discard,
 	).Return(werr).Once()
 	// The second compile job should not be run.
@@ -161,7 +160,7 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 	c := mdl.Configuration{}
 	mc.On("RunCompiler",
 		mock.Anything,
-		*compile.New(compile.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
+		*mdl.NewJob(mdl.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
 		ioutil.Discard).Return(nil).Once()
 
 	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r, interpreter.SetMaxObjs(1))

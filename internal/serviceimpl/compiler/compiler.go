@@ -14,8 +14,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
-
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
@@ -94,7 +92,7 @@ func (r *Resolver) DefaultMOpts(c *mdl.Compiler) (stringhelp.Set, error) {
 }
 
 // RunCompiler runs the compiler specified by nc on job j, using this resolver to map the style to a concrete compiler.
-func (r *Resolver) RunCompiler(ctx context.Context, j compile.Compile, errw io.Writer) error {
+func (r *Resolver) RunCompiler(ctx context.Context, j mdl.Job, errw io.Writer) error {
 	cp, err := r.Get(&j.Compiler.Compiler)
 	if err != nil {
 		return err

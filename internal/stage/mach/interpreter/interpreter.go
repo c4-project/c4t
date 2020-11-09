@@ -20,8 +20,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
-
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 )
 
@@ -34,7 +32,7 @@ type Driver interface {
 	// If applicable, errw will be connected to the compiler's standard error.
 	//
 	// Implementors should note that the paths in j are slash-paths, and will need converting to filepaths.
-	RunCompiler(ctx context.Context, j compile.Compile, errw io.Writer) error
+	RunCompiler(ctx context.Context, j compiler.Job, errw io.Writer) error
 }
 
 //go:generate mockery --name=Driver
@@ -152,7 +150,7 @@ func (p *Interpreter) compileObj(ctx context.Context, npops int) error {
 	if err != nil {
 		return err
 	}
-	if err := p.compile(ctx, n, compile.Obj, npops); err != nil {
+	if err := p.compile(ctx, n, compiler.Obj, npops); err != nil {
 		return err
 	}
 	p.fileStack = append(p.fileStack, n)
@@ -173,16 +171,16 @@ func (p *Interpreter) compileExe(ctx context.Context, npops int) error {
 	if p.recipe.Output != recipe.OutExe {
 		return fmt.Errorf("%w: cannot compile exe when targeting %q", ErrBadOutput, p.recipe.Output)
 	}
-	return p.compile(ctx, p.ofile, compile.Exe, npops)
+	return p.compile(ctx, p.ofile, compiler.Exe, npops)
 	// We don't push the binary onto the file stack.
 }
 
-func (p *Interpreter) compile(ctx context.Context, out string, kind compile.Kind, npops int) error {
+func (p *Interpreter) compile(ctx context.Context, out string, kind compiler.Target, npops int) error {
 	return p.driver.RunCompiler(ctx, *p.singleCompile(out, kind, npops), p.logw)
 }
 
-func (p *Interpreter) singleCompile(out string, kind compile.Kind, npops int) *compile.Compile {
-	return compile.New(kind, p.compiler, out, p.fileStack.pop(npops)...)
+func (p *Interpreter) singleCompile(out string, kind compiler.Target, npops int) *compiler.Job {
+	return compiler.NewJob(kind, p.compiler, out, p.fileStack.pop(npops)...)
 }
 
 // initPool creates a pool with each path in paths set as available.

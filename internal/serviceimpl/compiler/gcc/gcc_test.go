@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
@@ -25,7 +23,7 @@ import (
 func ExampleArgs() {
 	args := gcc.Args(
 		*service.NewRunInfo("gcc7", "-funroll-loops"),
-		*compile.New(compile.Exe, nil, "a.out", "foo.c", "bar.c"),
+		*compiler.NewJob(compiler.Exe, nil, "a.out", "foo.c", "bar.c"),
 	)
 	for _, arg := range args {
 		fmt.Println(arg)
@@ -43,8 +41,8 @@ func ExampleArgs() {
 func ExampleArgs_opt() {
 	args := gcc.Args(
 		*service.NewRunInfo("gcc7", "-funroll-loops"),
-		*compile.New(
-			compile.Exe,
+		*compiler.NewJob(
+			compiler.Exe,
 			&compiler.Configuration{SelectedOpt: &optlevel.Named{Name: "size"}},
 			"a.out",
 			"foo.c", "bar.c",
@@ -68,13 +66,13 @@ func TestArgs(t *testing.T) {
 
 	cases := map[string]struct {
 		run service.RunInfo
-		job compile.Compile
+		job compiler.Job
 		out []string
 	}{
 		"default": {
 			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
-			job: *compile.New(
-				compile.Exe,
+			job: *compiler.NewJob(
+				compiler.Exe,
 				nil,
 				"a.out",
 				"foo.c",
@@ -84,8 +82,8 @@ func TestArgs(t *testing.T) {
 		},
 		"obj": {
 			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
-			job: *compile.New(
-				compile.Obj,
+			job: *compiler.NewJob(
+				compiler.Obj,
 				nil,
 				"foo.o",
 				"foo.c",
@@ -94,8 +92,8 @@ func TestArgs(t *testing.T) {
 		},
 		"with-mopt": {
 			run: *service.NewRunInfo("gcc8"),
-			job: *compile.New(
-				compile.Exe,
+			job: *compiler.NewJob(
+				compiler.Exe,
 				&compiler.Configuration{
 					SelectedMOpt: "arch=nehalem",
 				},
@@ -107,8 +105,8 @@ func TestArgs(t *testing.T) {
 		},
 		"with-opt": {
 			run: *service.NewRunInfo("gcc8"),
-			job: *compile.New(
-				compile.Exe,
+			job: *compiler.NewJob(
+				compiler.Exe,
 				&compiler.Configuration{
 					SelectedOpt: &optlevel.Named{
 						Name: "3",
@@ -127,8 +125,8 @@ func TestArgs(t *testing.T) {
 		},
 		"do-not-override-run": {
 			run: *service.NewRunInfo("gcc4", "-funroll-loops"),
-			job: *compile.New(
-				compile.Exe,
+			job: *compiler.NewJob(
+				compiler.Exe,
 				&compiler.Configuration{
 					Compiler: compiler.Compiler{
 						Run: service.NewRunInfo("gcc8", "-pthread"),
