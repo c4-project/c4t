@@ -123,17 +123,25 @@ func (h Backend) makeRecipe(j backend2.LiftJob) (recipe.Recipe, error) {
 	}
 
 	return recipe.New(j.Out.Dir,
+		targetRecipeOutput(j.Out.Target),
 		recipe.AddFiles(fs...),
 		// TODO(@MattWindsor91): delitmus support
 		targetRecipeOption(j.Out.Target),
 	), nil
 }
 
+func targetRecipeOutput(tgt backend2.Target) recipe.Output {
+	if tgt == backend2.ToExeRecipe {
+		return recipe.OutExe
+	}
+	return recipe.OutText
+}
+
 func targetRecipeOption(tgt backend2.Target) recipe.Option {
 	if tgt == backend2.ToExeRecipe {
 		return recipe.CompileAllCToExe()
 	}
-	return recipe.CatAll()
+	return recipe.Options()
 }
 
 // BackendImpl describes the functionality that differs between Herdtools-style backends.

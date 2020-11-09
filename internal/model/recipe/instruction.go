@@ -32,12 +32,6 @@ type Instruction struct {
 	NPops int `json:"npops,omitempty"`
 }
 
-// IsRuntime gets whether this instruction is a run-time one.
-// The machine node will, at time of writing, segregate compile-time and run-time instructions.
-func (i Instruction) IsRuntime() bool {
-	return LastCompile < i.Op
-}
-
 // String produces a human-readable string representation of this instruction.
 func (i Instruction) String() string {
 	strs := []string{i.Op.String()}
@@ -46,10 +40,6 @@ func (i Instruction) String() string {
 	case CompileExe:
 		fallthrough
 	case CompileObj:
-		fallthrough
-	case RunExe:
-		fallthrough
-	case Cat:
 		strs = append(strs, npopString(i.NPops))
 	case PushInput:
 		strs = append(strs, strconv.Quote(i.File))
@@ -76,18 +66,6 @@ func CompileExeInst(npops int) Instruction {
 // CompileObjInst produces a 'compile object' instruction.
 func CompileObjInst(npops int) Instruction {
 	return Instruction{Op: CompileObj, NPops: npops}
-}
-
-/*
-// RunExe produces a 'run' instruction.
-func RunExeInst(npops int) Instruction {
-	return Instruction{Op: RunExe, NPops: npops}
-}
-*/
-
-// CatInst produces a 'cat' instruction.
-func CatInst(npops int) Instruction {
-	return Instruction{Op: Cat, NPops: npops}
 }
 
 // PushInputInst produces a 'push input' instruction.

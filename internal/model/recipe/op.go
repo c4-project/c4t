@@ -26,13 +26,7 @@ const (
 	CompileObj
 	// CompileObj pops inputs off the stack, compile them, and output the results to the output binary.
 	CompileExe
-	// RunExe pops inputs off the stack, executes them, and forwards their standard output.
-	RunExe
-	// Cat is a run instruction that pops inputs off the stack and reads them to standard output.
-	Cat
 
-	// LastCompile is the last instruction that is part of a compile.
-	LastCompile = CompileExe
 	// Last is the last operation defined.
 	Last = CompileExe
 )

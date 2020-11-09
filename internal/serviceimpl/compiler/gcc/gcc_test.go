@@ -25,7 +25,7 @@ import (
 func ExampleArgs() {
 	args := gcc.Args(
 		*service.NewRunInfo("gcc7", "-funroll-loops"),
-		compile.New(nil, "a.out", "foo.c", "bar.c").Single(compile.Exe),
+		*compile.New(compile.Exe, nil, "a.out", "foo.c", "bar.c"),
 	)
 	for _, arg := range args {
 		fmt.Println(arg)
@@ -43,11 +43,12 @@ func ExampleArgs() {
 func ExampleArgs_opt() {
 	args := gcc.Args(
 		*service.NewRunInfo("gcc7", "-funroll-loops"),
-		compile.New(
+		*compile.New(
+			compile.Exe,
 			&compiler.Configuration{SelectedOpt: &optlevel.Named{Name: "size"}},
 			"a.out",
 			"foo.c", "bar.c",
-		).Single(compile.Exe),
+		),
 	)
 	for _, arg := range args {
 		fmt.Println(arg)
@@ -67,43 +68,47 @@ func TestArgs(t *testing.T) {
 
 	cases := map[string]struct {
 		run service.RunInfo
-		job compile.Single
+		job compile.Compile
 		out []string
 	}{
 		"default": {
 			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
-			job: compile.New(
+			job: *compile.New(
+				compile.Exe,
 				nil,
 				"a.out",
 				"foo.c",
 				"bar.c",
-			).Single(compile.Exe),
+			),
 			out: []string{"-funroll-loops", "-o", "a.out", "foo.c", "bar.c"},
 		},
 		"obj": {
 			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
-			job: compile.New(
+			job: *compile.New(
+				compile.Obj,
 				nil,
 				"foo.o",
 				"foo.c",
-			).Single(compile.Obj),
+			),
 			out: []string{"-funroll-loops", "-c", "-o", "foo.o", "foo.c"},
 		},
 		"with-mopt": {
 			run: *service.NewRunInfo("gcc8"),
-			job: compile.New(
+			job: *compile.New(
+				compile.Exe,
 				&compiler.Configuration{
 					SelectedMOpt: "arch=nehalem",
 				},
 				"a.out",
 				"foo.c",
 				"bar.c",
-			).Single(compile.Exe),
+			),
 			out: []string{"-march=nehalem", "-o", "a.out", "foo.c", "bar.c"},
 		},
 		"with-opt": {
 			run: *service.NewRunInfo("gcc8"),
-			job: compile.New(
+			job: *compile.New(
+				compile.Exe,
 				&compiler.Configuration{
 					SelectedOpt: &optlevel.Named{
 						Name: "3",
@@ -117,12 +122,13 @@ func TestArgs(t *testing.T) {
 				"a.out",
 				"foo.c",
 				"bar.c",
-			).Single(compile.Exe),
+			),
 			out: []string{"-O3", "-o", "a.out", "foo.c", "bar.c"},
 		},
 		"do-not-override-run": {
 			run: *service.NewRunInfo("gcc4", "-funroll-loops"),
-			job: compile.New(
+			job: *compile.New(
+				compile.Exe,
 				&compiler.Configuration{
 					Compiler: compiler.Compiler{
 						Run: service.NewRunInfo("gcc8", "-pthread"),
@@ -131,7 +137,7 @@ func TestArgs(t *testing.T) {
 				"a.out",
 				"foo.c",
 				"bar.c",
-			).Single(compile.Exe),
+			),
 			out: []string{"-funroll-loops", "-o", "a.out", "foo.c", "bar.c"},
 		},
 	}

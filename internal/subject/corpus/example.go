@@ -101,6 +101,7 @@ func MockSuccessfulCompile(cstr string, sname string) compilation.CompileResult 
 func MockRecipe(dir string) recipe.Recipe {
 	return recipe.New(
 		dir,
+		recipe.OutExe,
 		recipe.AddFiles("run.c", "aux.c", "aux.h"),
 		recipe.CompileAllCToExe(),
 	)

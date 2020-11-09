@@ -26,20 +26,18 @@ func TestResolver_RunCompiler(t *testing.T) {
 	r := compiler.Resolver{Compilers: map[string]compiler.Compiler{"gcc": &mc}}
 
 	ctx := context.Background()
-	j := compile.Single{
-		Compile: compile.Compile{
-			Compiler: &mdl.Configuration{
-				SelectedMOpt: "plop",
-				Compiler: mdl.Compiler{
-					Style: id.FromString("gcc"),
-					Arch:  id.FromString("x86"),
-				},
+	j := *compile.New(
+		compile.Exe,
+		&mdl.Configuration{
+			SelectedMOpt: "plop",
+			Compiler: mdl.Compiler{
+				Style: id.FromString("gcc"),
+				Arch:  id.FromString("x86"),
 			},
-			In:  []string{"foo", "bar", "baz"},
-			Out: "a.out",
 		},
-		Kind: compile.Exe,
-	}
+		"a.out",
+		"foo", "bar", "baz",
+	)
 	errw := ioutil.Discard
 
 	mc.On("RunCompiler", ctx, j, errw).Return(nil).Once()

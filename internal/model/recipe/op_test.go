@@ -42,3 +42,15 @@ func TestOp_MarshalJSON_roundTrip(t *testing.T) {
 		})
 	}
 }
+
+// ExampleOpFromString is a runnable example for OpFromString.
+func ExampleOpFromString() {
+	o, _ := recipe.OpFromString("CompileExe")
+	fmt.Println(o)
+	_, err := recipe.OpFromString("None-such")
+	fmt.Println(err)
+
+	// Output:
+	// CompileExe
+	// unknown Op: "None-such"
+}

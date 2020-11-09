@@ -9,6 +9,8 @@ import (
 	"context"
 	"testing"
 
+	mocks2 "github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter/mocks"
+
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
 
 	"github.com/MattWindsor91/act-tester/internal/machine"
@@ -37,7 +39,7 @@ import (
 // TestCompiler_Run tests running a compile job.
 func TestCompiler_Run(t *testing.T) {
 	var (
-		mc mocks.Driver
+		mc mocks2.Driver
 		mp mocks.SubjectPather
 	)
 	mc.Test(t)
@@ -48,6 +50,7 @@ func TestCompiler_Run(t *testing.T) {
 	for n, cn := range c {
 		err := cn.AddRecipe(id.ArchX86Skylake, recipe.New(
 			n,
+			recipe.OutExe,
 			recipe.AddFiles("main.c"),
 			recipe.CompileAllCToExe(),
 		))
@@ -102,7 +105,7 @@ func TestCompiler_Run(t *testing.T) {
 	}
 
 	// not necessarily the same context
-	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 compile.Single) bool {
+	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 compile.Compile) bool {
 		return j2.SelectedOptName() == cmp.SelectedOpt.Name && j2.SelectedMOptName() == cmp.SelectedMOpt
 	}), mock.Anything).Return(nil)
 	mp.On("Prepare", id.FromString("gcc")).Return(nil)

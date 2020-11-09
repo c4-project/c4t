@@ -20,8 +20,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
-
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/status"
@@ -108,16 +106,15 @@ func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp compi
 
 	start := time.Now()
 
-	job := j.compileJob(h, nc, sp)
 	// Some compiler errors are recoverable, so we don't immediately bail on them.
-	rerr := j.runCompilerJob(tctx, job, logf)
+	rerr := j.runCompilerJob(tctx, nc, sp, h, logf)
 
 	lerr := logf.Close()
 	return j.makeCompileResult(sp, start, errhelp.TimeoutOrFirstError(tctx, rerr, lerr))
 }
 
-func (j *Instance) runCompilerJob(ctx context.Context, job compile.Recipe, logf io.Writer) error {
-	i, err := interpreter.NewInterpreter(j.driver, job, interpreter.LogTo(logf))
+func (j *Instance) runCompilerJob(ctx context.Context, nc *compiler.Named, sp compilation.CompileFileset, h recipe.Recipe, logf io.Writer) error {
+	i, err := interpreter.NewInterpreter(j.driver, &nc.Configuration, sp.Bin, h, interpreter.LogTo(logf))
 	if err != nil {
 		return err
 	}
@@ -129,10 +126,6 @@ func (j *Instance) openLogFile(l string) (io.WriteCloser, error) {
 		return iohelp.DiscardCloser(), nil
 	}
 	return os.Create(l)
-}
-
-func (j *Instance) compileJob(r recipe.Recipe, nc *compiler.Named, sp compilation.CompileFileset) compile.Recipe {
-	return compile.FromRecipe(&nc.Configuration, r, sp.Bin)
 }
 
 // makeCompileResult makes a compile result given a possible err and fileset sp.

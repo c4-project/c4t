@@ -59,6 +59,7 @@ func TestReplayer_Run_roundTripBuilder(t *testing.T) {
 		id.ArchX8664,
 		recipe.New(
 			"recipe",
+			recipe.OutNothing,
 			recipe.AddFiles("foo.c", "bar.c", "baz.c"),
 		))
 	com := builder.CompileRequest(

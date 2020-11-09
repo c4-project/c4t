@@ -11,7 +11,7 @@ import (
 	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 )
 
-// Compile represents a request to compile a list of files to an executable given a particular compiler.
+// Compile represents a request to compile a list of files to a particular target given a particular compiler.
 type Compile struct {
 	// Compiler describes the compiler to use for the compilation.
 	Compiler *compiler.Configuration
@@ -20,11 +20,15 @@ type Compile struct {
 	In []string
 	// Out is the file to be received from the compiler.
 	Out string
+
+	// Kind is the kind of file being produced by this compile.
+	Kind Kind
 }
 
 // New is a convenience constructor for compiles.
-func New(c *compiler.Configuration, out string, in ...string) *Compile {
+func New(k Kind, c *compiler.Configuration, out string, in ...string) *Compile {
 	return &Compile{
+		Kind:     k,
 		Compiler: c,
 		In:       in,
 		Out:      out,

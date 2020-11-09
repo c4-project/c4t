@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 	"github.com/stretchr/testify/require"
 
@@ -36,25 +37,22 @@ func TestInterpreter_Interpret(t *testing.T) {
 
 	r := recipe.New(
 		"in",
+		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileAllCToExe(),
 	)
 	c := mdl.Configuration{}
-	cr := compile.FromRecipe(&c, r, "a.out")
-	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
-		"filtering error making recipe")
-
-	it, err := interpreter.NewInterpreter(&mc, cr)
+	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r)
 	require.NoError(t, err, "error while making interpreter")
 
 	mc.On("RunCompiler",
 		mock.Anything,
-		compile.New(&c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")).Single(compile.Obj),
+		*compile.New(compile.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
 		ioutil.Discard,
 	).Return(nil).Once().On("RunCompiler",
 		mock.Anything,
-		compile.New(&c, "a.out", path.Join("in", "obj_0.o"), path.Join("in", "harness.c")).Single(compile.Exe),
+		*compile.New(compile.Exe, &c, "a.out", path.Join("in", "obj_0.o"), path.Join("in", "harness.c")),
 		ioutil.Discard,
 	).Return(nil).Once()
 
@@ -74,22 +72,19 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 
 	r := recipe.New(
 		"in",
+		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
 		recipe.AddInstructions(recipe.Instruction{Op: recipe.Nop}),
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileAllCToExe(),
 	)
 	c := mdl.Configuration{}
-	cr := compile.FromRecipe(&c, r, "a.out")
-	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
-		"filtering error making recipe")
-
-	it, err := interpreter.NewInterpreter(&mc, cr)
+	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r)
 	require.NoError(t, err, "error while making interpreter")
 
 	mc.On("RunCompiler",
 		mock.Anything,
-		compile.New(&c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")).Single(compile.Obj),
+		*compile.New(compile.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
 		ioutil.Discard,
 	).Return(werr).Once()
 	// The second compile job should not be run.
@@ -132,12 +127,12 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 
 			r := recipe.New(
 				"in",
+				recipe.OutExe,
 				recipe.AddFiles("body.c", "harness.c", "body.h"),
 				recipe.AddInstructions(c.in...),
 			)
 			cmp := mdl.Configuration{}
-			cr := compile.FromRecipe(&cmp, r, "a.out")
-			it, err := interpreter.NewInterpreter(&mc, cr)
+			it, err := interpreter.NewInterpreter(&mc, &cmp, "a.out", r)
 			require.NoError(t, err, "error while making interpreter")
 
 			err = it.Interpret(context.Background())
@@ -158,21 +153,18 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 
 	r := recipe.New(
 		"in",
+		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileFileToObj(path.Join("in", "harness.c")),
 	)
 	c := mdl.Configuration{}
-	cr := compile.FromRecipe(&c, r, "a.out")
-	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
-		"filtering error making recipe")
-
 	mc.On("RunCompiler",
 		mock.Anything,
-		compile.New(&c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")).Single(compile.Obj),
+		*compile.New(compile.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
 		ioutil.Discard).Return(nil).Once()
 
-	it, err := interpreter.NewInterpreter(&mc, cr, interpreter.SetMaxObjs(1))
+	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r, interpreter.SetMaxObjs(1))
 	require.NoError(t, err, "error while making interpreter")
 
 	err = it.Interpret(context.Background())
@@ -187,6 +179,7 @@ func TestNewInterpreter_errors(t *testing.T) {
 
 	r := recipe.New(
 		"in",
+		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileFileToObj(path.Join("in", "harness.c")),
@@ -195,22 +188,22 @@ func TestNewInterpreter_errors(t *testing.T) {
 
 	cases := map[string]struct {
 		useDriver bool
-		j         compile.Recipe
+		compiler  *compiler.Configuration
 		err       error
 	}{
 		"no-driver": {
 			useDriver: false,
-			j:         compile.FromRecipe(&cmp, r, "a.out"),
+			compiler:  &cmp,
 			err:       interpreter.ErrDriverNil,
 		},
 		"no-compiler-cfg": {
 			useDriver: true,
-			j:         compile.FromRecipe(nil, r, "a.out"),
+			compiler:  nil,
 			err:       interpreter.ErrCompilerConfigNil,
 		},
 		"ok": {
 			useDriver: true,
-			j:         compile.FromRecipe(&cmp, r, "a.out"),
+			compiler:  &cmp,
 		},
 	}
 
@@ -226,7 +219,7 @@ func TestNewInterpreter_errors(t *testing.T) {
 				d = &mc
 			}
 
-			_, err := interpreter.NewInterpreter(d, c.j)
+			_, err := interpreter.NewInterpreter(d, c.compiler, "a.out", r)
 			testhelp.ExpectErrorIs(t, err, c.err, "constructing new interpreter")
 		})
 	}

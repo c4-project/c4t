@@ -14,6 +14,9 @@ import (
 	"io/ioutil"
 	"math"
 	"path"
+	"path/filepath"
+
+	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
@@ -31,13 +34,20 @@ type Driver interface {
 	// If applicable, errw will be connected to the compiler's standard error.
 	//
 	// Implementors should note that the paths in j are slash-paths, and will need converting to filepaths.
-	RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error
+	RunCompiler(ctx context.Context, j compile.Compile, errw io.Writer) error
 }
+
+//go:generate mockery --name=Driver
 
 // Interpreter is an interpreter for compile recipes.
 type Interpreter struct {
 	driver Driver
-	job    compile.Recipe
+	// compiler is the compiler configuration.
+	compiler *compiler.Configuration
+	// ofile is the output filepath.
+	ofile string
+	// recipe is the recipe to interpret.
+	recipe recipe.Recipe
 
 	// pc is the program counter.
 	pc int
@@ -54,29 +64,31 @@ type Interpreter struct {
 }
 
 var (
-	// ErrCompilerConfigNil occurs if a processor is supplied a nil compiler config.
+	// ErrCompilerConfigNil occurs if an interpreter is supplied a nil compiler config.
 	ErrCompilerConfigNil = errors.New("compiler config nil")
-	// ErrBadOp occurs if a processor is supplied an unknown opcode.
+	// ErrBadOp occurs if an interpreter is supplied an unknown opcode.
 	ErrBadOp = errors.New("bad opcode")
+	// ErrBadOutput occurs if an interpreter is asked to output something that isn't compatible with its output spec.
+	ErrBadOutput = errors.New("bad output type")
 	// ErrFileUnavailable occurs if an instruction specifies a file that has been consumed, or wasn't available.
 	ErrFileUnavailable = errors.New("file not available")
 	// ErrObjOverflow occurs if too many object files are created.
 	ErrObjOverflow = errors.New("object file count overflow")
 )
 
-// NewInterpreter creates a new recipe processor using the compiler driver d, runner r, and job j.
-func NewInterpreter(d Driver, j compile.Recipe, os ...Option) (*Interpreter, error) {
+// NewInterpreter creates a new recipe processor using the compiler driver d, configuration c, runner r, and job j.
+func NewInterpreter(d Driver, c *compiler.Configuration, ofile string, r recipe.Recipe, os ...Option) (*Interpreter, error) {
 	if d == nil {
 		return nil, ErrDriverNil
 	}
-	if j.Compiler == nil {
+	if c == nil {
 		return nil, ErrCompilerConfigNil
 	}
 
-	p := Interpreter{driver: d, job: j, logw: ioutil.Discard, maxobjs: math.MaxUint64}
+	p := Interpreter{driver: d, compiler: c, ofile: ofile, recipe: r, logw: ioutil.Discard, maxobjs: math.MaxUint64}
 	Options(os...)(&p)
 
-	p.inPool = initPool(p.job.In)
+	p.inPool = p.initPool()
 	// Assuming that the usual case is that every file in the pool gets put in the stack.
 	p.fileStack = make([]string, 0, len(p.inPool))
 
@@ -86,9 +98,9 @@ func NewInterpreter(d Driver, j compile.Recipe, os ...Option) (*Interpreter, err
 // Interpret processes this processor's compilation recipe using ctx for timeout and cancellation.
 // It resumes from the last position where interpretation halted.
 func (p *Interpreter) Interpret(ctx context.Context) error {
-	ninst := len(p.job.Recipe.Instructions)
+	ninst := len(p.recipe.Instructions)
 	for p.pc < ninst {
-		if err := p.processInstruction(ctx, p.job.Recipe.Instructions[p.pc]); err != nil {
+		if err := p.processInstruction(ctx, p.recipe.Instructions[p.pc]); err != nil {
 			return err
 		}
 		p.pc++
@@ -154,27 +166,31 @@ func (p *Interpreter) freshObj() (string, error) {
 	// TODO(@MattWindsor91): filepath?
 	file := fmt.Sprintf("obj_%d.o", p.nobjs)
 	p.nobjs++
-	return path.Join(p.job.Recipe.Dir, file), nil
+	return path.Join(p.recipe.Dir, file), nil
 }
 
 func (p *Interpreter) compileExe(ctx context.Context, npops int) error {
-	return p.compile(ctx, p.job.Out, compile.Exe, npops)
+	if p.recipe.Output != recipe.OutExe {
+		return fmt.Errorf("%w: cannot compile exe when targeting %q", ErrBadOutput, p.recipe.Output)
+	}
+	return p.compile(ctx, p.ofile, compile.Exe, npops)
 	// We don't push the binary onto the file stack.
 }
 
 func (p *Interpreter) compile(ctx context.Context, out string, kind compile.Kind, npops int) error {
-	return p.driver.RunCompiler(ctx, p.singleCompile(out, kind, npops), p.logw)
+	return p.driver.RunCompiler(ctx, *p.singleCompile(out, kind, npops), p.logw)
 }
 
-func (p *Interpreter) singleCompile(out string, kind compile.Kind, npops int) compile.Single {
-	return compile.New(p.job.Compiler, out, p.fileStack.pop(npops)...).Single(kind)
+func (p *Interpreter) singleCompile(out string, kind compile.Kind, npops int) *compile.Compile {
+	return compile.New(kind, p.compiler, out, p.fileStack.pop(npops)...)
 }
 
 // initPool creates a pool with each path in paths set as available.
-func initPool(paths []string) map[string]bool {
-	pool := make(map[string]bool, len(paths))
-	for _, p := range paths {
-		pool[p] = true
+func (p *Interpreter) initPool() map[string]bool {
+	pool := make(map[string]bool, len(p.recipe.Files))
+	dir := filepath.Clean(p.recipe.Dir)
+	for _, file := range p.recipe.Files {
+		pool[filepath.Join(dir, file)] = true
 	}
 	return pool
 }

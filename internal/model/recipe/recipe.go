@@ -8,8 +8,6 @@ package recipe
 
 import (
 	"path"
-
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 )
 
 // Recipe represents information about a lifted test recipe.
@@ -22,64 +20,16 @@ type Recipe struct {
 
 	// Instructions is a list of instructions for the machine node.
 	Instructions []Instruction `json:"instructions,omitempty"`
+
+	// OutType is the type of output this recipe promises.  The output file is implicit.
+	Output Output `json:"out_type,omitempty"`
 }
 
 // New constructs a recipe using the input directory dir and the options os.
-func New(dir string, os ...Option) Recipe {
-	r := Recipe{Dir: dir}
+func New(dir string, otype Output, os ...Option) Recipe {
+	r := Recipe{Dir: dir, Output: otype}
 	Options(os...)(&r)
 	return r
-}
-
-// Option is a functional option for a recipe.
-type Option func(*Recipe)
-
-// Options applies multiple options to a recipe.
-func Options(os ...Option) Option {
-	return func(r *Recipe) {
-		for _, o := range os {
-			o(r)
-		}
-	}
-}
-
-// AddFiles adds each file in fs to the recipe.
-func AddFiles(fs ...string) Option {
-	return func(r *Recipe) {
-		r.Files = append(r.Files, fs...)
-	}
-}
-
-// AddInstructions adds each instruction in ins to the recipe.
-func AddInstructions(ins ...Instruction) Option {
-	return func(r *Recipe) {
-		r.Instructions = append(r.Instructions, ins...)
-	}
-}
-
-// CompileFileToObj adds a set of instructions that compile the named C input to an object file.
-func CompileFileToObj(file string) Option {
-	return AddInstructions(
-		PushInputInst(file),
-		CompileObjInst(1),
-	)
-}
-
-// CompileAllCToExe adds a set of instructions that compile all C inputs to an executable, then runs it.
-func CompileAllCToExe() Option {
-	return AddInstructions(
-		PushInputsInst(filekind.CSrc),
-		CompileExeInst(PopAll),
-		// RunExeInst(1),
-	)
-}
-
-// CatAll adds a set of instructions that catenate all inputs to stdout.
-func CatAll() Option {
-	return AddInstructions(
-		PushInputsInst(filekind.Any),
-		CatInst(PopAll),
-	)
 }
 
 // Paths retrieves the slash-joined dir/file paths for each file in the recipe.
