@@ -13,11 +13,13 @@ func _() {
 	_ = x[PushInput-2]
 	_ = x[CompileObj-3]
 	_ = x[CompileExe-4]
+	_ = x[RunExe-5]
+	_ = x[Cat-6]
 }
 
-const _Op_name = "NopPushInputsPushInputCompileObjCompileExe"
+const _Op_name = "NopPushInputsPushInputCompileObjCompileExeRunExeCat"
 
-var _Op_index = [...]uint8{0, 3, 13, 22, 32, 42}
+var _Op_index = [...]uint8{0, 3, 13, 22, 32, 42, 48, 51}
 
 func (i Op) String() string {
 	if i >= Op(len(_Op_index)-1) {

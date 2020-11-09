@@ -6,8 +6,8 @@
 package recipe
 
 import (
-	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 )
@@ -28,24 +28,36 @@ type Instruction struct {
 	// FileKind is, if applicable, the file kind argument to the instruction.
 	FileKind filekind.Kind `json:"file_kind,omitempty"`
 
-	// npops is, if applicable and nonzero, the maximum number of items to pop off the file stack.
+	// NPops is, if applicable and nonzero, the maximum number of items to pop off the file stack.
 	NPops int `json:"npops,omitempty"`
+}
+
+// IsRuntime gets whether this instruction is a run-time one.
+// The machine node will, at time of writing, segregate compile-time and run-time instructions.
+func (i Instruction) IsRuntime() bool {
+	return LastCompile < i.Op
 }
 
 // String produces a human-readable string representation of this instruction.
 func (i Instruction) String() string {
+	strs := []string{i.Op.String()}
+
 	switch i.Op {
 	case CompileExe:
 		fallthrough
 	case CompileObj:
-		return fmt.Sprintf("%s %s", i.Op, npopString(i.NPops))
+		fallthrough
+	case RunExe:
+		fallthrough
+	case Cat:
+		strs = append(strs, npopString(i.NPops))
 	case PushInput:
-		return fmt.Sprintf("%s %q", i.Op, i.File)
+		strs = append(strs, strconv.Quote(i.File))
 	case PushInputs:
-		return fmt.Sprintf("%s %q", i.Op, i.FileKind)
-	default:
-		return i.Op.String()
+		strs = append(strs, i.FileKind.String())
 	}
+
+	return strings.Join(strs, " ")
 }
 
 // npopString returns 'ALL' if npops requests popping all files, or npops as a string otherwise.
@@ -64,6 +76,18 @@ func CompileExeInst(npops int) Instruction {
 // CompileObjInst produces a 'compile object' instruction.
 func CompileObjInst(npops int) Instruction {
 	return Instruction{Op: CompileObj, NPops: npops}
+}
+
+/*
+// RunExe produces a 'run' instruction.
+func RunExeInst(npops int) Instruction {
+	return Instruction{Op: RunExe, NPops: npops}
+}
+*/
+
+// CatInst produces a 'cat' instruction.
+func CatInst(npops int) Instruction {
+	return Instruction{Op: Cat, NPops: npops}
 }
 
 // PushInputInst produces a 'push input' instruction.

@@ -7,7 +7,6 @@ package litmus
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
@@ -58,6 +57,7 @@ func (l *Instance) check() error {
 
 // jobRunInfo gets the command and arguments needed to run Litmus on the specific job given.
 func (l *Instance) jobRunInfo() (service.RunInfo, error) {
+	// This is distinct from the earlier override that overlays user-specified Litmus args on the default ones.
 	ri := l.RunInfo
 	args, err := l.litmusArgs()
 	if err != nil {
@@ -69,12 +69,13 @@ func (l *Instance) jobRunInfo() (service.RunInfo, error) {
 
 // litmusArgs works out the argument vector for Litmus.
 func (l *Instance) litmusArgs() ([]string, error) {
-	carch, err := lookupArch(l.Job.Arch)
+	args := l.Fixset.Args()
+	args = append(args, "-o", l.Job.Out.Dir)
+
+	cargs, err := litmusCommonArgs(l.Job)
 	if err != nil {
-		return nil, fmt.Errorf("when looking up -carch: %w", err)
+		return nil, err
 	}
 
-	args := l.Fixset.Args()
-	args = append(args, "-o", l.Job.Out.Dir, "-carch", carch, "-c11", "true", l.Job.In.Litmus.Path)
-	return args, nil
+	return append(args, cargs...), nil
 }

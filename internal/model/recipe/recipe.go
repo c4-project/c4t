@@ -65,11 +65,20 @@ func CompileFileToObj(file string) Option {
 	)
 }
 
-// CompileAllCToExe adds a set of instructions that compile all C inputs to an executable.
+// CompileAllCToExe adds a set of instructions that compile all C inputs to an executable, then runs it.
 func CompileAllCToExe() Option {
 	return AddInstructions(
 		PushInputsInst(filekind.CSrc),
 		CompileExeInst(PopAll),
+		// RunExeInst(1),
+	)
+}
+
+// CatAll adds a set of instructions that catenate all inputs to stdout.
+func CatAll() Option {
+	return AddInstructions(
+		PushInputsInst(filekind.Any),
+		CatInst(PopAll),
 	)
 }
 

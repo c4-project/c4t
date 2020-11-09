@@ -9,6 +9,7 @@ package herd
 import (
 	"context"
 	"fmt"
+	"io"
 
 	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
 
@@ -20,8 +21,13 @@ import (
 // Herd describes the parts of a backend invocation that are specific to Herd.
 type Herd struct{}
 
-// Run fails to run Herd (for now).
-func (h Herd) Run(_ context.Context, _ backend2.LiftJob, _ service.RunInfo, _ service.Runner) error {
-	// TODO(@MattWindsor91): once we extend this to deal with non-harness jobs, add functionality here.
+// Run fails to run Herd to generate executables.
+func (h Herd) LiftExe(context.Context, backend2.LiftJob, service.RunInfo, service.Runner) error {
 	return fmt.Errorf("%w: harness making", backend.ErrNotSupported)
+}
+
+// Run runs Herd standalone.
+func (h Herd) LiftStandalone(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner, w io.Writer) error {
+	r.Override(service.RunInfo{Args: []string{j.In.Litmus.Path}})
+	return x.WithStdout(w).Run(ctx, r)
 }

@@ -65,6 +65,7 @@ func LiftLitmusInput(l litmus.Litmus) LiftInput {
 	return LiftInput{Source: LiftLitmus, Litmus: l}
 }
 
+// Check makes sure that this lift input has a valid source and the data required for it.
 func (l LiftInput) Check() error {
 	switch l.Source {
 	case LiftLitmus:
@@ -90,13 +91,15 @@ type LiftOutput struct {
 	Target Target
 }
 
-// Check checks a LiftOutput for errors.
+// Check makes sure that this lift output has a valid target and the data required for it.
 func (l LiftOutput) Check() error {
 	// TODO(@MattWindsor91): ToStandalone shouldn't need a directory
 	if ystring.IsBlank(l.Dir) {
 		return ErrOutDirBlank
 	}
 	switch l.Target {
+	case ToDefault:
+		return nil
 	case ToExeRecipe:
 		return nil
 	case ToObjRecipe:

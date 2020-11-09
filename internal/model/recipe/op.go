@@ -15,17 +15,24 @@ import (
 type Op uint8
 
 const (
-	// No-operation.
+	// Nop is a no-operation.
 	Nop Op = iota
-	// Push all unconsumed inputs (matching the filekind argument, if given) onto the stack.
+	// PushInputs is a compile instruction that pushes all unconsumed inputs (matching the filekind argument, if given).
 	PushInputs
-	// Push a specific input onto the stack, consuming it.
+	// PushInput is a compile instruction that pushes a specific input onto the stack, consuming it.
 	// Takes a file argument.
 	PushInput
-	// Pop all of the inputs off the stack, compile them to an object, and push the name of the object onto the stack.
+	// CompileObj pops inputs off the stack, compile them to an object, and push the name of the object onto the stack.
 	CompileObj
-	// Pop all of the inputs off the stack, compile them, and output the results to the output binary.
+	// CompileObj pops inputs off the stack, compile them, and output the results to the output binary.
 	CompileExe
+	// RunExe pops inputs off the stack, executes them, and forwards their standard output.
+	RunExe
+	// Cat is a run instruction that pops inputs off the stack and reads them to standard output.
+	Cat
+
+	// LastCompile is the last instruction that is part of a compile.
+	LastCompile = CompileExe
 	// Last is the last operation defined.
 	Last = CompileExe
 )

@@ -41,10 +41,10 @@ func ExamplePushInputInst() {
 	// PushInput "foo.c"
 }
 
-// ExamplePushInputsInst is a runnable example for PushInputInst.
+// ExamplePushInputsInst is a runnable example for PushInputsInst.
 func ExamplePushInputsInst() {
 	fmt.Println(recipe.PushInputsInst(filekind.C))
 
 	// Output:
-	// PushInputs "c"
+	// PushInputs c
 }
