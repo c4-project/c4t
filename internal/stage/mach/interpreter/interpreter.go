@@ -3,7 +3,8 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package compiler
+// Package interpreter contains the recipe interpreter for the machine node.
+package interpreter
 
 import (
 	"context"
@@ -14,14 +15,24 @@ import (
 	"math"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
 )
+
+// ErrDriverNil occurs when the compiler tries to use the nil pointer as its single-compile driver.
+var ErrDriverNil = errors.New("driver nil")
+
+// Driver is the interface of things that can run compilers.
+type Driver interface {
+	// RunCompiler runs the compiler job j.
+	// If applicable, errw will be connected to the compiler's standard error.
+	//
+	// Implementors should note that the paths in j are slash-paths, and will need converting to filepaths.
+	RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error
+}
 
 // Interpreter is an interpreter for compile recipes.
 type Interpreter struct {
@@ -54,7 +65,7 @@ var (
 )
 
 // NewInterpreter creates a new recipe processor using the compiler driver d and job j.
-func NewInterpreter(d Driver, j compile.Recipe, os ...IOption) (*Interpreter, error) {
+func NewInterpreter(d Driver, j compile.Recipe, os ...Option) (*Interpreter, error) {
 	if d == nil {
 		return nil, ErrDriverNil
 	}
@@ -63,35 +74,13 @@ func NewInterpreter(d Driver, j compile.Recipe, os ...IOption) (*Interpreter, er
 	}
 
 	p := Interpreter{driver: d, job: j, logw: ioutil.Discard, maxobjs: math.MaxUint64}
-	IOptions(os...)(&p)
+	Options(os...)(&p)
 
 	p.inPool = initPool(p.job.In)
 	// Assuming that the usual case is that every file in the pool gets put in the stack.
 	p.fileStack = make([]string, 0, len(p.inPool))
 
 	return &p, nil
-}
-
-// IOption is the type of options to the interpreter.
-type IOption func(*Interpreter)
-
-// IOptions bundles the options os into one option.
-func IOptions(os ...IOption) IOption {
-	return func(i *Interpreter) {
-		for _, o := range os {
-			o(i)
-		}
-	}
-}
-
-// ILogTo logs compiler output to w.
-func ILogTo(w io.Writer) IOption {
-	return func(i *Interpreter) { i.logw = iohelp.EnsureWriter(w) }
-}
-
-// SetMaxObjs sets the maximum number of object files the interpreter can create.
-func SetMaxObjs(cap uint64) IOption {
-	return func(i *Interpreter) { i.maxobjs = cap }
 }
 
 // Interpret processes this processor's compilation recipe using ctx for timeout and cancellation.

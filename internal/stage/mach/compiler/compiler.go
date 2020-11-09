@@ -9,8 +9,8 @@ package compiler
 
 import (
 	"context"
-	"errors"
-	"io"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter"
 
 	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
@@ -19,7 +19,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 	"github.com/MattWindsor91/act-tester/internal/subject"
 
 	"github.com/MattWindsor91/act-tester/internal/model/id"
@@ -30,18 +29,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/plan"
 )
-
-// ErrDriverNil occurs when the compiler tries to use the nil pointer as its single-compile driver.
-var ErrDriverNil = errors.New("driver nil")
-
-// Driver is the interface of things that can run compilers.
-type Driver interface {
-	// RunCompiler runs the compiler job j.
-	// If applicable, errw will be connected to the compiler's standard error.
-	//
-	// Implementors should note that the paths in j are slash-paths, and will need converting to filepaths.
-	RunCompiler(ctx context.Context, j compile.Single, errw io.Writer) error
-}
 
 //go:generate mockery --name=Driver
 
@@ -62,7 +49,7 @@ type SubjectPather interface {
 // Compiler contains the configuration required to compile the recipes for a single test run.
 type Compiler struct {
 	// driver is what the compiler should use to run single compiler jobs.
-	driver Driver
+	driver interpreter.Driver
 
 	// observers observe the compiler's progress across a corpus.
 	observers []observer.Observer
@@ -77,9 +64,9 @@ type Compiler struct {
 // New creates a new batch compiler instance using the config c and plan p.
 // It can fail if various safety checks fail on the config,
 // or if there is no obvious machine that the compiler can target.
-func New(driver Driver, paths SubjectPather, opts ...Option) (*Compiler, error) {
+func New(driver interpreter.Driver, paths SubjectPather, opts ...Option) (*Compiler, error) {
 	if driver == nil {
-		return nil, ErrDriverNil
+		return nil, interpreter.ErrDriverNil
 	}
 	if paths == nil {
 		return nil, iohelp.ErrPathsetNil

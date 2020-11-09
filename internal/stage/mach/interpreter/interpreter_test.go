@@ -3,7 +3,7 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package compiler_test
+package interpreter_test
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"path"
 	"testing"
+
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter"
 
 	"github.com/MattWindsor91/act-tester/internal/model/filekind"
 
@@ -20,7 +22,6 @@ import (
 
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/act-tester/internal/model/recipe"
@@ -44,7 +45,7 @@ func TestInterpreter_Interpret(t *testing.T) {
 	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
 		"filtering error making recipe")
 
-	it, err := compiler.NewInterpreter(&mc, cr)
+	it, err := interpreter.NewInterpreter(&mc, cr)
 	require.NoError(t, err, "error while making interpreter")
 
 	mc.On("RunCompiler",
@@ -83,7 +84,7 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 	require.ElementsMatch(t, cr.In, []string{path.Join("in", "body.c"), path.Join("in", "harness.c")},
 		"filtering error making recipe")
 
-	it, err := compiler.NewInterpreter(&mc, cr)
+	it, err := interpreter.NewInterpreter(&mc, cr)
 	require.NoError(t, err, "error while making interpreter")
 
 	mc.On("RunCompiler",
@@ -107,17 +108,17 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 		in  []recipe.Instruction
 		err error
 	}{
-		"bad-op":   {in: []recipe.Instruction{{Op: 42}}, err: compiler.ErrBadOp},
-		"bad-file": {in: []recipe.Instruction{recipe.PushInputInst("nonsuch.c")}, err: compiler.ErrFileUnavailable},
+		"bad-op":   {in: []recipe.Instruction{{Op: 42}}, err: interpreter.ErrBadOp},
+		"bad-file": {in: []recipe.Instruction{recipe.PushInputInst("nonsuch.c")}, err: interpreter.ErrFileUnavailable},
 		"reused-file": {in: []recipe.Instruction{
 			recipe.PushInputInst("body.c"),
 			recipe.PushInputInst("body.c"),
-		}, err: compiler.ErrFileUnavailable,
+		}, err: interpreter.ErrFileUnavailable,
 		},
 		"reused-file-inputs": {in: []recipe.Instruction{
 			recipe.PushInputsInst(filekind.CSrc),
 			recipe.PushInputInst("body.c"),
-		}, err: compiler.ErrFileUnavailable,
+		}, err: interpreter.ErrFileUnavailable,
 		},
 	}
 
@@ -136,7 +137,7 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 			)
 			cmp := mdl.Configuration{}
 			cr := compile.FromRecipe(&cmp, r, "a.out")
-			it, err := compiler.NewInterpreter(&mc, cr)
+			it, err := interpreter.NewInterpreter(&mc, cr)
 			require.NoError(t, err, "error while making interpreter")
 
 			err = it.Interpret(context.Background())
@@ -171,11 +172,11 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 		compile.New(&c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")).Single(compile.Obj),
 		ioutil.Discard).Return(nil).Once()
 
-	it, err := compiler.NewInterpreter(&mc, cr, compiler.SetMaxObjs(1))
+	it, err := interpreter.NewInterpreter(&mc, cr, interpreter.SetMaxObjs(1))
 	require.NoError(t, err, "error while making interpreter")
 
 	err = it.Interpret(context.Background())
-	testhelp.ExpectErrorIs(t, err, compiler.ErrObjOverflow, "running interpreter with overflowing objs")
+	testhelp.ExpectErrorIs(t, err, interpreter.ErrObjOverflow, "running interpreter with overflowing objs")
 
 	mc.AssertExpectations(t)
 }
@@ -200,12 +201,12 @@ func TestNewInterpreter_errors(t *testing.T) {
 		"no-driver": {
 			useDriver: false,
 			j:         compile.FromRecipe(&cmp, r, "a.out"),
-			err:       compiler.ErrDriverNil,
+			err:       interpreter.ErrDriverNil,
 		},
 		"no-compiler-cfg": {
 			useDriver: true,
 			j:         compile.FromRecipe(nil, r, "a.out"),
-			err:       compiler.ErrCompilerConfigNil,
+			err:       interpreter.ErrCompilerConfigNil,
 		},
 		"ok": {
 			useDriver: true,
@@ -220,12 +221,12 @@ func TestNewInterpreter_errors(t *testing.T) {
 
 			var mc mocks.Compiler
 			mc.Test(t)
-			var d compiler.Driver
+			var d interpreter.Driver
 			if c.useDriver {
 				d = &mc
 			}
 
-			_, err := compiler.NewInterpreter(d, c.j)
+			_, err := interpreter.NewInterpreter(d, c.j)
 			testhelp.ExpectErrorIs(t, err, c.err, "constructing new interpreter")
 		})
 	}

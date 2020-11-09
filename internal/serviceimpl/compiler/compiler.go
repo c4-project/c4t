@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter"
+
 	"github.com/MattWindsor91/act-tester/internal/model/job/compile"
 
 	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
@@ -23,8 +25,6 @@ import (
 	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
 
 	"github.com/MattWindsor91/act-tester/internal/model/service"
-
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
 )
 
 var (
@@ -42,7 +42,7 @@ var (
 // Compiler contains the various interfaces that a compiler can implement.
 type Compiler interface {
 	mdl.Inspector
-	compiler.Driver
+	interpreter.Driver
 }
 
 //go:generate mockery --name=Compiler

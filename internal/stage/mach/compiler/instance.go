@@ -12,6 +12,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter"
+
 	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
 
 	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
@@ -49,7 +51,7 @@ type Instance struct {
 	compilers map[string]compiler.Configuration
 
 	// driver tells the instance how to run the compiler.
-	driver Driver
+	driver interpreter.Driver
 
 	// paths tells the instance which paths to use.
 	paths SubjectPather
@@ -115,7 +117,7 @@ func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp compi
 }
 
 func (j *Instance) runCompilerJob(ctx context.Context, job compile.Recipe, logf io.Writer) error {
-	i, err := NewInterpreter(j.driver, job, ILogTo(logf))
+	i, err := interpreter.NewInterpreter(j.driver, job, interpreter.LogTo(logf))
 	if err != nil {
 		return err
 	}
