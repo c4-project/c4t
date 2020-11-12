@@ -9,14 +9,14 @@ package backend
 type Target uint8
 
 const (
-	// ToDefault states that the lifting backend should return whatever it feels most comfortable with.
+	// ToDefault states that the lifting backend should perform its default lifting.
 	ToDefault Target = iota
-	// ToStandalone states that the backend should run to completion without further compilation or running;
-	// it will emit a single text output file and stub recipe.
+	// ToStandalone states that the backend should run in a standalone manner in the running phase, without compilation.
+	// The backend can still produce files and include them in the recipe, but should not produce instructions.
 	ToStandalone
 	// ToObjRecipe states that the backend should produce a recipe that emits one or more object files.
 	ToObjRecipe
-	// ToExeRecipe states that te backend should produce a recipe that emits a compilable executable.
+	// ToExeRecipe states that the backend should produce a recipe that emits a compilable executable.
 	ToExeRecipe
 )
 

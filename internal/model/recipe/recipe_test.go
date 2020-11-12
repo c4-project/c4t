@@ -18,7 +18,7 @@ import (
 
 // ExampleRecipe_Paths is a testable example for Recipe.Paths.
 func ExampleRecipe_Paths() {
-	h := recipe.New("foo/bar", recipe.OutNothing, recipe.AddFiles("baz", "barbaz", "foobar"))
+	h, _ := recipe.New("foo/bar", recipe.OutNothing, recipe.AddFiles("baz", "barbaz", "foobar"))
 	for _, f := range h.Paths() {
 		fmt.Println(f)
 	}

@@ -65,11 +65,10 @@ func (d Delitmus) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runne
 		return recipe.Recipe{}, err
 	}
 	return recipe.New(j.Out.Dir,
-		recipe.OutNothing,
+		recipe.OutObj,
 		recipe.AddFiles(dj.OutC),
 		recipe.AddInstructions(recipe.CompileObjInst(1)),
-		// TODO(@MattWindsor91): deal with the fact that this ends in an obj compile
-	), nil
+	)
 }
 
 func checkAndAmendJob(j *backend2.LiftJob) error {

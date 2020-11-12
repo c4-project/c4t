@@ -54,14 +54,15 @@ func TestReplayer_Run_roundTripBuilder(t *testing.T) {
 	}
 
 	add := builder.AddRequest(subject.NewOrPanic(litmus.New("foo.litmus")).AddName("foo"))
-	rec := builder.RecipeRequest(
-		"foo",
-		id.ArchX8664,
-		recipe.New(
-			"recipe",
-			recipe.OutNothing,
-			recipe.AddFiles("foo.c", "bar.c", "baz.c"),
-		))
+	r, err := recipe.New(
+		"recipe",
+		recipe.OutNothing,
+		recipe.AddFiles("foo.c", "bar.c", "baz.c"),
+	)
+	require.NoError(t, err, "recipe build shouldn't error")
+
+	rec := builder.RecipeRequest("foo", id.ArchX8664, r)
+
 	com := builder.CompileRequest(
 		compilation.Name{SubjectName: "foo", CompilerID: id.CStyleGCC},
 		compilation.CompileResult{

@@ -127,14 +127,14 @@ func (h Backend) makeRecipe(j backend2.LiftJob) (recipe.Recipe, error) {
 		recipe.AddFiles(fs...),
 		// TODO(@MattWindsor91): delitmus support
 		targetRecipeOption(j.Out.Target),
-	), nil
+	)
 }
 
 func targetRecipeOutput(tgt backend2.Target) recipe.Output {
 	if tgt == backend2.ToExeRecipe {
 		return recipe.OutExe
 	}
-	return recipe.OutText
+	return recipe.OutNothing
 }
 
 func targetRecipeOption(tgt backend2.Target) recipe.Option {

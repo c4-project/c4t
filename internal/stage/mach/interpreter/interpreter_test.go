@@ -34,13 +34,15 @@ func TestInterpreter_Interpret(t *testing.T) {
 
 	var mc mocks.Compiler
 
-	r := recipe.New(
+	r, err := recipe.New(
 		"in",
 		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileAllCToExe(),
 	)
+	require.NoError(t, err, "error while making recipe")
+
 	c := mdl.Configuration{}
 	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r)
 	require.NoError(t, err, "error while making interpreter")
@@ -69,7 +71,7 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 
 	werr := errors.New("no me gusta")
 
-	r := recipe.New(
+	r, err := recipe.New(
 		"in",
 		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
@@ -77,6 +79,8 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileAllCToExe(),
 	)
+	require.NoError(t, err, "error while making recipe")
+
 	c := mdl.Configuration{}
 	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r)
 	require.NoError(t, err, "error while making interpreter")
@@ -124,12 +128,14 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 			var mc mocks.Compiler
 			mc.Test(t)
 
-			r := recipe.New(
+			r, err := recipe.New(
 				"in",
 				recipe.OutExe,
 				recipe.AddFiles("body.c", "harness.c", "body.h"),
 				recipe.AddInstructions(c.in...),
 			)
+			require.NoError(t, err, "error while making recipe")
+
 			cmp := mdl.Configuration{}
 			it, err := interpreter.NewInterpreter(&mc, &cmp, "a.out", r)
 			require.NoError(t, err, "error while making interpreter")
@@ -150,13 +156,14 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 	var mc mocks.Compiler
 	mc.Test(t)
 
-	r := recipe.New(
+	r, err := recipe.New(
 		"in",
 		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileFileToObj(path.Join("in", "harness.c")),
 	)
+	require.NoError(t, err, "error while making recipe")
 	c := mdl.Configuration{}
 	mc.On("RunCompiler",
 		mock.Anything,
@@ -176,13 +183,15 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 func TestNewInterpreter_errors(t *testing.T) {
 	t.Parallel()
 
-	r := recipe.New(
+	r, err := recipe.New(
 		"in",
 		recipe.OutExe,
 		recipe.AddFiles("body.c", "harness.c", "body.h"),
 		recipe.CompileFileToObj(path.Join("in", "body.c")),
 		recipe.CompileFileToObj(path.Join("in", "harness.c")),
 	)
+	require.NoError(t, err, "error while making recipe")
+
 	cmp := mdl.Configuration{}
 
 	cases := map[string]struct {

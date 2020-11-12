@@ -9,13 +9,13 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[OutNothing-0]
-	_ = x[OutText-1]
+	_ = x[OutObj-1]
 	_ = x[OutExe-2]
 }
 
-const _Output_name = "OutNothingOutTextOutExe"
+const _Output_name = "OutNothingOutObjOutExe"
 
-var _Output_index = [...]uint8{0, 10, 17, 23}
+var _Output_index = [...]uint8{0, 10, 16, 22}
 
 func (i Output) String() string {
 	if i >= Output(len(_Output_index)-1) {

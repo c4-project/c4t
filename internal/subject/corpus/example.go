@@ -99,10 +99,14 @@ func MockSuccessfulCompile(cstr string, sname string) compilation.CompileResult 
 
 // MockRecipe constructs a mock recipe at dir.
 func MockRecipe(dir string) recipe.Recipe {
-	return recipe.New(
+	r, err := recipe.New(
 		dir,
 		recipe.OutExe,
 		recipe.AddFiles("run.c", "aux.c", "aux.h"),
 		recipe.CompileAllCToExe(),
 	)
+	if err != nil {
+		panic(err)
+	}
+	return r
 }

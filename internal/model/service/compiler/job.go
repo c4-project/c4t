@@ -3,7 +3,6 @@
 // This file is part of act-tester.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package compile describes compilation jobs.
 package compiler
 
 import (

@@ -9,10 +9,11 @@ package recipe
 type Output uint8
 
 const (
-	// This recipe doesn't output anything, and exists solely to feed into another recipe.
+	// This recipe doesn't output anything, and so need not be run.
+	// The recipe can still include files to make available to the backend's run-time driver.
 	OutNothing Output = iota
-	// This recipe outputs a file that should be read into the observation parser.
-	OutText
+	// This recipe outputs an object file that should be fed into another recipe.
+	OutObj
 	// This recipe outputs an executable that should be run with its output piped into the observation parser.
 	OutExe
 )

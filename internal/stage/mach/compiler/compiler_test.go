@@ -46,13 +46,15 @@ func TestCompiler_Run(t *testing.T) {
 	names := []string{"foo", "bar", "baz"}
 	c := corpus.New(names...)
 	for n, cn := range c {
-		err := cn.AddRecipe(id.ArchX86Skylake, recipe.New(
+		r, err := recipe.New(
 			n,
 			recipe.OutExe,
 			recipe.AddFiles("main.c"),
 			recipe.CompileAllCToExe(),
-		))
-		require.NoError(t, err, "setting up recipe")
+		)
+		require.NoError(t, err, "building recipe")
+		err = cn.AddRecipe(id.ArchX86Skylake, r)
+		require.NoError(t, err, "adding recipe")
 		c[n] = cn
 	}
 

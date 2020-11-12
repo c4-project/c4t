@@ -26,10 +26,12 @@ type Recipe struct {
 }
 
 // New constructs a recipe using the input directory dir and the options os.
-func New(dir string, otype Output, os ...Option) Recipe {
+func New(dir string, otype Output, os ...Option) (Recipe, error) {
 	r := Recipe{Dir: dir, Output: otype}
-	Options(os...)(&r)
-	return r
+	if err := Options(os...)(&r); err != nil {
+		return Recipe{}, err
+	}
+	return r, nil
 }
 
 // Paths retrieves the slash-joined dir/file paths for each file in the recipe.
