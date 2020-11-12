@@ -138,13 +138,15 @@ func (s *Subject) ensureCompilationMap() {
 }
 
 // Recipe gets the recipe for the architecture with id arch.
-func (s *Subject) Recipe(arch id.ID) (recipe.Recipe, error) {
+// It returns the ID of the recipe as well as the recipe contents.
+func (s *Subject) Recipe(arch id.ID) (id.ID, recipe.Recipe, error) {
+	// TODO(@MattWindsor91): do scoping here
 	key := arch.String()
-	h, ok := s.Recipes[key]
+	r, ok := s.Recipes[key]
 	if !ok {
-		return recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingRecipe, key)
+		return id.ID{}, recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingRecipe, key)
 	}
-	return h, nil
+	return arch, r, nil
 }
 
 // AddRecipe sets the recipe information for arch to r in this subject.

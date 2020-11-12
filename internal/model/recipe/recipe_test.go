@@ -29,6 +29,23 @@ func ExampleRecipe_Paths() {
 	// foo/bar/foobar
 }
 
+// ExampleRecipe_NeedsCompile is a testable example for Recipe.NeedsCompile.
+func ExampleRecipe_NeedsCompile() {
+	r1, _ := recipe.New("foo/bar", recipe.OutNothing, recipe.AddFiles("baz", "barbaz", "foobar"))
+	fmt.Println("first recipe needs compile:", r1.NeedsCompile())
+	r2, _ := recipe.New(
+		"foo/bar",
+		recipe.OutExe,
+		recipe.AddFiles("baz", "barbaz", "foobar"),
+		recipe.CompileAllCToExe(),
+	)
+	fmt.Println("second recipe needs compile:", r2.NeedsCompile())
+
+	// Output:
+	// first recipe needs compile: false
+	// second recipe needs compile: true
+}
+
 // TestOp_UnmarshalJSON_error tests error cases of Op.UnmarshalJSON.
 func TestOp_UnmarshalJSON_error(t *testing.T) {
 	t.Parallel()

@@ -79,41 +79,52 @@ func (j *Instance) Compile(ctx context.Context) error {
 }
 
 func (j *Instance) compileOnCompiler(ctx context.Context, nc *compiler.Named) error {
-	h, herr := j.subject.Recipe(nc.Arch)
-	if herr != nil {
-		return herr
+	rid, r, err := j.subject.Recipe(nc.Arch)
+	if err != nil {
+		return err
 	}
 
 	sc := compilation.Name{CompilerID: nc.ID, SubjectName: j.subject.Name}
-	sp := j.paths.SubjectPaths(sc)
-
-	res, rerr := j.runCompiler(ctx, nc, sp, h)
-	if rerr != nil {
-		return rerr
+	res := compilation.CompileResult{
+		Result: compilation.Result{
+			Status: status.Unknown,
+		},
+		RecipeID: rid,
+		Files:    j.paths.SubjectPaths(sc),
 	}
+
+	if r.NeedsCompile() {
+		if err := j.runCompiler(ctx, nc, &res, r); err != nil {
+			return err
+		}
+	}
+	res.Files = res.Files.StripMissing()
 
 	return builder.CompileRequest(sc, res).SendTo(ctx, j.resCh)
 }
 
-func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, sp compilation.CompileFileset, h recipe.Recipe) (compilation.CompileResult, error) {
-	logf, err := j.openLogFile(sp.Log)
+func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, res *compilation.CompileResult, h recipe.Recipe) error {
+	logf, err := j.openLogFile(res.Files.Log)
 	if err != nil {
-		return compilation.CompileResult{}, err
+		return err
 	}
 
 	tctx, cancel := j.quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
-	start := time.Now()
+	res.Time = time.Now()
 
 	// Some compiler errors are recoverable, so we don't immediately bail on them.
-	rerr := j.runCompilerJob(tctx, nc, sp, h, logf)
-
+	rerr := j.runCompilerJob(tctx, nc, res.Files, h, logf)
 	lerr := logf.Close()
-	return j.makeCompileResult(sp, start, errhelp.TimeoutOrFirstError(tctx, rerr, lerr))
+
+	res.Duration = time.Since(res.Time)
+	res.Status, err = status.FromCompileError(errhelp.TimeoutOrFirstError(tctx, rerr, lerr))
+	return err
 }
 
 func (j *Instance) runCompilerJob(ctx context.Context, nc *compiler.Named, sp compilation.CompileFileset, h recipe.Recipe, logf io.Writer) error {
+
 	i, err := interpreter.NewInterpreter(j.driver, &nc.Configuration, sp.Bin, h, interpreter.LogTo(logf))
 	if err != nil {
 		return err
@@ -126,20 +137,4 @@ func (j *Instance) openLogFile(l string) (io.WriteCloser, error) {
 		return iohelp.DiscardCloser(), nil
 	}
 	return os.Create(l)
-}
-
-// makeCompileResult makes a compile result given a possible err and fileset sp.
-// It fails if the error is considered substantially fatal.
-func (j *Instance) makeCompileResult(sp compilation.CompileFileset, start time.Time, err error) (compilation.CompileResult, error) {
-	cr := compilation.CompileResult{
-		Result: compilation.Result{
-			Time:     start,
-			Duration: time.Since(start),
-			Status:   status.Unknown,
-		},
-		Files: sp.StripMissing(),
-	}
-
-	cr.Status, err = status.FromCompileError(err)
-	return cr, err
 }

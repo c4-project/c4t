@@ -11,10 +11,11 @@ type Version uint32
 // CurrentVer is the current plan version.
 // It changes when the interface between various bits of the tester (generally manifested within the plan version)
 // changes.
-const CurrentVer Version = 2020_09_24
+const CurrentVer Version = 2020_11_12
 
 // Version history since 2020_05_29:
 //
+// 2020_11_12: Compile results now hold the ID of the recipe used.  Recipes have extended information about targets.
 // 2020_09_24: SSH configuration now uses camel_case tags.  The 'compiles' and 'runs' maps have become one
 //             'compilations' map, with optional 'compile' and 'run' subkeys (these currently contain exactly the same
 //             data as the original map entries).

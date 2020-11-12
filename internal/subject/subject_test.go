@@ -74,19 +74,23 @@ func ExampleSubject_Recipe() {
 		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
 		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
-	xs, _ := s.Recipe(id.ArchX8664)
-	as, _ := s.Recipe(id.ArchArm)
+	xsn, xs, _ := s.Recipe(id.ArchX8664)
+	asn, as, _ := s.Recipe(id.ArchArm)
 
+	fmt.Println("#", xsn)
 	for _, r := range xs.Files {
 		fmt.Println(r)
 	}
+	fmt.Println("#", asn)
 	for _, r := range as.Files {
 		fmt.Println(r)
 	}
 
 	// Output:
+	// # x86.64
 	// bar
 	// baz
+	// # arm
 	// barbaz
 }
 
@@ -133,7 +137,8 @@ func TestSubject_AddCompileResult(t *testing.T) {
 
 	var s subject.Subject
 	c := compilation.CompileResult{
-		Result: compilation.Result{Status: status.Ok},
+		Result:   compilation.Result{Status: status.Ok},
+		RecipeID: id.ArchArm,
 		Files: compilation.CompileFileset{
 			Bin: "a.out",
 			Log: "gcc.log",
@@ -161,7 +166,7 @@ func TestSubject_AddCompileResult(t *testing.T) {
 // the appropriate error.
 func TestSubject_Recipe_missing(t *testing.T) {
 	var s subject.Subject
-	_, err := s.Recipe(id.FromString("x86.64"))
+	_, _, err := s.Recipe(id.FromString("x86.64"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRecipe, "missing recipe path")
 }
 
@@ -181,8 +186,9 @@ func TestSubject_AddRecipe(t *testing.T) {
 		assert.NoError(t, s.AddRecipe(march, h), "err when adding recipe to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
-		h2, err := s.Recipe(march)
+		m2, h2, err := s.Recipe(march)
 		if assert.NoError(t, err, "err when getting added recipe") {
+			assert.Equal(t, march, m2, "wrong recipe ID")
 			assert.Equalf(t, h, h2, "added recipe (%v) came back wrong (%v)", h2, h)
 		}
 	})

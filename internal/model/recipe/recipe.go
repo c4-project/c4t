@@ -42,3 +42,8 @@ func (r *Recipe) Paths() []string {
 	}
 	return paths
 }
+
+// NeedsCompile gets whether this recipe needs to be compiled (ie, its instructions should be interpreted).
+func (r *Recipe) NeedsCompile() bool {
+	return r.Output != OutNothing
+}
