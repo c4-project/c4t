@@ -1,42 +1,42 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package invoker contains the app definition for act-tester-invoke.
+// Package invoker contains the app definition for c4t-invoke.
 package invoke
 
 import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
+	"github.com/MattWindsor91/c4t/internal/stage/invoker/runner"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
+	"github.com/MattWindsor91/c4t/internal/stage/invoker"
 
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
+	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
 
-	"github.com/MattWindsor91/act-tester/internal/ux"
+	"github.com/MattWindsor91/c4t/internal/ux"
 )
 
 const (
-	Name = "act-tester-invoke"
+	Name = "c4t-invoke"
 
 	flagForce      = "force"
 	flagForceShort = "f"
 	usageForce     = "allow invoke on plans that have already been invoked"
 )
 
-// App creates the act-tester-invoke app.
+// App creates the c4t-invoke app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  Name,

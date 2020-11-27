@@ -5,7 +5,7 @@
 # and 'saved' files (tarballs of failed runs).
 out_dir = "~/Documents/git/act/test_out"
 
-# The 'quantities' tables set various quantities on act-tester .
+# The 'quantities' tables set various quantities on c4t .
 # More quantities will be added as the tester matures.
 [quantities.fuzz]
     # If provided, this tells the tester to sample at most this many files AFTER fuzzing.
@@ -17,7 +17,7 @@ out_dir = "~/Documents/git/act/test_out"
 	id = "litmus"
 	style = "litmus"
 	[backend.run]
-	    # The `act-litmus` tool, provided in `act-tester`, wraps litmus and sidesteps several of its oddities.
+	    # The `act-litmus` tool, provided in `c4t`, wraps litmus and sidesteps several of its oddities.
 		cmd = "act-litmus"
 
 # We now define the machines that will be run in the test.
@@ -41,9 +41,9 @@ out_dir = "~/Documents/git/act/test_out"
 		style = "gcc"
 		arch = "x86.64"
 		[machines.localhost.compilers.gccnt.run]
-			cmd = "act-gccnt"
-			# We can append arguments to those that act-tester supplies here.
-			# act-tester automatically supplies arguments for pthreads and GNU11 C.
+			cmd = "c4t-gccnt"
+			# We can append arguments to those that c4t supplies here.
+			# c4t automatically supplies arguments for pthreads and GNU11 C.
 			args = ["-nt-bin", "gcc-9", "-nt-error-opt", "2", "-nt-diverge-opt", "3"]
 
 	[machines.localhost.compilers.clang]
@@ -58,7 +58,7 @@ out_dir = "~/Documents/git/act/test_out"
 
     # To SSH into a remote machine, give its host, your username, and a directory on that machine to which it can copy
     # scratch data.
-    # act-tester assumes that there is an SSH agent running that it can use to authenticate; it doesn't (yet) support
+    # c4t assumes that there is an SSH agent running that it can use to authenticate; it doesn't (yet) support
     # key files.
 	[machines.foo.ssh]
 		host = "foo.bar.baz"

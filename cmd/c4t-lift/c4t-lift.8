@@ -1,0 +1,45 @@
+.nh
+.TH c4t\-lift 8
+
+.SH NAME
+.PP
+c4t\-lift \- runs the lifter phase of an ACT test
+
+
+.SH SYNOPSIS
+.PP
+c4t\-lift
+
+.PP
+.RS
+
+.nf
+[\-\-verbose|\-v]
+[\-d]=[value]
+[\-x]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-lift [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-verbose, \-v\fP: enables verbose output
+
+.PP
+\fB\-d\fP="": \fB\fCdirectory\fR to which outputs will be written (default: lift\_results)
+
+.PP
+\fB\-x\fP: if true, use 'dune exec' to run OCaml ACT binaries

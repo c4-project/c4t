@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package pretty_test
@@ -9,9 +9,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/pretty"
 )
 
 // ExamplePrinter_OnAnalysis is a testable example for Printer.OnAnalysis.

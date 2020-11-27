@@ -1,0 +1,53 @@
+.nh
+.TH c4t\-perturb 8
+
+.SH NAME
+.PP
+c4t\-perturb \- perturbs a test plan
+
+
+.SH SYNOPSIS
+.PP
+c4t\-perturb
+
+.PP
+.RS
+
+.nf
+[\-\-corpus\-size|\-n]=[value]
+[\-\-full\-ids|\-I]
+[\-\-seed|\-s]=[value]
+[\-\-verbose|\-v]
+[\-C]=[value]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-perturb [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-corpus\-size, \-n\fP="": \fB\fCnumber\fR of corpus files to select for this test plan (default: 0)
+
+.PP
+\fB\-\-full\-ids, \-I\fP: map compilers to their 'full' IDs on perturbance
+
+.PP
+\fB\-\-seed, \-s\fP="": \fB\fCseed\fR to use for any randomised components of this test plan (default: \-1)
+
+.PP
+\fB\-\-verbose, \-v\fP: enables verbose output
+
+.PP
+\fB\-C\fP="": read tester config from this \fB\fCfile\fR

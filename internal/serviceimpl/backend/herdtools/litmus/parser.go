@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package litmus
@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/parser"
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/parser"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
 // ParseStateCount parses a Litmus state count.

@@ -1,35 +1,35 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package lift contains the app definition for act-tester-lift.
+// Package lift contains the app definition for c4t-lift.
 package lift
 
 import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/resolver"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
+	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/act-tester/internal/ux"
+	"github.com/MattWindsor91/c4t/internal/ux"
 )
 
 // defaultOutDir is the default directory used for the results of the lifter.
 const defaultOutDir = "lift_results"
 
-// App creates the act-tester-lift app.
+// App creates the c4t-lift app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester-lift",
+		Name:  "c4t-lift",
 		Usage: "runs the lifter phase of an ACT test",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {

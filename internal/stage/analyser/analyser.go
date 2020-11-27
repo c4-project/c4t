@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package analyser represents the stage of the tester that takes a plan, performs various statistics on it, and outputs
@@ -11,11 +11,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 )
 
 // Analyser represents the state of the plan analyser stage.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package litmus
@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 // archMap maps ACT architecture family/variant pairs to Litmus7 arch names.

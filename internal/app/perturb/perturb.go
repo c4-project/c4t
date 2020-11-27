@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package perturb contains the app definition for act-tester-perturb.
+// Package perturb contains the app definition for c4t-perturb.
 package perturb
 
 import (
@@ -11,16 +11,16 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
-	"github.com/MattWindsor91/act-tester/internal/ux"
+	"github.com/MattWindsor91/c4t/internal/stage/perturber"
+	"github.com/MattWindsor91/c4t/internal/ux"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
-	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
+	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -34,10 +34,10 @@ const (
 	usageFullIDs     = "map compilers to their 'full' IDs on perturbance"
 )
 
-// App creates the act-tester-perturb app.
+// App creates the c4t-perturb app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester-perturb",
+		Name:  "c4t-perturb",
 		Usage: "perturbs a test plan",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {

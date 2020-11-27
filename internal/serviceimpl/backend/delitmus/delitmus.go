@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package delitmus lifts the ACT delitmusifier into a backend.
@@ -12,15 +12,15 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
 const (

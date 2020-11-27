@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package coverage_test
@@ -11,14 +11,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/c4t/internal/observing"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/coverage"
+	"github.com/MattWindsor91/c4t/internal/coverage"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/coverage/mocks"
+	"github.com/MattWindsor91/c4t/internal/coverage/mocks"
 )
 
 // TestMaker_Run tests the happy path of Maker.Run using mocks.

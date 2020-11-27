@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package compilation
@@ -8,7 +8,7 @@ package compilation
 import (
 	"errors"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/normpath"
+	"github.com/MattWindsor91/c4t/internal/subject/normpath"
 
 	"github.com/1set/gut/ystring"
 )

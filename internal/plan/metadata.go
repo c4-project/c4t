@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package plan
@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+	"github.com/MattWindsor91/c4t/internal/plan/stage"
 )
 
 // UseDateSeed is a value for the header constructor's seed parameter that ensures its RNG will be seeded by run date.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package planner contains the logic for the test planner.
@@ -10,16 +10,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 )
 
 // Planner holds all configuration for the test planner.

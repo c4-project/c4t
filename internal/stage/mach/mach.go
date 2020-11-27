@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package mach contains the 'machine-dependent' stage of the tester.
@@ -11,13 +11,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/interpreter"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/compiler"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/runner"
 )
 
 // Mach encapsulates the state needed for the machine-dependent stage.

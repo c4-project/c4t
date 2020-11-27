@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package normaliser
@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 )
 
 // Corpus is a corpus-level normaliser.

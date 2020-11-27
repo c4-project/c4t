@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package parser
@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
 // StateLine is the struct that an implementation of the Herdtools parser must return when parsing a state line.

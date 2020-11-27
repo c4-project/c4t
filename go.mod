@@ -1,4 +1,4 @@
-module github.com/MattWindsor91/act-tester
+module github.com/MattWindsor91/c4t
 
 go 1.15
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package subject contains types and functions for dealing with test subject records.
@@ -12,13 +12,13 @@ package subject
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 // Normalise represents a single test subject in a corpus.

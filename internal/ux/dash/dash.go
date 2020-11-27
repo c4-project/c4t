@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package dash contains the act-tester console dashboard.
+// Package dash contains the c4t console dashboard.
 package dash
 
 import (
@@ -11,25 +11,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/director"
+	"github.com/MattWindsor91/c4t/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/director/pathset"
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/director/pathset"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
 	"github.com/mum4k/termdash/keyboard"
 
 	"github.com/mum4k/termdash/cell"
 
-	"github.com/MattWindsor91/act-tester/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/machine"
 
 	"github.com/mum4k/termdash/linestyle"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
 	"github.com/mum4k/termdash/widgets/text"
 

@@ -1,11 +1,11 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package copier
 
-import "github.com/MattWindsor91/act-tester/internal/observing"
+import "github.com/MattWindsor91/c4t/internal/observing"
 
 // Observer is an interface for types that observe an SFTP file copy.
 type Observer interface {

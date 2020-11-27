@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package resolver contains the backend resolver.
@@ -12,16 +12,16 @@ import (
 	"fmt"
 	"io"
 
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/delitmus"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/herd"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/delitmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/herd"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
 var (

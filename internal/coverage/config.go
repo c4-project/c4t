@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package coverage
@@ -8,21 +8,21 @@ package coverage
 import (
 	"errors"
 
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
-	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 	"github.com/pelletier/go-toml"
 )
 

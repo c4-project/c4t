@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package fuzzer
@@ -8,7 +8,7 @@ package fuzzer
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 )
 
 // SingleFuzzer represents types that can commune with a C litmus test fuzzer.

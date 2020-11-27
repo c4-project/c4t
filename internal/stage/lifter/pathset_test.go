@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package lifter_test
@@ -8,8 +8,8 @@ package lifter_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

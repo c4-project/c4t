@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package builder_test
@@ -10,20 +10,20 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/c4t/internal/observing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder/mocks"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 	"golang.org/x/sync/errgroup"
 )
 

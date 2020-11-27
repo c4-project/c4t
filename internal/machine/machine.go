@@ -1,15 +1,15 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package machine contains models for compiler-bearing machines.
 package machine
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/quantity"
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/remote"
 )
 
 // Machine represents the information about a machine that is relevant to the tester.

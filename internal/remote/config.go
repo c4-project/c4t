@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package remote
@@ -8,13 +8,13 @@ package remote
 import (
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )
 
-// Config is the top-level configuration for act-tester's SSH support.
+// Config is the top-level configuration for c4t's SSH support.
 type Config struct {
 	// SCPTimeoutMins is a timeout to apply to SCP.
 	SCPTimeoutMins int `toml:"scp_timeout,omitzero"`

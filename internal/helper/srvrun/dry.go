@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package srvrun
@@ -9,7 +9,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 )
 
 // DryRunner is a runner that just outputs all commands to be run to itself.

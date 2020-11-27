@@ -1,0 +1,57 @@
+.nh
+.TH c4t\-fuzz 8
+
+.SH NAME
+.PP
+c4t\-fuzz \- runs the batch\-fuzzer phase of an ACT test
+
+
+.SH SYNOPSIS
+.PP
+c4t\-fuzz
+
+.PP
+.RS
+
+.nf
+[\-\-corpus\-size|\-n]=[value]
+[\-\-verbose|\-v]
+[\-C]=[value]
+[\-d]=[value]
+[\-k]=[value]
+[\-x]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-fuzz [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-corpus\-size, \-n\fP="": \fB\fCnumber\fR of corpus files to select for this test plan (default: 0)
+
+.PP
+\fB\-\-verbose, \-v\fP: enables verbose output
+
+.PP
+\fB\-C\fP="": read tester config from this \fB\fCfile\fR
+
+.PP
+\fB\-d\fP="": \fB\fCdirectory\fR to which outputs will be written (default: fuzz\_results)
+
+.PP
+\fB\-k\fP="": number of \fB\fCcycles\fR to run for each subject in the corpus (default: 10)
+
+.PP
+\fB\-x\fP: if true, use 'dune exec' to run OCaml ACT binaries

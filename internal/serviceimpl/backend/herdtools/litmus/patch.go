@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package litmus
@@ -14,9 +14,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
 	"github.com/1set/gut/yos"
 )

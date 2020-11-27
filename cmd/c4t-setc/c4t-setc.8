@@ -1,0 +1,45 @@
+.nh
+.TH c4t\-setc 8
+
+.SH NAME
+.PP
+c4t\-setc \- sets various compiler properties
+
+
+.SH SYNOPSIS
+.PP
+c4t\-setc
+
+.PP
+.RS
+
+.nf
+[\-\-compiler|\-c]=[value]
+[\-\-machine\-opt|\-m]=[value]
+[\-\-opt\-level|\-O]=[value]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-setc [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-compiler, \-c\fP="": modify the compiler with this \fB\fCID\fR
+
+.PP
+\fB\-\-machine\-opt, \-m\fP="": set the compiler's machine optimising profile \fB\fCname\fR
+
+.PP
+\fB\-\-opt\-level, \-O\fP="": set the compiler's optimisation level \fB\fCname\fR

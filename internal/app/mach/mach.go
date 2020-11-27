@@ -1,25 +1,25 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package mach contains the app definition for act-tester-mach.
+// Package mach contains the app definition for c4t-mach.
 package mach
 
 import (
 	"io"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/app/invoke"
+	"github.com/MattWindsor91/c4t/internal/app/invoke"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
-	br "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
-	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
-	"github.com/MattWindsor91/act-tester/internal/ux"
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	br "github.com/MattWindsor91/c4t/internal/serviceimpl/backend/resolver"
+	cimpl "github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
+	"github.com/MattWindsor91/c4t/internal/stage/mach"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
+	"github.com/MattWindsor91/c4t/internal/ux"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -39,7 +39,7 @@ const (
 `
 )
 
-// App creates the act-tester-mach app.
+// App creates the c4t-mach app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:        Name,

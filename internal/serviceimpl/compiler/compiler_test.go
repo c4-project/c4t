@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package compiler_test
@@ -10,12 +10,12 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/mocks"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/mocks"
 	"github.com/stretchr/testify/require"
 
-	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	mdl "github.com/MattWindsor91/c4t/internal/model/service/compiler"
 )
 
 // TestResolver_RunCompiler tests that RunCompiler delegates properly.

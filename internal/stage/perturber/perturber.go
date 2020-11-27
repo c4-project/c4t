@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package perturber contains the logic for the test perturber.
@@ -10,13 +10,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+	"github.com/MattWindsor91/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 )
 
 // ErrCInspectorNil occurs if the perturber constructor is passed a nil compiler inspector.

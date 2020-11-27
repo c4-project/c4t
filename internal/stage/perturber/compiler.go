@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package perturber
@@ -9,15 +9,15 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 // compilerPerturber contains the state necessary to perturb the compiler part of a test plan.

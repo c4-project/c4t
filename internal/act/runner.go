@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package act
@@ -10,7 +10,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 )
 
 // ErrNoBaseRunner occurs if we try to use a Runner that has no Runner.Base set.

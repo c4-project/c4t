@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package stdflag
@@ -20,7 +20,7 @@ var authors = [...]*c.Author{
 	{Name: "Matt Windsor", Email: "m.windsor" + at + ic},
 }
 
-// SetCommonAppSettings sets app settings on a that are common to all act-tester endpoints.
+// SetCommonAppSettings sets app settings on a that are common to all c4t endpoints.
 // It passes through the pointer a.
 func SetCommonAppSettings(a *c.App, outw, errw io.Writer) *c.App {
 	a.Authors = authors[:]
@@ -37,7 +37,7 @@ const planDescription = /* newline intentional */ `
    this argument isn't present, or is set to '-', it will instead load the plan
    from stdin.`
 
-// SetPlanAppSettings sets app settings on a that are common to act-tester endpoints handling a plan.
+// SetPlanAppSettings sets app settings on a that are common to c4t endpoints handling a plan.
 // It passes through the pointer a.
 func SetPlanAppSettings(a *c.App, outw, errw io.Writer) *c.App {
 	a.ArgsUsage = "[plan file]"

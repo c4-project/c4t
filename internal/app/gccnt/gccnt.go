@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package gccnt contains the app definition for act-gccnt.
+// Package gccnt contains the app definition for c4t-gccnt.
 package gccnt
 
 import (
@@ -12,21 +12,21 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/gcc"
 
-	"github.com/MattWindsor91/act-tester/internal/tool/gccnt"
+	"github.com/MattWindsor91/c4t/internal/tool/gccnt"
 
 	// This name is because every single time I try to use v2 named as 'cli', my IDE decides to replace it with v1.
 	// Yes, I know, I shouldn't work around IDE issues by obfuscating my code, but I'm at my wit's end.
 	c "github.com/urfave/cli/v2"
 )
 
-// App creates the act-gccnt app.
+// App creates the c4t-gccnt app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:   "act-gccnt",
+		Name:   "c4t-gccnt",
 		Usage:  "wraps gcc with various optional failure modes",
 		Flags:  flags(),
 		Action: run,

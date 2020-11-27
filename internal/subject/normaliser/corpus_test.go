@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package normaliser_test
@@ -8,11 +8,11 @@ package normaliser_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
+	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 )
 
 // TestCorpus_Normalise tests the normaliser on a corpus stitched together from all of the individual subject

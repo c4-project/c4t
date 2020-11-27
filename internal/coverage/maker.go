@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package coverage
@@ -13,14 +13,14 @@ import (
 	"math/rand"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
+	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
-	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/observing"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
 
 	"golang.org/x/sync/errgroup"
 )

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package parser contains logic for parsing Herd and Litmus
@@ -12,7 +12,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
 // Parse parses an observation from r into o using i.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package runner
@@ -11,17 +11,17 @@ import (
 	"path"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 
-	"github.com/MattWindsor91/act-tester/internal/copier"
+	"github.com/MattWindsor91/c4t/internal/copier"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/MattWindsor91/c4t/internal/remote"
 
 	"github.com/alessio/shellescape"
 	"golang.org/x/crypto/ssh"

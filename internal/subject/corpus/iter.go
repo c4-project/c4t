@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package corpus
@@ -11,7 +11,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 // Each applies f to each subject in the corpus.

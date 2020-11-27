@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package herd
@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/parser"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/parser"
 )
 
 // ParseStateCount parses a Herd state count.

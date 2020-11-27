@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package resolver_test
@@ -8,11 +8,11 @@ package resolver_test
 import (
 	"testing"
 
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/resolver"
 	"github.com/stretchr/testify/assert"
 )
 

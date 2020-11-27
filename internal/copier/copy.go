@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package copy provides a mockable interface for network-transparent(ish) file copying, and implementations thereof.
@@ -13,7 +13,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 )
 
 // Copier provides a mockable interface for remote copying.

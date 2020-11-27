@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package planner
@@ -8,9 +8,9 @@ package planner
 import (
 	"context"
 
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 // BackendFinder is the interface of things that can find backends for machines.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package analysis
@@ -11,12 +11,12 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/status"
+	"github.com/MattWindsor91/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 	"gopkg.in/yaml.v3"
 )
 

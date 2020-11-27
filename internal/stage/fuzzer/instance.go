@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package fuzzer
@@ -12,17 +12,17 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 // Instance contains state for a single fuzzer instance.

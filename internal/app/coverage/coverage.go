@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package coverage contains the app definition for act-tester-coverage.
+// Package coverage contains the app definition for c4t-coverage.
 package coverage
 
 import (
@@ -11,13 +11,13 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/resolver"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
+	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
 
-	"github.com/MattWindsor91/act-tester/internal/coverage"
+	"github.com/MattWindsor91/c4t/internal/coverage"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -30,10 +30,10 @@ const (
 	defaultOutDir     = "coverage"
 )
 
-// App creates the act-tester-coverage app.
+// App creates the c4t-coverage app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester-coverage",
+		Name:  "c4t-coverage",
 		Usage: "makes a coverage testbed using a plan",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {

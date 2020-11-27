@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package runner
@@ -8,12 +8,12 @@ package runner
 import (
 	"context"
 
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
+	copy2 "github.com/MattWindsor91/c4t/internal/copier"
 
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+	"github.com/MattWindsor91/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
 )
 
 // Send translates p to the remote host, using SFTP to copy over any recipe files.

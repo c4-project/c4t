@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package pretty provides a pretty-printer for analyses.
@@ -12,9 +12,9 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/MattWindsor91/act-tester/internal/director"
+	"github.com/MattWindsor91/c4t/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
 )
 
 // Printer provides the ability to output human-readable summaries of analyses to a writer.

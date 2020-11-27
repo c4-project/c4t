@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package stdflag
@@ -8,15 +8,15 @@ package stdflag
 import (
 	"strconv"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
 	c "github.com/urfave/cli/v2"
 )
 
 // MachBinName is the name of the machine node binary.
-const MachBinName = "act-tester-mach"
+const MachBinName = "c4t-mach"
 
-// MachArgs is the arguments for an invocation of act-tester-mach, given directory dir and the config uc.
+// MachArgs is the arguments for an invocation of c4t-mach, given directory dir and the config uc.
 func MachArgs(dir string, qs quantity.MachNodeSet) []string {
 	// We assume that any shell escaping is done elsewhere.
 	args := []string{

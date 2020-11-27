@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package interpreter_test
@@ -12,20 +12,20 @@ import (
 	"path"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/interpreter"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/interpreter"
 
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+	"github.com/MattWindsor91/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	mdl "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	mdl "github.com/MattWindsor91/c4t/internal/model/service/compiler"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/mocks"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/mocks"
 )
 
 // TestInterpreter_Interpret tests Interpret on an example recipe.

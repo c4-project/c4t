@@ -1,0 +1,77 @@
+.nh
+.TH c4t\-analyse 8
+
+.SH NAME
+.PP
+c4t\-analyse \- analyses a plan file
+
+
+.SH SYNOPSIS
+.PP
+c4t\-analyse
+
+.PP
+.RS
+
+.nf
+[\-\-csv\-compilers]
+[\-\-csv\-stages]
+[\-\-error\-on\-bad\-status|\-e]
+[\-\-filter\-file]=[value]
+[\-\-num\-workers|\-j]=[value]
+[\-\-save\-dir|\-d]=[value]
+[\-\-show\-compiler\-logs|\-L]
+[\-\-show\-compilers|\-C]
+[\-\-show\-ok|\-O]
+[\-\-show\-plan\-info|\-P]
+[\-\-show\-subjects|\-S]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-analyse [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-csv\-compilers\fP: dump CSV of compilers and their run times
+
+.PP
+\fB\-\-csv\-stages\fP: dump CSV of stages and their run times
+
+.PP
+\fB\-\-error\-on\-bad\-status, \-e\fP: report an error if plan contains subjects with bad statuses
+
+.PP
+\fB\-\-filter\-file\fP="": load compile result filters from this file
+
+.PP
+\fB\-\-num\-workers, \-j\fP="": number of \fB\fCworkers\fR to run in parallel (default: 1)
+
+.PP
+\fB\-\-save\-dir, \-d\fP="": if present, save failing corpora to this \fB\fCdirectory\fR
+
+.PP
+\fB\-\-show\-compiler\-logs, \-L\fP: show breakdown of compiler logs (requires \-show\-compilers)
+
+.PP
+\fB\-\-show\-compilers, \-C\fP: show breakdown of compilers and their run times
+
+.PP
+\fB\-\-show\-ok, \-O\fP: show subjects that did not have compile or run issues
+
+.PP
+\fB\-\-show\-plan\-info, \-P\fP: show plan metadata and stage times
+
+.PP
+\fB\-\-show\-subjects, \-S\fP: show subjects by status

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package forward
@@ -12,9 +12,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 )
 
 var ErrRemote = errors.New("remote error")

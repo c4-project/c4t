@@ -1,11 +1,11 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package optlevel
 
-import "github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+import "github.com/MattWindsor91/c4t/internal/helper/stringhelp"
 
 // Selection represents a piece of compiler configuration that specifies which optimisation levels to select.
 type Selection struct {

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package compiler_test
@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 )
 
 // ExampleConfiguration_AddName is a runnable example for AddName.

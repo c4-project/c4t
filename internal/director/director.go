@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package director contains the top-level ACT test director, which manages a full testing campaign.
@@ -10,28 +10,28 @@ import (
 	"context"
 	"fmt"
 
-	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 
-	"github.com/MattWindsor91/act-tester/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/director/pathset"
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/MattWindsor91/c4t/internal/director/pathset"
+	"github.com/MattWindsor91/c4t/internal/remote"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 )
 
 // Director contains the main state and configuration for the test director.

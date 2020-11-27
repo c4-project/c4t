@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	copier "github.com/MattWindsor91/act-tester/internal/copier"
+	copier "github.com/MattWindsor91/c4t/internal/copier"
 	mock "github.com/stretchr/testify/mock"
 )
 

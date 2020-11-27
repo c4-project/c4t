@@ -1,0 +1,49 @@
+.nh
+.TH c4t\-coverage 8
+
+.SH NAME
+.PP
+c4t\-coverage \- makes a coverage testbed using a plan
+
+
+.SH SYNOPSIS
+.PP
+c4t\-coverage
+
+.PP
+.RS
+
+.nf
+[\-\-config|\-c]=[value]
+[\-\-verbose|\-v]
+[\-d]=[value]
+[\-x]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-coverage [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-config, \-c\fP="": Path to config file for coverage (not the tester config file!) (default: coverage.toml)
+
+.PP
+\fB\-\-verbose, \-v\fP: enables verbose output
+
+.PP
+\fB\-d\fP="": \fB\fCdirectory\fR to which outputs will be written (default: coverage)
+
+.PP
+\fB\-x\fP: if true, use 'dune exec' to run OCaml ACT binaries

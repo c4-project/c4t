@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package pathset_test
@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/director/pathset"
+	"github.com/MattWindsor91/c4t/internal/director/pathset"
 )
 
 // ExampleNewScratch is a runnable example for NewScratch.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package director
@@ -8,32 +8,32 @@ package director
 import (
 	"errors"
 
-	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/stage/perturber"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/MattWindsor91/c4t/internal/remote"
 
-	"github.com/MattWindsor91/act-tester/internal/director/pathset"
+	"github.com/MattWindsor91/c4t/internal/director/pathset"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
 
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
+	"github.com/MattWindsor91/c4t/internal/config"
 )
 
 var (

@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package mkdoc contains the app definition for act-tester-mkdoc.
+// Package mkdoc contains the app definition for c4t-mkdoc.
 package mkdoc
 
 import (
@@ -11,33 +11,33 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/app/coverage"
+	"github.com/MattWindsor91/c4t/internal/app/coverage"
 
-	"github.com/MattWindsor91/act-tester/internal/app/analyse"
-	"github.com/MattWindsor91/act-tester/internal/app/invoke"
-	"github.com/MattWindsor91/act-tester/internal/app/perturb"
-	"github.com/MattWindsor91/act-tester/internal/app/setc"
+	"github.com/MattWindsor91/c4t/internal/app/analyse"
+	"github.com/MattWindsor91/c4t/internal/app/invoke"
+	"github.com/MattWindsor91/c4t/internal/app/perturb"
+	"github.com/MattWindsor91/c4t/internal/app/setc"
 
-	"github.com/MattWindsor91/act-tester/internal/app/fuzz"
-	"github.com/MattWindsor91/act-tester/internal/app/lift"
+	"github.com/MattWindsor91/c4t/internal/app/fuzz"
+	"github.com/MattWindsor91/c4t/internal/app/lift"
 
-	"github.com/MattWindsor91/act-tester/internal/app/gccnt"
+	"github.com/MattWindsor91/c4t/internal/app/gccnt"
 
-	"github.com/MattWindsor91/act-tester/internal/app/director"
-	"github.com/MattWindsor91/act-tester/internal/app/mach"
+	"github.com/MattWindsor91/c4t/internal/app/director"
+	"github.com/MattWindsor91/c4t/internal/app/mach"
 
 	"github.com/1set/gut/yos"
-	"github.com/MattWindsor91/act-tester/internal/app/plan"
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/app/plan"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 
 	c "github.com/urfave/cli/v2"
 )
 
-// App creates the act-tester-mkdoc app.
+// App creates the c4t-mkdoc app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester-mkdoc",
-		Usage: "makes documentation for act-tester commands",
+		Name:  "c4t-mkdoc",
+		Usage: "makes documentation for c4t commands",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package planner
@@ -8,15 +8,15 @@ package planner
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
 	"github.com/1set/gut/yos"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 // SubjectProber is the interface of types that allow filling in of subject information.

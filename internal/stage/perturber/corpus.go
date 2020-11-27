@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package perturber
@@ -8,10 +8,10 @@ package perturber
 import (
 	"math/rand"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 )
 
 func (p *Perturber) sampleCorpus(rng *rand.Rand, pn *plan.Plan) error {

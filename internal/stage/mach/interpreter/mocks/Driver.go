@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
 	io "io"
 

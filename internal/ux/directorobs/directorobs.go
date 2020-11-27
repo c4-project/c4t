@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package directorobs contains a pre-packaged observer set for the test director.
@@ -15,11 +15,11 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/act-tester/internal/director"
+	"github.com/MattWindsor91/c4t/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
-	"github.com/MattWindsor91/act-tester/internal/ux/dash"
+	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/ux/dash"
 	"golang.org/x/sync/errgroup"
 )
 

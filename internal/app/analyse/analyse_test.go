@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package analyse_test
@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/app/analyse"
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
+	"github.com/MattWindsor91/c4t/internal/app/analyse"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"

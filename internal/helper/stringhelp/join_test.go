@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package stringhelp_test
@@ -8,7 +8,7 @@ package stringhelp_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
 )
 
 // ExampleJoinNonEmpty is a testable example for JoinNonEmpty.

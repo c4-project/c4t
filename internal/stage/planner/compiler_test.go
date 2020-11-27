@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package planner_test
@@ -10,25 +10,25 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner/mocks"
+	"github.com/MattWindsor91/c4t/internal/stage/planner/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/c4t/internal/observing"
 
 	"github.com/1set/gut/ystring"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	cmocks "github.com/MattWindsor91/act-tester/internal/model/service/compiler/mocks"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	cmocks "github.com/MattWindsor91/c4t/internal/model/service/compiler/mocks"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
 	"github.com/stretchr/testify/mock"
 )
 

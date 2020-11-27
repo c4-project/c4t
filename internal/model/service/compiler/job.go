@@ -1,12 +1,12 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package compiler
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 )
 
 // Job represents a request to compile a list of files to a particular target given a particular compiler.

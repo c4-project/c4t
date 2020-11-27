@@ -1,13 +1,13 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package invoker
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 )
 
 // PlanQuantityOverrider is the interface of things that may, or may not, override the invoker's quantity set with

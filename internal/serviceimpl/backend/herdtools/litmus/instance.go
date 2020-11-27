@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package litmus
@@ -8,9 +8,9 @@ package litmus
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	"github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 )
 
 // Instance holds all state needed to do one run of Litmus.

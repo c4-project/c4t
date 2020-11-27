@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package pathset contains the various path-sets for the director.
@@ -10,9 +10,9 @@ package pathset
 import (
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 const (

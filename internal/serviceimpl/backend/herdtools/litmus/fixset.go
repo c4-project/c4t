@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package litmus
@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 )
 
 // Fixset contains the various fix-ups that the litmus tool needs to do before and after the run to Litmus.

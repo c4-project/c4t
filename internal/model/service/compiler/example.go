@@ -1,13 +1,13 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package compiler
 
 import (
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
 )
 
 // MockPower9GCCOpt produces a GCC-compatible power entry with Power9 architecture and optimisation configuration.

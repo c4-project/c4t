@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package corpus_test
@@ -12,11 +12,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 // ExampleCorpus_Add is a runnable example for Add.

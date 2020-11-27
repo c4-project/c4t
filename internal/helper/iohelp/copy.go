@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package iohelp
@@ -8,7 +8,7 @@ package iohelp
 import (
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 )
 
 // CopyCloseSrc copies src to dst, then closes src.

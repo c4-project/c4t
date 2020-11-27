@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package compiler contains types for compilers, which are a particular type of service.
@@ -12,12 +12,12 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
 )
 
-// Compiler collects the part of a compiler's specification that comes from the act-tester configuration.
+// Compiler collects the part of a compiler's specification that comes from the c4t configuration.
 type Compiler struct {
 	// Disabled specifies whether this compiler has been disabled.
 	Disabled bool `toml:"disabled,omitempty" json:"disabled,omitempty"`

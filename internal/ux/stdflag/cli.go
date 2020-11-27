@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package stdflag
@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
-	"github.com/MattWindsor91/act-tester/internal/config"
+	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/MattWindsor91/c4t/internal/config"
 
 	// It's 2020, and tools _still_ can't understand the use of 'v2' unless you do silly hacks like this.
 	c "github.com/urfave/cli/v2"

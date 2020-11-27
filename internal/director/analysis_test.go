@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package director_test
@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/director"
+	"github.com/MattWindsor91/c4t/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/status"
+	"github.com/MattWindsor91/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 )
 
 // ExampleCycleAnalysis_String is a runnable example for CycleAnalysis.String.

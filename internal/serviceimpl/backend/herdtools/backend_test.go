@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package herdtools_test
@@ -14,13 +14,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/herd"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/herd"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools"
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package litmus_test
@@ -9,15 +9,15 @@ import (
 	"context"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	"github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
+	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	mdl "github.com/MattWindsor91/act-tester/internal/model/litmus"
-	"github.com/MattWindsor91/act-tester/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	mdl "github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/service"
 )
 
 // ExampleInstance_Run is a testable example for Run.

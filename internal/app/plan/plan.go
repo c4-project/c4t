@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package plan contains the app definition for act-tester-plan.
+// Package plan contains the app definition for c4t-plan.
 package plan
 
 import (
@@ -12,22 +12,22 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/machine"
 
 	"github.com/1set/gut/yos"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
+	"github.com/MattWindsor91/c4t/internal/act"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
@@ -39,10 +39,10 @@ const (
 	usageMachineFilter = "`glob` to use to filter machines to plan"
 )
 
-// App creates the act-tester-plan app.
+// App creates the c4t-plan app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
-		Name:  "act-tester-plan",
+		Name:  "c4t-plan",
 		Usage: "runs the planning phase of an ACT test standalone",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {

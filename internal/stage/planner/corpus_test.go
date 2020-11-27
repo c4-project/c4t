@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package planner_test
@@ -12,17 +12,17 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 type TestProber struct {

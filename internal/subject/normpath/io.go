@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package normpath
@@ -17,7 +17,7 @@ import (
 	"strings"
 
 	"github.com/1set/gut/yos"
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 )
 
 // ErrMissingFile occurs when we request a subject file but it isn't available.

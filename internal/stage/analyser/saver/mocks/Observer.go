@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	saver "github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	saver "github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 	mock "github.com/stretchr/testify/mock"
 )
 

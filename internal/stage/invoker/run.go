@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package invoker
@@ -11,19 +11,19 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
-	"github.com/MattWindsor91/act-tester/internal/stage/invoker/runner"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/stage/invoker/runner"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+	"github.com/MattWindsor91/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/remote"
+	"github.com/MattWindsor91/c4t/internal/remote"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 )
 
 // Run runs the machine invoker stage.

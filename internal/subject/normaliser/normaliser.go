@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package normaliser provides utilities for archiving and transferring plans, corpora, and subjects.
@@ -11,15 +11,15 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/normpath"
+	"github.com/MattWindsor91/c4t/internal/subject/normpath"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
 
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+	"github.com/MattWindsor91/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 // ErrCollision occurs if the normaliser tries to map two files to the same normalised path.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package directorobs
@@ -10,27 +10,27 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/director/pathset"
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/director/pathset"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/director"
+	"github.com/MattWindsor91/c4t/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/c4t/internal/observing"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/pretty"
 
-	"github.com/MattWindsor91/act-tester/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/machine"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 )
 
 // TODO(@MattWindsor91): merge this with the singleobs logger?

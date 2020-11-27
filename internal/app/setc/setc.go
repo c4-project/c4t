@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package setc contains the app definition for act-tester-setc.
+// Package setc contains the app definition for c4t-setc.
 package setc
 
 import (
@@ -14,21 +14,21 @@ import (
 	"os"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	cimpl "github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	cimpl "github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	"github.com/MattWindsor91/act-tester/internal/ux"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/ux"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
 const (
-	name = "act-tester-setc"
+	name = "c4t-setc"
 
 	usage = "sets various compiler properties"
 
@@ -49,7 +49,7 @@ const (
 	usageMopt     = "set the compiler's machine optimising profile `name`"
 )
 
-// App creates the act-tester-plan app.
+// App creates the c4t-plan app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:        name,

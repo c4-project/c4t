@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package corpus concerns test corpora (collections of named subjects).
@@ -11,11 +11,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 var (

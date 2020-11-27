@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	builder "github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	builder "github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 	mock "github.com/stretchr/testify/mock"
 )
 

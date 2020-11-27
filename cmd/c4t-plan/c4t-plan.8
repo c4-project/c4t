@@ -1,0 +1,61 @@
+.nh
+.TH c4t\-plan 8
+
+.SH NAME
+.PP
+c4t\-plan \- runs the planning phase of an ACT test standalone
+
+
+.SH SYNOPSIS
+.PP
+c4t\-plan
+
+.PP
+.RS
+
+.nf
+[\-\-filter\-compilers|\-c]=[value]
+[\-\-filter\-machines|\-m]=[value]
+[\-\-num\-workers|\-j]=[value]
+[\-\-verbose|\-v]
+[\-C]=[value]
+[\-d]=[value]
+[\-x]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-plan [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-filter\-compilers, \-c\fP="": \fB\fCglob\fR to use to filter compilers to enable
+
+.PP
+\fB\-\-filter\-machines, \-m\fP="": \fB\fCglob\fR to use to filter machines to plan
+
+.PP
+\fB\-\-num\-workers, \-j\fP="": number of \fB\fCworkers\fR to run in parallel (default: 1)
+
+.PP
+\fB\-\-verbose, \-v\fP: enables verbose output
+
+.PP
+\fB\-C\fP="": read tester config from this \fB\fCfile\fR
+
+.PP
+\fB\-d\fP="": \fB\fCdirectory\fR to which outputs will be written
+
+.PP
+\fB\-x\fP: if true, use 'dune exec' to run OCaml ACT binaries

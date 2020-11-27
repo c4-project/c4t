@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package runner
@@ -11,23 +11,23 @@ import (
 	"os/exec"
 	"time"
 
-	backend3 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	backend3 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/status"
+	"github.com/MattWindsor91/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
 // Instance contains all state required to perform a runner operation for a given subject.

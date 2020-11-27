@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package saver
@@ -11,7 +11,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/normaliser"
+	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
 )
 
 // Archiver is the interface of types that can archive subject files.

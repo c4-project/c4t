@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package coverage
@@ -11,17 +11,17 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	"github.com/MattWindsor91/c4t/internal/model/service"
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
 	"github.com/1set/gut/yos"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	litmus2 "github.com/MattWindsor91/act-tester/internal/model/litmus"
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	litmus2 "github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 
-	fuzzer2 "github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
 )
 
 var (

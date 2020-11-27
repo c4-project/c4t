@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package mach
@@ -8,12 +8,12 @@ package mach
 import (
 	"errors"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/runner"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/compiler"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/runner"
 )
 
 // Option is the type of functional options.

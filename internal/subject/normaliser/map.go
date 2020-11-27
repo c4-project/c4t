@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package normaliser
@@ -8,7 +8,7 @@ package normaliser
 import (
 	"path"
 
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+	"github.com/MattWindsor91/c4t/internal/model/filekind"
 )
 
 // Map is the type of normalisation mappings.

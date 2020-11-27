@@ -1,9 +1,9 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package director contains the app definition for act-tester ('the director').
+// Package director contains the app definition for c4t ('the director').
 package director
 
 import (
@@ -14,28 +14,28 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
-	"github.com/MattWindsor91/act-tester/internal/ux/directorobs"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/ux/directorobs"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
-	"github.com/MattWindsor91/act-tester/internal/config"
-	"github.com/MattWindsor91/act-tester/internal/director"
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	br "github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/resolver"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler"
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	br "github.com/MattWindsor91/c4t/internal/serviceimpl/backend/resolver"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
 const (
-	name  = "act-tester"
+	name  = "c4t"
 	usage = "runs compiler tests"
 
 	readme = `
@@ -70,7 +70,7 @@ const (
 	usageNoDash     = "turns off the dashboard"
 )
 
-// App creates the act-tester app.
+// App creates the c4t app.
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:        name,

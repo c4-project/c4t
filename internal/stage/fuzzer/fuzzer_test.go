@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package fuzzer_test
@@ -11,29 +11,29 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+	"github.com/MattWindsor91/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
-	mocks2 "github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	mocks2 "github.com/MattWindsor91/c4t/internal/model/litmus/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer/mocks"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer/mocks"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
 )
 
 // makePlan makes a 'valid' plan.

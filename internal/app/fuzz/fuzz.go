@@ -1,37 +1,37 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package fuzz contains the app definition for act-tester-fuzz.
+// Package fuzz contains the app definition for c4t-fuzz.
 package fuzz
 
 import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/config"
+	"github.com/MattWindsor91/c4t/internal/config"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/singleobs"
+	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/act-tester/internal/ux"
+	"github.com/MattWindsor91/c4t/internal/ux"
 )
 
 // defaultOutDir is the default directory used for the results of the fuzzer.
 const defaultOutDir = "fuzz_results"
 
-// App creates the act-tester-fuzz app.
+// App creates the c4t-fuzz app.
 func App(outw, errw io.Writer) *c.App {
 	a := &c.App{
-		Name:  "act-tester-fuzz",
+		Name:  "c4t-fuzz",
 		Usage: "runs the batch-fuzzer phase of an ACT test",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {

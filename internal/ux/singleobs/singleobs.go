@@ -1,25 +1,25 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package singleobs contains observer implementations for use in the 'single-shot' act-tester commands.
+// Package singleobs contains observer implementations for use in the 'single-shot' c4t commands.
 package singleobs
 
 import (
 	"log"
 
-	"github.com/MattWindsor91/act-tester/internal/coverage"
+	"github.com/MattWindsor91/c4t/internal/coverage"
 
-	"github.com/MattWindsor91/act-tester/internal/director"
+	"github.com/MattWindsor91/c4t/internal/director"
 
-	"github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+	"github.com/MattWindsor91/c4t/internal/copier"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+	"github.com/MattWindsor91/c4t/internal/stage/perturber"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 )
 
 // DirectorInstance builds a list of director-instance compatible observers suitable for single-shot binaries.
@@ -39,7 +39,7 @@ func DirectorInstance(l *log.Logger, verbose bool) []director.InstanceObserver {
 	}
 }
 
-// Planner builds a list of observers suitable for single-shot act-tester planner binaries.
+// Planner builds a list of observers suitable for single-shot c4t planner binaries.
 func Planner(l *log.Logger, verbose bool) []planner.Observer {
 	// Director observers don't implement the planner, annoyingly.
 	if !verbose {
@@ -48,12 +48,12 @@ func Planner(l *log.Logger, verbose bool) []planner.Observer {
 	return []planner.Observer{NewBar(), (*Logger)(l)}
 }
 
-// Perturber builds a list of observers suitable for single-shot act-tester perturber binaries.
+// Perturber builds a list of observers suitable for single-shot c4t perturber binaries.
 func Perturber(l *log.Logger, verbose bool) []perturber.Observer {
 	return director.LowerToPerturber(DirectorInstance(l, verbose))
 }
 
-// Builder builds a list of observers suitable for single-shot act-tester corpus-builder binaries.
+// Builder builds a list of observers suitable for single-shot c4t corpus-builder binaries.
 func Builder(l *log.Logger, verbose bool) []builder.Observer {
 	return director.LowerToBuilder(DirectorInstance(l, verbose))
 }

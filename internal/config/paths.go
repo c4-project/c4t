@@ -1,11 +1,11 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package config
 
-import "github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+import "github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
 // Pathset is a set of configuration paths (all of which are considered to be filepaths, not slashpaths).
 type Pathset struct {

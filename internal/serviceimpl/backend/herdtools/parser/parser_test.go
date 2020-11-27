@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package parser_test
@@ -12,11 +12,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/herd"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/litmus"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/herdtools/parser"
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/herd"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/parser"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
 // TestParse_error tests Parse with various error cases.

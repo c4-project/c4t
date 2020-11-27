@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package obs_test
@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/status"
+	"github.com/MattWindsor91/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 )
 
 // ExampleObs_Sat is a testable example for Obs.Sat.

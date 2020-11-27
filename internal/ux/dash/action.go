@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package dash
@@ -8,16 +8,16 @@ package dash
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/errhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/status"
+	"github.com/MattWindsor91/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 	"github.com/mum4k/termdash/cell"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/gauge"
 	"github.com/mum4k/termdash/widgets/text"

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package stringhelp_test
@@ -8,8 +8,8 @@ package stringhelp_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/stringhelp"
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 )
 
 // TestMapKeys_notStringMaps makes sure MapKeys does the right thing when given things that aren't string maps.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package plan_test
@@ -8,9 +8,9 @@ package plan_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus"
 )
 
 // ExamplePlan_MaxNumRecipes is a testable example for MaxNumRecipes.

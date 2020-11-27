@@ -1,38 +1,26 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package runner contains the part of act-tester that runs compiled test binaries and interprets their output.
+// Package runner contains the part of c4t that runs compiled test binaries and interprets their output.
 package runner
 
 import (
 	"context"
-	"io"
 
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
+	"github.com/MattWindsor91/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/obs"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
-
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/subject"
 )
-
-// ObsParser is the interface of things that can parse test outcomes.
-type ObsParser interface {
-	// ParseObs parses the observation in reader r into o according to the backend configuration in b.
-	// The backend described by b must have been used to produce the testcase outputting r.
-	ParseObs(ctx context.Context, b *backend2.Spec, r io.Reader, o *obs.Obs) error
-}
 
 // Runner contains information necessary to run a plan's compiled test cases.
 type Runner struct {

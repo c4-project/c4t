@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package analyse
@@ -9,25 +9,25 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/csvdump"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/pretty"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/csvdump"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/pretty"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser"
 
-	"github.com/MattWindsor91/act-tester/internal/ux"
+	"github.com/MattWindsor91/c4t/internal/ux"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/stdflag"
+	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 
 const (
 	// Name is the name of the analyser binary.
-	Name  = "act-tester-analyse"
+	Name  = "c4t-analyse"
 	usage = "analyses a plan file"
 
 	readme = `

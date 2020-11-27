@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package lifter_test
@@ -9,13 +9,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter/mocks"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 )
 
 // TestNew_errors tests the error result of New in various situations.

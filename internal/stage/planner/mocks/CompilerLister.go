@@ -5,9 +5,9 @@ package mocks
 import (
 	context "context"
 
-	compiler "github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	compiler "github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
-	id "github.com/MattWindsor91/act-tester/internal/model/id"
+	id "github.com/MattWindsor91/c4t/internal/model/id"
 
 	mock "github.com/stretchr/testify/mock"
 )

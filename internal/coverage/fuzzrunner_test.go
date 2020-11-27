@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package coverage_test
@@ -10,28 +10,28 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/srvrun"
+	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
 
-	backend2 "github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
-	mocks3 "github.com/MattWindsor91/act-tester/internal/model/litmus/mocks"
+	mocks3 "github.com/MattWindsor91/c4t/internal/model/litmus/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
-	mocks2 "github.com/MattWindsor91/act-tester/internal/stage/lifter/mocks"
+	"github.com/MattWindsor91/c4t/internal/model/id"
+	mocks2 "github.com/MattWindsor91/c4t/internal/stage/lifter/mocks"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/subject"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/coverage"
-	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/coverage"
+	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer/mocks"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer/mocks"
 )
 
 // TestFuzzRunner_Run tests FuzzRunner.Run's happy path.

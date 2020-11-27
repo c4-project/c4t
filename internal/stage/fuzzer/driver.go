@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package fuzzer
@@ -8,9 +8,9 @@ package fuzzer
 import (
 	"context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 )
 
 // Driver groups the interfaces used to 'drive' parts of the fuzzer.

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package directorobs_test
@@ -10,17 +10,17 @@ import (
 	"os"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler/optlevel"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/ux/directorobs"
+	"github.com/MattWindsor91/c4t/internal/ux/directorobs"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 // ExampleLogger_Instance_onArchive is a runnable example for Instance that exercises sending archive messages.

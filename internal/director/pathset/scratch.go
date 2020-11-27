@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package pathset
@@ -8,7 +8,7 @@ package pathset
 import (
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/iohelp"
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 )
 
 const (
@@ -23,7 +23,7 @@ type Scratch struct {
 	DirFuzz string
 	// DirLift is the directory to which lifter outputs will be written.
 	DirLift string
-	// DirRun is the directory into which act-tester-mach output will go.
+	// DirRun is the directory into which c4t-mach output will go.
 	DirRun string
 }
 

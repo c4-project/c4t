@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package config
@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	// dirConfig is the subdirectory under the user config directory in which act-tester will check for a config file.
-	dirConfig = "act"
-	// fileConfig is the default name that act-tester will use when looking for a config file.
+	// dirConfig is the subdirectory under the user config directory in which c4t will check for a config file.
+	dirConfig = "c4t"
+	// fileConfig is the default name that c4t will use when looking for a config file.
 	fileConfig = "tester.toml"
 )
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package director
@@ -10,17 +10,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
+	"github.com/MattWindsor91/c4t/internal/stage/perturber"
 
-	"github.com/MattWindsor91/act-tester/internal/plan/stage"
+	"github.com/MattWindsor91/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/invoker"
+	"github.com/MattWindsor91/c4t/internal/stage/invoker"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/stage/fuzzer"
-	"github.com/MattWindsor91/act-tester/internal/stage/lifter"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/stage/lifter"
 )
 
 // StageConfig groups together the stage configuration for of a director instance.

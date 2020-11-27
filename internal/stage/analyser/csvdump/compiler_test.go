@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package csvdump_test
@@ -9,9 +9,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/csvdump"
+	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/csvdump"
 )
 
 // NB: the below CSV is likely to change as the plan mock changes.

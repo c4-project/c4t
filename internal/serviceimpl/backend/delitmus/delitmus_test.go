@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package delitmus_test
@@ -11,19 +11,19 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
-	"github.com/MattWindsor91/act-tester/internal/model/service/mocks"
+	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service/mocks"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/backend"
+	"github.com/MattWindsor91/c4t/internal/model/service/backend"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/backend/delitmus"
+	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/delitmus"
 )
 
 // TestDelitmus_Lift tests the happy path of Delitmus.Lift.

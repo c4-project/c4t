@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package forward_test
@@ -13,35 +13,35 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/quantity"
+	"github.com/MattWindsor91/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/act-tester/internal/observing"
+	"github.com/MattWindsor91/c4t/internal/observing"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/compilation"
+	"github.com/MattWindsor91/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/status"
+	"github.com/MattWindsor91/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/act-tester/internal/helper/testhelp"
+	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/act-tester/internal/subject"
+	"github.com/MattWindsor91/c4t/internal/subject"
 
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/forward"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer/mocks"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/observer/mocks"
 )
 
 // TestReplayer_Run_roundTripBuilder a round-trip between Observer and Replayer over builder requests.

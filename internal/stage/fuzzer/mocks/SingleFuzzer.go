@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
 	mock "github.com/stretchr/testify/mock"
 )

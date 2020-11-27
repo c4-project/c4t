@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package interpreter contains the recipe interpreter for the machine node.
@@ -16,11 +16,11 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/act-tester/internal/model/filekind"
+	"github.com/MattWindsor91/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/act-tester/internal/model/recipe"
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
 )
 
 // ErrDriverNil occurs when the compiler tries to use the nil pointer as its single-compile driver.

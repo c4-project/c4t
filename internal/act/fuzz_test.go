@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package act_test
@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/model/service"
-	"github.com/MattWindsor91/act-tester/internal/model/service/mocks"
+	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/MattWindsor91/c4t/internal/model/service/mocks"
 
 	"github.com/1set/gut/ystring"
 
@@ -19,9 +19,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/act"
-	"github.com/MattWindsor91/act-tester/internal/machine"
-	"github.com/MattWindsor91/act-tester/internal/model/service/fuzzer"
+	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 )
 
 // TestRunner_Fuzz tests the happy path of Runner.Fuzz using a mock command runner.

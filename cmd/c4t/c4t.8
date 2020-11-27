@@ -1,0 +1,61 @@
+.nh
+.TH c4t 8
+
+.SH NAME
+.PP
+c4t \- runs compiler tests
+
+
+.SH SYNOPSIS
+.PP
+c4t
+
+.PP
+.RS
+
+.nf
+[\-\-corpus\-size|\-n]=[value]
+[\-\-cpuprofile]=[value]
+[\-\-machine\-filter|\-m]=[value]
+[\-\-no\-dashboard|\-D]
+[\-C]=[value]
+[\-k]=[value]
+[\-x]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-corpus\-size, \-n\fP="": \fB\fCnumber\fR of corpus files to select for this test plan (default: 0)
+
+.PP
+\fB\-\-cpuprofile\fP="": \fB\fCfile\fR into which we should dump pprof information
+
+.PP
+\fB\-\-machine\-filter, \-m\fP="": a \fB\fCglob\fR to use to filter incoming machines by ID
+
+.PP
+\fB\-\-no\-dashboard, \-D\fP: turns off the dashboard
+
+.PP
+\fB\-C\fP="": read tester config from this \fB\fCfile\fR
+
+.PP
+\fB\-k\fP="": number of \fB\fCcycles\fR to run for each subject in the corpus (default: 10)
+
+.PP
+\fB\-x\fP: if true, use 'dune exec' to run OCaml ACT binaries

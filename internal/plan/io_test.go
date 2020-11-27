@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package plan_test
@@ -15,7 +15,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/act-tester/internal/plan"
+	"github.com/MattWindsor91/c4t/internal/plan"
 )
 
 // TestPlan_Write_roundTrip exercises Write by doing a round-trip and checking if the reconstituted plan is similar.

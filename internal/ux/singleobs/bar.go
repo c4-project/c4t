@@ -1,21 +1,21 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package singleobs
 
 import (
-	copy2 "github.com/MattWindsor91/act-tester/internal/copier"
-	"github.com/MattWindsor91/act-tester/internal/director"
-	"github.com/MattWindsor91/act-tester/internal/model/service/compiler"
-	"github.com/MattWindsor91/act-tester/internal/observing"
-	"github.com/MattWindsor91/act-tester/internal/plan/analysis"
-	"github.com/MattWindsor91/act-tester/internal/stage/analyser/saver"
-	"github.com/MattWindsor91/act-tester/internal/stage/mach/observer"
-	"github.com/MattWindsor91/act-tester/internal/stage/perturber"
-	"github.com/MattWindsor91/act-tester/internal/stage/planner"
-	"github.com/MattWindsor91/act-tester/internal/subject/corpus/builder"
+	copy2 "github.com/MattWindsor91/c4t/internal/copier"
+	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
+	"github.com/MattWindsor91/c4t/internal/stage/perturber"
+	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
 	"github.com/cheggaaa/pb/v3"
 )

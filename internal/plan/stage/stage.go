@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package stage contains plan metadata describing which stages of a test cycle have occurred.
@@ -14,7 +14,7 @@ import (
 
 // Stage is the enumeration of stages.
 //
-// A stage generally corresponds to one of the 'act-tester-*' sub-programs, and represents a specific transformation
+// A stage generally corresponds to one of the 'c4t-*' sub-programs, and represents a specific transformation
 // of a plan file.
 type Stage uint8
 

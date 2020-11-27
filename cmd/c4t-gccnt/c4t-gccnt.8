@@ -1,0 +1,105 @@
+.nh
+.TH c4t\-gccnt 8
+
+.SH NAME
+.PP
+c4t\-gccnt \- wraps gcc with various optional failure modes
+
+
+.SH SYNOPSIS
+.PP
+c4t\-gccnt
+
+.PP
+.RS
+
+.nf
+[\-\-O0]
+[\-\-O1]
+[\-\-O2]
+[\-\-O3]
+[\-\-Ofast]
+[\-\-Og]
+[\-\-Os]
+[\-\-Oz]
+[\-\-march]=[value]
+[\-\-mcpu]=[value]
+[\-\-nt\-bin]=[value]
+[\-\-nt\-diverge\-opt]=[value]
+[\-\-nt\-dryrun]
+[\-\-nt\-error\-opt]=[value]
+[\-\-pthread]
+[\-\-std]=[value]
+[\-O]
+[\-o]=[value]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-gccnt [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-O0\fP: optimisation level '0'
+
+.PP
+\fB\-\-O1\fP: optimisation level '1'
+
+.PP
+\fB\-\-O2\fP: optimisation level '2'
+
+.PP
+\fB\-\-O3\fP: optimisation level '3'
+
+.PP
+\fB\-\-Ofast\fP: optimisation level 'fast'
+
+.PP
+\fB\-\-Og\fP: optimisation level 'g'
+
+.PP
+\fB\-\-Os\fP: optimisation level 's'
+
+.PP
+\fB\-\-Oz\fP: optimisation level 'z'
+
+.PP
+\fB\-\-march\fP="": architecture optimisation to pass through to gcc
+
+.PP
+\fB\-\-mcpu\fP="": cpu optimisation to pass through to gcc
+
+.PP
+\fB\-\-nt\-bin\fP="": the 'real' compiler \fB\fCcommand\fR to run (default: gcc)
+
+.PP
+\fB\-\-nt\-diverge\-opt\fP="": o\-levels (minus the '\-O') on which gccn't should diverge
+
+.PP
+\fB\-\-nt\-dryrun\fP: print the outcome of running gccn't instead of doing it
+
+.PP
+\fB\-\-nt\-error\-opt\fP="": o\-levels (minus the '\-O') on which gccn't should exit with an error
+
+.PP
+\fB\-\-pthread\fP: passes through pthread to gcc
+
+.PP
+\fB\-\-std\fP="": standard to pass through to gcc
+
+.PP
+\fB\-O\fP: optimisation level ''
+
+.PP
+\fB\-o\fP="": output file (default: a.out)

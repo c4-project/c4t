@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package gcc_test
@@ -8,11 +8,11 @@ package gcc_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/act-tester/internal/serviceimpl/compiler/gcc"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/gcc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 // TestDefaultMOpts tests the mopt calculation for various platforms.

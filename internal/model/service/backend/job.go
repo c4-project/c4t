@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Matt Windsor and contributors
 //
-// This file is part of act-tester.
+// This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
 package backend
@@ -10,11 +10,16 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/MattWindsor91/c4t/internal/model/recipe"
+
+	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
+
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/act-tester/internal/model/litmus"
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/act-tester/internal/model/id"
+	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
 var (
@@ -129,4 +134,21 @@ func (l LiftOutput) Files() ([]string, error) {
 		i++
 	}
 	return ps[:i], nil
+}
+
+// RunJob is the type of jobs being sent to a backend for running.
+type RunJob struct {
+	// Backend specifies the backend to use to perform the running.
+	Backend *Spec
+
+	// Recipe is a pointer to the recipe that was fed into the compile stage for this compilation; this is useful for
+	// backends that don't compile, and instead peruse files from the compiler recipe.
+	Recipe *recipe.Recipe
+
+	// CompileResult is a pointer to the result of any compilation that was done for the running.
+	// It may be nil if there was no compilation.
+	CompileResult *compilation.CompileResult
+
+	// Obs points to the observation record that should be filled out by the runner.
+	Obs *obs.Obs
 }
