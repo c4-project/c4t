@@ -11,9 +11,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
-
-	"github.com/mitchellh/go-homedir"
 
 	"github.com/MattWindsor91/c4t/internal/director"
 
@@ -63,7 +60,7 @@ func LoggerFromConfig(cfg *config.Config) (*Logger, error) {
 }
 
 func createResultLogFile(c *config.Config) (*os.File, error) {
-	logpath, err := homedir.Expand(filepath.Join(c.Paths.OutDir, "results.log"))
+	logpath, err := c.Paths.OutPath("results.log")
 	if err != nil {
 		return nil, fmt.Errorf("expanding result log file path: %w", err)
 	}

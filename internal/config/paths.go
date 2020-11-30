@@ -5,7 +5,12 @@
 
 package config
 
-import "github.com/MattWindsor91/c4t/internal/helper/iohelp"
+import (
+	"path/filepath"
+
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/mitchellh/go-homedir"
+)
 
 // Pathset is a set of configuration paths (all of which are considered to be filepaths, not slashpaths).
 type Pathset struct {
@@ -26,4 +31,9 @@ func (p Pathset) FallbackToInputs(fs []string) ([]string, error) {
 		return fs, nil
 	}
 	return iohelp.ExpandMany(p.Inputs)
+}
+
+// OutPath is shorthand for getting a homedir-expanded full path for the output filename file.
+func (p Pathset) OutPath(file string) (string, error) {
+	return homedir.Expand(filepath.Join(p.OutDir, file))
 }
