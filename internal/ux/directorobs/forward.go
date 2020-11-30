@@ -7,6 +7,13 @@ package directorobs
 
 import (
 	"context"
+	"errors"
+
+	"github.com/MattWindsor91/c4t/internal/director/pathset"
+	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/MattWindsor91/c4t/internal/quantity"
+
+	"github.com/MattWindsor91/c4t/internal/model/id"
 
 	"github.com/MattWindsor91/c4t/internal/copier"
 	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
@@ -23,7 +30,10 @@ import (
 )
 
 // Forward contains a director observation that has been forwarded from an instance to a 'main' observer,
-// and disambiguating information.
+// alongside disambiguating information.
+//
+// This struct, and its sibling structs and interfaces,exist to solve the problem that many things in the director
+// happen in instance threads, but then need to be observed by a single-threaded observer.
 type Forward struct {
 	// Cycle is the cycle message if the forward kind is ForwardCycle;
 	// if not, only its cycle is defined, and it determines the cycle from which this forward originates.
@@ -42,6 +52,7 @@ type Forward struct {
 	Save *saver.ArchiveMessage
 }
 
+// ForwardKind is the enumeration of possible Forward messages.
 type ForwardKind uint8
 
 const (
@@ -76,6 +87,8 @@ func ForwardSaveMessage(c director.Cycle, m saver.ArchiveMessage) Forward {
 }
 
 // ForwardReceiver holds receive channels for Forward messages.
+//
+// It is effectively a more type-safe form of observing.FanIn, and will usually be used inside a ForwardObserver.
 type ForwardReceiver observing.FanIn
 
 // NewForwardReceiver constructs a new ForwardReceiver.
@@ -93,6 +106,103 @@ func (r *ForwardReceiver) Add(c <-chan Forward) {
 // Run runs the forward receiver.
 func (r *ForwardReceiver) Run(ctx context.Context) error {
 	return (*observing.FanIn)(r).Run(ctx)
+}
+
+// ForwardHandler is the interface of observers that can handle observations forwarded from an instance.
+//
+// These inject behaviour into a ForwardObserver.
+type ForwardHandler interface {
+	// OnCycleAnalysis should handle an analysis for a particular cycle.
+	OnCycleAnalysis(director.CycleAnalysis)
+
+	// OnCycleCompiler handles a compiler message for a particular cycle.
+	OnCycleCompiler(director.Cycle, compiler.Message)
+
+	// OnCycleSave handles an archive message for a particular cycle.
+	OnCycleSave(director.Cycle, saver.ArchiveMessage)
+}
+
+// ForwardObserver is an observer that uses a ForwardReceiver and a ForwardHandler to handle observations.
+type ForwardObserver struct {
+	// done is the channel that will be closed when the observer finishes.
+	done chan struct{}
+
+	// handlers contain the observer logic.
+	handlers []ForwardHandler
+	// receiver contains the receiver, whose receiving loop should be spun up using Receiver.Run.
+	receiver *ForwardReceiver
+}
+
+// OnMachines does nothing, for now.
+func (f *ForwardObserver) OnMachines(machine.Message) {
+}
+
+// OnCompilerConfig does nothing, for now.
+func (f *ForwardObserver) OnCompilerConfig(compiler.Message) {
+}
+
+// OnBuild does nothing, for now.
+func (f *ForwardObserver) OnBuild(builder.Message) {
+}
+
+// OnPlan does nothing, for now.
+func (f *ForwardObserver) OnPlan(planner.Message) {
+}
+
+// OnPrepare does nothing, for now.
+func (f *ForwardObserver) OnPrepare(quantity.RootSet, pathset.Pathset) {
+}
+
+// ErrForwardHandlerNil occurs when NewForwardObserver is given a nil ForwardHandler.
+var ErrForwardHandlerNil = errors.New("forward handler is nil")
+
+// NewForwardObserver constructs a new ForwardObserver with the given handlers hs and message buffer capacity cap.
+func NewForwardObserver(cap int, hs ...ForwardHandler) (*ForwardObserver, error) {
+	for _, h := range hs {
+		if h == nil {
+			return nil, ErrForwardHandlerNil
+		}
+	}
+
+	fo := &ForwardObserver{handlers: hs, done: make(chan struct{})}
+	fo.receiver = NewForwardReceiver(fo.runStep, cap)
+	return fo, nil
+}
+
+// Run runs the observer's forwarding loop,and closes any attached instances when it finishes.
+func (f *ForwardObserver) Run(ctx context.Context) error {
+	defer close(f.done)
+	return f.receiver.Run(ctx)
+}
+
+func (f *ForwardObserver) runStep(fwd Forward) error {
+	switch fwd.Kind {
+	case ForwardAnalysis:
+		ca := director.CycleAnalysis{Cycle: fwd.Cycle.Cycle, Analysis: *fwd.Analysis}
+		for _, h := range f.handlers {
+			h.OnCycleAnalysis(ca)
+		}
+	case ForwardCompiler:
+		c := *fwd.Compiler
+		for _, h := range f.handlers {
+			h.OnCycleCompiler(fwd.Cycle.Cycle, c)
+		}
+	case ForwardCycle:
+		// do nothing for now
+	case ForwardSave:
+		s := *fwd.Save
+		for _, h := range f.handlers {
+			h.OnCycleSave(fwd.Cycle.Cycle, s)
+		}
+	}
+	return nil
+}
+
+// Instance creates an instance observer that forwards to this logger.
+func (f *ForwardObserver) Instance(id.ID) (director.InstanceObserver, error) {
+	ch := make(chan Forward)
+	f.receiver.Add(ch)
+	return &ForwardingInstanceObserver{done: f.done, fwd: ch}, nil
 }
 
 // ForwardingInstanceObserver is an instance observer that just forwards every observation to a director observer.

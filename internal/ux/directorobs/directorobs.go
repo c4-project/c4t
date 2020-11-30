@@ -22,8 +22,15 @@ import (
 
 // Obs is the standard top-level director observer.
 type Obs struct {
-	dash      *dash.Dash
+	// dash is the dashboard, if enabled (null otherwise).
+	dash *dash.Dash
+	// resultLog is a forward handler that logs results and other significant cycle phenomena to a text file.
 	resultLog *Logger
+	// fwd contains the forwarding observer that hosts resultLog.
+	fwd *ForwardObserver
+
+	// TODO(@MattWindsor91): in the medium term, I expect director observers that aren't forwarding will disappear.
+	// This will probably happen if/when the dashboard gets decoupled into a separate networked tool.
 }
 
 // NewObs creates a director observer using the global configuration cfg.
@@ -43,10 +50,29 @@ func (o *Obs) setup(cfg *config.Config, useDash bool) error {
 	if o.resultLog, err = LoggerFromConfig(cfg); err != nil {
 		return err
 	}
+	if err = o.setupForwarder(); err != nil {
+		return err
+	}
 	if !useDash {
 		return nil
 	}
+	return o.setupDash()
+}
+
+func (o *Obs) setupDash() error {
+	var err error
 	o.dash, err = dash.New()
+	return err
+}
+
+func (o *Obs) setupForwarder() error {
+	fhs := make([]ForwardHandler, 0, 1)
+	if o.resultLog != nil {
+		fhs = append(fhs, o.resultLog)
+	}
+	// TODO(@MattWindsor91): wire cap up to number of instances
+	var err error
+	o.fwd, err = NewForwardObserver(10, fhs...)
 	return err
 }
 
@@ -72,10 +98,14 @@ func createResultLogFile(c *config.Config) (*os.File, error) {
 }
 
 func (o *Obs) Observers() []director.Observer {
-	if o.dash == nil {
-		return []director.Observer{o.resultLog}
+	cands := []director.Observer{o.dash, o.fwd}
+	obs := make([]director.Observer, 0, len(cands))
+	for _, c := range cands {
+		if c != nil {
+			obs = append(obs, c)
+		}
 	}
-	return []director.Observer{o.dash, o.resultLog}
+	return obs
 }
 
 func (o *Obs) Run(ctx context.Context, cancel context.CancelFunc) error {
@@ -86,7 +116,7 @@ func (o *Obs) Run(ctx context.Context, cancel context.CancelFunc) error {
 		})
 	}
 	eg.Go(func() error {
-		return o.resultLog.Run(ectx)
+		return o.fwd.Run(ectx)
 	})
 	return eg.Wait()
 }

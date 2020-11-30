@@ -6,7 +6,6 @@
 package directorobs
 
 import (
-	"context"
 	"io"
 	"log"
 
@@ -29,24 +28,19 @@ import (
 
 	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
 	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 )
 
 // TODO(@MattWindsor91): merge this with the singleobs logger?
 
-// Logger is a director observer that emits logs to a writer when cycles finish up.
+// Logger is a ForwardHandler that emits logs to a writer when cycles finish up.
 type Logger struct {
-	// done is the channel used to signal that a logger has finished.
-	done chan struct{}
 	// out is the writer to use for logging analyses.
 	out io.WriteCloser
 	// l is the intermediate logger that sits atop out.
 	l *log.Logger
 	// aw is the analyser writer used for outputting sourced analyses.
 	aw *pretty.Printer
-	// fwd receives forwarded observations from instance loggers.
-	fwd *ForwardReceiver
 	// compilers holds state for assembling compiler builds.
 	compilers map[string][]compiler.Named
 }
@@ -75,44 +69,17 @@ func NewLogger(w io.WriteCloser, lflag int) (*Logger, error) {
 		return nil, err
 	}
 	l := &Logger{
-		done:      make(chan struct{}),
 		out:       w,
 		l:         log.New(w, "", lflag),
 		aw:        aw,
 		compilers: map[string][]compiler.Named{},
 	}
-	// TODO(@MattWindsor91): plumb in a capacity somehow
-	l.fwd = NewForwardReceiver(l.runStep, 0)
 	return l, nil
-}
-
-// Run runs the log observer.
-// It is not re-entrant.
-func (j *Logger) Run(ctx context.Context) error {
-	defer close(j.done)
-	return j.fwd.Run(ctx)
 }
 
 // Close closes the log observer.
 func (j *Logger) Close() error {
 	return j.out.Close()
-}
-
-func (j *Logger) runStep(f Forward) error {
-	switch f.Kind {
-	case ForwardAnalysis:
-		return j.logAnalysis(director.CycleAnalysis{
-			Cycle:    f.Cycle.Cycle,
-			Analysis: *f.Analysis,
-		})
-	case ForwardCompiler:
-		return j.logCompilerMessage(f.Cycle.Cycle, *f.Compiler)
-	case ForwardCycle:
-		// do nothing for now
-	case ForwardSave:
-		return j.logSaving(f.Cycle.Cycle, *f.Save)
-	}
-	return nil
 }
 
 // OnPrepare logs the preparation attempts of a director.
@@ -131,30 +98,24 @@ func (j *Logger) OnMachines(m machine.Message) {
 	}
 }
 
-// Instance creates an instance observer that forwards to this logger.
-func (j *Logger) Instance(id.ID) (director.InstanceObserver, error) {
-	ch := make(chan Forward)
-	j.fwd.Add(ch)
-	return &ForwardingInstanceObserver{done: j.done, fwd: ch}, nil
+// OnCycleAnalysis logs s to this logger's file.
+func (j *Logger) OnCycleAnalysis(s director.CycleAnalysis) {
+	if err := j.aw.WriteSourced(s); err != nil {
+		j.l.Println("error writing analysis:", err)
+	}
 }
 
-// logAnalysis logs s to this logger's file.
-func (j *Logger) logAnalysis(s director.CycleAnalysis) error {
-	return j.aw.WriteSourced(s)
-}
-
-// logSaving logs s to this logger's file.
-func (j *Logger) logSaving(c director.Cycle, s saver.ArchiveMessage) error {
+// OnCycleSave logs s to this logger's file.
+func (j *Logger) OnCycleSave(c director.Cycle, s saver.ArchiveMessage) {
 	switch s.Kind {
 	case saver.ArchiveStart:
 		j.l.Printf("saving (cycle %s) %s to %s\n", c, s.SubjectName, s.File)
 	case saver.ArchiveFileMissing:
 		j.l.Printf("when saving (cycle %s) %s: missing file %s\n", c, s.SubjectName, s.File)
 	}
-	return nil
 }
 
-func (j *Logger) logCompilerMessage(c director.Cycle, m compiler.Message) error {
+func (j *Logger) OnCycleCompiler(c director.Cycle, m compiler.Message) {
 	// TODO(@MattWindsor91): abstract this?
 	cs := c.String()
 	switch m.Kind {
@@ -165,7 +126,6 @@ func (j *Logger) logCompilerMessage(c director.Cycle, m compiler.Message) error 
 	case observing.BatchEnd:
 		j.logCompilers(c, j.compilers[cs])
 	}
-	return nil
 }
 
 // logCompilers logs compilers to this Logger's file.

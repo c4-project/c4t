@@ -23,10 +23,11 @@ import (
 	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
-// ExampleLogger_Instance_onArchive is a runnable example for Instance that exercises sending archive messages.
-func ExampleLogger_Instance_onArchive() {
+// ExampleLogger_OnCycleSave is a runnable example for Instance that exercises sending archive messages.
+func ExampleLogger_OnCycleSave() {
 	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
-	i, _ := l.Instance(id.FromString("localhost"))
+	r, _ := directorobs.NewForwardObserver(0, l)
+	i, _ := r.Instance(id.FromString("localhost"))
 
 	go func() {
 		saver.OnArchiveStart("subj", "subj.tar.gz", 2, i)
@@ -36,17 +37,18 @@ func ExampleLogger_Instance_onArchive() {
 		// Important, else the logger will keep waiting for the instance to provide observations.
 		i.OnInstanceClose()
 	}()
-	_ = l.Run(context.Background())
+	_ = r.Run(context.Background())
 
 	// Output:
 	// saving (cycle [ #0 (Jan  1 00:00:00)]) subj to subj.tar.gz
 	// when saving (cycle [ #0 (Jan  1 00:00:00)]) subj: missing file compile.log
 }
 
-// ExampleLogger_Instance_onCompiler is a runnable example for Instance that exercises sending compiler messages.
-func ExampleLogger_Instance_onCompiler() {
+// ExampleLogger_OnCycleCompiler is a runnable example for Instance that exercises sending compiler messages.
+func ExampleLogger_OnCycleCompiler() {
 	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
-	i, _ := l.Instance(id.FromString("localhost"))
+	r, _ := directorobs.NewForwardObserver(0, l)
+	i, _ := r.Instance(id.FromString("localhost"))
 
 	go func() {
 		compiler.OnCompilerConfigStart(3, i)
@@ -79,7 +81,7 @@ func ExampleLogger_Instance_onCompiler() {
 		// Important, else the logger will keep waiting for the instance to provide observations.
 		i.OnInstanceClose()
 	}()
-	_ = l.Run(context.Background())
+	_ = r.Run(context.Background())
 
 	// Output:
 	// [ #0 (Jan  1 00:00:00)] compilers 3:
@@ -94,7 +96,9 @@ func TestLogger_Run_empty(t *testing.T) {
 
 	l, err := directorobs.NewLogger(iohelp.DiscardCloser(), 0)
 	require.NoError(t, err, "logger should construct without errors")
-	err = l.Run(context.Background())
+	r, err := directorobs.NewForwardObserver(0, l)
+	require.NoError(t, err, "forwarder should construct without errors")
+	err = r.Run(context.Background())
 	require.NoError(t, err, "no channels = no error")
 }
 
@@ -104,11 +108,13 @@ func TestLogger_Run_noMessages(t *testing.T) {
 
 	l, err := directorobs.NewLogger(iohelp.DiscardCloser(), 0)
 	require.NoError(t, err, "logger should construct without errors")
-	i, err := l.Instance(id.FromString("foo"))
+	r, err := directorobs.NewForwardObserver(0, l)
+	require.NoError(t, err, "forwarder should construct without errors")
+	i, err := r.Instance(id.FromString("foo"))
 	require.NoError(t, err, "instance should construct without errors")
 	go func() {
 		i.OnInstanceClose()
 	}()
-	err = l.Run(context.Background())
+	err = r.Run(context.Background())
 	require.NoError(t, err, "should have stopped running with no error")
 }
