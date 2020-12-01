@@ -8,7 +8,6 @@ package lifter
 import (
 	"context"
 	"fmt"
-	"math/rand"
 
 	"github.com/MattWindsor91/c4t/internal/model/service"
 
@@ -40,9 +39,6 @@ type Instance struct {
 
 	// Normalise is the subject that we are trying to lift.
 	Subject subject.Named
-
-	// Rng is the random number generator to use for fuzz seeds.
-	Rng *rand.Rand
 
 	// ResCh is the channel onto which each fuzzed subject should be sent.
 	ResCh chan<- builder.Request

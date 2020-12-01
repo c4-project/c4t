@@ -146,6 +146,8 @@ func (f *Fuzzer) fuzzCorpus(ctx context.Context, rng *rand.Rand, c corpus.Corpus
 }
 
 // corpusSeeds generates a seed for each subject in c using rng.
+//
+// This is necessary to avoid a race on the random number generator inside the parallel builder.
 func corpusSeeds(rng *rand.Rand, c corpus.Corpus) map[string]int64 {
 	seeds := make(map[string]int64)
 	for n := range c {

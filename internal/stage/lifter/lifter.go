@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"math/rand"
 
 	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
 
@@ -134,22 +133,20 @@ func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, e
 			NReqs: p.MaxNumRecipes(),
 		},
 	}
-	mrng := p.Metadata.Rand()
 	// TODO(@MattWindsor91): extract this 20 into configuration.
 	return builder.ParBuild(ctx, 20, p.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
-		j := l.makeJob(p, s, mrng, rq)
+		j := l.makeJob(p, s, rq)
 		return j.Lift(ctx)
 	})
 }
 
-func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, mrng *rand.Rand, resCh chan<- builder.Request) Instance {
+func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, resCh chan<- builder.Request) Instance {
 	return Instance{
 		Arches:  p.Arches(),
 		Backend: p.Backend,
 		Paths:   l.paths,
 		Driver:  l.driver,
 		Subject: s,
-		Rng:     rand.New(rand.NewSource(mrng.Int63())),
 		ResCh:   resCh,
 		// TODO(@MattWindsor91): push this further up
 		Runner: srvrun.NewExecRunner(srvrun.StderrTo(l.errw)),
