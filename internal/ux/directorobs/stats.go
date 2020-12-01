@@ -75,7 +75,7 @@ func (s *Statset) OnCycleSave(director.Cycle, saver.ArchiveMessage) {
 }
 
 // OnMachines does nothing, for now.
-func (s *Statset) OnMachines(message machine.Message) {
+func (s *Statset) OnMachines(machine.Message) {
 }
 
 // OnPrepare does nothing, for now.
@@ -160,6 +160,8 @@ type StatPersister struct {
 // The StatPersister takes ownership of f; close f with Close.
 func NewStatPersister(f *os.File) (*StatPersister, error) {
 	sp := StatPersister{f: f, enc: json.NewEncoder(f)}
+	// Not strictly necessary, but makes eyeballing the stats easier.
+	sp.enc.SetIndent("", "\t")
 	if err := sp.tryReadStats(); err != nil {
 		return nil, fmt.Errorf("while reloading stats: %w", err)
 	}
