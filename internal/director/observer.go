@@ -36,18 +36,34 @@ type Observer interface {
 	// Observers can observe planner operations.
 	planner.Observer
 
-	// OnPrepare lets the observer know that the director is preparing to run on pathset ps with quantities qs.
-	OnPrepare(qs quantity.RootSet, ps pathset.Pathset)
+	// Observers can observe director preparations.
+	PrepareObserver
 
-	// InstanceObserver gets a sub-observer for the machine with ID id.
+	// Instance gets a sub-observer for the machine with ID id.
 	// It can fail if no such observer is available.
 	Instance(id id.ID) (InstanceObserver, error)
 }
 
-// InstanceObserver is an interface for types that observe a director instance.
-type InstanceObserver interface {
+// PrepareObserver is an interface for types that observer director preparations.
+type PrepareObserver interface {
+	// TODO(@MattWindsor91): this can go away if we flatten things into single, auto-forwarded Observers
+
+	// OnPrepare lets the observer know that the director is preparing to run on pathset ps with quantities qs.
+	OnPrepare(qs quantity.RootSet, ps pathset.Pathset)
+}
+
+// CycleObserver is an interface for types that observe cycles.
+//
+// This is a separate sub-interface of InstanceObserver because some things implement one, but not the other.
+type CycleObserver interface {
 	// OnCycle observes a message relating to this instance's current cycle.
 	OnCycle(m CycleMessage)
+}
+
+// InstanceObserver is an interface for types that observe a director instance.
+type InstanceObserver interface {
+	// InstanceObserver observers can observe cycles.
+	CycleObserver
 
 	// OnInstanceClose observes that the instance this observer is observing has closed.
 	// This gives the observer the opportunity to free any resources.

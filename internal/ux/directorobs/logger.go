@@ -82,6 +82,16 @@ func (j *Logger) Close() error {
 	return j.out.Close()
 }
 
+// OnCycle logs a cycle event.
+func (j *Logger) OnCycle(c director.CycleMessage) {
+	switch c.Kind {
+	case director.CycleStart:
+		j.l.Printf("* %s starts cycle %d *\n", c.Cycle.MachineID, c.Cycle.Iter)
+	case director.CycleError:
+		j.l.Printf("* %s ERROR: %s *\n", c.Cycle.MachineID, c.Err.Error())
+	}
+}
+
 // OnPrepare logs the preparation attempts of a director.
 func (j *Logger) OnPrepare(qs quantity.RootSet, _ pathset.Pathset) {
 	qs.Log(j.l)

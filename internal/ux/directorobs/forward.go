@@ -112,6 +112,18 @@ func (r *ForwardReceiver) Run(ctx context.Context) error {
 //
 // These inject behaviour into a ForwardObserver.
 type ForwardHandler interface {
+	// ForwardHandler instances can observe cycles in the same way that the forwarding observer can.
+	director.CycleObserver
+
+	// These exist to let ForwardHandlers also implement bits of normal Observers, and can safely be zeroed.
+	// TODO(@MattWindsor91): simplify this away.
+
+	// ForwardHandler instances can observe machines.
+	machine.Observer
+
+	// ForwardHandler instances can observe preparations.
+	director.PrepareObserver
+
 	// OnCycleAnalysis should handle an analysis for a particular cycle.
 	OnCycleAnalysis(director.CycleAnalysis)
 
@@ -133,8 +145,11 @@ type ForwardObserver struct {
 	receiver *ForwardReceiver
 }
 
-// OnMachines does nothing, for now.
-func (f *ForwardObserver) OnMachines(machine.Message) {
+// OnMachines delegates to the forward handlers.
+func (f *ForwardObserver) OnMachines(m machine.Message) {
+	for _, h := range f.handlers {
+		h.OnMachines(m)
+	}
 }
 
 // OnCompilerConfig does nothing, for now.
@@ -150,7 +165,10 @@ func (f *ForwardObserver) OnPlan(planner.Message) {
 }
 
 // OnPrepare does nothing, for now.
-func (f *ForwardObserver) OnPrepare(quantity.RootSet, pathset.Pathset) {
+func (f *ForwardObserver) OnPrepare(qs quantity.RootSet, ps pathset.Pathset) {
+	for _, h := range f.handlers {
+		h.OnPrepare(qs, ps)
+	}
 }
 
 // ErrForwardHandlerNil occurs when NewForwardObserver is given a nil ForwardHandler.
@@ -188,7 +206,9 @@ func (f *ForwardObserver) runStep(fwd Forward) error {
 			h.OnCycleCompiler(fwd.Cycle.Cycle, c)
 		}
 	case ForwardCycle:
-		// do nothing for now
+		for _, h := range f.handlers {
+			h.OnCycle(fwd.Cycle)
+		}
 	case ForwardSave:
 		s := *fwd.Save
 		for _, h := range f.handlers {
