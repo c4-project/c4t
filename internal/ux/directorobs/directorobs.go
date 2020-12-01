@@ -26,7 +26,9 @@ type Obs struct {
 	dash *dash.Dash
 	// resultLog is a forward handler that logs results and other significant cycle phenomena to a text file.
 	resultLog *Logger
-	// fwd contains the forwarding observer that hosts resultLog.
+	// statPersister is a forward handler that persists statistics in a JSON file.
+	statPersister *StatPersister
+	// fwd contains the forwarding observer that hosts forward handlers.
 	fwd *ForwardObserver
 
 	// TODO(@MattWindsor91): in the medium term, I expect director observers that aren't forwarding will disappear.
@@ -47,8 +49,11 @@ func NewObs(cfg *config.Config, useDash bool) (*Obs, error) {
 func (o *Obs) setup(cfg *config.Config, useDash bool) error {
 	var err error
 
-	if o.resultLog, err = LoggerFromConfig(cfg); err != nil {
-		return err
+	if o.resultLog, err = loggerFromConfig(cfg); err != nil {
+		return fmt.Errorf("while creating logger: %w", err)
+	}
+	if o.statPersister, err = statPersisterFromConfig(cfg); err != nil {
+		return fmt.Errorf("while creating stat persister: %w", err)
 	}
 	if err = o.setupForwarder(); err != nil {
 		return err
@@ -66,9 +71,12 @@ func (o *Obs) setupDash() error {
 }
 
 func (o *Obs) setupForwarder() error {
-	fhs := make([]ForwardHandler, 0, 1)
+	fhs := make([]ForwardHandler, 0, 2)
 	if o.resultLog != nil {
 		fhs = append(fhs, o.resultLog)
+	}
+	if o.statPersister != nil {
+		fhs = append(fhs, o.statPersister)
 	}
 	// TODO(@MattWindsor91): wire cap up to number of instances
 	var err error
@@ -76,8 +84,8 @@ func (o *Obs) setupForwarder() error {
 	return err
 }
 
-// LoggerFromConfig constructs a logger according to the configuration in cfg.
-func LoggerFromConfig(cfg *config.Config) (*Logger, error) {
+// loggerFromConfig constructs a logger according to the configuration in cfg.
+func loggerFromConfig(cfg *config.Config) (*Logger, error) {
 	logw, err := createResultLogFile(cfg)
 	if err != nil {
 		return nil, err
@@ -97,15 +105,23 @@ func createResultLogFile(c *config.Config) (*os.File, error) {
 	return logw, nil
 }
 
-func (o *Obs) Observers() []director.Observer {
-	cands := []director.Observer{o.dash, o.fwd}
-	obs := make([]director.Observer, 0, len(cands))
-	for _, c := range cands {
-		if c != nil {
-			obs = append(obs, c)
-		}
+func statPersisterFromConfig(c *config.Config) (*StatPersister, error) {
+	path, err := c.Paths.OutPath("stats.json")
+	if err != nil {
+		return nil, fmt.Errorf("expanding stat persister file path: %w", err)
 	}
-	return obs
+	f, err := OpenStatFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("opening stat persister file %q: %w", path, err)
+	}
+	return NewStatPersister(f)
+}
+
+func (o *Obs) Observers() []director.Observer {
+	if o.dash != nil {
+		return []director.Observer{o.dash, o.fwd}
+	}
+	return []director.Observer{o.fwd}
 }
 
 func (o *Obs) Run(ctx context.Context, cancel context.CancelFunc) error {
@@ -122,12 +138,15 @@ func (o *Obs) Run(ctx context.Context, cancel context.CancelFunc) error {
 }
 
 func (o *Obs) Close() error {
-	var derr, rerr error
+	var derr, rerr, serr error
 	if o.dash != nil {
 		derr = o.dash.Close()
 	}
 	if o.resultLog != nil {
 		rerr = o.resultLog.Close()
 	}
-	return errhelp.FirstError(derr, rerr)
+	if o.statPersister != nil {
+		serr = o.statPersister.Close()
+	}
+	return errhelp.FirstError(derr, rerr, serr)
 }
