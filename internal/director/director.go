@@ -42,6 +42,8 @@ type Director struct {
 	machines machine.ConfigMap
 	// observers contains multi-machine observers for the director.
 	observers []Observer
+	// instances contains the instances governed by the director.
+	instances []Instance
 	// env groups together the bits of configuration that pertain to dealing with the environment.
 	env Env
 	// ssh, if present, provides configuration for the director's remote invocation.
@@ -71,15 +73,53 @@ func New(e Env, ms machine.ConfigMap, files []string, opt ...Option) (*Director,
 	if err := Options(opt...)(&d); err != nil {
 		return nil, liftInitError(err)
 	}
-	return &d, d.tidyAfterOptions()
+	return &d, d.initAfterOptions()
 }
 
-func (d *Director) tidyAfterOptions() error {
+func (d *Director) initAfterOptions() error {
 	if len(d.machines) == 0 {
 		return ErrNoMachines
 	}
 	if d.paths == nil {
 		return iohelp.ErrPathsetNil
+	}
+	return d.initInstances()
+}
+
+// initInstances performs the initial set-up of instances (before allocation of plan resources to them).
+func (d *Director) initInstances() error {
+	// TODO(@MattWindsor91): eventually decouple machines from instances.
+
+	d.instances = make([]Instance, len(d.machines))
+	i := 0
+	for midstr, c := range d.machines {
+		if err := d.initInstance(i, midstr, c); err != nil {
+			return err
+		}
+		i++
+	}
+	return nil
+}
+
+func (d *Director) initInstance(i int, midstr string, c machine.Config) error {
+	mid, err := id.TryFromString(midstr)
+	if err != nil {
+		return err
+	}
+	obs, err := d.instanceObservers(mid)
+	if err != nil {
+		return err
+	}
+	d.instances[i] = Instance{
+		MachConfig:   c,
+		SSHConfig:    d.ssh,
+		Env:          d.env,
+		ID:           mid,
+		Observers:    obs,
+		Pathset:      d.paths.Instance(mid),
+		Quantities:   d.machineQuantities(&c),
+		Filters:      d.filters,
+		FuzzerConfig: d.fcfg,
 	}
 	return nil
 }
@@ -100,12 +140,7 @@ func (d *Director) Direct(ctx context.Context) error {
 		return err
 	}
 
-	ms, err := d.makeMachines(pn)
-	if err != nil {
-		return err
-	}
-
-	return d.runLoops(ctx, ms)
+	return d.runLoops(ctx, pn)
 }
 
 func (d *Director) plan(ctx context.Context) (map[string]plan.Plan, error) {
@@ -124,10 +159,11 @@ func (d *Director) makePlanner() (*planner.Planner, error) {
 	)
 }
 
-func (d *Director) runLoops(ctx context.Context, ms []*Instance) error {
+func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) error {
 	eg, ectx := errgroup.WithContext(ctx)
-	for _, m := range ms {
+	for _, m := range d.instances {
 		m := m
+		m.InitialPlan = plans[m.ID.String()]
 		eg.Go(func() error { return m.Run(ectx) })
 	}
 	return eg.Wait()
@@ -141,45 +177,6 @@ func (d *Director) prepare() error {
 	}
 
 	return d.machines.ObserveOn(LowerToMachine(d.observers)...)
-}
-
-func (d *Director) makeMachines(plans map[string]plan.Plan) ([]*Instance, error) {
-	ms := make([]*Instance, len(d.machines))
-	var (
-		i   int
-		err error
-	)
-	for midstr, c := range d.machines {
-		if ms[i], err = d.makeMachine(midstr, c, plans[midstr]); err != nil {
-			return nil, err
-		}
-		i++
-	}
-	return ms, nil
-}
-
-func (d *Director) makeMachine(midstr string, c machine.Config, p plan.Plan) (*Instance, error) {
-	mid, err := id.TryFromString(midstr)
-	if err != nil {
-		return nil, err
-	}
-	obs, err := d.instanceObservers(mid)
-	if err != nil {
-		return nil, err
-	}
-	m := Instance{
-		MachConfig:   c,
-		SSHConfig:    d.ssh,
-		Env:          d.env,
-		ID:           mid,
-		Observers:    obs,
-		Pathset:      d.paths.Instance(mid),
-		Quantities:   d.machineQuantities(&c),
-		InitialPlan:  p,
-		Filters:      d.filters,
-		FuzzerConfig: d.fcfg,
-	}
-	return &m, nil
 }
 
 func (d *Director) machineQuantities(c *machine.Config) quantity.MachineSet {
