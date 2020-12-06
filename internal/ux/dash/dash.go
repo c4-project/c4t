@@ -8,18 +8,18 @@ package dash
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strconv"
 	"time"
+
+	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
 	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
 
 	"github.com/MattWindsor91/c4t/internal/stage/planner"
-
-	"github.com/MattWindsor91/c4t/internal/director"
-
-	"github.com/MattWindsor91/c4t/internal/director/pathset"
-	"github.com/MattWindsor91/c4t/internal/quantity"
 
 	"github.com/mum4k/termdash/keyboard"
 
@@ -28,8 +28,6 @@ import (
 	"github.com/MattWindsor91/c4t/internal/machine"
 
 	"github.com/mum4k/termdash/linestyle"
-
-	"github.com/MattWindsor91/c4t/internal/model/id"
 
 	"github.com/mum4k/termdash/widgets/text"
 
@@ -51,17 +49,68 @@ type Dash struct {
 	// nlines is the number of lines written, so far, to the log.
 	nlines uint
 
-	// machines maps from stringified machine IDs to their observers.
-	// (There is a display order for the machines, but we don't track it ourselves.)
-	machines map[string]*Instance
+	// instances contains all instances currently allocated for the dashboard.
+	instances []*Instance
+}
 
-	// obs contains the observer records used to populate machines.
-	obs []*Instance
+// OnCycle forwards the cycle message m to the relevant instance.
+func (d *Dash) OnCycle(m director.CycleMessage) {
+	// TODO(@MattWindsor91): the instance itself should handle this
+	if m.Kind == director.CycleStart {
+		d.assignMachineID(m.Cycle.Instance, m.Cycle.MachineID)
+	}
+	d.onInstance(m.Cycle.Instance, func(i *Instance) { i.OnCycle(m) })
+}
+
+// OnCycleAnalysis forwards the analysis m to the relevant instance.
+func (d *Dash) OnCycleAnalysis(m director.CycleAnalysis) {
+	d.onInstance(m.Cycle.Instance, func(i *Instance) { i.OnAnalysis(m.Analysis) })
+}
+
+// OnCycleCompiler forwards the compiler message m to the instance mentioned in c.
+func (d *Dash) OnCycleCompiler(c director.Cycle, m compiler.Message) {
+	d.onInstance(c.Instance, func(i *Instance) { i.OnCompilerConfig(m) })
+}
+
+// OnCycleSave forwards the archive message m to the instance mentioned in c.
+func (d *Dash) OnCycleSave(c director.Cycle, m saver.ArchiveMessage) {
+	d.onInstance(c.Instance, func(i *Instance) { i.OnArchive(m) })
+}
+
+// ErrNoSuchInstance occurs when a message arrives from an instance that the dashboard hasn't allocated room for.
+var ErrNoSuchInstance = errors.New("received message for instance that doesn't exist")
+
+func (d *Dash) onInstance(i int, f func(*Instance)) {
+	if i < 0 || len(d.instances) <= i {
+		d.logError(fmt.Errorf("%w: %d", ErrNoSuchInstance, i))
+		return
+	}
+	f(d.instances[i])
+}
+
+// ensureInstances ensures there are at least n instances, and recalculates the machine grid if not.
+func (d *Dash) ensureInstances(n int) error {
+	var err error
+
+	ninst := len(d.instances)
+	excess := n - ninst
+	if excess <= 0 {
+		return nil
+	}
+	newinsts := make([]*Instance, excess)
+	for j := range newinsts {
+		if newinsts[j], err = NewInstance(machineContainerID(j+ninst), d); err != nil {
+			return err
+		}
+	}
+
+	d.instances = append(d.instances[:], newinsts...)
+	return d.updateMachineGrid()
 }
 
 const (
-	// idMachines is the container ID used to update the machine grid.
-	idMachines = "machines"
+	// idInstances is the container ID used to update the instance grid.
+	idInstances = "machines"
 
 	// MaxLogLines is the maximum number of lines that can be written to the log before it resets.
 	MaxLogLines = 1000
@@ -135,13 +184,8 @@ func New() (*Dash, error) {
 	return &d, nil
 }
 
-func (d *Dash) OnMachines(m machine.Message) {
-	switch m.Kind {
-	case machine.MessageStart:
-		d.setupMachineSplit(m.Index)
-	case machine.MessageRecord:
-		d.setupMachineID(m.Index, m.Machine.ID)
-	}
+func (d *Dash) OnMachines(machine.Message) {
+	// do nothing, for now
 }
 
 func (d *Dash) logError(err error) {
@@ -200,18 +244,18 @@ func (d *Dash) Close() error {
 	return nil
 }
 
-// Instance locates the observer for the machine with ID mid.
-func (d *Dash) Instance(mid id.ID) (director.InstanceObserver, error) {
-	o := d.machines[mid.String()]
-	if o == nil {
-		return nil, fmt.Errorf("instance not prepared for machine %s", mid.String())
-	}
-	return o, nil
-}
-
-// OnPrepare (currently) does nothing.
-func (_ *Dash) OnPrepare(_ quantity.RootSet, _ pathset.Pathset) {
+// OnPrepare uses the instance calculation to prepare a machine grid.
+func (d *Dash) OnPrepare(m director.PrepareMessage) {
 	// TODO(@MattWindsor91): broadcast the quantities somewhere
+	if m.Kind != director.PrepareInstances {
+		return
+	}
+	if err := d.log.Write("Instances: " + strconv.Itoa(m.NumInstances)); err != nil {
+		d.logError(err)
+	}
+	if err := d.ensureInstances(m.NumInstances); err != nil {
+		d.logError(err)
+	}
 }
 
 // OnCompilerConfig (currently) does nothing.

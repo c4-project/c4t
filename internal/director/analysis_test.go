@@ -22,6 +22,7 @@ import (
 func ExampleCycleAnalysis_String() {
 	sc := director.CycleAnalysis{
 		Cycle: director.Cycle{
+			Instance:  4,
 			MachineID: id.FromString("foo.bar.baz"),
 			Iter:      42,
 			Start:     time.Date(1997, time.May, 1, 10, 0, 0, 0, time.FixedZone("BST", 60*60)),
@@ -41,5 +42,5 @@ func ExampleCycleAnalysis_String() {
 	fmt.Println(&sc)
 
 	// Output:
-	// [foo.bar.baz #42 (May  1 10:00:00)] 4 Ok, 5 Filtered, 1 Flagged, 3 CompileFail, 2 RunFail
+	// [4: foo.bar.baz #42 (May  1 10:00:00)] 4 Ok, 5 Filtered, 1 Flagged, 3 CompileFail, 2 RunFail
 }

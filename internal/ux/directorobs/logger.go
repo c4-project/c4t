@@ -9,9 +9,6 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/c4t/internal/director/pathset"
-	"github.com/MattWindsor91/c4t/internal/quantity"
-
 	"github.com/MattWindsor91/c4t/internal/director"
 
 	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
@@ -93,8 +90,13 @@ func (j *Logger) OnCycle(c director.CycleMessage) {
 }
 
 // OnPrepare logs the preparation attempts of a director.
-func (j *Logger) OnPrepare(qs quantity.RootSet, _ pathset.Pathset) {
-	qs.Log(j.l)
+func (j *Logger) OnPrepare(m director.PrepareMessage) {
+	switch m.Kind {
+	case director.PrepareInstances:
+		j.l.Print("running on ", stringhelp.PluralQuantity(m.NumInstances, "instance", "", "s"))
+	case director.PrepareQuantities:
+		m.Quantities.Log(j.l)
+	}
 }
 
 // OnMachines logs a machine block.
@@ -125,6 +127,7 @@ func (j *Logger) OnCycleSave(c director.Cycle, s saver.ArchiveMessage) {
 	}
 }
 
+// OnCycleCompiler handles a compiler message m coming from the director cycle c.
 func (j *Logger) OnCycleCompiler(c director.Cycle, m compiler.Message) {
 	// TODO(@MattWindsor91): abstract this?
 	cs := c.String()

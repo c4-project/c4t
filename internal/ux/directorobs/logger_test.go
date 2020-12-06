@@ -7,8 +7,12 @@ package directorobs_test
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
+	"time"
+
+	"github.com/MattWindsor91/c4t/internal/director"
 
 	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
 	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
@@ -23,13 +27,52 @@ import (
 	"github.com/MattWindsor91/c4t/internal/model/id"
 )
 
-// ExampleLogger_OnCycleSave is a runnable example for Instance that exercises sending archive messages.
+// ExampleLogger_OnPrepare is a runnable example indirectly exercising Logger.OnPrepare.
+func ExampleLogger_OnPrepare() {
+	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
+	r, _ := directorobs.NewForwardObserver(0, l)
+
+	director.OnPrepare(director.PrepareInstancesMessage(5), r)
+
+	// Output:
+	// running on 5 instances
+}
+
+// ExampleLogger_OnCycle is a runnable example indirectly exercising Logger.OnCycle.
+func ExampleLogger_OnCycle() {
+	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
+	r, _ := directorobs.NewForwardObserver(0, l)
+	i, _ := r.Instance(id.FromString("localhost"))
+
+	c := director.Cycle{
+		Instance:  0,
+		MachineID: id.FromString("localhost"),
+		Iter:      10,
+		Start:     time.Time{},
+	}
+
+	go func() {
+		// These messages will arrive through l.OnCycle.
+		director.OnCycle(director.CycleStartMessage(c), i)
+		director.OnCycle(director.CycleErrorMessage(c, errors.New("the front fell off")), i)
+		// Important, else the logger will keep waiting for the instance to provide observations.
+		i.OnInstanceClose()
+	}()
+	_ = r.Run(context.Background())
+
+	// Output:
+	// * localhost starts cycle 10 *
+	// * localhost ERROR: the front fell off *
+}
+
+// ExampleLogger_OnCycleSave is a runnable example indirectly exercising Logger.OnCycleSave.
 func ExampleLogger_OnCycleSave() {
 	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
 	r, _ := directorobs.NewForwardObserver(0, l)
 	i, _ := r.Instance(id.FromString("localhost"))
 
 	go func() {
+		// These messages will arrive through l.OnCycleSave.
 		saver.OnArchiveStart("subj", "subj.tar.gz", 2, i)
 		saver.OnArchiveFileAdded("subj", "a.out", 0, i)
 		saver.OnArchiveFileMissing("subj", "compile.log", 1, i)
@@ -40,17 +83,18 @@ func ExampleLogger_OnCycleSave() {
 	_ = r.Run(context.Background())
 
 	// Output:
-	// saving (cycle [ #0 (Jan  1 00:00:00)]) subj to subj.tar.gz
-	// when saving (cycle [ #0 (Jan  1 00:00:00)]) subj: missing file compile.log
+	// saving (cycle [0:  #0 (Jan  1 00:00:00)]) subj to subj.tar.gz
+	// when saving (cycle [0:  #0 (Jan  1 00:00:00)]) subj: missing file compile.log
 }
 
-// ExampleLogger_OnCycleCompiler is a runnable example for Instance that exercises sending compiler messages.
+// ExampleLogger_OnCycleCompiler is a runnable example indirectly exercising Logger.OnCycleCompiler.
 func ExampleLogger_OnCycleCompiler() {
 	l, _ := directorobs.NewLogger(iohelp.NopWriteCloser{Writer: os.Stdout}, 0)
 	r, _ := directorobs.NewForwardObserver(0, l)
 	i, _ := r.Instance(id.FromString("localhost"))
 
 	go func() {
+		// These messages will arrive through l.OnCycleCompiler.
 		compiler.OnCompilerConfigStart(3, i)
 		compiler.OnCompilerConfigStep(0,
 			compiler.Named{
@@ -84,7 +128,7 @@ func ExampleLogger_OnCycleCompiler() {
 	_ = r.Run(context.Background())
 
 	// Output:
-	// [ #0 (Jan  1 00:00:00)] compilers 3:
+	// [0:  #0 (Jan  1 00:00:00)] compilers 3:
 	// - gcc.4: gcc@arm.7 opt "3" march "arch=native"
 	// - gcc.9: gcc@arm.8 opt "2" march "arch=skylake"
 	// - msvc: msvc@x86.64

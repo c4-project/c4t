@@ -9,10 +9,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/director/pathset"
 	"github.com/MattWindsor91/c4t/internal/machine"
-	"github.com/MattWindsor91/c4t/internal/quantity"
-
 	"github.com/MattWindsor91/c4t/internal/model/id"
 
 	"github.com/MattWindsor91/c4t/internal/copier"
@@ -164,10 +161,10 @@ func (f *ForwardObserver) OnBuild(builder.Message) {
 func (f *ForwardObserver) OnPlan(planner.Message) {
 }
 
-// OnPrepare does nothing, for now.
-func (f *ForwardObserver) OnPrepare(qs quantity.RootSet, ps pathset.Pathset) {
+// OnPrepare forwards prepare messages to the handlers.
+func (f *ForwardObserver) OnPrepare(p director.PrepareMessage) {
 	for _, h := range f.handlers {
-		h.OnPrepare(qs, ps)
+		h.OnPrepare(p)
 	}
 }
 

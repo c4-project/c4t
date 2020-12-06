@@ -53,8 +53,11 @@ import (
 // The maximum permitted number of times a loop can error out consecutively before the tester fails.
 const maxConsecutiveErrors = 10
 
-// Instance contains the state necessary to run a single machine loop of a director.
+// Instance contains the state necessary to run a single loop of a director.
 type Instance struct {
+	// Index is the index of the instance in the director.
+	Index int
+
 	// MachConfig contains the machine config for this machine.
 	MachConfig machine.Config
 	// SSHConfig contains top-level SSH configuration.
@@ -162,6 +165,7 @@ func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
 
 	c := cycleInstance{
 		cycle: Cycle{
+			Instance:  i.Index,
 			MachineID: i.ID,
 			Iter:      nCycle,
 			Start:     time.Now(),

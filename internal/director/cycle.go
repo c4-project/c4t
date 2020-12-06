@@ -46,6 +46,9 @@ func (c *cycleInstance) runStage(ctx context.Context, s stageRunner) error {
 
 // Cycle contains information about a particular test cycle.
 type Cycle struct {
+	// Instance is the index of the instance running this cycle.
+	Instance int
+
 	// MachineID is the ID of the machine on which this cycle is running.
 	MachineID id.ID
 
@@ -56,10 +59,11 @@ type Cycle struct {
 	Start time.Time
 }
 
-// String returns a string containing the components of this run in a human-readable manner.
+// String returns a string containing the components of this cycle in a human-readable manner.
 func (r Cycle) String() string {
 	return fmt.Sprintf(
-		"[%s #%d (%s)]",
+		"[%d: %s #%d (%s)]",
+		r.Instance,
 		r.MachineID.String(),
 		r.Iter,
 		r.Start.Format(time.Stamp),

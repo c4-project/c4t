@@ -48,8 +48,56 @@ type Observer interface {
 type PrepareObserver interface {
 	// TODO(@MattWindsor91): this can go away if we flatten things into single, auto-forwarded Observers
 
-	// OnPrepare lets the observer know that the director is preparing to run on pathset ps with quantities qs.
-	OnPrepare(qs quantity.RootSet, ps pathset.Pathset)
+	// OnPrepare lets the observer know that the director is performing some sort of preparation.
+	OnPrepare(message PrepareMessage)
+}
+
+// PrepareKind is the enumeration of kinds of PrepareMessage.
+type PrepareKind uint8
+
+const (
+	// PrepareInstances states that the director is preparing its instance set; NumInstances is set.
+	PrepareInstances PrepareKind = iota
+	// PrepareQuantities states the director's quantity set; Quantities is set.
+	PrepareQuantities
+	// PreparePaths states that the director is about to make its top-level paths; Paths is set.
+	PreparePaths
+)
+
+// PrepareMessage is a message from the director stating some aspect of its pre-experiment preparation.
+type PrepareMessage struct {
+	// Kind states the kind of message.
+	Kind PrepareKind `json:"kind"`
+
+	// NumInstances states, if Kind is PrepareInstances, the number of instances that the director is going to run.
+	// This can be used by observers to pre-allocate instance sub-observers.
+	NumInstances int `json:"num_instances,omitempty"`
+	// Quantities states, if Kind is PrepareQuantities, the quantities the director is going to make.
+	Quantities quantity.RootSet `json:"quantities,omitempty"`
+	// Paths states, if Kind is PreparePaths, where the director is going to make its top-level paths.
+	Paths pathset.Pathset `json:"paths,omitempty"`
+}
+
+// PrepareInstancesMessage creates a PrepareMessage with kind PrepareInstances and instance count ninst.
+func PrepareInstancesMessage(ninst int) PrepareMessage {
+	return PrepareMessage{Kind: PrepareInstances, NumInstances: ninst}
+}
+
+// PrepareQuantitiesMessage creates a PrepareMessage with kind PrepareQuantities and quantity set qs.
+func PrepareQuantitiesMessage(qs quantity.RootSet) PrepareMessage {
+	return PrepareMessage{Kind: PrepareQuantities, Quantities: qs}
+}
+
+// PreparePathsMessage creates a PrepareMessage with kind PreparePaths and path set ps.
+func PreparePathsMessage(ps pathset.Pathset) PrepareMessage {
+	return PrepareMessage{Kind: PreparePaths, Paths: ps}
+}
+
+// OnPrepare sends OnPrepare to every observer in obs.
+func OnPrepare(m PrepareMessage, obs ...PrepareObserver) {
+	for _, o := range obs {
+		o.OnPrepare(m)
+	}
 }
 
 // CycleObserver is an interface for types that observe cycles.
@@ -123,13 +171,6 @@ func CycleErrorMessage(c Cycle, err error) CycleMessage {
 	return CycleMessage{Cycle: c, Kind: CycleError, Err: err}
 }
 
-// OnPrepare sends OnPrepare to every observer in obs.
-func OnPrepare(qs quantity.RootSet, ps pathset.Pathset, obs ...Observer) {
-	for _, o := range obs {
-		o.OnPrepare(qs, ps)
-	}
-}
-
 // OnCycle sends a cycle message to every instance observer in obs.
 func OnCycle(m CycleMessage, obs ...InstanceObserver) {
 	for _, o := range obs {
@@ -153,6 +194,15 @@ func LowerToMachine(obs []Observer) []machine.Observer {
 		cos[i] = o
 	}
 	return cos
+}
+
+// LowerToPrepare lowers a slice of director observers to a slice of prepare observers.
+func LowerToPrepare(obs []Observer) []PrepareObserver {
+	dobs := make([]PrepareObserver, len(obs))
+	for i, o := range obs {
+		dobs[i] = o
+	}
+	return dobs
 }
 
 // LowerToAnalyser lowers a slice of instance observers to a slice of analyser observers.

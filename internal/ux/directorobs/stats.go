@@ -12,9 +12,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/director/pathset"
-	"github.com/MattWindsor91/c4t/internal/quantity"
-
 	"github.com/MattWindsor91/c4t/internal/machine"
 
 	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
@@ -79,7 +76,7 @@ func (s *Statset) OnMachines(machine.Message) {
 }
 
 // OnPrepare does nothing, for now.
-func (s *Statset) OnPrepare(quantity.RootSet, pathset.Pathset) {
+func (s *Statset) OnPrepare(director.PrepareMessage) {
 }
 
 // liftCycle lifts an operation on a cycle c, handling making sure the machine exists, translating the ID, etc.
@@ -183,8 +180,8 @@ func (s *StatPersister) OnMachines(m machine.Message) {
 }
 
 // OnMachine feeds the information from m into the stats set.
-func (s *StatPersister) OnPrepare(qs quantity.RootSet, ps pathset.Pathset) {
-	s.set.OnPrepare(qs, ps)
+func (s *StatPersister) OnPrepare(m director.PrepareMessage) {
+	s.set.OnPrepare(m)
 	s.flush()
 }
 

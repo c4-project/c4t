@@ -71,7 +71,10 @@ func (o *Obs) setupDash() error {
 }
 
 func (o *Obs) setupForwarder() error {
-	fhs := make([]ForwardHandler, 0, 2)
+	fhs := make([]ForwardHandler, 0, 3)
+	if o.dash != nil {
+		fhs = append(fhs, o.dash)
+	}
 	if o.resultLog != nil {
 		fhs = append(fhs, o.resultLog)
 	}
@@ -118,9 +121,6 @@ func statPersisterFromConfig(c *config.Config) (*StatPersister, error) {
 }
 
 func (o *Obs) Observers() []director.Observer {
-	if o.dash != nil {
-		return []director.Observer{o.dash, o.fwd}
-	}
 	return []director.Observer{o.fwd}
 }
 

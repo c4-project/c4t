@@ -111,6 +111,7 @@ func (d *Director) initInstance(i int, midstr string, c machine.Config) error {
 		return err
 	}
 	d.instances[i] = Instance{
+		Index:        i,
 		MachConfig:   c,
 		SSHConfig:    d.ssh,
 		Env:          d.env,
@@ -122,6 +123,26 @@ func (d *Director) initInstance(i int, midstr string, c machine.Config) error {
 		FuzzerConfig: d.fcfg,
 	}
 	return nil
+}
+
+func (d *Director) machineQuantities(c *machine.Config) quantity.MachineSet {
+	if c.Quantities == nil {
+		return d.quantities.MachineSet
+	}
+	qs := d.quantities.MachineSet
+	qs.Override(*c.Quantities)
+	return qs
+}
+
+func (d *Director) instanceObservers(mid id.ID) ([]InstanceObserver, error) {
+	var err error
+	ios := make([]InstanceObserver, len(d.observers))
+	for i, o := range d.observers {
+		if ios[i], err = o.Instance(mid); err != nil {
+			return nil, err
+		}
+	}
+	return ios, nil
 }
 
 // liftInitError lifts err to mention that it occurred during initialisation of a director.
@@ -170,31 +191,17 @@ func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) err
 }
 
 func (d *Director) prepare() error {
-	OnPrepare(d.quantities, *d.paths, d.observers...)
+	obs := LowerToPrepare(d.observers)
 
+	// Instance preparation happens at construction, but it'd be strange to send the message before run-time.
+	OnPrepare(PrepareInstancesMessage(len(d.instances)), obs...)
+
+	OnPrepare(PrepareQuantitiesMessage(d.quantities), obs...)
+
+	OnPrepare(PreparePathsMessage(*d.paths), obs...)
 	if err := d.paths.Prepare(); err != nil {
 		return err
 	}
 
 	return d.machines.ObserveOn(LowerToMachine(d.observers)...)
-}
-
-func (d *Director) machineQuantities(c *machine.Config) quantity.MachineSet {
-	if c.Quantities == nil {
-		return d.quantities.MachineSet
-	}
-	qs := d.quantities.MachineSet
-	qs.Override(*c.Quantities)
-	return qs
-}
-
-func (d *Director) instanceObservers(mid id.ID) ([]InstanceObserver, error) {
-	var err error
-	ios := make([]InstanceObserver, len(d.observers))
-	for i, o := range d.observers {
-		if ios[i], err = o.Instance(mid); err != nil {
-			return nil, err
-		}
-	}
-	return ios, nil
 }
