@@ -35,14 +35,14 @@ type Statset struct {
 	// as to which machine has changed
 
 	// StartTime is the time at which this statistics set was first created.
-	StartTime time.Time `json:"start_time"`
+	StartTime time.Time `json:"start_time,omitempty"`
 
 	// EventCount is the number of events that have been applied to this Statset.
 	// This metric isn't particularly exciting from a user perspective, but is used to prevent spurious disk flushes.
 	EventCount uint64 `json:"event_count"`
 
 	// SessionStartTime is the time at which this session started (ie, the statset was last reloaded from disk).
-	SessionStartTime time.Time `json:"session_start_time"`
+	SessionStartTime time.Time `json:"session_start_time,omitempty"`
 
 	// Machines is a map from machine IDs to statistics about those machines.
 	Machines map[string]MachineStatset `json:"machines,omitempty"`
@@ -77,16 +77,13 @@ func (s *Statset) OnCycleCompiler(director.Cycle, compiler.Message) {}
 func (s *Statset) OnCycleCopy(director.Cycle, copier.Message) {}
 
 // OnCycleSave does nothing, for now.
-func (s *Statset) OnCycleSave(director.Cycle, saver.ArchiveMessage) {
-}
+func (s *Statset) OnCycleSave(director.Cycle, saver.ArchiveMessage) {}
 
 // OnMachines does nothing, for now.
-func (s *Statset) OnMachines(machine.Message) {
-}
+func (s *Statset) OnMachines(machine.Message) {}
 
 // OnPrepare does nothing, for now.
-func (s *Statset) OnPrepare(director.PrepareMessage) {
-}
+func (s *Statset) OnPrepare(director.PrepareMessage) {}
 
 // liftCycle lifts an operation on a cycle c, handling making sure the machine exists, translating the ID, etc.
 func (s *Statset) liftCycle(c director.Cycle, f func(m *MachineStatset)) {
@@ -123,7 +120,8 @@ type MachineStatset struct {
 	// StatusTotals contains status totals since this statset started.
 	StatusTotals map[status.Status]uint64 `json:"status_totals"`
 	// SessionStatusTotals contains status totals since this session started.
-	SessionStatusTotals map[status.Status]uint64 `json:"session_status_totals"`
+	// It may be empty if this machine has not yet been active this session.
+	SessionStatusTotals map[status.Status]uint64 `json:"session_status_totals,omitempty"`
 }
 
 // ResetForSession removes from this statset any statistics that no longer apply across session boundaries.

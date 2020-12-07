@@ -47,16 +47,18 @@ func (c *cycleInstance) runStage(ctx context.Context, s stageRunner) error {
 // Cycle contains information about a particular test cycle.
 type Cycle struct {
 	// Instance is the index of the instance running this cycle.
-	Instance int
+	// Indices currently start from 0, so the zero value is also a valid instance number; this may change.
+	Instance int `json:"instance"`
 
 	// MachineID is the ID of the machine on which this cycle is running.
-	MachineID id.ID
+	MachineID id.ID `json:"machine_id,omitempty"`
 
 	// Iter is the iteration number of this cycle.
-	Iter uint64
+	// Iteration numbers currently start from 0, so the zero value is also a valid iteration number; this may change.
+	Iter uint64 `json:"iter"`
 
 	// Start is the start time of this cycle.
-	Start time.Time
+	Start time.Time `json:"start_time,omitempty"`
 }
 
 // String returns a string containing the components of this cycle in a human-readable manner.
