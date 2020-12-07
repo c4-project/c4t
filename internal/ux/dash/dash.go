@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/MattWindsor91/c4t/internal/copier"
+
 	"github.com/MattWindsor91/c4t/internal/director"
 	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
@@ -67,9 +69,21 @@ func (d *Dash) OnCycleAnalysis(m director.CycleAnalysis) {
 	d.onInstance(m.Cycle.Instance, func(i *Instance) { i.OnAnalysis(m.Analysis) })
 }
 
+// OnCycleBuild forwards the cycle corpus build information m to the instance mentioned in c.
+func (d *Dash) OnCycleBuild(c director.Cycle, m builder.Message) {
+	// Note: these build messages come from the perturber, fuzzer, etc.
+	// Plan build messages, being experiment-global, come through the top-level 'OnBuild' observation.
+	d.onInstance(c.Instance, func(i *Instance) { i.OnBuild(m) })
+}
+
 // OnCycleCompiler forwards the compiler message m to the instance mentioned in c.
 func (d *Dash) OnCycleCompiler(c director.Cycle, m compiler.Message) {
 	d.onInstance(c.Instance, func(i *Instance) { i.OnCompilerConfig(m) })
+}
+
+// OnCycleCopy forwards the copier message m to the instance mentioned in c.
+func (d *Dash) OnCycleCopy(c director.Cycle, m copier.Message) {
+	d.onInstance(c.Instance, func(i *Instance) { i.OnCopy(m) })
 }
 
 // OnCycleSave forwards the archive message m to the instance mentioned in c.

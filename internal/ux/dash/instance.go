@@ -200,11 +200,6 @@ func (o *Instance) OnBuild(m builder.Message) {
 	}
 }
 
-// OnCopyStart forwards a copy start observation.
-func (o *Instance) OnCopyStart(nfiles int) {
-	o.action.OnCopyStart(nfiles)
-}
-
 // OnCopy forwards a copy observation.
 func (o *Instance) OnCopy(m copy2.Message) {
 	switch m.Kind {

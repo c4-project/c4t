@@ -47,6 +47,12 @@ type Forward struct {
 
 	// Save is, when Kind is ForwardSave, a forwarded save message.
 	Save *saver.ArchiveMessage
+
+	// Build is, when Kind is ForwardBuild, a forwarded build message.
+	Build *builder.Message
+
+	// Copy is, when Kind is ForwardCopy, a forwarded copy message.
+	Copy *copier.Message
 }
 
 // ForwardKind is the enumeration of possible Forward messages.
@@ -61,6 +67,10 @@ const (
 	ForwardCompiler
 	// ForwardSave delimits a forwarding message where Save is populated (Cycle contains the cycle structure).
 	ForwardSave
+	// ForwardBuild delimits a forwarding message where Build is populated (Cycle contains the cycle structure).
+	ForwardBuild
+	// ForwardCopy delimits a forwarding message where Copy is populated (Cycle contains the cycle structure).
+	ForwardCopy
 )
 
 // ForwardCycleMessage constructs a forwarding message for m.
@@ -81,6 +91,16 @@ func ForwardCompilerMessage(c director.Cycle, m compiler.Message) Forward {
 // ForwardSaveMessage constructs a forwarding message for m over cycle c.
 func ForwardSaveMessage(c director.Cycle, m saver.ArchiveMessage) Forward {
 	return Forward{Cycle: director.CycleMessage{Cycle: c}, Kind: ForwardSave, Save: &m}
+}
+
+// ForwardBuildMessage constructs a forwarding message for m over cycle c.
+func ForwardBuildMessage(c director.Cycle, m builder.Message) Forward {
+	return Forward{Cycle: director.CycleMessage{Cycle: c}, Kind: ForwardBuild, Build: &m}
+}
+
+// ForwardCopyMessage constructs a forwarding message for m over cycle c.
+func ForwardCopyMessage(c director.Cycle, m copier.Message) Forward {
+	return Forward{Cycle: director.CycleMessage{Cycle: c}, Kind: ForwardCopy, Copy: &m}
 }
 
 // ForwardReceiver holds receive channels for Forward messages.
@@ -124,8 +144,14 @@ type ForwardHandler interface {
 	// OnCycleAnalysis should handle an analysis for a particular cycle.
 	OnCycleAnalysis(director.CycleAnalysis)
 
+	// OnCycleBuild should handle a corpus build for a particular cycle.
+	OnCycleBuild(director.Cycle, builder.Message)
+
 	// OnCycleCompiler handles a compiler message for a particular cycle.
 	OnCycleCompiler(director.Cycle, compiler.Message)
+
+	// OnCycleCopy handles a copy message for a particular cycle.
+	OnCycleCopy(director.Cycle, copier.Message)
 
 	// OnCycleSave handles an archive message for a particular cycle.
 	OnCycleSave(director.Cycle, saver.ArchiveMessage)
@@ -197,10 +223,18 @@ func (f *ForwardObserver) runStep(fwd Forward) error {
 		for _, h := range f.handlers {
 			h.OnCycleAnalysis(ca)
 		}
+	case ForwardBuild:
+		for _, h := range f.handlers {
+			h.OnCycleBuild(fwd.Cycle.Cycle, *fwd.Build)
+		}
 	case ForwardCompiler:
 		c := *fwd.Compiler
 		for _, h := range f.handlers {
 			h.OnCycleCompiler(fwd.Cycle.Cycle, c)
+		}
+	case ForwardCopy:
+		for _, h := range f.handlers {
+			h.OnCycleCopy(fwd.Cycle.Cycle, *fwd.Copy)
 		}
 	case ForwardCycle:
 		for _, h := range f.handlers {
@@ -244,11 +278,12 @@ func (l *ForwardingInstanceObserver) OnCycle(r director.CycleMessage) {
 	l.forward(ForwardCycleMessage(r))
 }
 
-// OnCollation logs a collation to this logger.
+// OnAnalysis forwards a cycle analysis.
 func (l *ForwardingInstanceObserver) OnAnalysis(c analysis.Analysis) {
 	l.forward(ForwardAnalysisMessage(l.cycle, c))
 }
 
+// OnArchive forwards a cycle save message.
 func (l *ForwardingInstanceObserver) OnArchive(s saver.ArchiveMessage) {
 	l.forward(ForwardSaveMessage(l.cycle, s))
 }
@@ -259,13 +294,17 @@ func (l *ForwardingInstanceObserver) OnPerturb(perturber.Message) {}
 // OnPlan does nothing, at the moment.
 func (l *ForwardingInstanceObserver) OnPlan(planner.Message) {}
 
-// OnBuild does nothing.
-func (l *ForwardingInstanceObserver) OnBuild(builder.Message) {}
+// OnBuild forwards a cycle build message.
+func (l *ForwardingInstanceObserver) OnBuild(m builder.Message) {
+	l.forward(ForwardBuildMessage(l.cycle, m))
+}
 
-// OnCopy does nothing.
-func (l *ForwardingInstanceObserver) OnCopy(copier.Message) {}
+// OnCopy forwards a cycle copy message.
+func (l *ForwardingInstanceObserver) OnCopy(m copier.Message) {
+	l.forward(ForwardCopyMessage(l.cycle, m))
+}
 
-// OnMachineNodeMessage does nothing.
+// OnMachineNodeAction does nothing.
 func (l *ForwardingInstanceObserver) OnMachineNodeAction(observer.Message) {}
 
 // OnInstanceClose doesn't (yet) log the instance closure, but closes the forwarding channel.

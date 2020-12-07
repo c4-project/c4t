@@ -9,13 +9,14 @@ import (
 	"io"
 	"log"
 
+	"github.com/MattWindsor91/c4t/internal/copier"
+	"github.com/MattWindsor91/c4t/internal/observing"
+
 	"github.com/MattWindsor91/c4t/internal/director"
 
 	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
 
 	"github.com/MattWindsor91/c4t/internal/stage/planner"
-
-	"github.com/MattWindsor91/c4t/internal/observing"
 
 	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
 
@@ -117,15 +118,8 @@ func (j *Logger) OnCycleAnalysis(s director.CycleAnalysis) {
 	}
 }
 
-// OnCycleSave logs s to this logger's file.
-func (j *Logger) OnCycleSave(c director.Cycle, s saver.ArchiveMessage) {
-	switch s.Kind {
-	case saver.ArchiveStart:
-		j.l.Printf("saving (cycle %s) %s to %s\n", c, s.SubjectName, s.File)
-	case saver.ArchiveFileMissing:
-		j.l.Printf("when saving (cycle %s) %s: missing file %s\n", c, s.SubjectName, s.File)
-	}
-}
+// OnCycleBuild does nothing, for now.
+func (j *Logger) OnCycleBuild(director.Cycle, builder.Message) {}
 
 // OnCycleCompiler handles a compiler message m coming from the director cycle c.
 func (j *Logger) OnCycleCompiler(c director.Cycle, m compiler.Message) {
@@ -138,6 +132,19 @@ func (j *Logger) OnCycleCompiler(c director.Cycle, m compiler.Message) {
 		j.compilers[cs][m.Num] = *m.Configuration
 	case observing.BatchEnd:
 		j.logCompilers(c, j.compilers[cs])
+	}
+}
+
+// OnCycleCopy does nothing, for now.
+func (j *Logger) OnCycleCopy(director.Cycle, copier.Message) {}
+
+// OnCycleSave logs s to this logger's file.
+func (j *Logger) OnCycleSave(c director.Cycle, s saver.ArchiveMessage) {
+	switch s.Kind {
+	case saver.ArchiveStart:
+		j.l.Printf("saving (cycle %s) %s to %s\n", c, s.SubjectName, s.File)
+	case saver.ArchiveFileMissing:
+		j.l.Printf("when saving (cycle %s) %s: missing file %s\n", c, s.SubjectName, s.File)
 	}
 }
 

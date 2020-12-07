@@ -12,6 +12,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+
+	"github.com/MattWindsor91/c4t/internal/copier"
+
 	"github.com/MattWindsor91/c4t/internal/machine"
 
 	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
@@ -63,9 +67,14 @@ func (s *Statset) OnCycleAnalysis(a director.CycleAnalysis) {
 	})
 }
 
+// OnCycleBuild does nothing, for now.
+func (s *Statset) OnCycleBuild(director.Cycle, builder.Message) {}
+
 // OnCycleCompiler does nothing, for now.
-func (s *Statset) OnCycleCompiler(director.Cycle, compiler.Message) {
-}
+func (s *Statset) OnCycleCompiler(director.Cycle, compiler.Message) {}
+
+// OnCycleCopy does nothing, for now.
+func (s *Statset) OnCycleCopy(director.Cycle, copier.Message) {}
 
 // OnCycleSave does nothing, for now.
 func (s *Statset) OnCycleSave(director.Cycle, saver.ArchiveMessage) {
@@ -197,9 +206,21 @@ func (s *StatPersister) OnCycleAnalysis(a director.CycleAnalysis) {
 	s.flush()
 }
 
+// OnCycleBuild feeds the information from c and m into the stats set.
+func (s *StatPersister) OnCycleBuild(c director.Cycle, m builder.Message) {
+	s.set.OnCycleBuild(c, m)
+	s.flush()
+}
+
 // OnCycleCompiler feeds the information from c and m into the stats set.
 func (s *StatPersister) OnCycleCompiler(c director.Cycle, m compiler.Message) {
 	s.set.OnCycleCompiler(c, m)
+	s.flush()
+}
+
+// OnCycleCopy feeds the information from c and m into the stats set.
+func (s *StatPersister) OnCycleCopy(c director.Cycle, m copier.Message) {
+	s.set.OnCycleCopy(c, m)
 	s.flush()
 }
 
