@@ -104,7 +104,7 @@ func (d *Dash) ensureInstances(n int) error {
 		}
 	}
 
-	d.instances = append(d.instances[:], newinsts...)
+	d.instances = append(d.instances, newinsts...)
 	return d.updateMachineGrid()
 }
 
@@ -172,7 +172,7 @@ func New() (*Dash, error) {
 	c, err := container.New(d.term,
 		container.SplitVertical(
 			container.Left(logs),
-			container.Right(container.ID("machines")),
+			container.Right(container.ID(idInstances)),
 			container.SplitPercent(25),
 		),
 	)

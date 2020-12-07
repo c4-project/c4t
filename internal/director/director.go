@@ -92,6 +92,10 @@ func (d *Director) initInstances() error {
 
 	d.instances = make([]Instance, len(d.machines))
 	i := 0
+
+	// This is a bit weird, but necessary at the moment to solve a race involving instance observers.
+	OnPrepare(PrepareInstancesMessage(len(d.instances)), LowerToPrepare(d.observers)...)
+
 	for midstr, c := range d.machines {
 		if err := d.initInstance(i, midstr, c); err != nil {
 			return err
@@ -192,9 +196,6 @@ func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) err
 
 func (d *Director) prepare() error {
 	obs := LowerToPrepare(d.observers)
-
-	// Instance preparation happens at construction, but it'd be strange to send the message before run-time.
-	OnPrepare(PrepareInstancesMessage(len(d.instances)), obs...)
 
 	OnPrepare(PrepareQuantitiesMessage(d.quantities), obs...)
 

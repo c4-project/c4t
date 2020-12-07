@@ -55,13 +55,12 @@ func (o *Obs) setup(cfg *config.Config, useDash bool) error {
 	if o.statPersister, err = statPersisterFromConfig(cfg); err != nil {
 		return fmt.Errorf("while creating stat persister: %w", err)
 	}
-	if err = o.setupForwarder(); err != nil {
-		return err
+	if useDash {
+		if err = o.setupDash(); err != nil {
+			return err
+		}
 	}
-	if !useDash {
-		return nil
-	}
-	return o.setupDash()
+	return o.setupForwarder()
 }
 
 func (o *Obs) setupDash() error {
