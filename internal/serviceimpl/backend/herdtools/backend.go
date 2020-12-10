@@ -66,25 +66,35 @@ func (h Backend) Lift(ctx context.Context, j backend2.LiftJob, x service.Runner)
 		r.Override(*b.Run)
 	}
 
-	if err := h.liftInner(ctx, j, r, x); err != nil {
-		return recipe.Recipe{}, fmt.Errorf("running %s: %w", r.Cmd, err)
-	}
-	return h.makeRecipe(j)
+	return h.liftInner(ctx, j, r, x)
 }
 
-func (h Backend) liftInner(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) error {
-	var err error
+func (h Backend) liftInner(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) (recipe.Recipe, error) {
 	switch j.Out.Target {
 	case backend2.ToStandalone:
-		err = h.liftStandalone(ctx, j, r, x)
+		return h.liftStandalone(ctx, j, r, x)
 	case backend2.ToExeRecipe:
-		err = h.Impl.LiftExe(ctx, j, r, x)
+		return h.liftExe(ctx, j, r, x)
 	}
 	// We should've filtered out bad targets by this stage.
-	return err
+	return recipe.Recipe{}, nil
 }
 
-func (h Backend) liftStandalone(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) error {
+func (h Backend) liftStandalone(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) (recipe.Recipe, error) {
+	if err := h.runStandalone(ctx, j, r, x); err != nil {
+		return recipe.Recipe{}, err
+	}
+	return h.makeStandaloneRecipe(j.Out)
+}
+
+func (h Backend) liftExe(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) (recipe.Recipe, error) {
+	if err := h.Impl.LiftExe(ctx, j, r, x); err != nil {
+		return recipe.Recipe{}, err
+	}
+	return h.makeExeRecipe(j.Out)
+}
+
+func (h Backend) runStandalone(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) error {
 	f, err := os.Create(filepath.Join(filepath.Clean(j.Out.Dir), standaloneOut))
 	if err != nil {
 		return fmt.Errorf("couldn't create standalone output file: %s", err)
@@ -116,32 +126,25 @@ func (h Backend) checkAndAmendJob(j *backend2.LiftJob) error {
 	return nil
 }
 
-func (h Backend) makeRecipe(j backend2.LiftJob) (recipe.Recipe, error) {
-	fs, err := j.Out.Files()
+func (h Backend) makeStandaloneRecipe(o backend2.LiftOutput) (recipe.Recipe, error) {
+	return recipe.New(o.Dir,
+		recipe.OutNothing,
+		recipe.AddFiles(standaloneOut),
+	)
+}
+
+func (h Backend) makeExeRecipe(o backend2.LiftOutput) (recipe.Recipe, error) {
+	fs, err := o.Files()
 	if err != nil {
 		return recipe.Recipe{}, err
 	}
 
-	return recipe.New(j.Out.Dir,
-		targetRecipeOutput(j.Out.Target),
+	return recipe.New(o.Dir,
+		recipe.OutExe,
 		recipe.AddFiles(fs...),
 		// TODO(@MattWindsor91): delitmus support
-		targetRecipeOption(j.Out.Target),
+		recipe.CompileAllCToExe(),
 	)
-}
-
-func targetRecipeOutput(tgt backend2.Target) recipe.Output {
-	if tgt == backend2.ToExeRecipe {
-		return recipe.OutExe
-	}
-	return recipe.OutNothing
-}
-
-func targetRecipeOption(tgt backend2.Target) recipe.Option {
-	if tgt == backend2.ToExeRecipe {
-		return recipe.CompileAllCToExe()
-	}
-	return recipe.Options()
 }
 
 // BackendImpl describes the functionality that differs between Herdtools-style backends.

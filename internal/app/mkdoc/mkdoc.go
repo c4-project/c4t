@@ -8,6 +8,7 @@ package mkdoc
 
 import (
 	"fmt"
+	"github.com/MattWindsor91/c4t/internal/app/backend"
 	"io"
 	"path/filepath"
 
@@ -64,6 +65,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 
 var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	analyse.App,
+	backend.App,
 	coverage.App,
 	director.App,
 	fuzz.App,

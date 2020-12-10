@@ -149,3 +149,10 @@ func (i ID) Triple() (f, v string, s ID) {
 	}
 	return f, v, s
 }
+
+// Set behaves like TryFromString, but replaces an ID in-place.
+func (i *ID) Set(value string) error {
+	var err error
+	*i, err = TryFromString(value)
+	return err
+}
