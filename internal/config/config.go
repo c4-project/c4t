@@ -8,8 +8,6 @@
 package config
 
 import (
-	"errors"
-
 	"github.com/MattWindsor91/c4t/internal/model/service/backend"
 
 	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
@@ -18,15 +16,16 @@ import (
 
 	"github.com/MattWindsor91/c4t/internal/machine"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-
 	"github.com/MattWindsor91/c4t/internal/remote"
 )
 
 // Config is a top-level tester config struct.
 type Config struct {
-	// Backend contains information about the backend being used to generate recipes.
-	Backend *backend.Spec `toml:"backend,omitempty"`
+	// Backends contains information about the backends available for generating recipes.
+	//
+	// These are given as a list rather than a map because ordering matters: the director will satisfy requests for
+	// backends by trying each backend specification in order.
+	Backends []backend.NamedSpec `toml:"backends,omitempty"`
 
 	// Machines enumerates the machines available for testing.
 	Machines machine.ConfigMap `toml:"machines,omitempty"`
@@ -46,14 +45,5 @@ type Config struct {
 
 // FindBackend uses the configuration to find a backend matching criteria cr.
 func (c *Config) FindBackend(cr backend.Criteria) (*backend.NamedSpec, error) {
-	// TODO(@MattWindsor91): this needs rearranging a bit.
-	if c.Backend == nil {
-		return nil, errors.New("backend nil")
-	}
-	return cr.Find([]backend.NamedSpec{
-		{
-			ID:   id.ID{},
-			Spec: *c.Backend,
-		},
-	})
+	return cr.Find(c.Backends)
 }
