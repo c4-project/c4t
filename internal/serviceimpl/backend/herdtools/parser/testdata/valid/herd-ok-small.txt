@@ -1,0 +1,10 @@
+Test test_0 Required
+States 1
+0:r0=1; x=1;
+Ok
+Witnesses
+Positive: 1 Negative: 0
+Condition forall (x=1 /\ 0:r0=1)
+Observation test_0 Always 1 0
+Time test_0 0.01
+Hash=868514d2e13decaf0175ece4df272e90

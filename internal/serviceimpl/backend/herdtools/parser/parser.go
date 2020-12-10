@@ -60,7 +60,7 @@ func (p *parser) parseLines(r io.Reader) error {
 	lineno := 1
 	for s.Scan() {
 		if err := p.parseLine(s.Text()); err != nil {
-			return fmt.Errorf("line %d: %w", lineno, err)
+			return fmt.Errorf("line %d (%q): %w", lineno, s.Text(), err)
 		}
 		lineno++
 	}
