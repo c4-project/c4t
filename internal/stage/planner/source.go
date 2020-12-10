@@ -7,6 +7,8 @@ package planner
 
 import (
 	"errors"
+
+	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 )
 
 var (
@@ -18,7 +20,7 @@ var (
 // Source contains all of the various sources for a Planner's information.
 type Source struct {
 	// BProbe is the backend finder.
-	BProbe BackendFinder
+	BProbe backend2.Finder
 
 	// CLister is the compiler lister.
 	CLister CompilerLister

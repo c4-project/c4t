@@ -89,7 +89,7 @@ func (p *Planner) makeMachinePlan(ctx context.Context, start time.Time, nm machi
 	pn.Corpus = corp
 
 	p.announce(Message{Kind: KindPlanningBackend, MachineID: nm.ID})
-	pn.Backend, err = p.planBackend(ctx, nm.ID)
+	pn.Backend, err = p.planBackend()
 	if err != nil {
 		return pn, err
 	}

@@ -143,7 +143,7 @@ func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, e
 func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, resCh chan<- builder.Request) Instance {
 	return Instance{
 		Arches:  p.Arches(),
-		Backend: p.Backend,
+		Backend: &p.Backend.Spec,
 		Paths:   l.paths,
 		Driver:  l.driver,
 		Subject: s,

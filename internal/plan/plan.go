@@ -37,7 +37,7 @@ type Plan struct {
 	Machine machine.Named `json:"machine"`
 
 	// Backend represents the backend targeted by this plan.
-	Backend *backend2.Spec `json:"backend,omitempty"`
+	Backend *backend2.NamedSpec `json:"backend,omitempty"`
 
 	// Compilers represents the compilers to be targeted by this plan.
 	// Each compiler's key is a stringified form of its machine CompilerID.

@@ -8,9 +8,7 @@
 package config
 
 import (
-	"context"
 	"errors"
-	"fmt"
 
 	"github.com/MattWindsor91/c4t/internal/model/service/backend"
 
@@ -46,14 +44,16 @@ type Config struct {
 	Paths Pathset `toml:"paths,omitempty"`
 }
 
-// FindBackend uses the configuration to find a backend with style style.
-func (c *Config) FindBackend(_ context.Context, style id.ID, _ ...id.ID) (*backend.Spec, error) {
+// FindBackend uses the configuration to find a backend matching criteria cr.
+func (c *Config) FindBackend(cr backend.Criteria) (*backend.NamedSpec, error) {
 	// TODO(@MattWindsor91): this needs rearranging a bit.
 	if c.Backend == nil {
 		return nil, errors.New("backend nil")
 	}
-	if !c.Backend.Style.Equal(style) {
-		return nil, fmt.Errorf("backend doesn't match given style: got=%q, want=%q", c.Backend.Style.String(), style.String())
-	}
-	return c.Backend, nil
+	return cr.Find([]backend.NamedSpec{
+		{
+			ID:   id.ID{},
+			Spec: *c.Backend,
+		},
+	})
 }

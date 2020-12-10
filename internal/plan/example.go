@@ -34,8 +34,11 @@ func Mock() *Plan {
 		Machine: machine.Named{
 			ID: id.FromString("localhost"),
 		},
-		Backend: &backend2.Spec{
-			Style: id.FromString("litmus"),
+		Backend: &backend2.NamedSpec{
+			ID: id.FromString("litmus"),
+			Spec: backend2.Spec{
+				Style: id.FromString("litmus"),
+			},
 		},
 		Compilers: compiler.MockSet(),
 		Corpus:    corpus.Mock(),

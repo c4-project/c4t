@@ -94,7 +94,6 @@ func (r *Runner) builderConfig(p *plan.Plan) builder.Config {
 }
 
 func checkPlan(p *plan.Plan) error {
-	// TODO(@MattWindsor91): require compile stage
 	if p == nil {
 		return plan.ErrNil
 	}
@@ -106,7 +105,7 @@ func checkPlan(p *plan.Plan) error {
 
 func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, p *plan.Plan) *Instance {
 	return &Instance{
-		backend:    p.Backend,
+		backend:    &p.Backend.Spec,
 		parser:     r.parser,
 		quantities: r.quantities,
 		resCh:      requests,
