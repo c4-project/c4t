@@ -146,7 +146,7 @@ func runAndParse(ctx context.Context, b backend2.Backend, j backend.LiftJob, o *
 		return fmt.Errorf("can't handle recipes with outputs: %s", r.Output)
 	}
 
-	for _, fname := range r.Files {
+	for _, fname := range r.Paths() {
 		if err := parseFile(ctx, b, j, o, fname); err != nil {
 			return err
 		}
