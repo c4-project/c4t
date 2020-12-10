@@ -33,12 +33,12 @@ var (
 	// Resolve is a pre-populated backend resolver.
 	Resolve = Resolver{Backends: map[string]backend.Backend{
 		"delitmus": delitmus.Delitmus{},
-		"herd": herdtools.Backend{
+		"herdtools.herd": herdtools.Backend{
 			Capability: backend.CanLiftLitmus | backend.CanRunStandalone,
 			DefaultRun: service.RunInfo{Cmd: "herd7"},
 			Impl:       herd.Herd{},
 		},
-		"litmus": herdtools.Backend{
+		"herdtools.litmus": herdtools.Backend{
 			Capability: backend.CanRunStandalone | backend.CanLiftLitmus | backend.CanProduceExe,
 			DefaultRun: service.RunInfo{Cmd: "litmus7"},
 			Impl:       litmus.Litmus{},

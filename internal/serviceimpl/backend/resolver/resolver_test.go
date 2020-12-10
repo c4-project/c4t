@@ -21,10 +21,10 @@ func TestResolver_Capabilities(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]backend.Capability{
-		"nope":     0,
-		"delitmus": backend.CanLiftLitmus | backend.CanProduceObj,
-		"herd":     backend.CanLiftLitmus | backend.CanRunStandalone,
-		"litmus":   backend.CanLiftLitmus | backend.CanRunStandalone | backend.CanProduceExe,
+		"nope":             0,
+		"delitmus":         backend.CanLiftLitmus | backend.CanProduceObj,
+		"herdtools.herd":   backend.CanLiftLitmus | backend.CanRunStandalone,
+		"herdtools.litmus": backend.CanLiftLitmus | backend.CanRunStandalone | backend.CanProduceExe,
 	}
 	for name, c := range cases {
 		name, c := name, c
