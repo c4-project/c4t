@@ -1,0 +1,53 @@
+.nh
+.TH c4t\-backend 8
+
+.SH NAME
+.PP
+c4t\-backend \- runs backends standalone
+
+
+.SH SYNOPSIS
+.PP
+c4t\-backend
+
+.PP
+.RS
+
+.nf
+[\-\-arch|\-a]=[value]
+[\-\-backend\-id|\-n]=[value]
+[\-\-backend\-style|\-s]=[value]
+[\-C]=[value]
+[\-x]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-backend [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-arch, \-a\fP="": ID of \fB\fCARCH\fR to target for architecture\-dependent backends
+
+.PP
+\fB\-\-backend\-id, \-n\fP="": filter to backends whose names match \fB\fCGLOB\fR
+
+.PP
+\fB\-\-backend\-style, \-s\fP="": filter to backends whose styles match \fB\fCGLOB\fR
+
+.PP
+\fB\-C\fP="": read tester config from this \fB\fCfile\fR
+
+.PP
+\fB\-x\fP: if true, use 'dune exec' to run OCaml ACT binaries
