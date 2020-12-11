@@ -8,9 +8,11 @@ package mkdoc
 
 import (
 	"fmt"
-	"github.com/MattWindsor91/c4t/internal/app/backend"
 	"io"
 	"path/filepath"
+
+	"github.com/MattWindsor91/c4t/internal/app/backend"
+	"github.com/MattWindsor91/c4t/internal/app/obs"
 
 	"github.com/MattWindsor91/c4t/internal/app/coverage"
 
@@ -73,6 +75,7 @@ var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	invoke.App,
 	lift.App,
 	mach.App,
+	obs.App,
 	perturb.App,
 	plan.App,
 	setc.App,
