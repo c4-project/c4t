@@ -12,6 +12,8 @@ const (
 	ArchFamilyX86 = "x86"
 	// ArchFamilyArm is the tag representing the 32-bit Arm architecture family.
 	ArchFamilyArm = "arm"
+	// ArchFamilyAArch64 is the tag representing the 64-bit Arm architecture family.
+	ArchFamilyAArch64 = "aarch64"
 	// ArchFamilyPPC is the tag representing the PowerPC architecture family.
 	ArchFamilyPPC = "ppc"
 
@@ -53,7 +55,7 @@ var (
 	// ArchX86Skylake is the ACT architecture ID for x86-64 Skylake.
 	ArchX86Skylake = ID{[]string{ArchFamilyX86, ArchVariantX8664, ArchSubVariantX86Skylake}}
 
-	// ArchArm is the ACT architecture ID for ARM (generic, assumed 32-bit).
+	// ArchArm is the ACT architecture ID for ARM (generic, 32-bit).
 	ArchArm = ID{[]string{ArchFamilyArm}}
 	// ArchArm7 is the ACT architecture ID for arm7(-a).
 	ArchArm7 = ID{[]string{ArchFamilyArm, ArchVariantArm7}}
@@ -61,6 +63,9 @@ var (
 	ArchArm8 = ID{[]string{ArchFamilyArm, ArchVariantArm8}}
 	// ArchArmCortexA72 is the ACT architecture ID for arm Cortex-A72.
 	ArchArmCortexA72 = ID{[]string{ArchFamilyArm, ArchVariantArmCortexA72}}
+
+	// ArchAArch64 is the ACT architecture ID for ARM (generic, 64-bit).
+	ArchAArch64 = ID{[]string{ArchFamilyAArch64}}
 
 	// ArchPPC is the ACT architecture ID for PowerPC.
 	ArchPPC = ID{[]string{ArchFamilyPPC}}

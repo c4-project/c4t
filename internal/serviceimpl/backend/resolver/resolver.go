@@ -43,6 +43,12 @@ var (
 			DefaultRun: service.RunInfo{Cmd: "litmus7"},
 			Impl:       litmus.Litmus{},
 		},
+		// TODO(@MattWindsor91): this isn't 'herdtools', we should generalise this framework
+		"rmem": herdtools.Backend{
+			Capability: backend.CanRunStandalone | backend.CanLiftLitmus,
+			DefaultRun: service.RunInfo{Cmd: "rmem"},
+			Impl:       litmus.Litmus{},
+		},
 	}}
 )
 
