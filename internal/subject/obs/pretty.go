@@ -30,10 +30,14 @@ const (
 	//
 	// It requires the funcmap to have a function 'obsIndent' from an integer indent level to an indent string.
 	tmplObsInteresting = `
+{{- if .Flags.IsPartial -}}
+{{ obsIndent 0 }}WARNING: this observation is partial.
+{{ end -}}
+
 {{- if .Flags.IsInteresting -}}
 {{- if .Flags.IsExistential -}}
 
-{{ obsIndent 0}}postcondition witnessed by
+{{ obsIndent 0 }}postcondition witnessed by
 {{- with .Witnesses -}}:
 {{ template "stateset" . }}
 {{- else }} at least one of these states:
@@ -92,7 +96,7 @@ type prettyContext struct {
 }
 
 func (p prettyContext) ShowInteresting() bool {
-	return p.Mode.Interesting && p.Obs.Flags.IsInteresting()
+	return p.Mode.Interesting && (p.Obs.Flags.IsPartial() || p.Obs.Flags.IsInteresting())
 }
 
 // AddObsTemplates adds to t a set of templates useful for pretty-printing observations.

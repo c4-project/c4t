@@ -132,7 +132,7 @@ func ExampleFlag_IsSat() {
 	// e-sat: true
 }
 
-// ExampleFlag_IsUnSat is a testable example for Flag.IsUnsat.
+// ExampleFlag_IsUnsat is a testable example for Flag.IsUnsat.
 func ExampleFlag_IsUnsat() {
 	fmt.Println("empty:", obs.Flag(0).IsUnsat())
 	fmt.Println("unsat:", obs.Unsat.IsUnsat())
@@ -142,4 +142,18 @@ func ExampleFlag_IsUnsat() {
 	// empty: false
 	// unsat: true
 	// e-sat: false
+}
+
+// ExampleFlag_IsPartial is a testable example for Flag.IsPartial.
+func ExampleFlag_IsPartial() {
+	fmt.Println("empty:", obs.Flag(0).IsPartial())
+	fmt.Println("not-partial:", obs.Unsat.IsPartial())
+	fmt.Println("partial:", obs.Partial.IsPartial())
+	fmt.Println("e-partial:", (obs.Partial | obs.Exist).IsPartial())
+
+	// Output:
+	// empty: false
+	// not-partial: false
+	// partial: true
+	// e-partial: true
 }
