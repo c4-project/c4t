@@ -16,30 +16,6 @@ import (
 	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
 )
 
-// ExampleObs_Sat is a testable example for Obs.Sat.
-func ExampleObs_Sat() {
-	fmt.Println("empty:", (&obs.Obs{}).Sat())
-	fmt.Println("unsat:", (&obs.Obs{Flags: obs.Unsat}).Sat())
-	fmt.Println("e-sat:", (&obs.Obs{Flags: obs.Sat | obs.Exist}).Sat())
-
-	// Output:
-	// empty: false
-	// unsat: false
-	// e-sat: true
-}
-
-// ExampleObs_Unsat is a testable example for Obs.Unsat.
-func ExampleObs_Unsat() {
-	fmt.Println("empty:", (&obs.Obs{}).Unsat())
-	fmt.Println("unsat:", (&obs.Obs{Flags: obs.Unsat}).Unsat())
-	fmt.Println("e-sat:", (&obs.Obs{Flags: obs.Sat | obs.Exist}).Unsat())
-
-	// Output:
-	// empty: false
-	// unsat: true
-	// e-sat: false
-}
-
 // Used to avoid compiler-optimising-out of the benchmark below.
 var stat status.Status
 

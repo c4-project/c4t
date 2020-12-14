@@ -23,21 +23,6 @@ type Obs struct {
 	States []State `json:"states" toml:"states,omitempty"`
 }
 
-// Sat gets whether the observation satisfies its validation.
-func (o *Obs) Sat() bool {
-	return o.Flags.Has(Sat)
-}
-
-// Unsat gets whether the observation does not satisfy its validation.
-func (o *Obs) Unsat() bool {
-	return o.Flags.Has(Unsat)
-}
-
-// Existential gets whether the observation's validation was existential rather than universal.
-func (o *Obs) Existential() bool {
-	return o.Flags.Has(Exist)
-}
-
 // AddState adds the state s in accordance with the tag t.
 func (o *Obs) AddState(t Tag, s State) {
 	o.States = append(o.States, s)

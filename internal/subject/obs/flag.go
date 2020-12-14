@@ -89,6 +89,21 @@ func (o Flag) IsInteresting() bool {
 		(o&(Sat|Unsat) == 0) // Flags that are neither sat nor unsat are interesting; they suggest something weird happened.
 }
 
+// IsSat gets whether a flag represents a satisfying observation.
+func (o Flag) IsSat() bool {
+	return o.Has(Sat)
+}
+
+// IsUnsat gets whether the observation does not satisfy its validation.
+func (o Flag) IsUnsat() bool {
+	return o.Has(Unsat)
+}
+
+// IsExistential gets whether the observation's validation was existential rather than universal.
+func (o Flag) IsExistential() bool {
+	return o.Has(Exist)
+}
+
 // UnmarshalText unmarshals an observation flag list from bs by interpreting it as a string list.
 func (o *Flag) UnmarshalText(bs []byte) error {
 	strs := strings.Fields(string(bs))

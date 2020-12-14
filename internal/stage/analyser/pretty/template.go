@@ -8,6 +8,8 @@ package pretty
 import (
 	"text/template"
 
+	"github.com/MattWindsor91/c4t/internal/subject/obs"
+
 	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 
 	"github.com/MattWindsor91/c4t/internal/plan/analysis"
@@ -46,16 +48,6 @@ const (
   - version: {{ .Analysis.Plan.Metadata.Version }}
 {{ template "stages" .Analysis.Plan.Metadata.Stages -}}
 `
-
-	tmplStateset = `{{ range . }}          {{ range $k, $v := . }}  {{ $k }} = {{ $v }}{{- end }}
-{{ end -}}`
-
-	tmplObs = `{{- if .CounterExamples -}}
-{{- if .Witnesses }}        - witnessing observations:
-{{ template "states" .Witnesses }}
-{{ end }}        - counter-example observations:
-{{ template "states" .CounterExamples }}
-{{- end -}}`
 
 	tmplCompilerCounts = `{{ range $status, $count := . }}      - {{ $status }}: {{ $count }} subject(s)
 {{ end -}}`
@@ -126,15 +118,20 @@ const (
 )
 
 func getTemplate() (*template.Template, error) {
-	return iohelp.TemplateFromStrings(tmplRoot, map[string]string{
+	t, err := template.New("root").Parse(tmplRoot)
+	if err != nil {
+		return nil, err
+	}
+	if t, err = obs.AddObsTemplates(t, func(n int) string { return "" }); err != nil {
+		return nil, err
+	}
+	return iohelp.ParseTemplateStrings(t, map[string]string{
 		"timeset":        tmplTime,
-		"states":         tmplStateset,
 		"byStatus":       tmplByStatus,
 		"compilers":      tmplCompilers,
 		"compilerCounts": tmplCompilerCounts,
 		"compilerInfo":   tmplCompilerInfo,
 		"compilerLogs":   tmplCompilerLogs,
-		"obs":            tmplObs,
 		"planInfo":       tmplPlanInfo,
 		"stages":         tmplStages,
 	})

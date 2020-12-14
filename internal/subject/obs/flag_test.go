@@ -119,3 +119,27 @@ func TestFlag_MarshalJSON_roundTrip(t *testing.T) {
 		})
 	}
 }
+
+// ExampleFlag_IsSat is a testable example for Flag.IsSat.
+func ExampleFlag_IsSat() {
+	fmt.Println("empty:", obs.Flag(0).IsSat())
+	fmt.Println("unsat:", obs.Unsat.IsSat())
+	fmt.Println("e-sat:", (obs.Sat | obs.Exist).IsSat())
+
+	// Output:
+	// empty: false
+	// unsat: false
+	// e-sat: true
+}
+
+// ExampleFlag_IsUnSat is a testable example for Flag.IsUnsat.
+func ExampleFlag_IsUnsat() {
+	fmt.Println("empty:", obs.Flag(0).IsUnsat())
+	fmt.Println("unsat:", obs.Unsat.IsUnsat())
+	fmt.Println("e-sat:", (obs.Sat | obs.Exist).IsUnsat())
+
+	// Output:
+	// empty: false
+	// unsat: true
+	// e-sat: false
+}

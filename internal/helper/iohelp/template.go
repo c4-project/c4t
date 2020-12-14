@@ -7,13 +7,9 @@ package iohelp
 
 import "text/template"
 
-// TemplateFromStrings parses a template from a series of named strings.
-// It defines root first, under the name "root".
-func TemplateFromStrings(root string, sub map[string]string) (*template.Template, error) {
-	t, err := template.New("root").Parse(root)
-	if err != nil {
-		return nil, err
-	}
+// ParseTemplateStrings adds to t the template bindings in sub.
+func ParseTemplateStrings(t *template.Template, sub map[string]string) (*template.Template, error) {
+	var err error
 	for n, ts := range sub {
 		if t, err = t.New(n).Parse(ts); err != nil {
 			return nil, err
