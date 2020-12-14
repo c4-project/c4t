@@ -13,6 +13,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/rmem"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
@@ -31,7 +33,7 @@ func TestParse_error(t *testing.T) {
 		err  error
 	}{
 		"empty":                      {impl: herd.Herd{}, err: parser.ErrInputEmpty},
-		"herd-no-states":             {impl: herd.Herd{}, err: parser.ErrBadStateCount},
+		"herd-no-states":             {impl: herd.Herd{}, err: parser.ErrNoStates},
 		"herd-no-states-end":         {impl: herd.Herd{}, err: parser.ErrNoStates},
 		"herd-not-enough-states":     {impl: herd.Herd{}, err: parser.ErrBadStateLine},
 		"herd-not-enough-states-end": {impl: herd.Herd{}, err: parser.ErrNotEnoughStates},
@@ -62,7 +64,8 @@ func TestParse_valid(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]parser.Impl{
-		"herd-ok-small": herd.Herd{},
+		"herd-ok-small":         herd.Herd{},
+		"rmem-ok-unsat-partial": rmem.Rmem{},
 	}
 
 	for name, c := range cases {

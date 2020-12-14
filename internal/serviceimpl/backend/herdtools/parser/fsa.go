@@ -14,12 +14,14 @@ const (
 	// psEmpty states that we haven't read anything yet.
 	psEmpty state = iota
 	// psPreTest states that we haven't hit the actual test yet.
+	// In this state, we feed any line that isn't the 'Test' line to the implementation.
 	psPreTest
 	// psPreamble states that we're in the pre-state matter.
 	psPreamble
 	// psState states that we're in a state block.
+	// We expect the specific number of states defined in the preamble.
 	psState
-	// psSummary states that we're reading the summary tag.
+	// psSummary states that we're expecting to read the summary tag.
 	psSummary
 	// psPostamble states that we're in the post-summary matter.
 	psPostamble

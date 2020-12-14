@@ -1,0 +1,17 @@
+***********************
+*** PARTIAL RESULTS ***
+***********************
+Test test_8_1 Required
+Memory-writes=
+States 4
+35    :>y=0; x=1; t1r0=0; t0r0=0;  via "0;0;0;0;0;0;0"
+35    :>y=0; x=1; t1r0=1; t0r0=0;  via "0;0;0;1;0;0;0"
+2400  *>y=1; x=1; t1r0=0; t0r0=0;  via "0;0;0;0;0;1;1;0;0;0;0;0"
+2204  *>y=1; x=1; t1r0=1; t0r0=0;  via "0;0;0;1;0;1;1;0;0;0;0;0"
+Unhandled exceptions 0
+
+No (forbidden found)
+Condition forall (x=1 /\ y=1 /\ t0r0=0 /\ t1r0=0 \/ x=1 /\ y=1 /\ t0r0=0 /\ t1r0=1 \/ x=1 /\ y=1 /\ t0r0=1 /\ t1r0=0)
+Hash=2887fc5e6d933b7c90d99a3c46476385
+Observation test_8_1 Sometimes 2 2
+Runtime: 54.458944 sec

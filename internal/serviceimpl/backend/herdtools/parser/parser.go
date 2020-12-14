@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package parser contains logic for parsing Herd and Litmus
+// Package parser contains logic for parsing Herd-style observations.
 package parser
 
 import (
@@ -48,8 +48,6 @@ func (p *parser) parse(r io.Reader) error {
 	if err := p.parseLines(r); err != nil {
 		return err
 	}
-
-	p.o.Flags |= p.tt.Flags()
 
 	return p.checkFinalState()
 }
@@ -98,27 +96,46 @@ func (p *parser) processEmpty(fields []string) error {
 
 func (p *parser) processPreTest(fields []string) error {
 	nf := len(fields)
-	if nf == 0 || fields[0] != "Test" {
+	if nf == 0 {
 		return nil
 	}
-
+	if fields[0] != "Test" {
+		return p.processPreTestImplHooks(fields)
+	}
 	if nf != 3 {
 		return fmt.Errorf("%w: expected three fields, got %d", ErrBadTestType, nf)
 	}
+	return p.processTestType(fields)
+}
 
+func (p *parser) processTestType(fields []string) error {
 	var err error
-	p.tt, err = parseTestType(fields[2])
-	if err != nil {
+	if p.tt, err = parseTestType(fields[2]); err != nil {
 		return err
 	}
+	p.o.Flags |= p.tt.Flags()
 
 	return p.afterPreTest()
 }
 
-func (p *parser) processPreamble(fields []string) error {
-	nstates, err := p.impl.ParseStateCount(fields)
+// processPreTestImplHooks handles passing a pre-test line to the implementation to scan for flags.
+func (p *parser) processPreTestImplHooks(fields []string) error {
+	f, err := p.impl.ParsePreTestLine(fields)
 	if err != nil {
 		return err
+	}
+	p.o.Flags |= f
+	return nil
+}
+
+func (p *parser) processPreamble(fields []string) error {
+	nstates, ok, err := p.impl.ParseStateCount(fields)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		// Skip this line.
+		return nil
 	}
 	return p.afterPreamble(nstates)
 }
@@ -135,26 +152,43 @@ func (p *parser) processState(fields []string) error {
 }
 
 func (p *parser) processSummary(fields []string) error {
-	if nf := len(fields); nf != 1 {
-		return fmt.Errorf("%w: expected one field, got %d", ErrBadSummary, nf)
+	// Herd and Litmus themselves always follow the final state line with a summary;
+	// the leniency here, as often is the case, is mainly for rmem and other herd-a-likes.
+	nf := len(fields)
+	// Some summary lines might be 'Flag (description)'.
+	if nf == 0 {
+		return nil
 	}
-	var err error
-	if p.o.Flags, err = parseFlag(fields[0]); err != nil {
-		return err
+	f, ok := parseFlag(fields[0])
+	if !ok {
+		// We want to catch possible mismatches between state count and state lines.
+		return p.errorIfStateLine(fields)
 	}
+	// Making sure not to override any partiality flags already parsed.
+	p.o.Flags |= f
 	return p.afterSummary()
 }
 
+func (p *parser) errorIfStateLine(fields []string) error {
+	if _, err := p.impl.ParseStateLine(p.tt, fields); err != nil {
+		// Intentional
+		return nil
+	}
+	return fmt.Errorf("%w: possible extraneous state line", ErrBadSummary)
+}
+
 // parseFlag parses the summary flag f as an observation flag.
-func parseFlag(f string) (obs.Flag, error) {
+func parseFlag(f string) (flag obs.Flag, ok bool) {
+	ok = true
 	switch f {
 	case "Ok":
-		return obs.Sat, nil
+		flag = obs.Sat
 	case "No":
-		return obs.Unsat, nil
+		flag = obs.Unsat
 	case "Undef":
-		return obs.Undef, nil
+		flag = obs.Undef
 	default:
-		return 0, fmt.Errorf("%w: bad flag %s", ErrBadSummary, f)
+		ok = false
 	}
+	return
 }

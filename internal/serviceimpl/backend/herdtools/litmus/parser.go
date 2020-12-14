@@ -15,17 +15,23 @@ import (
 )
 
 // ParseStateCount parses a Litmus state count.
-func (l Litmus) ParseStateCount(fields []string) (uint64, error) {
-	if nf := len(fields); nf != 3 {
-		return 0, fmt.Errorf("%w: expected three fields, got %d", parser.ErrBadStateCount, nf)
+func (l Litmus) ParseStateCount(fields []string) (k uint64, ok bool, err error) {
+	// We haven't ever seen a test header that isn't followed by 'Histogram',
+	// but this safeguards on the possibility of that ever happening.
+	nf := len(fields)
+	if nf == 0 || fields[0] != "Histogram" {
+		return 0, false, nil
 	}
-	if f := fields[0]; f != "Histogram" {
-		return 0, fmt.Errorf("%w: expected first word to be 'Histogram', got %q", parser.ErrBadStateCount, f)
+	// We are now expecting a state count.
+	if nf != 3 {
+		return 0, false, fmt.Errorf("%w: expected three fields, got %d", parser.ErrBadStateCount, nf)
 	}
 	if f := fields[2]; f != "states)" {
-		return 0, fmt.Errorf("%w: expected last word to be 'states)', got %q", parser.ErrBadStateCount, f)
+		return 0, false, fmt.Errorf("%w: expected last word to be 'states)', got %q", parser.ErrBadStateCount, f)
 	}
-	return strconv.ParseUint(strings.TrimPrefix(fields[1], "("), 10, 64)
+
+	k, err = strconv.ParseUint(strings.TrimPrefix(fields[1], "("), 10, 64)
+	return k, true, err
 }
 
 func (l Litmus) ParseStateLine(tt parser.TestType, fields []string) (*parser.StateLine, error) {
@@ -42,6 +48,11 @@ func (l Litmus) ParseStateLine(tt parser.TestType, fields []string) (*parser.Sta
 	// There may be some space after N, which means we can't rely on the field split.
 	line := parseLine{line: strings.Join(fields, " "), tt: tt}
 	return line.parse()
+}
+
+// ParsePreTestLine does nothing, as pre-Test lines have no meaning in Litmus.
+func (Litmus) ParsePreTestLine([]string) (obs.Flag, error) {
+	return 0, nil
 }
 
 // parseLine is an intermediate struct used for parsing a state line.
