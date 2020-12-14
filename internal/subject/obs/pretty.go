@@ -33,22 +33,27 @@ const (
 {{- if .Flags.IsInteresting -}}
 {{- if .Flags.IsExistential -}}
 
-{{- with .Witnesses }}{{ obsIndent 0}}- existential witnessed by:
+{{ obsIndent 0}}postcondition witnessed by
+{{- with .Witnesses -}}:
 {{ template "stateset" . }}
-{{ end -}}
+{{- else }} at least one of these states:
+{{ template "stateset" .States }}
+{{- end -}}
 
 {{- else -}}
 
-{{- with .CounterExamples }}{{ obsIndent 0 }}- postcondition violated by:
+{{ obsIndent 0 }}postcondition violated by
+{{- with .CounterExamples }}:
 {{ template "stateset" . }}
-{{ end -}}
+{{- else }} at least one of these states:
+{{ template "stateset" .States }}
+{{- end -}}
 
 {{- end -}}
 {{- end -}}
 `
 
-	tmplDnf = `
-forall (
+	tmplDnf = `forall (
 {{- range $i, $s := .States }}
   {{ if eq $i 0 }}  {{ else }}\/{{ end }} (
 {{- range $j, $v := .Vars -}}
@@ -64,8 +69,10 @@ forall (
 `
 
 	tmplPretty = `
-{{- if .Mode.Interesting -}}{{ template "interesting" .Obs }}{{- end -}}
-{{- if and .Mode.Interesting .Mode.Dnf }}{{/* TODO(@MattWindsor91): make this unnecessary */}}
+{{- if .ShowInteresting -}}{{ template "interesting" .Obs }}{{- end -}}
+{{- if and .ShowInteresting .Mode.Dnf }}{{/* TODO(@MattWindsor91): make this unnecessary */}}
+postcondition covering all observed states:
+
 {{ end }}
 {{- if .Mode.Dnf -}}{{ template "dnf" .Obs }}{{ end -}}
 `
@@ -82,6 +89,10 @@ type PrettyMode struct {
 type prettyContext struct {
 	Mode PrettyMode
 	Obs  Obs
+}
+
+func (p prettyContext) ShowInteresting() bool {
+	return p.Mode.Interesting && p.Obs.Flags.IsInteresting()
 }
 
 func AddObsTemplates(t *template.Template, indent func(n int) string) (*template.Template, error) {

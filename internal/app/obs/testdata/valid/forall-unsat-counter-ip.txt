@@ -1,0 +1,9 @@
+postcondition violated by:
+  0:r0 = 2, 1:r0 = 0, x = 1
+
+postcondition covering all observed states:
+
+forall (
+     (0:r0 == 0 /\ 1:r0 == 0 /\ x == 2)
+  \/ (0:r0 == 2 /\ 1:r0 == 0 /\ x == 1)
+)

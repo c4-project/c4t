@@ -28,6 +28,9 @@ const (
 	readme = `
     This program interprets observation JSON files of the form produced by act-backend.`
 
+	flagShowInteresting        = "show-interesting"
+	flagShowInterestingShort   = "i"
+	usageShowInteresting       = "print a summary of any 'interesting' states observed"
 	flagShowPostcondition      = "show-postcondition"
 	flagShowPostconditionShort = "p"
 	usageShowPostcondition     = "print a Litmus (forall, sum of products) postcondition capturing the states observed"
@@ -50,6 +53,11 @@ func App(outw, errw io.Writer) *c.App {
 func flags() []c.Flag {
 	return []c.Flag{
 		&c.BoolFlag{
+			Name:    flagShowInteresting,
+			Aliases: []string{flagShowInterestingShort},
+			Usage:   usageShowInteresting,
+		},
+		&c.BoolFlag{
 			Name:    flagShowPostcondition,
 			Aliases: []string{flagShowPostconditionShort},
 			Usage:   usageShowPostcondition,
@@ -70,7 +78,8 @@ func run(ctx *c.Context, outw io.Writer) error {
 
 func modeFromCli(ctx *c.Context) obs2.PrettyMode {
 	return obs2.PrettyMode{
-		Dnf: ctx.Bool(flagShowPostcondition),
+		Dnf:         ctx.Bool(flagShowPostcondition),
+		Interesting: ctx.Bool(flagShowInteresting),
 	}
 }
 
