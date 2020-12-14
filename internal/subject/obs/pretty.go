@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	// TmplStateset is a template that prints out a set of observation states.
+	// tmplStateset is a template that prints out a set of observation states.
 	//
 	// It requires the funcmap to have a function 'obsIndent' from an integer indent level to an indent string.
-	TmplStateset = `
+	tmplStateset = `
 {{- range $s := . -}}
 {{- obsIndent 1 -}}
 {{- range $j, $v := .Vars -}}
@@ -26,10 +26,10 @@ const (
 {{- end }}{{/* deliberate newline here */}}
 {{ end -}}`
 
-	// TmplObsInteresting is a template that outputs 'interesting' states on an observation.
+	// tmplObsInteresting is a template that outputs 'interesting' states on an observation.
 	//
 	// It requires the funcmap to have a function 'obsIndent' from an integer indent level to an indent string.
-	TmplObsInteresting = `
+	tmplObsInteresting = `
 {{- if .Flags.IsInteresting -}}
 {{- if .Flags.IsExistential -}}
 
@@ -95,11 +95,15 @@ func (p prettyContext) ShowInteresting() bool {
 	return p.Mode.Interesting && p.Obs.Flags.IsInteresting()
 }
 
+// AddObsTemplates adds to t a set of templates useful for pretty-printing observations.
+//
+// indent is a function that should indent observation lines n places, as well as adding any indenting needed to put the
+// lines into context.
 func AddObsTemplates(t *template.Template, indent func(n int) string) (*template.Template, error) {
 	t = t.Funcs(template.FuncMap{"obsIndent": indent})
 	return iohelp.ParseTemplateStrings(t, map[string]string{
-		"stateset":    TmplStateset,
-		"interesting": TmplObsInteresting,
+		"stateset":    tmplStateset,
+		"interesting": tmplObsInteresting,
 	})
 }
 
