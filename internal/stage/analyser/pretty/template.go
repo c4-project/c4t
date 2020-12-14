@@ -8,6 +8,8 @@ package pretty
 import (
 	"text/template"
 
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+
 	"github.com/MattWindsor91/c4t/internal/plan/analysis"
 )
 
@@ -124,11 +126,7 @@ const (
 )
 
 func getTemplate() (*template.Template, error) {
-	t, err := template.New("root").Parse(tmplRoot)
-	if err != nil {
-		return nil, err
-	}
-	for n, ts := range map[string]string{
+	return iohelp.TemplateFromStrings(tmplRoot, map[string]string{
 		"timeset":        tmplTime,
 		"states":         tmplStateset,
 		"byStatus":       tmplByStatus,
@@ -139,11 +137,5 @@ func getTemplate() (*template.Template, error) {
 		"obs":            tmplObs,
 		"planInfo":       tmplPlanInfo,
 		"stages":         tmplStages,
-	} {
-		t, err = t.New(n).Parse(ts)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return t, nil
+	})
 }

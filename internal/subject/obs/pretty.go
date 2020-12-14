@@ -8,13 +8,14 @@ package obs
 import (
 	"io"
 	"text/template"
+
+	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
 )
 
 const (
-	prettyTmpl = `
-{{- if .Mode.Dnf -}}
+	tmplDnf = `
 forall (
-{{- range $i, $s := .Obs.States }}
+{{- range $i, $s := .States }}
   {{ if eq $i 0 }}  {{ else }}\/{{ end }} (
 {{- range $j, $v := .Vars -}}
   {{ if ne $j 0 }} /\ {{ end }}{{ $v }} == {{ index $s $v }}
@@ -26,7 +27,10 @@ forall (
   true
 {{- end }}
 )
-{{ end -}}
+`
+
+	tmplPretty = `
+{{- if .Mode.Dnf -}}{{ template "dnf" .Obs }}{{ end -}}
 `
 )
 
@@ -41,11 +45,17 @@ type prettyContext struct {
 	Obs  Obs
 }
 
+func makeTemplate() (*template.Template, error) {
+	return iohelp.TemplateFromStrings(tmplPretty, map[string]string{
+		"dnf": tmplDnf,
+	})
+}
+
 // Pretty pretty-prints an observation o onto w according to mode m.
 func Pretty(w io.Writer, o Obs, m PrettyMode) error {
-	t, err := template.New("obs").Parse(prettyTmpl)
+	t, err := makeTemplate()
 	if err != nil {
 		return err
 	}
-	return t.Execute(w, prettyContext{Mode: m, Obs: o})
+	return t.ExecuteTemplate(w, "root", prettyContext{Mode: m, Obs: o})
 }
