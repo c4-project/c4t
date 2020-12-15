@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/MattWindsor91/c4t/internal/model/id"
+
 	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
 
 	"github.com/MattWindsor91/c4t/internal/machine"
@@ -91,7 +93,8 @@ func (j *Instance) fuzzCycle(ctx context.Context, cycle int) error {
 	}
 	dur := time.Since(stime)
 
-	l, err := litmus.NewWithStats(ctx, jb.OutLitmus, j.Driver)
+	// TODO(@MattWindsor91): should we double-check the architecture here?
+	l, err := litmus.New(jb.OutLitmus, litmus.WithArch(id.ArchC), litmus.PopulateStatsFrom(ctx, j.Driver))
 	if err != nil {
 		return nil
 	}

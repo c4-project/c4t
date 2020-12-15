@@ -29,12 +29,14 @@ import (
 
 // ExampleSubject_BestLitmus is a testable example for BestLitmus.
 func ExampleSubject_BestLitmus() {
-	s1, _ := subject.New(litmus.New("foo.litmus"))
+	l, _ := litmus.New("foo.litmus")
+
+	s1, _ := subject.New(l)
 	b1, _ := s1.BestLitmus()
 
 	// This subject has a fuzzed litmus file, which takes priority.
-	s2, _ := subject.New(litmus.New("foo.litmus"),
-		subject.WithFuzz(&subject.Fuzz{Litmus: *litmus.New("bar.litmus")}))
+	f, _ := litmus.New("bar.litmus")
+	s2, _ := subject.New(l, subject.WithFuzz(&subject.Fuzz{Litmus: *f}))
 	b2, _ := s2.BestLitmus()
 
 	fmt.Println("s1:", b1.Path)
@@ -249,9 +251,9 @@ func TestSubject_BestLitmus(t *testing.T) {
 	}{
 		"zero":             {s: subject.Subject{}, err: subject.ErrNoBestLitmus, want: ""},
 		"zero-fuzz":        {s: subject.Subject{Fuzz: &subject.Fuzz{}}, err: subject.ErrNoBestLitmus, want: ""},
-		"litmus-only":      {s: *subject.NewOrPanic(litmus.New("foo")), err: nil, want: "foo"},
-		"litmus-only-fuzz": {s: *subject.NewOrPanic(litmus.New("foo"), subject.WithFuzz(&subject.Fuzz{})), err: nil, want: "foo"},
-		"fuzz":             {s: *subject.NewOrPanic(litmus.New("foo"), subject.WithFuzz(&subject.Fuzz{Litmus: *litmus.New("bar")})), err: nil, want: "bar"},
+		"litmus-only":      {s: *subject.NewOrPanic(litmus.NewOrPanic("foo")), err: nil, want: "foo"},
+		"litmus-only-fuzz": {s: *subject.NewOrPanic(litmus.NewOrPanic("foo"), subject.WithFuzz(&subject.Fuzz{})), err: nil, want: "foo"},
+		"fuzz":             {s: *subject.NewOrPanic(litmus.NewOrPanic("foo"), subject.WithFuzz(&subject.Fuzz{Litmus: *litmus.NewOrPanic("bar")})), err: nil, want: "bar"},
 	}
 	for name, c := range cases {
 		c := c

@@ -7,6 +7,7 @@ package coverage_test
 
 import (
 	"context"
+	"io/ioutil"
 	"reflect"
 	"testing"
 
@@ -58,13 +59,17 @@ func TestFuzzRunner_Run(t *testing.T) {
 		Backend:    &backend2.Spec{Style: id.FromString("litmus")},
 		Runner:     dr,
 	}
-	sub := subject.NewOrPanic(litmus.New("foo.litmus"))
+	sub := subject.NewOrPanic(litmus.NewOrPanic("foo.litmus", litmus.WithArch(id.ArchC)))
 	rc := coverage.RunContext{
 		Seed:        4321,
 		BucketDir:   td,
 		NumInBucket: 1,
 		Input:       sub,
 	}
+
+	// TODO(@MattWindsor91): it'd be good if we didn't have to do this, but it's needed for the litmus arch scraper.
+	err := ioutil.WriteFile(rc.OutLitmus(), []byte("C foo1\n"), 0644)
+	require.NoError(t, err, "couldn't write stub litmus output")
 
 	f.On("Fuzz", mock.Anything, mock.MatchedBy(func(f fuzzer.Job) bool {
 		return f.Seed == rc.Seed &&
@@ -82,8 +87,7 @@ func TestFuzzRunner_Run(t *testing.T) {
 	}), dr).Return(recipe.Recipe{}, nil).Once()
 	s.On("DumpStats", mock.Anything, mock.AnythingOfType("*litmus.Statset"), rc.OutLitmus()).Return(nil).Once()
 
-	err := fr.Run(context.Background(), rc)
-	require.NoError(t, err, "mock fuzz run shouldn't error")
+	require.NoError(t, fr.Run(context.Background(), rc), "mock fuzz run shouldn't error")
 
 	f.AssertExpectations(t)
 	l.AssertExpectations(t)

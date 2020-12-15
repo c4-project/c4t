@@ -75,6 +75,9 @@ func checkAndAmendJob(j *backend2.LiftJob) error {
 	if j.In.Source != backend2.LiftLitmus {
 		return fmt.Errorf("%w: source must be litmus", backend.ErrNotSupported)
 	}
+	if !j.In.Litmus.IsC() {
+		return fmt.Errorf("%w: source must be C litmus", backend.ErrNotSupported)
+	}
 	if j.Out.Target == backend2.ToDefault {
 		j.Out.Target = backend2.ToObjRecipe
 	} else if j.Out.Target != backend2.ToObjRecipe {

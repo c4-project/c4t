@@ -41,9 +41,9 @@ func makePlan() *plan.Plan {
 	return &plan.Plan{
 		Metadata: plan.Metadata{Version: plan.CurrentVer},
 		Corpus: map[string]subject.Subject{
-			"foo": *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(1))),
-			"bar": *subject.NewOrPanic(litmus.New("bar.litmus", litmus.WithThreads(2))),
-			"baz": *subject.NewOrPanic(litmus.New("baz.litmus", litmus.WithThreads(3))),
+			"foo": *subject.NewOrPanic(litmus.NewOrPanic("foo.litmus", litmus.WithThreads(1))),
+			"bar": *subject.NewOrPanic(litmus.NewOrPanic("bar.litmus", litmus.WithThreads(2))),
+			"baz": *subject.NewOrPanic(litmus.NewOrPanic("baz.litmus", litmus.WithThreads(3))),
 		},
 	}
 }

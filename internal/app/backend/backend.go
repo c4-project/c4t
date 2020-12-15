@@ -23,8 +23,6 @@ import (
 	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
 	"github.com/MattWindsor91/c4t/internal/subject/obs"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
-
 	"github.com/MattWindsor91/c4t/internal/config"
 	"github.com/MattWindsor91/c4t/internal/model/id"
 	"github.com/MattWindsor91/c4t/internal/model/service/backend"
@@ -103,7 +101,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 		return err
 	}
 
-	in, err := makeInput(ctx.Context, fn, c4f)
+	in, err := backend.InputFromFile(ctx.Context, fn, c4f)
 	if err != nil {
 		return err
 	}
@@ -162,16 +160,6 @@ func parseFile(ctx context.Context, b backend2.Backend, j backend.LiftJob, o *ob
 	perr := b.ParseObs(ctx, j.Backend, f, o)
 	cerr := f.Close()
 	return errhelp.FirstError(perr, cerr)
-}
-
-func makeInput(ctx context.Context, fn string, sd litmus.StatDumper) (backend.LiftInput, error) {
-	// TODO: support non-C litmus
-	// TOOD: support non-litmus
-	l, err := litmus.NewWithStats(ctx, fn, sd)
-	if err != nil {
-		return backend.LiftInput{}, fmt.Errorf("when scanning litmus input file: %w", err)
-	}
-	return backend.LiftLitmusInput(*l), nil
 }
 
 func inputNameFromCli(ctx *c.Context) (string, error) {

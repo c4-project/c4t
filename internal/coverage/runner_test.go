@@ -20,7 +20,7 @@ func ExampleRunContext_ExpandArgs() {
 		Seed:        8675309,
 		BucketDir:   "bucket1,1",
 		NumInBucket: 42,
-		Input:       subject.NewOrPanic(litmus.New("foo/bar.litmus")),
+		Input:       subject.NewOrPanic(litmus.NewOrPanic("foo/bar.litmus")),
 	}
 	args := rc.ExpandArgs("-seed", "${seed}", "-o", "${outputDir}/${i}.c", "${input}")
 	for _, arg := range args {

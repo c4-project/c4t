@@ -12,6 +12,7 @@ const (
 	// LiftUnknown states that the lifting source is unknown.
 	LiftUnknown Source = iota
 	// LiftLitmus states that the backend takes Litmus tests.
+	// The backend may further specify particular architectures it can handle.
 	LiftLitmus
 )
 

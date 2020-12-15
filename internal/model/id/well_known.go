@@ -8,6 +8,9 @@ package id
 // This file contains 'well-known' IDs, the idea being that we can avoid having to construct them at run-time.
 
 const (
+	// ArchFamilyC is the tag representing the C pseudo-architecture family.
+	ArchFamilyC = "c"
+
 	// ArchFamilyX86 is the tag representing the X86 architecture family.
 	ArchFamilyX86 = "x86"
 	// ArchFamilyArm is the tag representing the 32-bit Arm architecture family.
@@ -46,45 +49,42 @@ const (
 )
 
 var (
-	// ArchX86 is the ACT architecture ID for x86 (generic, assumed 32-bit).
+	// ArchC is the architecture ID for C.
+	// (C isn't an architecture, but certain parts of the backend system are easier if we treat it as one.)
+	ArchC = ID{[]string{ArchFamilyC}}
+
+	// ArchX86 is the architecture ID for x86 (generic, assumed 32-bit).
 	ArchX86 = ID{[]string{ArchFamilyX86}}
-	// ArchX8664 is the ACT architecture ID for x86-64.
+	// ArchX8664 is the architecture ID for x86-64.
 	ArchX8664 = ID{[]string{ArchFamilyX86, ArchVariantX8664}}
-	// ArchX86Broadwell is the ACT architecture ID for x86-64 Broadwell.
+	// ArchX86Broadwell is the architecture ID for x86-64 Broadwell.
 	ArchX86Broadwell = ID{[]string{ArchFamilyX86, ArchVariantX8664, ArchSubVariantX86Broadwell}}
-	// ArchX86Skylake is the ACT architecture ID for x86-64 Skylake.
+	// ArchX86Skylake is the architecture ID for x86-64 Skylake.
 	ArchX86Skylake = ID{[]string{ArchFamilyX86, ArchVariantX8664, ArchSubVariantX86Skylake}}
 
-	// ArchArm is the ACT architecture ID for ARM (generic, 32-bit).
+	// ArchArm is the architecture ID for ARM (generic, 32-bit).
 	ArchArm = ID{[]string{ArchFamilyArm}}
-	// ArchArm7 is the ACT architecture ID for arm7(-a).
+	// ArchArm7 is the architecture ID for arm7(-a).
 	ArchArm7 = ID{[]string{ArchFamilyArm, ArchVariantArm7}}
-	// ArchArm8 is the ACT architecture ID for arm8(-a).
+	// ArchArm8 is the architecture ID for arm8(-a).
 	ArchArm8 = ID{[]string{ArchFamilyArm, ArchVariantArm8}}
-	// ArchArmCortexA72 is the ACT architecture ID for arm Cortex-A72.
+	// ArchArmCortexA72 is the architecture ID for arm Cortex-A72.
 	ArchArmCortexA72 = ID{[]string{ArchFamilyArm, ArchVariantArmCortexA72}}
 
-	// ArchAArch64 is the ACT architecture ID for ARM (generic, 64-bit).
+	// ArchAArch64 is the architecture ID for ARM (generic, 64-bit).
 	ArchAArch64 = ID{[]string{ArchFamilyAArch64}}
 
-	// ArchPPC is the ACT architecture ID for PowerPC.
+	// ArchPPC is the architecture ID for PowerPC.
 	ArchPPC = ID{[]string{ArchFamilyPPC}}
-	// ArchPPC64LE is the ACT architecture ID for PowerPC64LE.
+	// ArchPPC64LE is the architecture ID for PowerPC64LE.
 	ArchPPC64LE = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE}}
-	// ArchPPCPOWER7 is the ACT architecture ID for POWER7.
+	// ArchPPCPOWER7 is the architecture ID for POWER7.
 	ArchPPCPOWER7 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER7}}
-	// ArchPPCPOWER8 is the ACT architecture ID for POWER8.
+	// ArchPPCPOWER8 is the architecture ID for POWER8.
 	ArchPPCPOWER8 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER8}}
-	// ArchPPCPOWER9 is the ACT architecture ID for POWER9.
+	// ArchPPCPOWER9 is the architecture ID for POWER9.
 	ArchPPCPOWER9 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER9}}
-	/*
-		KnownArches = []ID{
-			ArchX86, ArchX8664, ArchX86Skylake,
-			ArchArm, ArchArm7, ArchArm8, ArchArmCortexA72,
-			ArchPPC, ArchPPC64LE,
-		}
-	*/
 
-	// CStyleGCC is the ACT compiler style for GCC.
+	// CStyleGCC is the compiler style ID for GCC.
 	CStyleGCC = ID{[]string{"gcc"}}
 )

@@ -105,5 +105,9 @@ func (p *profileMaker) randomInput() (*subject.Subject, error) {
 		return nil, nil
 	}
 	input := p.inputs[p.rng.Intn(nin)]
-	return subject.New(litmus.New(filepath.ToSlash(input)))
+	l, err := litmus.New(filepath.ToSlash(input))
+	if err != nil {
+		return nil, err
+	}
+	return subject.New(l)
 }

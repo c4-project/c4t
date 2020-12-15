@@ -45,8 +45,8 @@ var testSubjects = map[string]func(root string) testCase{
 	"litmus": func(root string) testCase {
 		olit := path.Join(root, normpath.FileOrigLitmus)
 		return testCase{
-			in:  *subject.NewOrPanic(litmus.New(path.Join("foo", "bar", "baz.litmus"))),
-			out: *subject.NewOrPanic(litmus.New(olit)),
+			in:  *subject.NewOrPanic(litmus.NewOrPanic(path.Join("foo", "bar", "baz.litmus"))),
+			out: *subject.NewOrPanic(litmus.NewOrPanic(olit)),
 			maps: normaliser.Map{
 				olit: normaliser.NewEntry(filekind.Litmus, filekind.InOrig, "foo", "bar", "baz.litmus"),
 			},
@@ -57,13 +57,13 @@ var testSubjects = map[string]func(root string) testCase{
 		return testCase{
 			in: subject.Subject{
 				Fuzz: &subject.Fuzz{
-					Litmus: *litmus.New(path.Join("barbaz", "baz.1.litmus")),
+					Litmus: *litmus.NewOrPanic(path.Join("barbaz", "baz.1.litmus")),
 					Trace:  path.Join("barbaz", "baz.1.trace"),
 				},
 			},
 			out: subject.Subject{
 				Fuzz: &subject.Fuzz{
-					Litmus: *litmus.New(r(normpath.FileFuzzLitmus)),
+					Litmus: *litmus.NewOrPanic(r(normpath.FileFuzzLitmus)),
 					Trace:  r(normpath.FileFuzzTrace),
 				},
 			},

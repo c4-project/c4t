@@ -34,7 +34,11 @@ type TestProber struct {
 func (t *TestProber) ProbeSubject(_ context.Context, path string) (*subject.Named, error) {
 	t.probes.Store(path, struct{}{})
 
-	s, err := subject.New(litmus.New(path, litmus.WithThreads(2)))
+	l, err := litmus.New(path, litmus.WithThreads(2))
+	if err != nil {
+		return nil, err
+	}
+	s, err := subject.New(l)
 	if err != nil {
 		return nil, err
 	}

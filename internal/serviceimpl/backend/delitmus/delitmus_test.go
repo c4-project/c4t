@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/MattWindsor91/c4t/internal/model/id"
+
 	"github.com/MattWindsor91/c4t/internal/model/service"
 	"github.com/MattWindsor91/c4t/internal/model/service/mocks"
 
@@ -32,7 +34,9 @@ func TestDelitmus_Lift(t *testing.T) {
 	cr.Test(t)
 
 	j := backend.LiftJob{
-		In:  backend.LiftLitmusInput(*litmus.New(path.Join("in", "foo.litmus"))),
+		In: backend.LiftLitmusInput(
+			litmus.NewOrPanic(path.Join("in", "foo.litmus"), litmus.WithArch(id.ArchC)),
+		),
 		Out: backend.LiftOutput{Dir: "out", Target: backend.ToDefault},
 	}
 

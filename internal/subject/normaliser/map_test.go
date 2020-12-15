@@ -25,14 +25,10 @@ import (
 // ExampleMap_RenamesMatching is a runnable example for RenamesMatching.
 func ExampleMap_RenamesMatching() {
 	n := normaliser.New("root")
-	s, _ := subject.New(
-		litmus.New(path.Join("foo", "bar", "baz.litmus")),
-		subject.WithFuzz(
-			&subject.Fuzz{
-				Litmus: *litmus.New(path.Join("barbaz", "baz.1.litmus")),
-				Trace:  path.Join("barbaz", "baz.1.trace"),
-			},
-		),
+	l, _ := litmus.New(path.Join("foo", "bar", "baz.litmus"))
+	f, _ := litmus.New(path.Join("barbaz", "baz.1.litmus"))
+	s, _ := subject.New(l,
+		subject.WithFuzz(&subject.Fuzz{Litmus: *f, Trace: path.Join("barbaz", "baz.1.trace")}),
 		subject.WithCompile(id.FromString("clang"),
 			compilation.CompileResult{
 				Result: compilation.Result{Status: status.Ok},

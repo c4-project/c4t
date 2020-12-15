@@ -17,20 +17,25 @@ import (
 	"github.com/MattWindsor91/c4t/internal/subject"
 )
 
-// BinActC is the name of the ACT C services binary.
+// BinActC is the name of the c4f C services binary.
 const BinActC = "act-c"
 
 // ProbeSubject probes the litmus test at path, returning a named subject record.
 func (a *Runner) ProbeSubject(ctx context.Context, path string) (*subject.Named, error) {
 	// TODO(@MattWindsor91): stat dumping and subject probing should likely be two separate things.
+	// Perform arch check first.
+	l, err := litmus.New(path, litmus.ReadArchFromFile(), litmus.PopulateStatsFrom(ctx, a))
+	if err != nil {
+		return nil, fmt.Errorf("stats read on %s failed: %w", path, err)
+	}
+
+	if !l.IsC() {
+		return nil, fmt.Errorf("%w: c4f only supports C litmus tests", litmus.ErrBadArch)
+	}
+
 	var h Header
 	if err := a.DumpHeader(ctx, &h, path); err != nil {
 		return nil, fmt.Errorf("header read on %s failed: %w", path, err)
-	}
-
-	l, err := litmus.NewWithStats(ctx, path, a)
-	if err != nil {
-		return nil, fmt.Errorf("stats read on %s failed: %w", path, err)
 	}
 	s, err := subject.New(l)
 	if err != nil {

@@ -26,7 +26,7 @@ import (
 // - a subject with a flagged observation.
 func Mock() Corpus {
 	return Corpus{
-		"foo":    *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(1))),
+		"foo":    *subject.NewOrPanic(litmus.NewOrPanic("foo.litmus", litmus.WithThreads(1))),
 		"bar":    *MockFailedCompile("bar"),
 		"baz":    *MockFlaggedRun("baz"),
 		"barbaz": *MockTimeoutRun("barbaz"),
@@ -36,7 +36,7 @@ func Mock() Corpus {
 // MockFailedCompile expands to a realistic looking subject that contains a failed compilation.
 func MockFailedCompile(name string) *subject.Subject {
 	return subject.NewOrPanic(
-		litmus.New(name+".litmus", litmus.WithThreads(8)),
+		litmus.NewOrPanic(name+".litmus", litmus.WithThreads(8)),
 		subject.WithRecipe(id.ArchArm,
 			recipe.Recipe{
 				Dir:   "arm",
@@ -64,7 +64,7 @@ func MockFailedCompile(name string) *subject.Subject {
 // MockFlaggedRun expands to a realistic looking subject that contains some flagged runs.
 func MockFlaggedRun(name string) *subject.Subject {
 	return subject.NewOrPanic(
-		litmus.New(name+".litmus", litmus.WithThreads(2)),
+		litmus.NewOrPanic(name+".litmus", litmus.WithThreads(2)),
 		subject.WithRecipe(id.ArchX8664, MockRecipe("x86")),
 		subject.WithCompile(id.FromString("gcc"), MockSuccessfulCompile("gcc", name)),
 		subject.WithCompile(id.FromString("icc"), MockSuccessfulCompile("icc", name)),
@@ -76,7 +76,7 @@ func MockFlaggedRun(name string) *subject.Subject {
 // MockTimeoutRun expands to a realistic looking subject that contains some timed-out runs.
 func MockTimeoutRun(name string) *subject.Subject {
 	return subject.NewOrPanic(
-		litmus.New("baz.litmus", litmus.WithThreads(4)),
+		litmus.NewOrPanic("baz.litmus", litmus.WithThreads(4)),
 		subject.WithRecipe(id.ArchPPC, MockRecipe("ppc")),
 		subject.WithCompile(id.FromString("msvc"), MockSuccessfulCompile("msvc", name)),
 		subject.WithRun(id.FromString("msvc"), compilation.RunResult{Result: compilation.Result{Status: status.RunTimeout}}),

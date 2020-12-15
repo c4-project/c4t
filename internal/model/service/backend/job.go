@@ -6,9 +6,13 @@
 package backend
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
+
+	"github.com/MattWindsor91/c4t/internal/model/filekind"
 
 	"github.com/MattWindsor91/c4t/internal/model/recipe"
 
@@ -27,6 +31,8 @@ var (
 	ErrBadSource = errors.New("bad input source")
 	// ErrBadTarget occurs when the output of a LiftJob has a target set to an unknown value.
 	ErrBadTarget = errors.New("bad output target")
+	// ErrUnsupportedFile occurs when we try to determine a LiftInput from a file that can't supply one.
+	ErrUnsupportedFile = errors.New("file format not supported as a backend input source")
 	// ErrInLitmusBlank occurs when the input file of a lifter job is checked and found to be blank.
 	ErrInLitmusBlank = errors.New("input litmus file path blank")
 	// ErrOutDirBlank occurs when the output directory of a lifter job is checked and found to be blank.
@@ -62,12 +68,38 @@ type LiftInput struct {
 	Source Source
 
 	// Litmus gives information about an input Litmus test, if any.
-	Litmus litmus.Litmus
+	Litmus *litmus.Litmus
 }
 
-// LiftLitmusInput is shorthand for creating a LiftLitmus-style LiftInput over l.
-func LiftLitmusInput(l litmus.Litmus) LiftInput {
-	return LiftInput{Source: LiftLitmus, Litmus: l}
+// InputFromFile tries to divine what sort of lifting input fpath contains.
+// It returns, on success, a determined input.
+func InputFromFile(ctx context.Context, fpath string, s litmus.StatDumper) (in LiftInput, err error) {
+	fk := filekind.GuessFromFile(fpath)
+
+	switch fk {
+	case filekind.Litmus:
+		return inputFromLitmusFile(ctx, fpath, s)
+	default:
+		return in,
+			fmt.Errorf("%w: unsupported file kind: %s", ErrUnsupportedFile, fk)
+	}
+}
+
+func inputFromLitmusFile(ctx context.Context, fpath string, s litmus.StatDumper) (LiftInput, error) {
+	l, err := litmus.New(
+		filepath.ToSlash(fpath),
+		litmus.ReadArchFromFile(),
+		litmus.PopulateStatsFrom(ctx, s),
+	)
+	return LiftLitmusInput(l), err
+}
+
+// LiftLitmusInput is shorthand for creating a LiftInput over the litmus test l.
+func LiftLitmusInput(l *litmus.Litmus) LiftInput {
+	return LiftInput{
+		Source: LiftLitmus,
+		Litmus: l,
+	}
 }
 
 // Check makes sure that this lift input has a valid source and the data required for it.
@@ -83,6 +115,9 @@ func (l LiftInput) Check() error {
 func (l LiftInput) checkLitmus() error {
 	if !l.Litmus.HasPath() {
 		return ErrInLitmusBlank
+	}
+	if l.Litmus.Arch.IsEmpty() {
+		return litmus.ErrEmptyArch
 	}
 	return nil
 }

@@ -35,15 +35,15 @@ func TestBuilder_Run_Adds(t *testing.T) {
 	adds := []subject.Named{
 		{
 			Name:    "foo",
-			Subject: *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(2))),
+			Subject: *subject.NewOrPanic(litmus.NewOrPanic("foo.litmus", litmus.WithThreads(2))),
 		},
 		{
 			Name:    "bar",
-			Subject: *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(1))),
+			Subject: *subject.NewOrPanic(litmus.NewOrPanic("foo.litmus", litmus.WithThreads(1))),
 		},
 		{
 			Name:    "baz",
-			Subject: *subject.NewOrPanic(litmus.New("foo.litmus", litmus.WithThreads(4))),
+			Subject: *subject.NewOrPanic(litmus.NewOrPanic("foo.litmus", litmus.WithThreads(4))),
 		},
 	}
 
@@ -78,7 +78,7 @@ func TestBuilder_Run_Adds(t *testing.T) {
 				request != nil &&
 				request.Name == c.Name &&
 				request.Add != nil &&
-				request.Add.Source == c.Source
+				request.Add.Source.Path == c.Source.Path
 		}).Return().Once()
 	}
 
@@ -144,7 +144,7 @@ func TestBuilderReq_SendTo(t *testing.T) {
 
 func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan builder.Request) error {
 	want := builder.AddRequest(
-		subject.NewOrPanic(litmus.New("blah", litmus.WithThreads(5))).AddName("foo"))
+		subject.NewOrPanic(litmus.NewOrPanic("blah", litmus.WithThreads(5))).AddName("foo"))
 
 	eg.Go(func() error {
 		select {

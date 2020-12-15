@@ -115,20 +115,20 @@ func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, lpath string) erro
 	if err := yos.MakeDir(rc.LiftOutDir()); err != nil {
 		return fmt.Errorf("making dir for lift output: %w", err)
 	}
-	litmus, err := litmus2.NewWithStats(ctx, lpath, f.StatDumper)
+	in, err := backend2.InputFromFile(ctx, lpath, f.StatDumper)
 	if err != nil {
-		return fmt.Errorf("getting stats of generated litmus file %q: %w", lpath, err)
+		return fmt.Errorf("reading in input file %q: %w", lpath, err)
 	}
 	// TODO(@MattWindsor91): do something with the recipe
-	_, err = f.Lifter.Lift(ctx, f.liftJob(litmus, rc), f.Runner)
+	_, err = f.Lifter.Lift(ctx, f.liftJob(in, rc), f.Runner)
 	return err
 }
 
-func (f *FuzzRunner) liftJob(litmus *litmus2.Litmus, rc RunContext) backend2.LiftJob {
+func (f *FuzzRunner) liftJob(in backend2.LiftInput, rc RunContext) backend2.LiftJob {
 	return backend2.LiftJob{
 		Backend: f.Backend,
 		Arch:    f.Arch,
-		In:      backend2.LiftLitmusInput(*litmus),
+		In:      in,
 		Out: backend2.LiftOutput{
 			Dir:    rc.LiftOutDir(),
 			Target: backend2.ToDefault,

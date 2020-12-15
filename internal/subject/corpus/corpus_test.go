@@ -22,11 +22,11 @@ import (
 // ExampleCorpus_Add is a runnable example for Add.
 func ExampleCorpus_Add() {
 	c := make(corpus.Corpus)
-	_ = c.Add(*subject.NewOrPanic(litmus.New("bar/baz.litmus")).AddName("foo"))
+	_ = c.Add(*subject.NewOrPanic(litmus.NewOrPanic("bar/baz.litmus")).AddName("foo"))
 	fmt.Println(c["foo"].Source.Path)
 
 	// We can't add duplicates to a corpus.
-	err := c.Add(*subject.NewOrPanic(litmus.New("bar/baz2.litmus")).AddName("foo"))
+	err := c.Add(*subject.NewOrPanic(litmus.NewOrPanic("bar/baz2.litmus")).AddName("foo"))
 	fmt.Println(err)
 
 	// Output:

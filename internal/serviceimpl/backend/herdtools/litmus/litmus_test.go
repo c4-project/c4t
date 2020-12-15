@@ -25,17 +25,11 @@ func ExampleInstance_Run() {
 	i := litmus.Instance{
 		Job: backend.LiftJob{
 			Arch: id.ArchX8664,
-			In:   backend.LiftLitmusInput(*mdl.New("in.litmus")),
-			Out: backend.LiftOutput{
-				Dir:    "out",
-				Target: backend.ToExeRecipe,
-			},
+			In:   backend.LiftLitmusInput(mdl.NewOrPanic("in.litmus", mdl.WithArch(id.ArchC))),
+			Out:  backend.LiftOutput{Dir: "out", Target: backend.ToExeRecipe},
 		},
-		RunInfo: service.RunInfo{
-			Cmd:  "litmus7",
-			Args: []string{"-v"},
-		},
-		Runner: srvrun.DryRunner{Writer: os.Stdout},
+		RunInfo: service.RunInfo{Cmd: "litmus7", Args: []string{"-v"}},
+		Runner:  srvrun.DryRunner{Writer: os.Stdout},
 	}
 
 	// We don't ask for a fixset, so we won't have any patching.

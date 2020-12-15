@@ -12,6 +12,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/MattWindsor91/c4t/internal/model/id"
+
 	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 
 	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
@@ -33,6 +35,9 @@ const standaloneOut = "output.txt"
 type Backend struct {
 	// Capability contains the capability flags for this backend.
 	Capability backend.Capability
+
+	// LitmusArches describes the architectures of Litmus test this backend can deal with.
+	LitmusArches []id.ID
 
 	// DefaultRun is the default run information for the particular backend.
 	DefaultRun service.RunInfo
@@ -108,13 +113,36 @@ func (h Backend) checkAndAmendJob(j *backend2.LiftJob) error {
 	if err := j.Check(); err != nil {
 		return err
 	}
-	if j.In.Source != backend2.LiftLitmus {
+	if err := h.checkAndAmendInput(&j.In); err != nil {
+		return err
+	}
+	return h.checkAndAmendOutput(&j.Out)
+}
+
+func (h Backend) checkAndAmendInput(i *backend2.LiftInput) error {
+	if i.Source != backend2.LiftLitmus {
 		return fmt.Errorf("%w: can only lift litmus files", backend.ErrNotSupported)
 	}
-	if j.Out.Target == backend2.ToDefault {
-		j.Out.Target = backend2.ToStandalone
+	if !h.supportsLitmusArch(i.Litmus.Arch) {
+		return fmt.Errorf("%w: architecture %q not supported", backend.ErrNotSupported, i.Litmus.Arch)
 	}
-	switch j.Out.Target {
+	return nil
+}
+
+func (h Backend) supportsLitmusArch(a id.ID) bool {
+	for _, a2 := range h.LitmusArches {
+		if a.HasPrefix(a2) {
+			return true
+		}
+	}
+	return false
+}
+
+func (h Backend) checkAndAmendOutput(o *backend2.LiftOutput) error {
+	switch o.Target {
+	case backend2.ToDefault:
+		o.Target = backend2.ToStandalone
+		fallthrough
 	case backend2.ToStandalone:
 	case backend2.ToExeRecipe:
 		if (h.Capability & backend.CanProduceExe) == 0 {

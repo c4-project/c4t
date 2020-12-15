@@ -53,7 +53,7 @@ func TestReplayer_Run_roundTripBuilder(t *testing.T) {
 		NReqs: 3,
 	}
 
-	add := builder.AddRequest(subject.NewOrPanic(litmus.New("foo.litmus")).AddName("foo"))
+	add := builder.AddRequest(subject.NewOrPanic(litmus.NewOrPanic("foo.litmus")).AddName("foo"))
 	r, err := recipe.New(
 		"recipe",
 		recipe.OutNothing,

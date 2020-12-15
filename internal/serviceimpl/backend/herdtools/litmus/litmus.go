@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/c4t/internal/model/litmus"
+
 	"github.com/MattWindsor91/c4t/internal/model/service/backend"
 
 	"github.com/MattWindsor91/c4t/internal/model/service"
@@ -26,7 +28,7 @@ func (l Litmus) LiftExe(ctx context.Context, j backend.LiftJob, r service.RunInf
 }
 
 func litmusCommonArgs(j backend.LiftJob) ([]string, error) {
-	carch, err := lookupArch(j.Arch)
+	carch, err := litmus.ArchToLitmus(j.Arch)
 	if err != nil {
 		return nil, fmt.Errorf("when looking up -carch: %w", err)
 	}

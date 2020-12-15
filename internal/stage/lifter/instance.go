@@ -86,7 +86,7 @@ func (j *Instance) liftArch(ctx context.Context, arch id.ID) error {
 	spec := backend2.LiftJob{
 		Backend: j.Backend,
 		Arch:    arch,
-		In:      backend2.LiftLitmusInput(*lit),
+		In:      backend2.LiftLitmusInput(lit),
 		Out: backend2.LiftOutput{
 			Dir:    dir,
 			Target: backend2.ToExeRecipe,
