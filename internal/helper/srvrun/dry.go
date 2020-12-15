@@ -8,6 +8,7 @@ package srvrun
 import (
 	"context"
 	"io"
+	"time"
 
 	"github.com/MattWindsor91/c4t/internal/model/service"
 )
@@ -24,6 +25,11 @@ func (d DryRunner) WithStdout(_ io.Writer) service.Runner {
 
 // WithStderr just returns the same runner, ignoring the override.
 func (d DryRunner) WithStderr(_ io.Writer) service.Runner {
+	return d
+}
+
+// WithGrace just returns the same runner, ignoring the override.
+func (d DryRunner) WithGrace(_ time.Duration) service.Runner {
 	return d
 }
 

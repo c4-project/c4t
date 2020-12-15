@@ -13,6 +13,9 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"time"
+
+	"github.com/MattWindsor91/c4t/internal/act"
 
 	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
 
@@ -60,6 +63,12 @@ const (
 	flagDryRun                = "dry-run"
 	flagDryRunShort           = "d"
 	usageDryRun               = "if true, print any external commands run instead of running them"
+	flagTimeout               = "timeout"
+	flagTimeoutShort          = "t"
+	usageTimeout              = "`DURATION` to wait before trying to stop the backend"
+	flagGrace                 = "grace"
+	flagGraceShort            = "g"
+	usageGrace                = "`DURATION` to wait between sigterm and sigkill when timing out"
 )
 
 // App is the c4-backend app.
@@ -83,6 +92,8 @@ func flags() []c.Flag {
 		&c.GenericFlag{Name: flagBackendIDGlob, Aliases: []string{flagBackendIDGlobShort}, Usage: usageBackendIDGlob, Value: &id.ID{}},
 		&c.GenericFlag{Name: flagBackendStyleGlob, Aliases: []string{flagBackendStyleGlobShort}, Usage: usageBackendStyleGlob, Value: &id.ID{}},
 		&c.BoolFlag{Name: flagDryRun, Aliases: []string{flagDryRunShort}, Usage: usageDryRun},
+		&c.DurationFlag{Name: flagTimeout, Aliases: []string{flagTimeoutShort}, Usage: usageTimeout},
+		&c.DurationFlag{Name: flagGrace, Aliases: []string{flagGraceShort}, Usage: usageGrace},
 	}
 	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
 }
@@ -93,37 +104,44 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 		return fmt.Errorf("while getting config: %w", err)
 	}
 	c4f := stdflag.ActRunnerFromCli(ctx, errw)
-	cri := criteriaFromCli(ctx)
-	fn, err := inputNameFromCli(ctx)
-	if err != nil {
-		return err
-	}
-	arch := idFromCli(ctx, flagArchID)
-
-	bspec, b, err := getBackend(cfg, cri)
-	if err != nil {
-		return err
-	}
-
-	in, err := backend.InputFromFile(ctx.Context, fn, c4f)
-	if err != nil {
-		return err
-	}
 
 	td, err := ioutil.TempDir("", "c4t-backend")
 	if err != nil {
 		return err
 	}
+
+	fn, err := inputNameFromCli(ctx)
+	if err != nil {
+		return err
+	}
+
+	bspec, b, err := getBackend(cfg, criteriaFromCli(ctx))
+	if err != nil {
+		return err
+	}
+
+	j, err := jobFromCli(ctx, fn, c4f, bspec, td)
+	if err != nil {
+		return err
+	}
+	perr := runParseAndDump(ctx, outw, b, j, makeRunner(ctx, errw))
+	derr := os.RemoveAll(td)
+	return errhelp.FirstError(perr, derr)
+}
+
+func jobFromCli(ctx *c.Context, fn string, c4f *act.Runner, bspec *backend.Spec, td string) (backend.LiftJob, error) {
+	in, err := backend.InputFromFile(ctx.Context, fn, c4f)
+	if err != nil {
+		return backend.LiftJob{}, err
+	}
+
 	j := backend.LiftJob{
 		Backend: bspec,
-		Arch:    arch,
+		Arch:    idFromCli(ctx, flagArchID),
 		In:      in,
 		Out:     backend.LiftOutput{Dir: td, Target: backend.ToStandalone},
 	}
-	xr := makeRunner(ctx, errw)
-	perr := runParseAndDump(ctx, outw, b, j, xr)
-	derr := os.RemoveAll(td)
-	return errhelp.FirstError(perr, derr)
+	return j, nil
 }
 
 func makeRunner(ctx *c.Context, errw io.Writer) service.Runner {
@@ -131,12 +149,15 @@ func makeRunner(ctx *c.Context, errw io.Writer) service.Runner {
 	if ctx.Bool(flagDryRun) {
 		return srvrun.DryRunner{Writer: errw}
 	}
-	return srvrun.NewExecRunner(srvrun.StderrTo(errw))
+	// TODO(@MattWindsor91): use grace in the rest of c4t
+	return srvrun.NewExecRunner(srvrun.StderrTo(errw), srvrun.WithGrace(ctx.Duration(flagGrace)))
 }
 
 func runParseAndDump(ctx *c.Context, outw io.Writer, b backend2.Backend, j backend.LiftJob, xr service.Runner) error {
 	var o obs.Obs
-	if err := runAndParse(ctx.Context, b, j, &o, xr); err != nil {
+
+	to := ctx.Duration(flagTimeout)
+	if err := runAndParse(ctx.Context, to, b, j, &o, xr); err != nil {
 		return err
 	}
 
@@ -145,9 +166,10 @@ func runParseAndDump(ctx *c.Context, outw io.Writer, b backend2.Backend, j backe
 	return e.Encode(o)
 }
 
-func runAndParse(ctx context.Context, b backend2.Backend, j backend.LiftJob, o *obs.Obs, xr service.Runner) error {
-	// TODO(@MattWindsor91): deduplicate with runAndParseBin?.
-	r, err := b.Lift(ctx, j, xr)
+func runAndParse(ctx context.Context, to time.Duration, b backend2.Backend, j backend.LiftJob, o *obs.Obs, xr service.Runner) error {
+	// TODO(@MattWindsor91): clean this function up, eg making a separate struct...
+
+	r, err := liftWithTimeout(ctx, to, b, j, xr)
 	if err != nil {
 		return err
 	}
@@ -162,6 +184,17 @@ func runAndParse(ctx context.Context, b backend2.Backend, j backend.LiftJob, o *
 		}
 	}
 	return nil
+}
+
+func liftWithTimeout(ctx context.Context, to time.Duration, b backend2.Backend, j backend.LiftJob, xr service.Runner) (recipe.Recipe, error) {
+	cf := func() {}
+	if to != 0 {
+		ctx, cf = context.WithTimeout(ctx, to)
+	}
+	defer cf()
+
+	// TODO(@MattWindsor91): deduplicate with runAndParseBin?.
+	return b.Lift(ctx, j, xr)
 }
 
 func parseFile(ctx context.Context, b backend2.Backend, j backend.LiftJob, o *obs.Obs, fname string) error {

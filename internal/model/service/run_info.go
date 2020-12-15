@@ -9,6 +9,7 @@ import (
 	"context"
 	"io"
 	"strings"
+	"time"
 )
 
 // Runner is the interface of things that can run, or pretend to run, services.
@@ -18,6 +19,9 @@ type Runner interface {
 
 	// WithStderr should return a new runner with the standard error overridden to w.
 	WithStderr(w io.Writer) Runner
+
+	// WithGrace should return a new runner with the timeout grace period set to d.
+	WithGrace(d time.Duration) Runner
 
 	// Run runs r using context ctx.
 	Run(ctx context.Context, r RunInfo) error
