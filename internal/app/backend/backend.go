@@ -57,6 +57,9 @@ const (
 	flagArchID                = "arch"
 	flagArchIDShort           = "a"
 	usageArchID               = "ID of `ARCH` to target for architecture-dependent backends"
+	flagDryRun                = "dry-run"
+	flagDryRunShort           = "d"
+	usageDryRun               = "if true, print any external commands run instead of running them"
 )
 
 // App is the c4-backend app.
@@ -79,6 +82,7 @@ func flags() []c.Flag {
 		&c.GenericFlag{Name: flagArchID, Aliases: []string{flagArchIDShort}, Usage: usageArchID, Value: &id.ID{}},
 		&c.GenericFlag{Name: flagBackendIDGlob, Aliases: []string{flagBackendIDGlobShort}, Usage: usageBackendIDGlob, Value: &id.ID{}},
 		&c.GenericFlag{Name: flagBackendStyleGlob, Aliases: []string{flagBackendStyleGlobShort}, Usage: usageBackendStyleGlob, Value: &id.ID{}},
+		&c.BoolFlag{Name: flagDryRun, Aliases: []string{flagDryRunShort}, Usage: usageDryRun},
 	}
 	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
 }
@@ -116,13 +120,21 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 		In:      in,
 		Out:     backend.LiftOutput{Dir: td, Target: backend.ToStandalone},
 	}
-	xr := srvrun.NewExecRunner(srvrun.StderrTo(errw))
+	xr := makeRunner(ctx, errw)
 	perr := runParseAndDump(ctx, outw, b, j, xr)
 	derr := os.RemoveAll(td)
 	return errhelp.FirstError(perr, derr)
 }
 
-func runParseAndDump(ctx *c.Context, outw io.Writer, b backend2.Backend, j backend.LiftJob, xr *srvrun.ExecRunner) error {
+func makeRunner(ctx *c.Context, errw io.Writer) service.Runner {
+	// TODO(@MattWindsor91): the backend logic isn't very resilient against having external commands not run.
+	if ctx.Bool(flagDryRun) {
+		return srvrun.DryRunner{Writer: errw}
+	}
+	return srvrun.NewExecRunner(srvrun.StderrTo(errw))
+}
+
+func runParseAndDump(ctx *c.Context, outw io.Writer, b backend2.Backend, j backend.LiftJob, xr service.Runner) error {
 	var o obs.Obs
 	if err := runAndParse(ctx.Context, b, j, &o, xr); err != nil {
 		return err
