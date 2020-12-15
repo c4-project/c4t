@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package herdtools_test
+package herdstyle_test
 
 import (
 	"bytes"
@@ -14,12 +14,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/herd"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
 
 	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle"
 	"github.com/MattWindsor91/c4t/internal/subject/obs"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,7 +28,7 @@ import (
 func TestBackend_ParseObs(t *testing.T) {
 	t.Parallel()
 
-	impls := map[string]herdtools.BackendImpl{
+	impls := map[string]herdstyle.BackendImpl{
 		"herd":   herd.Herd{},
 		"litmus": litmus.Litmus{},
 	}
@@ -38,7 +38,7 @@ func TestBackend_ParseObs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			b := herdtools.Backend{Impl: i}
+			b := herdstyle.Backend{Impl: i}
 
 			indir := filepath.Join("testdata", name, "in")
 			fs, err := ioutil.ReadDir(indir)

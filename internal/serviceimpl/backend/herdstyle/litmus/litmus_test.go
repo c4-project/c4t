@@ -13,7 +13,7 @@ import (
 
 	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 
 	"github.com/MattWindsor91/c4t/internal/model/id"
 	mdl "github.com/MattWindsor91/c4t/internal/model/litmus"

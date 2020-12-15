@@ -3,7 +3,19 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package herdtools
+// Package herdstyle contains backends that act in a similar way to the Herd memory simulator.
+//
+// Herd is a de facto standard in the area of concurrency exploration, so various tools have the same flow, which
+// has the following characteristics:
+//
+// - Is an external, third-party tool running on the local machine, largely communicated with by command-line flags;
+//
+// - Accepts Litmus tests (different tools accept different architectures, possibly including C);
+//
+// - Outputs observations to stdout in a loosely standard format (handled by the parser package);
+//
+// - Generally run standalone, though some tools may support lifting to executables.
+package herdstyle
 
 import (
 	"context"
@@ -20,7 +32,7 @@ import (
 
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/parser"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
 
 	"github.com/MattWindsor91/c4t/internal/model/recipe"
 
@@ -31,7 +43,7 @@ import (
 // standaloneOut is the name of the file in the output directory to which we should write standalone output.
 const standaloneOut = "output.txt"
 
-// Backend represents herdtools-style backends such as Herd and Litmus.
+// Backend represents herd-style backends such as Herd and Litmus.
 type Backend struct {
 	// Capability contains the capability flags for this backend.
 	Capability backend.Capability

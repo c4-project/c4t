@@ -11,7 +11,7 @@ import (
 
 	"github.com/MattWindsor91/c4t/internal/subject/obs"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/parser"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
 )
 
 // ParseStateCount parses a Herd state count.

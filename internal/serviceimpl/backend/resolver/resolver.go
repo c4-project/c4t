@@ -18,9 +18,9 @@ import (
 	"github.com/MattWindsor91/c4t/internal/model/service"
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/delitmus"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/herd"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
@@ -33,18 +33,18 @@ var (
 	// Resolve is a pre-populated backend resolver.
 	Resolve = Resolver{Backends: map[string]backend.Backend{
 		"delitmus": delitmus.Delitmus{},
-		"herdtools.herd": herdtools.Backend{
+		"herdtools.herd": herdstyle.Backend{
 			Capability: backend.CanLiftLitmus | backend.CanRunStandalone,
 			DefaultRun: service.RunInfo{Cmd: "herd7"},
 			Impl:       herd.Herd{},
 		},
-		"herdtools.litmus": herdtools.Backend{
+		"herdtools.litmus": herdstyle.Backend{
 			Capability: backend.CanRunStandalone | backend.CanLiftLitmus | backend.CanProduceExe,
 			DefaultRun: service.RunInfo{Cmd: "litmus7"},
 			Impl:       litmus.Litmus{},
 		},
 		// TODO(@MattWindsor91): this isn't 'herdtools', we should generalise this framework
-		"rmem": herdtools.Backend{
+		"rmem": herdstyle.Backend{
 			Capability: backend.CanRunStandalone | backend.CanLiftLitmus,
 			DefaultRun: service.RunInfo{Cmd: "rmem"},
 			Impl:       litmus.Litmus{},

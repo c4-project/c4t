@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/parser"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
 	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 

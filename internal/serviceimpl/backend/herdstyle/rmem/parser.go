@@ -6,9 +6,9 @@
 package rmem
 
 import (
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/herd"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/parser"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
 	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 

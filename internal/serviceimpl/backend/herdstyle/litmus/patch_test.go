@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	litmus2 "github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdtools/litmus"
+	litmus2 "github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 )
 
 const mainFileExample = `// File example
