@@ -45,11 +45,11 @@ const standaloneOut = "output.txt"
 
 // Backend represents herd-style backends such as Herd and Litmus.
 type Backend struct {
-	// Capability contains the capability flags for this backend.
-	Capability backend.Capability
+	// OptCapabilities contains the capability flags for this backend not implied by being a herdstyle backend.
+	OptCapabilities backend.Capability
 
-	// LitmusArches describes the architectures of Litmus test this backend can deal with.
-	LitmusArches []id.ID
+	// Arches describes the architectures of Litmus test this backend can deal with.
+	Arches []id.ID
 
 	// DefaultRun is the default run information for the particular backend.
 	DefaultRun service.RunInfo
@@ -58,9 +58,14 @@ type Backend struct {
 	Impl BackendImpl
 }
 
-// Capabilities returns Capability, to satisfy the backend interface.
+// Capabilities returns OptCapabilities (as well as the implied backend.CanLiftLitmus and backend.CanRunStandalone).
 func (h Backend) Capabilities(_ *backend2.Spec) backend.Capability {
-	return h.Capability
+	return backend.CanLiftLitmus | backend.CanRunStandalone | h.OptCapabilities
+}
+
+// LitmusArches returns Arches, to satisfy the backend interface.
+func (h Backend) LitmusArches(_ *backend2.Spec) []id.ID {
+	return h.Arches
 }
 
 // ParseObs parses an observation from r into o.
@@ -125,6 +130,11 @@ func (h Backend) checkAndAmendJob(j *backend2.LiftJob) error {
 	if err := j.Check(); err != nil {
 		return err
 	}
+
+	if !j.Arch.IsEmpty() && !j.In.Litmus.IsC() {
+		return fmt.Errorf("%w: can only set lifting architecture for C litmus tests", backend.ErrNotSupported)
+	}
+
 	if err := h.checkAndAmendInput(&j.In); err != nil {
 		return err
 	}
@@ -142,7 +152,7 @@ func (h Backend) checkAndAmendInput(i *backend2.LiftInput) error {
 }
 
 func (h Backend) supportsLitmusArch(a id.ID) bool {
-	for _, a2 := range h.LitmusArches {
+	for _, a2 := range h.Arches {
 		if a.HasPrefix(a2) {
 			return true
 		}
@@ -157,7 +167,7 @@ func (h Backend) checkAndAmendOutput(o *backend2.LiftOutput) error {
 		fallthrough
 	case backend2.ToStandalone:
 	case backend2.ToExeRecipe:
-		if (h.Capability & backend.CanProduceExe) == 0 {
+		if (h.OptCapabilities & backend.CanProduceExe) == 0 {
 			return fmt.Errorf("%w: cannot produce executables", backend.ErrNotSupported)
 		}
 	case backend2.ToObjRecipe:

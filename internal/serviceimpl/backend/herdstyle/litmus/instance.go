@@ -33,11 +33,9 @@ type Instance struct {
 func (l *Instance) Run(ctx context.Context) error {
 	// TODO(@MattWindsor91): delitmus support
 
-	if err := l.check(); err != nil {
+	if err := l.Job.Check(); err != nil {
 		return err
 	}
-
-	l.Fixset.PopulateFromStats(l.Job.In.Litmus.Stats)
 
 	ji, err := l.jobRunInfo()
 	if err != nil {
@@ -47,12 +45,12 @@ func (l *Instance) Run(ctx context.Context) error {
 		return err
 	}
 
-	return l.patch()
-}
-
-// check checks that the configuration makes sense.
-func (l *Instance) check() error {
-	return l.Job.Check()
+	// TODO(@MattWindsor91): this probably needs some work
+	if l.Job.In.Litmus.IsC() {
+		l.Fixset.PopulateFromStats(l.Job.In.Litmus.Stats)
+		return l.patch()
+	}
+	return nil
 }
 
 // jobRunInfo gets the command and arguments needed to run Litmus on the specific job given.

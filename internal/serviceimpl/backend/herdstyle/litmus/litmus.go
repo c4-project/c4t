@@ -23,11 +23,14 @@ type Litmus struct{}
 
 // LiftExe runs litmus in a mode that generates files compilable into an executable.
 func (l Litmus) LiftExe(ctx context.Context, j backend.LiftJob, r service.RunInfo, x service.Runner) error {
-	i := Instance{Job: j, RunInfo: r, Runner: x}
-	return i.Run(ctx)
+	return (&Instance{Job: j, RunInfo: r, Runner: x}).Run(ctx)
 }
 
 func litmusCommonArgs(j backend.LiftJob) ([]string, error) {
+	if !j.In.Litmus.IsC() {
+		return []string{j.In.Litmus.Path}, nil
+	}
+
 	carch, err := litmus.ArchToLitmus(j.Arch)
 	if err != nil {
 		return nil, fmt.Errorf("when looking up -carch: %w", err)

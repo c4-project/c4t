@@ -9,6 +9,8 @@ package backend
 import (
 	"errors"
 
+	"github.com/MattWindsor91/c4t/internal/model/id"
+
 	"github.com/MattWindsor91/c4t/internal/model/service/backend"
 
 	"github.com/MattWindsor91/c4t/internal/stage/lifter"
@@ -20,10 +22,13 @@ type Backend interface {
 	// Capabilities gets the capability set reported for this backend.
 	Capabilities(b *backend.Spec) Capability
 
+	// LitmusArches gets the list of Litmus architectures understood by this backend (capability CanLiftLitmus).
+	LitmusArches(b *backend.Spec) []id.ID
+
 	// Some backends can lift test-cases into recipes (capability CanLift).
 	lifter.SingleLifter
 
-	// Backends that can be run standalone or produce executables (capability CanRunStandalone | CanProduceExecutables)
+	// Backends that can be run standalone or produce executables (capability CanRunStandalone | CanProduceExe)
 	// must give an observation parser for interpreting their stdout as observations.
 	runner.ObsParser
 }

@@ -12,6 +12,8 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/MattWindsor91/c4t/internal/model/id"
+
 	"github.com/MattWindsor91/c4t/internal/model/service"
 
 	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
@@ -41,6 +43,11 @@ type Delitmus struct {
 // Capabilities reports that this backend can lift (and nothing else).
 func (d Delitmus) Capabilities(_ *backend2.Spec) backend.Capability {
 	return backend.CanLiftLitmus | backend.CanProduceObj
+}
+
+// LitmusArches reports that this backend understands C litmus (and nothing else).
+func (Delitmus) LitmusArches(_ *backend2.Spec) []id.ID {
+	return []id.ID{id.ArchC}
 }
 
 // Lift delitmusifies the litmus file specified in j, using errw for standard output.

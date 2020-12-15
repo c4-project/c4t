@@ -14,15 +14,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
 
 	"github.com/MattWindsor91/c4t/internal/model/service"
 	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 )
 
-var armArgs = []string{
+var armArgs = [...]string{
 	"-model", "promising",
 	"-model", "promise_first",
 	"-model", "promising_parallel_thread_state_search",
@@ -38,19 +36,8 @@ var armArgs = []string{
 type Rmem struct{}
 
 func (Rmem) LiftStandalone(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner, w io.Writer) error {
-	// TODO(@MattWindsor91): this is only useful when the source is an assembly Litmus test.
-	// We should distinguish between the two.
-
-	if j.Arch.IsEmpty() {
-		j.Arch = id.ArchAArch64
-	}
-	// TODO(@MattWindsor91): eventually support other things here
-	if !j.Arch.Equal(id.ArchAArch64) {
-		return fmt.Errorf("%w: only AArch64 is supported for now", backend.ErrNotSupported)
-	}
-
 	// TODO(@MattWindsor91): sanitise here
-	r.Override(service.RunInfo{Args: append(armArgs, j.In.Litmus.Path)})
+	r.Override(service.RunInfo{Args: append(armArgs[:], j.In.Litmus.Path)})
 	return x.WithStdout(w).Run(ctx, r)
 }
 

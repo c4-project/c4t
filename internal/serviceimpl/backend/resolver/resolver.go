@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/MattWindsor91/c4t/internal/model/id"
+
 	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
 
 	"github.com/MattWindsor91/c4t/internal/model/recipe"
@@ -21,6 +23,7 @@ import (
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle"
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
+	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/rmem"
 	"github.com/MattWindsor91/c4t/internal/subject/obs"
 )
 
@@ -34,20 +37,23 @@ var (
 	Resolve = Resolver{Backends: map[string]backend.Backend{
 		"delitmus": delitmus.Delitmus{},
 		"herdtools.herd": herdstyle.Backend{
-			Capability: backend.CanLiftLitmus | backend.CanRunStandalone,
-			DefaultRun: service.RunInfo{Cmd: "herd7"},
-			Impl:       herd.Herd{},
+			OptCapabilities: 0,
+			Arches:          []id.ID{id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC},
+			DefaultRun:      service.RunInfo{Cmd: "herd7"},
+			Impl:            herd.Herd{},
 		},
 		"herdtools.litmus": herdstyle.Backend{
-			Capability: backend.CanRunStandalone | backend.CanLiftLitmus | backend.CanProduceExe,
-			DefaultRun: service.RunInfo{Cmd: "litmus7"},
-			Impl:       litmus.Litmus{},
+			OptCapabilities: backend.CanProduceExe,
+			Arches:          []id.ID{id.ArchC, id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC},
+			DefaultRun:      service.RunInfo{Cmd: "litmus7"},
+			Impl:            litmus.Litmus{},
 		},
-		// TODO(@MattWindsor91): this isn't 'herdtools', we should generalise this framework
 		"rmem": herdstyle.Backend{
-			Capability: backend.CanRunStandalone | backend.CanLiftLitmus,
+			OptCapabilities: backend.CanLiftLitmus,
+			// TODO(@MattWindsor91): rmem supports more than this, but needs more work on sanitising/model selection
+			Arches:     []id.ID{id.ArchAArch64},
 			DefaultRun: service.RunInfo{Cmd: "rmem"},
-			Impl:       litmus.Litmus{},
+			Impl:       rmem.Rmem{},
 		},
 	}}
 )

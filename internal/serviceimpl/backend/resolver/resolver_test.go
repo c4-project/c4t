@@ -25,6 +25,7 @@ func TestResolver_Capabilities(t *testing.T) {
 		"delitmus":         backend.CanLiftLitmus | backend.CanProduceObj,
 		"herdtools.herd":   backend.CanLiftLitmus | backend.CanRunStandalone,
 		"herdtools.litmus": backend.CanLiftLitmus | backend.CanRunStandalone | backend.CanProduceExe,
+		"rmem":             backend.CanLiftLitmus | backend.CanRunStandalone,
 	}
 	for name, c := range cases {
 		name, c := name, c
