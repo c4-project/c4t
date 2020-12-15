@@ -29,7 +29,7 @@
       "t0r0": "0"
     }
   ],
-  "witnesses": [
+  "counter_examples": [
     {
       "y": "0",
       "x": "1",
@@ -43,7 +43,7 @@
       "t0r0": "0"
     }
   ],
-  "counter_examples": [
+  "witnesses": [
     {
       "y": "1",
       "x": "1",

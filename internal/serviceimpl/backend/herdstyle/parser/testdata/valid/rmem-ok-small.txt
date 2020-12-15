@@ -1,0 +1,10 @@
+Test test_0 Required
+Memory-writes=
+States 1
+2     *>x=1; t0r0=1;  via "0;0;0;0"
+Unhandled exceptions 0
+Ok
+Condition forall (x=1 /\ t0r0=1)
+Hash=f4ff57c0c324471586adc4e4cab40264
+Observation test_0 Always 1 0
+Runtime: 0.179883 sec

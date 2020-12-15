@@ -22,9 +22,9 @@ func (Rmem) ParseStateLine(_ parser.TestType, fields []string) (*parser.StateLin
 	// Rmem's state line syntax is similar to that of Litmus's, but with a few gotchas:
 	//
 	// - Asterisks always represent witnesses, not 'interesting' cases; this means we always parse as if the test type
-	//   is 'required';
+	//   is 'allowed';
 	// - State lines contain a 'via "XYZ"' line, which we need to scrub.
-	return litmus.Litmus{}.ParseStateLine(parser.Required, stripVia(fields))
+	return litmus.Litmus{}.ParseStateLine(parser.Allowed, stripVia(fields))
 }
 
 // ParsePreTestLine checks the pre-Test line in fields to check whether it states this is a partial observation.

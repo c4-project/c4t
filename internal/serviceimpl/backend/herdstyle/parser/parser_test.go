@@ -11,8 +11,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/1set/gut/yos"
 	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/rmem"
 
 	"github.com/stretchr/testify/require"
@@ -63,21 +65,37 @@ func TestParse_error(t *testing.T) {
 func TestParse_valid(t *testing.T) {
 	t.Parallel()
 
-	cases := map[string]parser.Impl{
-		"herd-ok-small":         herd.Herd{},
-		"rmem-ok-unsat-partial": rmem.Rmem{},
-	}
+	fs, err := yos.ListMatch(filepath.Join("testdata", "valid"), yos.ListIncludeFile, "*.json")
+	require.NoError(t, err, "testdata listing shouldn't fail")
 
-	for name, c := range cases {
-		name, c := name, c
+	for _, f := range fs {
+		path := f.Path
+		pprefix := strings.TrimSuffix(path, ".json")
+		name := filepath.Base(pprefix)
+
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			f, err := os.Open(filepath.Join("testdata", "valid", name+".txt"))
+			pfields := strings.SplitN(name, "-", 2)
+			require.NotEmpty(t, pfields, "malformed test name, should be 'type-*.json'")
+
+			var c parser.Impl
+			switch pfields[0] {
+			case "herd":
+				c = herd.Herd{}
+			case "litmus":
+				c = litmus.Litmus{}
+			case "rmem":
+				c = rmem.Rmem{}
+			default:
+				require.Failf(t, "unsupported parser subtype", "got %q", pfields[0])
+			}
+
+			f, err := os.Open(pprefix + ".txt")
 			require.NoError(t, err, "missing input file")
 			defer func() { _ = f.Close() }()
 
-			out, err := ioutil.ReadFile(filepath.Join("testdata", "valid", name+".json"))
+			out, err := ioutil.ReadFile(path)
 			require.NoError(t, err, "missing output file")
 
 			o := new(obs.Obs)
