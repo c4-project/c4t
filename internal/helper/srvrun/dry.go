@@ -29,6 +29,6 @@ func (d DryRunner) WithStderr(_ io.Writer) service.Runner {
 
 // Run dumps r to the dry runner's writer.
 func (d DryRunner) Run(_ context.Context, r service.RunInfo) error {
-	_, err := io.WriteString(d, r.String())
+	_, err := io.WriteString(d, r.String()+"\n")
 	return err
 }
