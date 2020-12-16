@@ -38,7 +38,7 @@ var (
 		"delitmus": delitmus.Delitmus{},
 		"herdtools.herd": herdstyle.Backend{
 			OptCapabilities: 0,
-			Arches:          []id.ID{id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC},
+			Arches:          []id.ID{id.ArchC, id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC},
 			DefaultRun:      service.RunInfo{Cmd: "herd7"},
 			Impl:            herd.Herd{},
 		},
