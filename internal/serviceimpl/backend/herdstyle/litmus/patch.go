@@ -31,14 +31,14 @@ const (
 	dumpPrefix = "fprintf(fhist,"
 )
 
-// patch patches the Litmus files in p, which originated from a Litmus invocation in inFile.
-func (l *Instance) patch() error {
-	if !l.Fixset.NeedsPatch() {
+// patch patches the instance's Litmus file according to f.
+func (l *Instance) patch(f Fixset) error {
+	if !f.NeedsPatch() {
 		return nil
 	}
 
 	rpath := l.mainCFile()
-	wpath, err := l.patchToTemp(rpath)
+	wpath, err := l.patchToTemp(f, rpath)
 	if err != nil {
 		return err
 	}
@@ -53,24 +53,24 @@ func (l *Instance) mainCFile() string {
 	return filepath.Join(l.Job.Out.Dir, file)
 }
 
-func (l *Instance) patchToTemp(rpath string) (wpath string, err error) {
+func (l *Instance) patchToTemp(f Fixset, rpath string) (wpath string, err error) {
 	r, rerr := os.Open(rpath)
 	if rerr != nil {
 		return "", fmt.Errorf("can't open C file for reading: %w", rerr)
 	}
-	wpath, werr := l.patchReaderToTemp(r)
+	wpath, werr := l.patchReaderToTemp(f, r)
 	cerr := r.Close()
 	return wpath, errhelp.FirstError(werr, cerr)
 }
 
-func (l *Instance) patchReaderToTemp(r io.Reader) (string, error) {
+func (l *Instance) patchReaderToTemp(f Fixset, r io.Reader) (string, error) {
 	w, werr := ioutil.TempFile("", "*.c")
 	if werr != nil {
 		return "", fmt.Errorf("can't open temp file for reading: %w", werr)
 	}
 	wpath := w.Name()
 	// Right now, there's only one thing to patch, so this is fairly easy.
-	err := l.Fixset.PatchMainFile(r, w)
+	err := f.PatchMainFile(r, w)
 	cerr := w.Close()
 	return wpath, errhelp.FirstError(err, cerr)
 }

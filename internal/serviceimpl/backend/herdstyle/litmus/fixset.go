@@ -35,6 +35,13 @@ func (f *Fixset) Args() []string {
 	return args
 }
 
+// PopulateFromStats switches various fixes on as appropriate for the Litmus file l.
+func (f *Fixset) PopulateFromLitmus(l *litmus.Litmus) {
+	if l != nil && l.IsC() {
+		f.PopulateFromStats(l.Stats)
+	}
+}
+
 // PopulateFromStats switches various fixes on according to the statistics in s.
 func (f *Fixset) PopulateFromStats(s *litmus.Statset) {
 	if s == nil {

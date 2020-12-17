@@ -23,10 +23,6 @@ type Instance struct {
 
 	// Runner is the thing that actually runs Litmus.
 	Runner service.Runner
-
-	// Fixset is the set of enabled fixes.
-	// It is part of the config to allow the forcing of fixes that the shim would otherwise deem unnecessary.
-	Fixset Fixset
 }
 
 // Run runs the litmus wrapper according to the configuration c.
@@ -37,27 +33,29 @@ func (l *Instance) Run(ctx context.Context) error {
 		return err
 	}
 
-	ji, err := l.jobRunInfo()
+	var f Fixset
+	f.PopulateFromLitmus(l.Job.In.Litmus)
+
+	if err := l.runLitmus(ctx, f); err != nil {
+		return err
+	}
+
+	return l.patch(f)
+}
+
+func (l *Instance) runLitmus(ctx context.Context, f Fixset) error {
+	ji, err := l.jobRunInfo(f)
 	if err != nil {
 		return err
 	}
-	if err := l.Runner.Run(ctx, ji); err != nil {
-		return err
-	}
-
-	// TODO(@MattWindsor91): this probably needs some work
-	if l.Job.In.Litmus.IsC() {
-		l.Fixset.PopulateFromStats(l.Job.In.Litmus.Stats)
-		return l.patch()
-	}
-	return nil
+	return l.Runner.Run(ctx, ji)
 }
 
 // jobRunInfo gets the command and arguments needed to run Litmus on the specific job given.
-func (l *Instance) jobRunInfo() (service.RunInfo, error) {
+func (l *Instance) jobRunInfo(f Fixset) (service.RunInfo, error) {
 	// This is distinct from the earlier override that overlays user-specified Litmus args on the default ones.
 	ri := l.RunInfo
-	args, err := l.litmusArgs()
+	args, err := l.litmusArgs(f)
 	if err != nil {
 		return ri, err
 	}
@@ -66,9 +64,8 @@ func (l *Instance) jobRunInfo() (service.RunInfo, error) {
 }
 
 // litmusArgs works out the argument vector for Litmus.
-func (l *Instance) litmusArgs() ([]string, error) {
-	args := l.Fixset.Args()
-	args = append(args, "-o", l.Job.Out.Dir)
+func (l *Instance) litmusArgs(f Fixset) ([]string, error) {
+	args := append(f.Args(), "-o", l.Job.Out.Dir)
 
 	cargs, err := litmusCommonArgs(l.Job)
 	if err != nil {

@@ -18,11 +18,13 @@ import (
 // ExampleID_HasPrefix is a runnable example for HasPrefix.
 func ExampleID_HasPrefix() {
 	x := id.FromString("x86.64")
+	fmt.Println("x86.64 prefix of x86.64:", x.HasPrefix(id.FromString("x86.64")))
 	fmt.Println("x86 prefix of x86.64:", x.HasPrefix(id.FromString("x86")))
 	fmt.Println("arm prefix of x86.64:", x.HasPrefix(id.FromString("arm")))
 	fmt.Println("empty prefix of x86.64:", x.HasPrefix(id.ID{}))
 
 	// Output:
+	// x86.64 prefix of x86.64: true
 	// x86 prefix of x86.64: true
 	// arm prefix of x86.64: false
 	// empty prefix of x86.64: true
@@ -31,11 +33,13 @@ func ExampleID_HasPrefix() {
 // ExampleID_HasSuffix is a runnable example for HasSuffix.
 func ExampleID_HasSuffix() {
 	x := id.FromString("x86.64")
+	fmt.Println("x86.64 suffix of x86.64:", x.HasSuffix(id.FromString("x86.64")))
 	fmt.Println("64 suffix of x86.64:", x.HasSuffix(id.FromString("64")))
 	fmt.Println("32 suffix of x86.64:", x.HasSuffix(id.FromString("32")))
 	fmt.Println("empty suffix of x86.64:", x.HasSuffix(id.ID{}))
 
 	// Output:
+	// x86.64 suffix of x86.64: true
 	// 64 suffix of x86.64: true
 	// 32 suffix of x86.64: false
 	// empty suffix of x86.64: true
@@ -84,6 +88,11 @@ func TestID_HasPrefix(t *testing.T) {
 			inTags:     []string{"arm", "8"},
 			prefixTags: []string{"arm", "7"},
 			want:       false,
+		},
+		"yes-same-length-single": {
+			inTags:     []string{"arm"},
+			prefixTags: []string{"arm"},
+			want:       true,
 		},
 	}
 	for name, c := range cases {
@@ -145,6 +154,11 @@ func TestID_HasSuffix(t *testing.T) {
 			inTags:     []string{"arm", "8"},
 			suffixTags: []string{"arm", "7"},
 			want:       false,
+		},
+		"yes-same-length-single": {
+			inTags:     []string{"arm"},
+			suffixTags: []string{"arm"},
+			want:       true,
 		},
 	}
 	for name, c := range cases {
