@@ -10,16 +10,16 @@ import (
 	"io"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/app/invoke"
+	"github.com/c4-project/c4t/internal/app/invoke"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	br "github.com/MattWindsor91/c4t/internal/serviceimpl/backend/resolver"
-	cimpl "github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
-	"github.com/MattWindsor91/c4t/internal/stage/mach"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
-	"github.com/MattWindsor91/c4t/internal/ux"
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	br "github.com/c4-project/c4t/internal/serviceimpl/backend/resolver"
+	cimpl "github.com/c4-project/c4t/internal/serviceimpl/compiler"
+	"github.com/c4-project/c4t/internal/stage/mach"
+	"github.com/c4-project/c4t/internal/stage/mach/forward"
+	"github.com/c4-project/c4t/internal/ux"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

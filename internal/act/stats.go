@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 )
 
 // ErrStatsetParse occurs when there is a parse error reading a statset.

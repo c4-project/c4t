@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/gcc"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler/gcc"
 	"github.com/stretchr/testify/assert"
 )
 

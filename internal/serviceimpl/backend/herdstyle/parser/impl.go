@@ -5,7 +5,7 @@
 
 package parser
 
-import "github.com/MattWindsor91/c4t/internal/subject/obs"
+import "github.com/c4-project/c4t/internal/subject/obs"
 
 // Impl describes the parser functionality that differs between Herdtools-style backends.
 type Impl interface {

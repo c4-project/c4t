@@ -11,16 +11,16 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
-	"github.com/MattWindsor91/c4t/internal/ux"
+	"github.com/c4-project/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/ux"
 
-	"github.com/MattWindsor91/c4t/internal/config"
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
-	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler"
+	"github.com/c4-project/c4t/internal/ux/singleobs"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

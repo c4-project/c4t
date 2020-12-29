@@ -5,7 +5,7 @@
 
 package pathset
 
-import "github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+import "github.com/c4-project/c4t/internal/stage/analyser/saver"
 
 // Instance is an instance-specific pathset.
 type Instance struct {

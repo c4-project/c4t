@@ -15,11 +15,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 )
 
 // ExamplePathset_Dirs is a testable example for Dirs.

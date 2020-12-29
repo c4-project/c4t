@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/director"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/widgets/sparkline"

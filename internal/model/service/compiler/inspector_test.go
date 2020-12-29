@@ -9,14 +9,14 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/mocks"
+	"github.com/c4-project/c4t/internal/model/service/compiler/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

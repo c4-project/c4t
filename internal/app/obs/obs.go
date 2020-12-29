@@ -12,11 +12,11 @@ import (
 	"os"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
-	obs2 "github.com/MattWindsor91/c4t/internal/subject/obs"
-	"github.com/MattWindsor91/c4t/internal/ux"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
+	obs2 "github.com/c4-project/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/ux"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

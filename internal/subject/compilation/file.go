@@ -8,7 +8,7 @@ package compilation
 import (
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/subject/normpath"
+	"github.com/c4-project/c4t/internal/subject/normpath"
 
 	"github.com/1set/gut/ystring"
 )

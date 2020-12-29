@@ -8,15 +8,15 @@ package planner
 import (
 	"context"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/1set/gut/yos"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // SubjectProber is the interface of types that allow filling in of subject information.

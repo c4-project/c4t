@@ -12,9 +12,9 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 )
 
 // Compiler collects the part of a compiler's specification that comes from the c4t configuration.

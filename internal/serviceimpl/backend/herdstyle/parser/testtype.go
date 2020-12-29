@@ -8,7 +8,7 @@ package parser
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // TestType is the type of test we're parsing.

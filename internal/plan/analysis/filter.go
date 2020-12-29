@@ -11,12 +11,12 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/model/id"
 	"gopkg.in/yaml.v3"
 )
 

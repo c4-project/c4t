@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/config"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"

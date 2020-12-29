@@ -9,19 +9,19 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/csvdump"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/pretty"
+	"github.com/c4-project/c4t/internal/stage/analyser/csvdump"
+	"github.com/c4-project/c4t/internal/stage/analyser/pretty"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser"
+	"github.com/c4-project/c4t/internal/stage/analyser"
 
-	"github.com/MattWindsor91/c4t/internal/ux"
+	"github.com/c4-project/c4t/internal/ux"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

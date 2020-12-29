@@ -9,9 +9,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/pretty"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/stage/analyser/pretty"
 )
 
 // ExamplePrinter_OnAnalysis is a testable example for Printer.OnAnalysis.

@@ -12,11 +12,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // ExampleCorpus_Add is a runnable example for Add.

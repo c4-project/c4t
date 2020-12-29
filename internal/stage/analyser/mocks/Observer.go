@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	analysis "github.com/MattWindsor91/c4t/internal/plan/analysis"
+	analysis "github.com/c4-project/c4t/internal/plan/analysis"
 	mock "github.com/stretchr/testify/mock"
 )
 

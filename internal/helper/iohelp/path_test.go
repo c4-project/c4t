@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
 // ExampleExtlessFile is a runnable example for ExtlessFile.

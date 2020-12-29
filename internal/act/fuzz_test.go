@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	"github.com/MattWindsor91/c4t/internal/model/service/mocks"
+	"github.com/c4-project/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service/mocks"
 
 	"github.com/1set/gut/ystring"
 
@@ -19,9 +19,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/act"
-	"github.com/MattWindsor91/c4t/internal/machine"
-	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 )
 
 // TestRunner_Fuzz tests the happy path of Runner.Fuzz using a mock command runner.

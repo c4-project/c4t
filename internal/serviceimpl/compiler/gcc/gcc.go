@@ -11,11 +11,11 @@ import (
 	"io"
 	"os/exec"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // GCC represents GCC-style compilers such as GCC and Clang.

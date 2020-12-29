@@ -9,15 +9,15 @@ import (
 	"context"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
+	"github.com/c4-project/c4t/internal/helper/srvrun"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	mdl "github.com/MattWindsor91/c4t/internal/model/litmus"
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/id"
+	mdl "github.com/c4-project/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // ExampleInstance_Run is a testable example for Run.

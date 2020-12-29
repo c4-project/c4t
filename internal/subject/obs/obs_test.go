@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/subject/obs"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 )
 
 // Used to avoid compiler-optimising-out of the benchmark below.

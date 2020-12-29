@@ -8,8 +8,8 @@ package stringhelp_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 )
 
 // TestMapKeys_notStringMaps makes sure MapKeys does the right thing when given things that aren't string maps.

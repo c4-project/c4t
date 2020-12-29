@@ -6,7 +6,7 @@
 package compiler
 
 import (
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // Job represents a request to compile a list of files to a particular target given a particular compiler.

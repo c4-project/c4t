@@ -6,9 +6,9 @@
 package runner
 
 import (
-	"github.com/MattWindsor91/c4t/internal/observing"
-	"github.com/MattWindsor91/c4t/internal/quantity"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
 )
 
 // Option is the type of functional options for the machine node.

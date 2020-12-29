@@ -12,22 +12,22 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 
 	"github.com/1set/gut/yos"
 
-	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/act"
 
-	"github.com/MattWindsor91/c4t/internal/config"
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
-	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/ux/singleobs"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

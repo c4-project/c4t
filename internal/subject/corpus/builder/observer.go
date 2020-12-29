@@ -6,7 +6,7 @@
 package builder
 
 import (
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 )
 
 // Observer is the interface for things that observe a builder.

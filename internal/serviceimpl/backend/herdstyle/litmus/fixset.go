@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 )
 
 // Fixset contains the various fix-ups that the litmus tool needs to do before and after the run to Litmus.

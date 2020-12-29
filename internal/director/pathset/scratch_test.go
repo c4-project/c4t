@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/director/pathset"
+	"github.com/c4-project/c4t/internal/director/pathset"
 )
 
 // ExampleNewScratch is a runnable example for NewScratch.

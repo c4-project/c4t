@@ -6,9 +6,9 @@
 package runner
 
 import (
-	"github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/remote"
+	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/remote"
 )
 
 // FromPlanFactory is a runner factory that instantiates either a SSH or local runner depending on the machine

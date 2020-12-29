@@ -8,9 +8,9 @@ package recipe_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/model/filekind"
+	"github.com/c4-project/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/recipe"
 )
 
 // ExampleCompileExeInst is a runnable example for CompileExeInst.

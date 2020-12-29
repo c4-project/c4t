@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/parser"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // ParseStateCount parses a Litmus state count.

@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/coverage"
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/coverage"
+	"github.com/c4-project/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // ExampleRunContext_ExpandArgs is a runnable example for RunContext.ExpandArgs.

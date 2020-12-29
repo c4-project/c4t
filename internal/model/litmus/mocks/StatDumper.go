@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	litmus "github.com/MattWindsor91/c4t/internal/model/litmus"
+	litmus "github.com/c4-project/c4t/internal/model/litmus"
 	mock "github.com/stretchr/testify/mock"
 )
 

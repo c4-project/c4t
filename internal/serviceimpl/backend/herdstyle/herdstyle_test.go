@@ -14,13 +14,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/herd"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle"
+	"github.com/c4-project/c4t/internal/subject/obs"
 	"github.com/stretchr/testify/assert"
 )
 

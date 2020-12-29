@@ -11,11 +11,11 @@ import (
 	"fmt"
 	"io"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // Herd describes the parts of a backend invocation that are specific to Herd.

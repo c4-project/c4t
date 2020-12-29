@@ -8,8 +8,8 @@
 package forward
 
 import (
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 
 // Forward describes a 'forwarded' message or error.

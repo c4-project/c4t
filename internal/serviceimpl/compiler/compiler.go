@@ -12,17 +12,17 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/interpreter"
+	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/gcc"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler/gcc"
 
-	mdl "github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	mdl "github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 var (

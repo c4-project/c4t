@@ -14,9 +14,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
 	"github.com/1set/gut/yos"
 )

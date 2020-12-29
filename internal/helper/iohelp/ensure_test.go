@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
 // TestEnsureWriter tests various properties of EnsureWriter.

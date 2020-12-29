@@ -12,17 +12,17 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 type TestProber struct {

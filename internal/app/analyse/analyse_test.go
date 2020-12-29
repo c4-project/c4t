@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/app/analyse"
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser"
+	"github.com/c4-project/c4t/internal/app/analyse"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/stage/analyser"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"

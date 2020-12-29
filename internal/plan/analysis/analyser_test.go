@@ -11,18 +11,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // TestAnalyse_errors tests various errors while analysing plans.

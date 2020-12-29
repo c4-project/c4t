@@ -8,11 +8,11 @@ package saver
 import (
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/status"
 )
 
 // bucketSaver handles the setup of per-status buckets in an analysis save.

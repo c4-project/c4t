@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // StateLine is the struct that an implementation of the Herdtools parser must return when parsing a state line.

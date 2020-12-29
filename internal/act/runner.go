@@ -10,7 +10,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // ErrNoBaseRunner occurs if we try to use a Runner that has no Runner.Base set.

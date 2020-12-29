@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/model/recipe"
 )
 
 // ExampleOp_String is a runnable example for String.

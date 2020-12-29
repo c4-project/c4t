@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	coverage "github.com/MattWindsor91/c4t/internal/coverage"
+	coverage "github.com/c4-project/c4t/internal/coverage"
 	mock "github.com/stretchr/testify/mock"
 )
 

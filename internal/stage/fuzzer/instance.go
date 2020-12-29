@@ -12,19 +12,19 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // Instance contains state for a single fuzzer instance.

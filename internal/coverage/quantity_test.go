@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/coverage"
+	"github.com/c4-project/c4t/internal/coverage"
 	"github.com/stretchr/testify/assert"
 )
 

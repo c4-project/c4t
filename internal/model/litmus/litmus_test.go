@@ -8,8 +8,8 @@ package litmus_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/litmus"
 )
 
 // ExampleLitmus_IsC is a testable example for Litmus.IsC.

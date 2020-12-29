@@ -9,12 +9,12 @@ package backend
 import (
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/runner"
+	"github.com/c4-project/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/stage/mach/runner"
 )
 
 // Backend contains the various interfaces that a backend can implement.

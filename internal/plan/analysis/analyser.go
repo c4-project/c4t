@@ -10,14 +10,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/plan"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // Analyse runs the analyser with context ctx, on plan p and with options opts.

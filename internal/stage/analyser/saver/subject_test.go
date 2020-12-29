@@ -8,16 +8,16 @@ package saver_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/subject/normpath"
+	"github.com/c4-project/c4t/internal/subject/normpath"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/model/filekind"
-	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
+	"github.com/c4-project/c4t/internal/model/filekind"
+	"github.com/c4-project/c4t/internal/subject/normaliser"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver/mocks"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver/mocks"
 )
 
 // TestArchiveSubject tests ArchiveSubject.

@@ -8,7 +8,7 @@ package planner
 import (
 	"errors"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 )
 
 var (

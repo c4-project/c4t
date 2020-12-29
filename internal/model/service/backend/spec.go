@@ -6,8 +6,8 @@
 package backend
 
 import (
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // Spec tells the tester how to run a backend.

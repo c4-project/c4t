@@ -9,11 +9,11 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
 const (

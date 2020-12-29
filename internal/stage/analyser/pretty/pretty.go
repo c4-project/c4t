@@ -12,9 +12,9 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/director"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 )
 
 // Printer provides the ability to output human-readable summaries of analyses to a writer.

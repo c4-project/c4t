@@ -8,7 +8,7 @@ package subject
 import (
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 )
 
 // Fuzz is the set of file paths, and other metadata, associated with a fuzzer output.

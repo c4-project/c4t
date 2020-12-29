@@ -12,17 +12,17 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/c4t/internal/act"
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 const (

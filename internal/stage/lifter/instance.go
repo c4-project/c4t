@@ -9,15 +9,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // Instance is the type of per-subject lifter jobs.

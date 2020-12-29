@@ -8,10 +8,10 @@ package invoker
 
 import (
 	"github.com/1set/gut/ystring"
-	"github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/quantity"
-	"github.com/MattWindsor91/c4t/internal/stage/invoker/runner"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/stage/invoker/runner"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
 )
 
 // Invoker runs the machine-runner, through SSH if needed.

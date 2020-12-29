@@ -8,12 +8,12 @@ package mach
 import (
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
+	"github.com/c4-project/c4t/internal/stage/mach/forward"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/compiler"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/runner"
+	"github.com/c4-project/c4t/internal/stage/mach/compiler"
+	"github.com/c4-project/c4t/internal/stage/mach/runner"
 )
 
 // Option is the type of functional options.

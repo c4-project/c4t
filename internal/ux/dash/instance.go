@@ -6,21 +6,21 @@
 package dash
 
 import (
-	copy2 "github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/director"
-	"github.com/MattWindsor91/c4t/internal/observing"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	copy2 "github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 	"github.com/mum4k/termdash/linestyle"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 
 const (

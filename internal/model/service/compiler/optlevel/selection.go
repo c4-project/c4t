@@ -5,7 +5,7 @@
 
 package optlevel
 
-import "github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+import "github.com/c4-project/c4t/internal/helper/stringhelp"
 
 // Selection represents a piece of compiler configuration that specifies which optimisation levels to select.
 type Selection struct {

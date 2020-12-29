@@ -3,7 +3,7 @@
 _c4t_ ('C4 tester')
 is the top-level testing framework
 for the 'C Compiler Concurrency Checker' (C4) project.  It sits on top of
-[c4f](https://github.com/MattWindsor91/c4f) and
+[c4f](https://github.com/c4-project/c4f) and
 [herdtools7](https://github.com/herd/herdtools7) and allows running of
 multi-compiler, multi-machine testing campaigns.
 
@@ -60,8 +60,8 @@ Note that _c4t_ is still pretty rough around the edges - please feel free to
 file issues about its user experience and documentation.
 
 - Install using the usual `go` tools: for example,
- `go get github.com/MattWindsor91/c4t/cmd/...`.  All commands are in the `cmd` directory.
-- Make sure that the [c4f](https://github.com/MattWindsor91/c4f) tools are
+ `go get github.com/c4-project/c4t/cmd/...`.  All commands are in the `cmd` directory.
+- Make sure that the [c4f](https://github.com/c4-project/c4f) tools are
   in `PATH` on the test-running machine (eg run `make install`)
 - Make sure that at least `c4t-mach` is installed on any remote machine you wish to use for testing.
 - Create a `tester.toml` file in

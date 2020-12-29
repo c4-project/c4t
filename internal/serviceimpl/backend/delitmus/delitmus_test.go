@@ -11,21 +11,21 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	"github.com/MattWindsor91/c4t/internal/model/service/mocks"
+	"github.com/c4-project/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service/backend"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/act"
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/delitmus"
+	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/delitmus"
 )
 
 // TestDelitmus_Lift tests the happy path of Delitmus.Lift.

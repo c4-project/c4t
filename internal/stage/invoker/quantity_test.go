@@ -8,11 +8,11 @@ package invoker_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/quantity"
-	"github.com/MattWindsor91/c4t/internal/stage/invoker"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/stage/invoker"
 	"github.com/stretchr/testify/require"
 )
 

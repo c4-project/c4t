@@ -11,17 +11,17 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
 	"github.com/1set/gut/yos"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	litmus2 "github.com/MattWindsor91/c4t/internal/model/litmus"
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/model/id"
+	litmus2 "github.com/c4-project/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/stage/lifter"
 
-	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
 )
 
 var (

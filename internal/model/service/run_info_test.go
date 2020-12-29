@@ -8,7 +8,7 @@ package service_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // ExampleRunInfo_Override is a runnable example for the Override method.

@@ -8,32 +8,32 @@ package director
 import (
 	"errors"
 
-	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/stage/perturber"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/c4t/internal/remote"
+	"github.com/c4-project/c4t/internal/remote"
 
-	"github.com/MattWindsor91/c4t/internal/director/pathset"
+	"github.com/c4-project/c4t/internal/director/pathset"
 
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/stage/lifter"
 
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
 
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/config"
 )
 
 var (

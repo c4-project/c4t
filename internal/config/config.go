@@ -8,15 +8,15 @@
 package config
 
 import (
-	"github.com/MattWindsor91/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 
-	"github.com/MattWindsor91/c4t/internal/remote"
+	"github.com/c4-project/c4t/internal/remote"
 )
 
 // Config is a top-level tester config struct.

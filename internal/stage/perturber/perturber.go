@@ -10,13 +10,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // ErrCInspectorNil occurs if the perturber constructor is passed a nil compiler inspector.

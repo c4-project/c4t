@@ -11,27 +11,27 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/app/backend"
-	"github.com/MattWindsor91/c4t/internal/app/obs"
+	"github.com/c4-project/c4t/internal/app/backend"
+	"github.com/c4-project/c4t/internal/app/obs"
 
-	"github.com/MattWindsor91/c4t/internal/app/coverage"
+	"github.com/c4-project/c4t/internal/app/coverage"
 
-	"github.com/MattWindsor91/c4t/internal/app/analyse"
-	"github.com/MattWindsor91/c4t/internal/app/invoke"
-	"github.com/MattWindsor91/c4t/internal/app/perturb"
-	"github.com/MattWindsor91/c4t/internal/app/setc"
+	"github.com/c4-project/c4t/internal/app/analyse"
+	"github.com/c4-project/c4t/internal/app/invoke"
+	"github.com/c4-project/c4t/internal/app/perturb"
+	"github.com/c4-project/c4t/internal/app/setc"
 
-	"github.com/MattWindsor91/c4t/internal/app/fuzz"
-	"github.com/MattWindsor91/c4t/internal/app/lift"
+	"github.com/c4-project/c4t/internal/app/fuzz"
+	"github.com/c4-project/c4t/internal/app/lift"
 
-	"github.com/MattWindsor91/c4t/internal/app/gccnt"
+	"github.com/c4-project/c4t/internal/app/gccnt"
 
-	"github.com/MattWindsor91/c4t/internal/app/director"
-	"github.com/MattWindsor91/c4t/internal/app/mach"
+	"github.com/c4-project/c4t/internal/app/director"
+	"github.com/c4-project/c4t/internal/app/mach"
 
 	"github.com/1set/gut/yos"
-	"github.com/MattWindsor91/c4t/internal/app/plan"
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/app/plan"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 
 	c "github.com/urfave/cli/v2"
 )

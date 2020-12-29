@@ -13,14 +13,14 @@ import (
 	"math/rand"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
+	"github.com/c4-project/c4t/internal/helper/srvrun"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/observing"
 
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/stage/lifter"
 
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
 
 	"golang.org/x/sync/errgroup"
 )

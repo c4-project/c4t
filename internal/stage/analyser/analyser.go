@@ -11,11 +11,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // Analyser represents the state of the plan analyser stage.

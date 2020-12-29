@@ -9,17 +9,17 @@ package singleobs
 import (
 	"log"
 
-	"github.com/MattWindsor91/c4t/internal/coverage"
+	"github.com/c4-project/c4t/internal/coverage"
 
-	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/director"
 
-	"github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/stage/perturber"
 
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 
 // DirectorInstance builds a list of director-instance compatible observers suitable for single-shot binaries.

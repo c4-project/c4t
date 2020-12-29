@@ -12,19 +12,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/director"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/ux/directorobs"
+	"github.com/c4-project/c4t/internal/ux/directorobs"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/model/id"
 )
 
 // ExampleLogger_OnPrepare is a runnable example indirectly exercising Logger.OnPrepare.

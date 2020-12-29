@@ -11,15 +11,15 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/recipe"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 var (

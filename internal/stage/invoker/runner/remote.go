@@ -11,17 +11,17 @@ import (
 	"path"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 
-	"github.com/MattWindsor91/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/copier"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/c4t/internal/remote"
+	"github.com/c4-project/c4t/internal/remote"
 
 	"github.com/alessio/shellescape"
 	"golang.org/x/crypto/ssh"

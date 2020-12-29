@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
 // ExampleCheckDone is a runnable example for CheckDone.

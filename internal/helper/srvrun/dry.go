@@ -10,7 +10,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // DryRunner is a runner that just outputs all commands to be run to itself.

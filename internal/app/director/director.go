@@ -14,23 +14,23 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
-	"github.com/MattWindsor91/c4t/internal/ux/directorobs"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/ux/directorobs"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/c4t/internal/act"
-	"github.com/MattWindsor91/c4t/internal/config"
-	"github.com/MattWindsor91/c4t/internal/director"
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	br "github.com/MattWindsor91/c4t/internal/serviceimpl/backend/resolver"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler"
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/model/id"
+	br "github.com/c4-project/c4t/internal/serviceimpl/backend/resolver"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler"
+	"github.com/c4-project/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
 

@@ -9,17 +9,17 @@ package runner
 import (
 	"context"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // Runner contains information necessary to run a plan's compiled test cases.

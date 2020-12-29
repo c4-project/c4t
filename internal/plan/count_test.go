@@ -8,9 +8,9 @@ package plan_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 )
 
 // ExamplePlan_MaxNumRecipes is a testable example for MaxNumRecipes.

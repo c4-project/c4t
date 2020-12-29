@@ -9,10 +9,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/csvdump"
+	"github.com/c4-project/c4t/internal/stage/analyser/csvdump"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 )
 
 // NB: the below CSV is likely to change as the plan mock changes.

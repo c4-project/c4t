@@ -10,24 +10,24 @@ package compiler
 import (
 	"context"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/interpreter"
+	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 //go:generate mockery --name=Driver

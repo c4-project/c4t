@@ -11,15 +11,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
+	"github.com/c4-project/c4t/internal/subject/normaliser"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 )
 
 // Saver contains the state used when saving 'interesting' subjects.

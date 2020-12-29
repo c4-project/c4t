@@ -11,12 +11,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/subject/normpath"
+	"github.com/c4-project/c4t/internal/subject/normpath"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/subject/status"
 )
 
 const (

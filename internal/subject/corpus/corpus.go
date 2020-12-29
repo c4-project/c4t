@@ -11,11 +11,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 var (

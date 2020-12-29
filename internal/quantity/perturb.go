@@ -8,7 +8,7 @@ package quantity
 import (
 	"log"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // PerturbSet contains configurable quantities for the perturber.

@@ -7,8 +7,8 @@
 package observer
 
 import (
-	"github.com/MattWindsor91/c4t/internal/quantity"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 
 // Observer is the interface of anything that observes machine node behaviour.

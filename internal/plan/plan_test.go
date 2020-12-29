@@ -11,19 +11,19 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // ExamplePlan_CompilerIDs is a runnable example for Plan.CompilerIDs.

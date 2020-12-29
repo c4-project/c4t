@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // Sort sorts ids.

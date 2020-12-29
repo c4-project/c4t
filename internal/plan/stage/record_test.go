@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 )
 
 // ExampleNewRecord is a testable example for NewRecord.

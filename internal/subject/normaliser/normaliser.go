@@ -11,15 +11,15 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/MattWindsor91/c4t/internal/subject/normpath"
+	"github.com/c4-project/c4t/internal/subject/normpath"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/recipe"
 
-	"github.com/MattWindsor91/c4t/internal/model/filekind"
+	"github.com/c4-project/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // ErrCollision occurs if the normaliser tries to map two files to the same normalised path.

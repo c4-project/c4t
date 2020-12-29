@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/helper/srvrun"
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/helper/srvrun"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/act"
-	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/config"
 
 	// It's 2020, and tools _still_ can't understand the use of 'v2' unless you do silly hacks like this.
 	c "github.com/urfave/cli/v2"

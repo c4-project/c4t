@@ -6,7 +6,7 @@
 package fuzzer
 
 import (
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 )
 
 // Job contains information on how to fuzz a litmus file.

@@ -11,17 +11,17 @@ import (
 	"errors"
 	"time"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 )
 
 // ErrNil is an error that can be returned if a tester stage gets a nil plan.

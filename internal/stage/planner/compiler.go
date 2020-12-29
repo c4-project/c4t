@@ -9,9 +9,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 )
 
 // CompilerLister is the interface of things that can query compiler information.

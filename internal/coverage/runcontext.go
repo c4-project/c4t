@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // RunContext is the type of state provided to a coverage runner.

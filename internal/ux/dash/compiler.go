@@ -12,9 +12,9 @@ import (
 
 	"github.com/mum4k/termdash/container"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 	"github.com/mum4k/termdash/cell"
 	"github.com/mum4k/termdash/widgets/text"
 )

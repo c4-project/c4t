@@ -9,29 +9,29 @@ import (
 	"context"
 	"testing"
 
-	mocks2 "github.com/MattWindsor91/c4t/internal/stage/mach/interpreter/mocks"
+	mocks2 "github.com/c4-project/c4t/internal/stage/mach/interpreter/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/plan"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/compiler/mocks"
+	"github.com/c4-project/c4t/internal/stage/mach/compiler/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/recipe"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	mdl "github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/compiler"
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/service"
+	mdl "github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/stage/mach/compiler"
 )
 
 // TestCompiler_Run tests running a compile job.

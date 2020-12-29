@@ -8,7 +8,7 @@ package compilation
 import (
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/subject/status"
 )
 
 // Result is the base structure for things that represent the result of an external process.

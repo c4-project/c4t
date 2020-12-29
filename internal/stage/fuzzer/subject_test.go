@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
 )
 
 // TestParseSubjectCycle_roundTrip tests ParseSubjectCycle by round-tripping using String.

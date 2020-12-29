@@ -11,19 +11,19 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
-	"github.com/MattWindsor91/c4t/internal/stage/invoker/runner"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/stage/invoker/runner"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/c4t/internal/remote"
+	"github.com/c4-project/c4t/internal/remote"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
+	"github.com/c4-project/c4t/internal/stage/mach/forward"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // Run runs the machine invoker stage.

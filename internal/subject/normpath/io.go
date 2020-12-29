@@ -17,7 +17,7 @@ import (
 	"strings"
 
 	"github.com/1set/gut/yos"
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 )
 
 // ErrMissingFile occurs when we request a subject file but it isn't available.

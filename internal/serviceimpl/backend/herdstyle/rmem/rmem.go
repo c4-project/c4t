@@ -14,10 +14,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 )
 
 var armArgs = [...]string{

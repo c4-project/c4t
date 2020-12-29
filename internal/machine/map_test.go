@@ -11,12 +11,12 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/machine/mocks"
+	"github.com/c4-project/c4t/internal/machine/mocks"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 )
 
 // ExampleConfigMap_IDs is a runnable example for IDs.

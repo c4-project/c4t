@@ -12,9 +12,9 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 )
 
 // BinActC is the name of the c4f C services binary.

@@ -5,7 +5,7 @@
 
 package saver
 
-import "github.com/MattWindsor91/c4t/internal/observing"
+import "github.com/c4-project/c4t/internal/observing"
 
 // Option is the type of options to New.
 type Option func(*Saver) error

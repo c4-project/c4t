@@ -15,15 +15,15 @@ import (
 	"testing"
 
 	"github.com/1set/gut/yos"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/rmem"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/rmem"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/herd"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/litmus"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/parser"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // TestParse_error tests Parse with various error cases.

@@ -12,20 +12,20 @@ import (
 	"path"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/interpreter"
+	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
-	"github.com/MattWindsor91/c4t/internal/model/filekind"
+	"github.com/c4-project/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	mdl "github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	mdl "github.com/c4-project/c4t/internal/model/service/compiler"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/mocks"
+	"github.com/c4-project/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler/mocks"
 )
 
 // TestInterpreter_Interpret tests Interpret on an example recipe.

@@ -6,7 +6,7 @@
 package compiler
 
 import (
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 )
 
 // This interface is modelled after the corpus equivalent, builder.Observer, and should probably follow any major

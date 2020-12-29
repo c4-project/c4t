@@ -8,9 +8,9 @@ package observing_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 )
 
 type observer interface {

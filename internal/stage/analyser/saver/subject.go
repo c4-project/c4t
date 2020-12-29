@@ -11,7 +11,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
+	"github.com/c4-project/c4t/internal/subject/normaliser"
 )
 
 // Archiver is the interface of types that can archive subject files.

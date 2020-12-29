@@ -14,12 +14,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus/mocks"
+	"github.com/c4-project/c4t/internal/model/litmus/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/subject"
 	"golang.org/x/sync/errgroup"
 )
 

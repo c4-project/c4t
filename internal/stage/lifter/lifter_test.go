@@ -9,13 +9,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/stage/lifter/mocks"
+	"github.com/c4-project/c4t/internal/stage/lifter/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/stage/lifter"
 )
 
 // TestNew_errors tests the error result of New in various situations.

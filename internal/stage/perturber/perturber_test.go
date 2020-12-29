@@ -10,22 +10,22 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/mocks"
-	mocks2 "github.com/MattWindsor91/c4t/internal/stage/perturber/mocks"
+	"github.com/c4-project/c4t/internal/model/service/compiler/mocks"
+	mocks2 "github.com/c4-project/c4t/internal/stage/perturber/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/observing"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/stage/perturber"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

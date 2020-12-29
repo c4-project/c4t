@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // ExamplePretty_dnf shows the result of pretty-printing an observation to a DNF postcondition.

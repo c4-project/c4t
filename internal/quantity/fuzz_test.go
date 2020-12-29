@@ -8,7 +8,7 @@ package quantity_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 )
 
 // ExampleFuzzSet_Override is a runnable example for FuzzSet.Override.

@@ -9,14 +9,14 @@ import (
 	"context"
 	"fmt"
 
-	copy2 "github.com/MattWindsor91/c4t/internal/copier"
+	copy2 "github.com/c4-project/c4t/internal/copier"
 
-	"github.com/MattWindsor91/c4t/internal/model/filekind"
+	"github.com/c4-project/c4t/internal/model/filekind"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/subject"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
-	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/normaliser"
 )
 
 // Recv copies bits of remp into locp, including run information and any compiler failures.

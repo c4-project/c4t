@@ -8,7 +8,7 @@ package obs_test
 import (
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // ExampleState_Vars is a runnable example for State.Vars.

@@ -13,21 +13,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/copier"
 
-	"github.com/MattWindsor91/c4t/internal/director"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/stage/planner"
 
 	"github.com/mum4k/termdash/keyboard"
 
 	"github.com/mum4k/termdash/cell"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 
 	"github.com/mum4k/termdash/linestyle"
 

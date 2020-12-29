@@ -9,17 +9,17 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/recipe"
 
-	"github.com/MattWindsor91/c4t/internal/model/filekind"
-	"github.com/MattWindsor91/c4t/internal/subject"
-	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/model/filekind"
+	"github.com/c4-project/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject/normaliser"
+	"github.com/c4-project/c4t/internal/subject/status"
 )
 
 // ExampleMap_RenamesMatching is a runnable example for RenamesMatching.

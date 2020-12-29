@@ -12,7 +12,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // Parse parses an observation from r into o using i.

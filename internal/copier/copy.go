@@ -13,7 +13,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
 // Copier provides a mockable interface for remote copying.

@@ -11,13 +11,13 @@ import (
 	"io"
 	"os/exec"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/backend"
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // BackendRunner is the interface that backends must implement to slot into the machine node runner.

@@ -15,7 +15,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // TestPlan_Write_roundTrip exercises Write by doing a round-trip and checking if the reconstituted plan is similar.

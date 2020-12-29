@@ -12,19 +12,19 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/delitmus"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/rmem"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/delitmus"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/herd"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/litmus"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/rmem"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 var (

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 )
 
 // ExampleSelection_Override is a testable example for Override.

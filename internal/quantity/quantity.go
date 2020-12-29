@@ -13,7 +13,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // GenericOverride substitutes any quantities in new that are non-zero for those in *old (which must be a pointer).

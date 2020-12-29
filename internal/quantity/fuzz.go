@@ -8,7 +8,7 @@ package quantity
 import (
 	"log"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // FuzzSet represents the part of a configuration that holds various tunable parameters for the fuzzer.

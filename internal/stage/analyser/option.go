@@ -8,9 +8,9 @@ package analyser
 import (
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 )
 
 // ErrObserverNil occurs if we pass a nil Observer to ObserveWith.

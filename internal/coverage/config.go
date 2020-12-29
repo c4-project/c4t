@@ -8,21 +8,21 @@ package coverage
 import (
 	"errors"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/stage/lifter"
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/config"
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/model/service"
 	"github.com/pelletier/go-toml"
 )
 

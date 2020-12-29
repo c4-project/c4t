@@ -6,7 +6,7 @@
 package corpus
 
 import (
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // Merge merges corpora into a single corpus.

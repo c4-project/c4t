@@ -10,22 +10,22 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/c4t/internal/stage/invoker/runner"
+	"github.com/c4-project/c4t/internal/stage/invoker/runner"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 
-	"github.com/MattWindsor91/c4t/internal/config"
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	"github.com/MattWindsor91/c4t/internal/stage/invoker"
+	"github.com/c4-project/c4t/internal/stage/invoker"
 
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/c4t/internal/ux/singleobs"
+	"github.com/c4-project/c4t/internal/ux/singleobs"
 
-	"github.com/MattWindsor91/c4t/internal/ux"
+	"github.com/c4-project/c4t/internal/ux"
 )
 
 const (

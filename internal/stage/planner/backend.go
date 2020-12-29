@@ -6,7 +6,7 @@
 package planner
 
 import (
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 )
 
 func (p *Planner) planBackend() (*backend2.NamedSpec, error) {

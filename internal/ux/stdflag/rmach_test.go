@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	"github.com/stretchr/testify/assert"
 	c "github.com/urfave/cli/v2"
 )

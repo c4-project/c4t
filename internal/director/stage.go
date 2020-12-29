@@ -10,17 +10,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/stage/perturber"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser"
+	"github.com/c4-project/c4t/internal/stage/analyser"
 
-	"github.com/MattWindsor91/c4t/internal/stage/invoker"
+	"github.com/c4-project/c4t/internal/stage/invoker"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/lifter"
 )
 
 // StageConfig groups together the stage configuration for of a director instance.

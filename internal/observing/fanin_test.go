@@ -10,11 +10,11 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 	"github.com/stretchr/testify/require"
 )
 

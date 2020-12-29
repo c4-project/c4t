@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	fuzzer "github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	fuzzer "github.com/c4-project/c4t/internal/stage/fuzzer"
 	mock "github.com/stretchr/testify/mock"
 )
 

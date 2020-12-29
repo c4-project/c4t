@@ -8,7 +8,7 @@ package stdflag
 import (
 	"strconv"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
 	c "github.com/urfave/cli/v2"
 )

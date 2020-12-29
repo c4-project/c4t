@@ -8,7 +8,7 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	service "github.com/MattWindsor91/c4t/internal/model/service"
+	service "github.com/c4-project/c4t/internal/model/service"
 
 	time "time"
 )

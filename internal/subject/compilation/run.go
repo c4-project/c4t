@@ -6,7 +6,7 @@
 package compilation
 
 import (
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // RunResult represents information about a single run of a subject.

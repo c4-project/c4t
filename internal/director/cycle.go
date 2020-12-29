@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // cycleInstance contains state for one cycle of one instance of the director.

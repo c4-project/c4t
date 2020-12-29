@@ -8,11 +8,11 @@ package gcc_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/gcc"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler/gcc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 )
 
 // TestDefaultMOpts tests the mopt calculation for various platforms.

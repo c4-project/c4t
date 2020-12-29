@@ -6,9 +6,9 @@
 package gcc
 
 import (
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 )
 
 var (

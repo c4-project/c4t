@@ -8,9 +8,9 @@ package main
 import (
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/app/director"
+	"github.com/c4-project/c4t/internal/app/director"
 
-	"github.com/MattWindsor91/c4t/internal/ux"
+	"github.com/c4-project/c4t/internal/ux"
 )
 
 func main() {

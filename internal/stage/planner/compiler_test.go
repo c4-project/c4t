@@ -10,25 +10,25 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/stage/planner/mocks"
+	"github.com/c4-project/c4t/internal/stage/planner/mocks"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 
 	"github.com/1set/gut/ystring"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	cmocks "github.com/MattWindsor91/c4t/internal/model/service/compiler/mocks"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	cmocks "github.com/c4-project/c4t/internal/model/service/compiler/mocks"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 	"github.com/stretchr/testify/mock"
 )
 

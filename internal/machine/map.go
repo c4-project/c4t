@@ -10,8 +10,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 )
 
 // ErrNoMachine occurs when we try to look up the compilers of a missing machine.

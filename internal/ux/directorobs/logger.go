@@ -9,24 +9,24 @@ import (
 	"io"
 	"log"
 
-	"github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/observing"
 
-	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/director"
 
-	"github.com/MattWindsor91/c4t/internal/helper/stringhelp"
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/stage/planner"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/pretty"
+	"github.com/c4-project/c4t/internal/stage/analyser/pretty"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/machine"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 
 // TODO(@MattWindsor91): merge this with the singleobs logger?

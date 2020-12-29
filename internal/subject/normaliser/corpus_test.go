@@ -8,11 +8,11 @@ package normaliser_test
 import (
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/subject/normaliser"
+	"github.com/c4-project/c4t/internal/subject/normaliser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus"
+	"github.com/c4-project/c4t/internal/subject/corpus"
 )
 
 // TestCorpus_Normalise tests the normaliser on a corpus stitched together from all of the individual subject

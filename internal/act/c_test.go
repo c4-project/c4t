@@ -9,12 +9,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	"github.com/MattWindsor91/c4t/internal/model/service/mocks"
+	"github.com/c4-project/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service/mocks"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/act"
 	"github.com/stretchr/testify/require"
 )
 

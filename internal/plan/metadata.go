@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan/stage"
 )
 
 // UseDateSeed is a value for the header constructor's seed parameter that ensures its RNG will be seeded by run date.

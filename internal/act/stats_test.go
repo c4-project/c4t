@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/act"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

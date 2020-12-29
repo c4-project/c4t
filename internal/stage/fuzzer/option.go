@@ -6,10 +6,10 @@
 package fuzzer
 
 import (
-	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 
 // Option is the type of options passed to the fuzzer constructor.

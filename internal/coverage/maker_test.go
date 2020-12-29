@@ -11,14 +11,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/MattWindsor91/c4t/internal/coverage"
+	"github.com/c4-project/c4t/internal/coverage"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/coverage/mocks"
+	"github.com/c4-project/c4t/internal/coverage/mocks"
 )
 
 // TestMaker_Run tests the happy path of Maker.Run using mocks.

@@ -8,7 +8,7 @@ package iohelp
 import (
 	"io"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 )
 
 // CopyCloseSrc copies src to dst, then closes src.

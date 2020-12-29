@@ -10,10 +10,10 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 )
 
 // StdinFile is the special file path that the plan loader treats as a request to load from stdin instead.

@@ -5,7 +5,7 @@
 
 package builder
 
-import "github.com/MattWindsor91/c4t/internal/subject/corpus"
+import "github.com/c4-project/c4t/internal/subject/corpus"
 
 // Config is a configuration for a Builder.
 type Config struct {

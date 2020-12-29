@@ -6,7 +6,7 @@
 package coverage
 
 import (
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 )
 
 // Observer is the interface of types that can observe the progress of a coverage testbed generator.

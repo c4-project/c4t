@@ -10,11 +10,11 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 )
 
 // BinActFuzz is the name of the ACT fuzzer binary.

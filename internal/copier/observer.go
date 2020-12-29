@@ -5,7 +5,7 @@
 
 package copier
 
-import "github.com/MattWindsor91/c4t/internal/observing"
+import "github.com/c4-project/c4t/internal/observing"
 
 // Observer is an interface for types that observe an SFTP file copy.
 type Observer interface {

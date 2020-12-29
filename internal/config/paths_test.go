@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/MattWindsor91/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/config"
 )
 
 // ExamplePathset_OutPath is a runnable example for Pathset.OutPath.

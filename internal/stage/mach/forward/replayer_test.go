@@ -13,35 +13,35 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 
-	"github.com/MattWindsor91/c4t/internal/subject/compilation"
+	"github.com/c4-project/c4t/internal/subject/compilation"
 
-	"github.com/MattWindsor91/c4t/internal/model/litmus"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/recipe"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/subject/status"
+	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/helper/testhelp"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
-	"github.com/MattWindsor91/c4t/internal/subject"
+	"github.com/c4-project/c4t/internal/subject"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer/mocks"
+	"github.com/c4-project/c4t/internal/stage/mach/forward"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/stage/mach/observer/mocks"
 )
 
 // TestReplayer_Run_roundTripBuilder a round-trip between Observer and Replayer over builder requests.

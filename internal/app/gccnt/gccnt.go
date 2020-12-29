@@ -12,11 +12,11 @@ import (
 	"io"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/ux/stdflag"
+	"github.com/c4-project/c4t/internal/ux/stdflag"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/gcc"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler/gcc"
 
-	"github.com/MattWindsor91/c4t/internal/tool/gccnt"
+	"github.com/c4-project/c4t/internal/tool/gccnt"
 
 	// This name is because every single time I try to use v2 named as 'cli', my IDE decides to replace it with v1.
 	// Yes, I know, I shouldn't work around IDE issues by obfuscating my code, but I'm at my wit's end.

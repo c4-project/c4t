@@ -6,10 +6,10 @@
 package rmem
 
 import (
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/herd"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/litmus"
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/herd"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/litmus"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/parser"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // ParseStateCount parses the state count in fields according to Rmem's syntax.

@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/plan/stage"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan/stage"
 )
 
 // ExampleMetadata_RequireStage is a testable example for Metadata.RequireStage.

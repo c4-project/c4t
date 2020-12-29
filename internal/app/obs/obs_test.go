@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/1set/gut/yos"
-	"github.com/MattWindsor91/c4t/internal/app/obs"
+	"github.com/c4-project/c4t/internal/app/obs"
 	"github.com/stretchr/testify/require"
 )
 

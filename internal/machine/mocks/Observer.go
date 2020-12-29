@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	machine "github.com/MattWindsor91/c4t/internal/machine"
+	machine "github.com/c4-project/c4t/internal/machine"
 	mock "github.com/stretchr/testify/mock"
 )
 

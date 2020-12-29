@@ -6,8 +6,8 @@
 package invoker
 
 import (
-	"github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 
 // Observer is the union of the various interfaces of observers used by invoker.

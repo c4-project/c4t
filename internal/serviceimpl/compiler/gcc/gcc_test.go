@@ -11,12 +11,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler/optlevel"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/compiler/gcc"
+	"github.com/c4-project/c4t/internal/serviceimpl/compiler/gcc"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/model/service"
 )
 
 // ExampleArgs is a runnable example for Args.

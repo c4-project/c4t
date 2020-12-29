@@ -6,7 +6,7 @@
 package analyser
 
 import (
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 )
 
 // Observer represents the observer interface for the analyser stage.

@@ -12,12 +12,12 @@ import (
 	"path"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 	"github.com/stretchr/testify/mock"
 
-	copy2 "github.com/MattWindsor91/c4t/internal/copier"
+	copy2 "github.com/c4-project/c4t/internal/copier"
 
-	"github.com/MattWindsor91/c4t/internal/copier/mocks"
+	"github.com/c4-project/c4t/internal/copier/mocks"
 
 	"github.com/stretchr/testify/assert"
 )

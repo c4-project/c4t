@@ -9,21 +9,21 @@ import (
 	"context"
 	"errors"
 
-	"github.com/MattWindsor91/c4t/internal/machine"
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/observer"
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
-	"github.com/MattWindsor91/c4t/internal/stage/planner"
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/stage/mach/observer"
+	"github.com/c4-project/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/stage/planner"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/observing"
 
-	"github.com/MattWindsor91/c4t/internal/director"
-	"github.com/MattWindsor91/c4t/internal/model/service/compiler"
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+	"github.com/c4-project/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 )
 
 // Forward contains a director observation that has been forwarded from an instance to a 'main' observer,

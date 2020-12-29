@@ -8,7 +8,7 @@ package normaliser
 import (
 	"path"
 
-	"github.com/MattWindsor91/c4t/internal/model/filekind"
+	"github.com/c4-project/c4t/internal/model/filekind"
 )
 
 // Map is the type of normalisation mappings.

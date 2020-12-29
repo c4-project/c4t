@@ -6,8 +6,8 @@
 package planner
 
 import (
-	"github.com/MattWindsor91/c4t/internal/observing"
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/observing"
+	"github.com/c4-project/c4t/internal/quantity"
 )
 
 // Option is the type of options to the Planner constructor.

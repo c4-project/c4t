@@ -6,8 +6,8 @@
 package invoker
 
 import (
-	"github.com/MattWindsor91/c4t/internal/plan"
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/quantity"
 )
 
 // PlanQuantityOverrider is the interface of things that may, or may not, override the invoker's quantity set with

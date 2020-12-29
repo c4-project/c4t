@@ -11,13 +11,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/interpreter"
+	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 
-	"github.com/MattWindsor91/c4t/internal/stage/mach/compiler"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/forward"
-	"github.com/MattWindsor91/c4t/internal/stage/mach/runner"
+	"github.com/c4-project/c4t/internal/stage/mach/compiler"
+	"github.com/c4-project/c4t/internal/stage/mach/forward"
+	"github.com/c4-project/c4t/internal/stage/mach/runner"
 )
 
 // Mach encapsulates the state needed for the machine-dependent stage.

@@ -24,20 +24,20 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	backend2 "github.com/MattWindsor91/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
-	"github.com/MattWindsor91/c4t/internal/serviceimpl/backend/herdstyle/parser"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/parser"
 
-	"github.com/MattWindsor91/c4t/internal/model/recipe"
+	"github.com/c4-project/c4t/internal/model/recipe"
 
-	"github.com/MattWindsor91/c4t/internal/model/service"
-	"github.com/MattWindsor91/c4t/internal/subject/obs"
+	"github.com/c4-project/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
 // standaloneOut is the name of the file in the output directory to which we should write standalone output.

@@ -12,11 +12,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/MattWindsor91/c4t/internal/director"
+	"github.com/c4-project/c4t/internal/director"
 
-	"github.com/MattWindsor91/c4t/internal/config"
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
-	"github.com/MattWindsor91/c4t/internal/ux/dash"
+	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/ux/dash"
 	"golang.org/x/sync/errgroup"
 )
 

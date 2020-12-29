@@ -8,7 +8,7 @@ package fuzzer
 import (
 	"context"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 )
 
 // SingleFuzzer represents types that can commune with a C litmus test fuzzer.

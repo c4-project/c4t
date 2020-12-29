@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 )
 
 // Name describes the unique name of a particular instance of the batch compiler.

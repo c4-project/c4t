@@ -10,44 +10,44 @@ import (
 	"fmt"
 	"time"
 
-	fuzzer2 "github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/plan/analysis"
+	"github.com/c4-project/c4t/internal/plan/analysis"
 
-	"github.com/MattWindsor91/c4t/internal/stage/invoker/runner"
+	"github.com/c4-project/c4t/internal/stage/invoker/runner"
 
-	observer2 "github.com/MattWindsor91/c4t/internal/stage/mach/observer"
+	observer2 "github.com/c4-project/c4t/internal/stage/mach/observer"
 
-	"github.com/MattWindsor91/c4t/internal/quantity"
+	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/MattWindsor91/c4t/internal/stage/perturber"
+	"github.com/c4-project/c4t/internal/stage/perturber"
 
-	"github.com/MattWindsor91/c4t/internal/helper/errhelp"
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	"github.com/MattWindsor91/c4t/internal/copier"
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/machine"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser"
+	"github.com/c4-project/c4t/internal/stage/analyser"
 
-	"github.com/MattWindsor91/c4t/internal/stage/analyser/saver"
+	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
-	"github.com/MattWindsor91/c4t/internal/subject/corpus/builder"
+	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
-	"github.com/MattWindsor91/c4t/internal/director/pathset"
+	"github.com/c4-project/c4t/internal/director/pathset"
 
-	"github.com/MattWindsor91/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/model/id"
 
-	"github.com/MattWindsor91/c4t/internal/remote"
+	"github.com/c4-project/c4t/internal/remote"
 
-	"github.com/MattWindsor91/c4t/internal/stage/invoker"
+	"github.com/c4-project/c4t/internal/stage/invoker"
 
-	"github.com/MattWindsor91/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/stage/lifter"
 
-	"github.com/MattWindsor91/c4t/internal/stage/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
 
-	"github.com/MattWindsor91/c4t/internal/plan"
+	"github.com/c4-project/c4t/internal/plan"
 
-	"github.com/MattWindsor91/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
 // The maximum permitted number of times a loop can error out consecutively before the tester fails.

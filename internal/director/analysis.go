@@ -5,7 +5,7 @@
 
 package director
 
-import "github.com/MattWindsor91/c4t/internal/plan/analysis"
+import "github.com/c4-project/c4t/internal/plan/analysis"
 
 // CycleAnalysis contains an analysis as well as the cycle that produced it.
 type CycleAnalysis struct {

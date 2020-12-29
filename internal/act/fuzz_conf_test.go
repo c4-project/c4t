@@ -12,12 +12,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/MattWindsor91/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/MattWindsor91/c4t/internal/act"
-	"github.com/MattWindsor91/c4t/internal/machine"
+	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/machine"
 )
 
 // ExampleWriteFuzzConf_empty is a testable example for WriteFuzzConf, showing an empty config.
