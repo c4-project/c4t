@@ -22,8 +22,7 @@ JSON file that centralises information about a testing campaign for one machine.
 Many of its components operate on one or more test plans, either implicitly or
 explicitly.
 
-At time of writing, `c4t` has the following components (due to be renamed from
-`c4t-*` to `c4t-*`:
+At time of writing, `c4t` has the following components:
 
 ### The main test cycle
 
@@ -38,21 +37,25 @@ At time of writing, `c4t` has the following components (due to be renamed from
 - `c4t-invoke` (on the machine running _c4t_) and `c4t-mach` (on
    the target machine), which communicate with each other through SSH and
    perform the compilation and running phases of a test plan;
+- `c4t`, which combines the above into a looping test campaign over multiple machines.
 
-### Analysing test plans
+### Analysing things
 
 - `c4t-analyse`, which performs some basic analysis over a test plan and
   prints reports on failures, compiler warnings, etc.;
-- `c4t`, which combines the above into a looping test campaign over multiple machines.
+- `c4t-obs`, which parses and pretty-prints information from backend observation
+  JSON records (such as those produced by `c4t-backend` and nested inside plan
+  files).
 
 ### Utilities
 
-- `c4t-setc`, which overrides compiler parameters in an existing plan
-  (useful for exploring particular optimisation levels);
+- `c4t-backend`, for running backends separately from test cycles;
 - `c4t-coverage`, which produces coverage testbeds (work in progress);
 - `c4t-gccnt` (GCCn't), a wrapper over `gcc` that can inject compiler failures
   when certain parameters are triggered (useful for testing that the workflow
-  handles such issues).
+  handles such issues);
+- `c4t-setc`, which overrides compiler parameters in an existing plan
+  (useful for exploring particular optimisation levels).
 
 ## Use
 
