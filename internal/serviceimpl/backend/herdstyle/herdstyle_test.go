@@ -56,7 +56,7 @@ func TestBackend_ParseObs(t *testing.T) {
 						return
 					}
 					var o obs.Obs
-					err = b.ParseObs(context.Background(), nil, file, &o)
+					err = b.ParseObs(context.Background(), file, &o)
 					_ = file.Close()
 					if !assert.NoError(t, err, "parsing test file", fname) {
 						return

@@ -53,8 +53,6 @@ type FuzzRunner struct {
 
 	// Arch is the architecture that the lifting process should target.
 	Arch id.ID
-	// Backend can point to the backend information for the lifter.
-	Backend *backend.Spec
 	// Runner should be the service runner to use when invoking the lifter.
 	Runner service.Runner
 }
@@ -125,9 +123,8 @@ func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, lpath string) erro
 
 func (f *FuzzRunner) liftJob(in backend.LiftInput, rc RunContext) backend.LiftJob {
 	return backend.LiftJob{
-		Backend: f.Backend,
-		Arch:    f.Arch,
-		In:      in,
+		Arch: f.Arch,
+		In:   in,
 		Out: backend.LiftOutput{
 			Dir:    rc.LiftOutDir(),
 			Target: backend.ToDefault,

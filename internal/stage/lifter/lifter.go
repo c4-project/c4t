@@ -127,17 +127,16 @@ func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, e
 	}
 	// TODO(@MattWindsor91): extract this 20 into configuration.
 	return builder.ParBuild(ctx, 20, p.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
-		j := l.makeJob(p, b, spec, s, rq)
+		j := l.makeJob(p, b, s, rq)
 		return j.Lift(ctx)
 	})
 }
 
-func (l *Lifter) makeJob(p *plan.Plan, b backend.SingleLifter, spec backend.Spec, s subject.Named, resCh chan<- builder.Request) Instance {
+func (l *Lifter) makeJob(p *plan.Plan, b backend.SingleLifter, s subject.Named, resCh chan<- builder.Request) Instance {
 
 	return Instance{
 		Arches: p.Arches(),
 		// TODO(@MattWindsor91): remove this
-		Backend: &spec,
 		Paths:   l.paths,
 		Driver:  b,
 		Subject: s,

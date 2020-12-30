@@ -39,12 +39,12 @@ type Delitmus struct {
 }
 
 // Capabilities reports that this backend can lift (and nothing else).
-func (d Delitmus) Capabilities(_ *backend2.Spec) backend2.Capability {
+func (d Delitmus) Capabilities() backend2.Capability {
 	return backend2.CanLiftLitmus | backend2.CanProduceObj
 }
 
 // LitmusArches reports that this backend understands C litmus (and nothing else).
-func (Delitmus) LitmusArches(_ *backend2.Spec) []id.ID {
+func (Delitmus) LitmusArches() []id.ID {
 	return []id.ID{id.ArchC}
 }
 
@@ -92,6 +92,6 @@ func checkAndAmendJob(j *backend2.LiftJob) error {
 }
 
 // ParseObs errors, for we cannot parse the observations of a delitmus run.
-func (d Delitmus) ParseObs(_ context.Context, _ *backend2.Spec, _ io.Reader, _ *obs.Obs) error {
+func (d Delitmus) ParseObs(_ context.Context, _ io.Reader, _ *obs.Obs) error {
 	return backend2.ErrNotSupported
 }

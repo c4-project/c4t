@@ -258,7 +258,6 @@ func (m *Maker) knownRunner(p Profile) (Runner, error) {
 		StatDumper: m.sdump,
 		Config:     p.Fuzz,
 		Arch:       p.Arch,
-		Backend:    p.Backend,
 		// TODO(@MattWindsor91): push this up somehow
 		Runner: srvrun.NewExecRunner(srvrun.StderrTo(m.errw)),
 	}, nil

@@ -28,35 +28,39 @@ var (
 	// ErrUnknownStyle occurs when we ask the resolver for a backend style of which it isn't aware.
 	ErrUnknownStyle = errors.New("unknown backend style")
 
+	herdArches   = []id.ID{id.ArchC, id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC}
+	litmusArches = []id.ID{id.ArchC, id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC}
+	// TODO(@MattWindsor91): rmem supports more than this, but needs more work on sanitising/model selection
+	rmemArches = []id.ID{id.ArchAArch64}
+
 	// Resolve is a pre-populated backend resolver.
-	Resolve = Resolver{Backends: map[string]backend2.Backend{
-		"delitmus": delitmus.Delitmus{},
+	Resolve = Resolver{Backends: map[string]func(r *service.RunInfo) backend2.Backend{
+		"delitmus": func(*service.RunInfo) backend2.Backend { return delitmus.Delitmus{} },
 		"herdtools.herd": herdstyle.Backend{
 			OptCapabilities: 0,
-			Arches:          []id.ID{id.ArchC, id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC},
-			DefaultRun:      service.RunInfo{Cmd: "herd7"},
+			Arches:          herdArches,
+			RunInfo:         service.RunInfo{Cmd: "herd7"},
 			Impl:            herd.Herd{},
-		},
+		}.Instantiate,
 		"herdtools.litmus": herdstyle.Backend{
 			OptCapabilities: backend2.CanProduceExe,
-			Arches:          []id.ID{id.ArchC, id.ArchAArch64, id.ArchArm, id.ArchX8664, id.ArchX86, id.ArchPPC},
-			DefaultRun:      service.RunInfo{Cmd: "litmus7"},
+			Arches:          litmusArches,
+			RunInfo:         service.RunInfo{Cmd: "litmus7"},
 			Impl:            litmus.Litmus{},
-		},
+		}.Instantiate,
 		"rmem": herdstyle.Backend{
 			OptCapabilities: backend2.CanLiftLitmus,
-			// TODO(@MattWindsor91): rmem supports more than this, but needs more work on sanitising/model selection
-			Arches:     []id.ID{id.ArchAArch64},
-			DefaultRun: service.RunInfo{Cmd: "rmem"},
-			Impl:       rmem.Rmem{},
-		},
+			Arches:          rmemArches,
+			RunInfo:         service.RunInfo{Cmd: "rmem"},
+			Impl:            rmem.Rmem{},
+		}.Instantiate,
 	}}
 )
 
 // Resolver maps backend styles to backends.
 type Resolver struct {
-	// Backends is the raw map from style strings to backend runners.
-	Backends map[string]backend2.Backend
+	// Backends is the raw map from style strings to backend constructors.
+	Backends map[string]func(ri *service.RunInfo) backend2.Backend
 }
 
 // Resolve tries to look up the backend specified by b in this resolver.
@@ -70,5 +74,5 @@ func (r *Resolver) Resolve(b *backend2.Spec) (backend2.Backend, error) {
 	if !ok {
 		return nil, fmt.Errorf("%w: %s", ErrUnknownStyle, sstr)
 	}
-	return bi, nil
+	return bi(b.Run), nil
 }

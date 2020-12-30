@@ -22,10 +22,10 @@ import (
 // Backend contains the various interfaces that a backend can implement.
 type Backend interface {
 	// Capabilities gets the capability set reported for this backend.
-	Capabilities(b *Spec) Capability
+	Capabilities() Capability
 
 	// LitmusArches gets the list of Litmus architectures understood by this backend (capability CanLiftLitmus).
-	LitmusArches(b *Spec) []id.ID
+	LitmusArches() []id.ID
 
 	// Some backends can lift test-cases into recipes (capability CanLift).
 	SingleLifter
@@ -58,7 +58,7 @@ type SingleLifter interface {
 type ObsParser interface {
 	// ParseObs parses the observation in reader r into o according to the backend configuration in b.
 	// The backend described by b must have been used to produce the testcase outputting r.
-	ParseObs(ctx context.Context, b *Spec, r io.Reader, o *obs.Obs) error
+	ParseObs(ctx context.Context, r io.Reader, o *obs.Obs) error
 }
 
 /*

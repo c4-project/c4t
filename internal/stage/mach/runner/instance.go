@@ -35,10 +35,6 @@ type Instance struct {
 	// backend is the backend used to produce the recipes being run.
 	backend backend.ObsParser
 
-	// spec is the spec for the backend used to produce the recipes being run.
-	// We retain the backend to be able to work out how to parse the run results.
-	spec backend.Spec
-
 	// resCh is the channel to which we're sending the run result.
 	resCh chan<- builder.Request
 
@@ -124,7 +120,7 @@ func (n *Instance) runAndParseBin(ctx context.Context, name compilation.Name, bi
 	}
 
 	var o obs.Obs
-	perr := n.backend.ParseObs(tctx, &n.spec, obsr, &o)
+	perr := n.backend.ParseObs(tctx, obsr, &o)
 	werr := cmd.Wait()
 
 	return &o, errhelp.TimeoutOrFirstError(tctx, werr, perr)

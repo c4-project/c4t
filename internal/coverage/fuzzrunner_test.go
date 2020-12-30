@@ -56,7 +56,6 @@ func TestFuzzRunner_Run(t *testing.T) {
 		StatDumper: &s,
 		Config:     &conf,
 		Arch:       id.ArchX86,
-		Backend:    &backend2.Spec{Style: id.FromString("litmus")},
 		Runner:     dr,
 	}
 	sub := subject.NewOrPanic(litmus.NewOrPanic("foo.litmus", litmus.WithArch(id.ArchC)))
@@ -79,7 +78,6 @@ func TestFuzzRunner_Run(t *testing.T) {
 	})).Return(nil).Once()
 	l.On("Lift", mock.Anything, mock.MatchedBy(func(l backend2.LiftJob) bool {
 		return l.Arch.Equal(fr.Arch) &&
-			l.Backend == fr.Backend &&
 			l.In.Source == backend2.LiftLitmus &&
 			l.In.Litmus.Filepath() == rc.OutLitmus() &&
 			l.Out.Target == backend2.ToDefault &&

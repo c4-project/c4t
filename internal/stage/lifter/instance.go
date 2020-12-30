@@ -25,9 +25,6 @@ type Instance struct {
 	// Arches is the list of architectures for which this job is responsible.
 	Arches []id.ID
 
-	// Backend is the backend that this job will use.
-	Backend *backend.Spec
-
 	// Driver is the single-lift driver for this job.
 	Driver backend.SingleLifter
 
@@ -61,9 +58,6 @@ func (j *Instance) Lift(ctx context.Context) error {
 
 // check does some basic checking on the Instance before starting to run it.
 func (j *Instance) check() error {
-	if j.Backend == nil {
-		return ErrNoBackend
-	}
 	if j.Driver == nil {
 		return ErrDriverNil
 	}
@@ -84,9 +78,8 @@ func (j *Instance) liftArch(ctx context.Context, arch id.ID) error {
 
 	// TODO(@MattWindsor91): don't hardcode this
 	spec := backend.LiftJob{
-		Backend: j.Backend,
-		Arch:    arch,
-		In:      backend.LiftLitmusInput(lit),
+		Arch: arch,
+		In:   backend.LiftLitmusInput(lit),
 		Out: backend.LiftOutput{
 			Dir:    dir,
 			Target: backend.ToExeRecipe,

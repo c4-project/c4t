@@ -49,25 +49,33 @@ type Backend struct {
 	// Arches describes the architectures of Litmus test this backend can deal with.
 	Arches []id.ID
 
-	// DefaultRun is the default run information for the particular backend.
-	DefaultRun service.RunInfo
+	// RunInfo is the run information for the particular backend.
+	RunInfo service.RunInfo
 
 	// Impl provides parts of the Backend backend setup that differ between the various tools.
 	Impl BackendImpl
 }
 
+// Instantiate overrides the run info in this backend, and returns a new backend in an interface wrapper.
+//
+// This slightly strange implementation is designed to slot into function tables in resolvers.
+func (h Backend) Instantiate(new *service.RunInfo) backend2.Backend {
+	h.RunInfo.OverrideIfNotNil(new)
+	return h
+}
+
 // Capabilities returns OptCapabilities (as well as the implied backend.CanLiftLitmus and backend.CanRunStandalone).
-func (h Backend) Capabilities(_ *backend2.Spec) backend2.Capability {
+func (h Backend) Capabilities() backend2.Capability {
 	return backend2.CanLiftLitmus | backend2.CanRunStandalone | h.OptCapabilities
 }
 
 // LitmusArches returns Arches, to satisfy the backend interface.
-func (h Backend) LitmusArches(_ *backend2.Spec) []id.ID {
+func (h Backend) LitmusArches() []id.ID {
 	return h.Arches
 }
 
 // ParseObs parses an observation from r into o.
-func (h Backend) ParseObs(_ context.Context, _ *backend2.Spec, r io.Reader, o *obs.Obs) error {
+func (h Backend) ParseObs(_ context.Context, r io.Reader, o *obs.Obs) error {
 	return parser.Parse(h.Impl, r, o)
 }
 
@@ -75,51 +83,36 @@ func (h Backend) Lift(ctx context.Context, j backend2.LiftJob, x service.Runner)
 	if err := h.checkAndAmendJob(&j); err != nil {
 		return recipe.Recipe{}, err
 	}
-
-	b := j.Backend
-	if b == nil {
-		return recipe.Recipe{}, fmt.Errorf("%w: backend in harness job", service.ErrNil)
-	}
-
-	r := h.DefaultRun
-	if b.Run != nil {
-		r.Override(*b.Run)
-	}
-
-	return h.liftInner(ctx, j, r, x)
-}
-
-func (h Backend) liftInner(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) (recipe.Recipe, error) {
 	switch j.Out.Target {
 	case backend2.ToStandalone:
-		return h.liftStandalone(ctx, j, r, x)
+		return h.liftStandalone(ctx, j, x)
 	case backend2.ToExeRecipe:
-		return h.liftExe(ctx, j, r, x)
+		return h.liftExe(ctx, j, x)
 	}
 	// We should've filtered out bad targets by this stage.
 	return recipe.Recipe{}, nil
 }
 
-func (h Backend) liftStandalone(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) (recipe.Recipe, error) {
-	if err := h.runStandalone(ctx, j, r, x); err != nil {
+func (h Backend) liftStandalone(ctx context.Context, j backend2.LiftJob, x service.Runner) (recipe.Recipe, error) {
+	if err := h.runStandalone(ctx, j, x); err != nil {
 		return recipe.Recipe{}, err
 	}
 	return h.makeStandaloneRecipe(j.Out)
 }
 
-func (h Backend) liftExe(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) (recipe.Recipe, error) {
-	if err := h.Impl.LiftExe(ctx, j, r, x); err != nil {
+func (h Backend) liftExe(ctx context.Context, j backend2.LiftJob, x service.Runner) (recipe.Recipe, error) {
+	if err := h.Impl.LiftExe(ctx, j, h.RunInfo, x); err != nil {
 		return recipe.Recipe{}, err
 	}
 	return h.makeExeRecipe(j.Out)
 }
 
-func (h Backend) runStandalone(ctx context.Context, j backend2.LiftJob, r service.RunInfo, x service.Runner) error {
+func (h Backend) runStandalone(ctx context.Context, j backend2.LiftJob, x service.Runner) error {
 	f, err := os.Create(filepath.Join(filepath.Clean(j.Out.Dir), standaloneOut))
 	if err != nil {
 		return fmt.Errorf("couldn't create standalone output file: %s", err)
 	}
-	rerr := h.Impl.LiftStandalone(ctx, j, r, x, f)
+	rerr := h.Impl.LiftStandalone(ctx, j, h.RunInfo, x, f)
 	cerr := f.Close()
 	return errhelp.FirstError(rerr, cerr)
 }

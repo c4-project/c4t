@@ -41,9 +41,6 @@ var (
 
 // LiftJob is a specification of how to lift a test into a compilable recipe.
 type LiftJob struct {
-	// Backend specifies the backend to use to perform the lifting.
-	Backend *Spec
-
 	// Arch is the ID of the architecture for which a recipe should be prepared, if the recipe is architecture-specific.
 	Arch id.ID
 
@@ -173,9 +170,6 @@ func (l LiftOutput) Files() ([]string, error) {
 
 // RunJob is the type of jobs being sent to a backend for running.
 type RunJob struct {
-	// Backend specifies the backend to use to perform the running.
-	Backend *Spec
-
 	// Recipe is a pointer to the recipe that was fed into the compile stage for this compilation; this is useful for
 	// backends that don't compile, and instead peruse files from the compiler recipe.
 	Recipe *recipe.Recipe

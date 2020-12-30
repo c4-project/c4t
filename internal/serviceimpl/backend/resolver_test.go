@@ -37,7 +37,7 @@ func TestResolver_Get_capabilities(t *testing.T) {
 			r, err := backend.Resolve.Resolve(spec)
 			require.NoError(t, err, "resolution should pass")
 
-			assert.Equal(t, c, r.Capabilities(spec))
+			assert.Equal(t, c, r.Capabilities())
 		})
 	}
 }

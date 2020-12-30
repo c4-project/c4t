@@ -114,12 +114,12 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 		return err
 	}
 
-	bspec, b, err := getBackend(cfg, criteriaFromCli(ctx))
+	b, err := getBackend(cfg, criteriaFromCli(ctx))
 	if err != nil {
 		return err
 	}
 
-	j, err := jobFromCli(ctx, fn, c4f, bspec, td)
+	j, err := jobFromCli(ctx, fn, c4f, td)
 	if err != nil {
 		return err
 	}
@@ -128,17 +128,16 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	return errhelp.FirstError(perr, derr)
 }
 
-func jobFromCli(ctx *c.Context, fn string, c4f *act.Runner, bspec *backend.Spec, td string) (backend.LiftJob, error) {
+func jobFromCli(ctx *c.Context, fn string, c4f *act.Runner, td string) (backend.LiftJob, error) {
 	in, err := backend.InputFromFile(ctx.Context, fn, c4f)
 	if err != nil {
 		return backend.LiftJob{}, err
 	}
 
 	j := backend.LiftJob{
-		Backend: bspec,
-		Arch:    idFromCli(ctx, flagArchID),
-		In:      in,
-		Out:     backend.LiftOutput{Dir: td, Target: backend.ToStandalone},
+		Arch: idFromCli(ctx, flagArchID),
+		In:   in,
+		Out:  backend.LiftOutput{Dir: td, Target: backend.ToStandalone},
 	}
 	return j, nil
 }
@@ -178,7 +177,7 @@ func runAndParse(ctx context.Context, to time.Duration, b backend.Backend, j bac
 	}
 
 	for _, fname := range r.Paths() {
-		if err := parseFile(ctx, b, j, o, fname); err != nil {
+		if err := parseFile(ctx, b, o, fname); err != nil {
 			return err
 		}
 	}
@@ -196,12 +195,12 @@ func liftWithTimeout(ctx context.Context, to time.Duration, b backend.Backend, j
 	return b.Lift(ctx, j, xr)
 }
 
-func parseFile(ctx context.Context, b backend.Backend, j backend.LiftJob, o *obs.Obs, fname string) error {
+func parseFile(ctx context.Context, b backend.Backend, o *obs.Obs, fname string) error {
 	f, err := os.Open(fname)
 	if err != nil {
 		return fmt.Errorf("can't open output file %s: %w", fname, err)
 	}
-	perr := b.ParseObs(ctx, j.Backend, f, o)
+	perr := b.ParseObs(ctx, f, o)
 	cerr := f.Close()
 	return errhelp.FirstError(perr, cerr)
 }
@@ -213,18 +212,18 @@ func inputNameFromCli(ctx *c.Context) (string, error) {
 	return ctx.Args().First(), nil
 }
 
-func getBackend(cfg *config.Config, c backend.Criteria) (*backend.Spec, backend.Backend, error) {
+func getBackend(cfg *config.Config, c backend.Criteria) (backend.Backend, error) {
 	spec, err := cfg.FindBackend(c)
 	if err != nil {
-		return nil, nil, fmt.Errorf("while finding backend: %w", err)
+		return nil, fmt.Errorf("while finding backend: %w", err)
 	}
 
 	s := &spec.Spec
 	b, err := backend2.Resolve.Resolve(s)
 	if err != nil {
-		return nil, nil, fmt.Errorf("while resolving backend %s: %w", spec.ID, err)
+		return nil, fmt.Errorf("while resolving backend %s: %w", spec.ID, err)
 	}
-	return s, b, nil
+	return b, nil
 }
 
 func criteriaFromCli(ctx *c.Context) backend.Criteria {

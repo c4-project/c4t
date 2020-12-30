@@ -60,6 +60,13 @@ func (r *RunInfo) Override(new RunInfo) {
 	r.Args = append(r.Args, new.Args...)
 }
 
+// OverrideIfNotNil is Override if new is non-nil, and no-op otherwise.
+func (r *RunInfo) OverrideIfNotNil(new *RunInfo) {
+	if new != nil {
+		r.Override(*new)
+	}
+}
+
 func overrideCmd(old, new string) string {
 	if new == "" {
 		return old

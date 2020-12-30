@@ -79,7 +79,7 @@ func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error)
 	bcfg := r.builderConfig(p)
 	c, err := builder.ParBuild(ctx, r.quantities.NWorkers, p.Corpus, bcfg,
 		func(ctx context.Context, named subject.Named, requests chan<- builder.Request) error {
-			return r.instance(requests, named, b, spec).Run(ctx)
+			return r.instance(requests, named, b).Run(ctx)
 		})
 	if err != nil {
 		return nil, err
@@ -111,11 +111,10 @@ func checkPlan(p *plan.Plan) error {
 	return p.Metadata.RequireStage(stage.Compile)
 }
 
-func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, backend backend.Backend, spec backend.Spec) *Instance {
+func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, backend backend.Backend) *Instance {
 
 	return &Instance{
 		backend:    backend,
-		spec:       spec,
 		quantities: r.quantities,
 		resCh:      requests,
 		subject:    &named,
