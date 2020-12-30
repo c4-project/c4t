@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pelletier/go-toml"
 
@@ -22,6 +23,22 @@ const (
 	// fileConfig is the default name that c4t will use when looking for a config file.
 	fileConfig = "tester.toml"
 )
+
+// NoConfigFileError wraps an error when trying to resolve a config file through FilePath.
+type NoConfigFileError struct {
+	// Tried is the list of config files that have been tried.
+	Tried []string
+}
+
+// Error returns the error string for this error.
+func (n *NoConfigFileError) Error() string {
+	return fmt.Sprintf("no config file found (tried %s)", strings.Join(n.Tried, ", "))
+}
+
+// Unwrap returns os.ErrNotExist, as this is a particular kind of not-exist error.
+func (n *NoConfigFileError) Unwrap() error {
+	return os.ErrNotExist
+}
 
 // Load tries to load a tester config from various places.
 // If override is non-empty, it tries there.
@@ -46,16 +63,22 @@ func tryLoad(f string) (*Config, error) {
 // FilePath resolves the config file path file using hooks.
 // The first hook to successfully find a valid file wins.
 func FilePath(file string, hooks ...func(string) (string, error)) (string, error) {
+	tried := make([]string, 0, len(hooks))
+
 	for _, h := range hooks {
 		path, err := h(file)
 		if err != nil {
 			return "", err
 		}
-		if ystring.IsNotBlank(path) && yos.ExistFile(path) {
+		if ystring.IsBlank(path) {
+			continue
+		}
+		if yos.ExistFile(path) {
 			return path, nil
 		}
+		tried = append(tried, path)
 	}
-	return "", fmt.Errorf("%w: config file %s", os.ErrNotExist, file)
+	return "", &NoConfigFileError{Tried: tried}
 }
 
 // StandardHooks is the default set of hooks to use when getting a config file.

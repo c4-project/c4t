@@ -35,16 +35,15 @@ func LogTopError(err error) {
 }
 
 func logTopExitError(err error, perr *exec.ExitError) {
-	_, _ = fmt.Fprintln(os.Stderr, "A child process encountered an error:")
+	_, _ = fmt.Fprintln(os.Stderr, "child process encountered error:")
 	_, _ = fmt.Fprintln(os.Stderr, err)
 	if len(perr.Stderr) == 0 {
 		return
 	}
-	_, _ = fmt.Fprintln(os.Stderr, "Any captured stderr follows.")
+	_, _ = fmt.Fprintln(os.Stderr, "(any captured stderr follows)")
 	_, _ = fmt.Fprintln(os.Stderr, string(perr.Stderr))
 }
 
 func logTopNormalError(err error) {
-	_, _ = fmt.Fprintln(os.Stderr, "A fatal error has occurred:")
 	_, _ = fmt.Fprintln(os.Stderr, err)
 }
