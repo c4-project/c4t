@@ -71,6 +71,7 @@ const (
 	usageSaveDir              = "if present, save failing corpora to this `directory`"
 )
 
+// App is the entry point for c4t-analyse.
 func App(outw, errw io.Writer) *c.App {
 	a := &c.App{
 		Name:        Name,

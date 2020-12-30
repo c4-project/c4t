@@ -4,11 +4,13 @@
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package config describes the top-level tester configuration.
-
 package config
 
 import (
+	"io"
+
 	"github.com/c4-project/c4t/internal/model/service/backend"
+	"github.com/pelletier/go-toml"
 
 	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 
@@ -46,4 +48,9 @@ type Config struct {
 // FindBackend uses the configuration to find a backend matching criteria cr.
 func (c *Config) FindBackend(cr backend.Criteria) (*backend.NamedSpec, error) {
 	return cr.Find(c.Backends)
+}
+
+// Dump dumps this configuration to the writer w.
+func (c *Config) Dump(w io.Writer) error {
+	return toml.NewEncoder(w).Encode(c)
 }
