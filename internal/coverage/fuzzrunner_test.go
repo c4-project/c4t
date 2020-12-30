@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"testing"
 
+	mocks4 "github.com/c4-project/c4t/internal/model/service/backend/mocks"
+
 	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
@@ -20,8 +22,6 @@ import (
 	"github.com/c4-project/c4t/internal/model/recipe"
 
 	"github.com/c4-project/c4t/internal/model/id"
-	mocks2 "github.com/c4-project/c4t/internal/stage/lifter/mocks"
-
 	"github.com/stretchr/testify/mock"
 
 	"github.com/c4-project/c4t/internal/model/litmus"
@@ -41,7 +41,7 @@ func TestFuzzRunner_Run(t *testing.T) {
 
 	var (
 		f  mocks.SingleFuzzer
-		l  mocks2.SingleLifter
+		l  mocks4.SingleLifter
 		s  mocks3.StatDumper
 		dr srvrun.DryRunner
 	)

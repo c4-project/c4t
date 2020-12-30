@@ -12,13 +12,12 @@ import (
 	"path/filepath"
 
 	"github.com/c4-project/c4t/internal/model/service"
-	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service/backend"
 
 	"github.com/1set/gut/yos"
 
 	"github.com/c4-project/c4t/internal/model/id"
-	litmus2 "github.com/c4-project/c4t/internal/model/litmus"
-	"github.com/c4-project/c4t/internal/stage/lifter"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
 	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 	"github.com/c4-project/c4t/internal/stage/fuzzer"
@@ -46,16 +45,16 @@ type FuzzRunner struct {
 	// Fuzzer is the fuzzer this fuzz runner uses.
 	Fuzzer fuzzer.SingleFuzzer
 	// Lifter is the lifter this fuzz runner uses.
-	Lifter lifter.SingleLifter
+	Lifter backend.SingleLifter
 	// StatDumper is the statistics dumper this fuzz runner uses between fuzzing and lifting.
-	StatDumper litmus2.StatDumper
+	StatDumper litmus.StatDumper
 	// Config is the configuration to pass to the fuzz runner.
 	Config *fuzzer2.Configuration
 
 	// Arch is the architecture that the lifting process should target.
 	Arch id.ID
 	// Backend can point to the backend information for the lifter.
-	Backend *backend2.Spec
+	Backend *backend.Spec
 	// Runner should be the service runner to use when invoking the lifter.
 	Runner service.Runner
 }
@@ -66,11 +65,11 @@ func (f *FuzzRunner) Run(ctx context.Context, rc RunContext) error {
 		return fmt.Errorf("fuzz runner internal checks failed: %w", err)
 	}
 
-	litmus, err := f.fuzz(ctx, rc)
+	fuzzed, err := f.fuzz(ctx, rc)
 	if err != nil {
 		return fmt.Errorf("while fuzzing (%q -> %q): %w", rc.inputPathOrEmpty(), rc.OutLitmus(), err)
 	}
-	return f.lift(ctx, rc, litmus)
+	return f.lift(ctx, rc, fuzzed)
 }
 
 func (f *FuzzRunner) check() error {
@@ -115,7 +114,7 @@ func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, lpath string) erro
 	if err := yos.MakeDir(rc.LiftOutDir()); err != nil {
 		return fmt.Errorf("making dir for lift output: %w", err)
 	}
-	in, err := backend2.InputFromFile(ctx, lpath, f.StatDumper)
+	in, err := backend.InputFromFile(ctx, lpath, f.StatDumper)
 	if err != nil {
 		return fmt.Errorf("reading in input file %q: %w", lpath, err)
 	}
@@ -124,14 +123,14 @@ func (f *FuzzRunner) lift(ctx context.Context, rc RunContext, lpath string) erro
 	return err
 }
 
-func (f *FuzzRunner) liftJob(in backend2.LiftInput, rc RunContext) backend2.LiftJob {
-	return backend2.LiftJob{
+func (f *FuzzRunner) liftJob(in backend.LiftInput, rc RunContext) backend.LiftJob {
+	return backend.LiftJob{
 		Backend: f.Backend,
 		Arch:    f.Arch,
 		In:      in,
-		Out: backend2.LiftOutput{
+		Out: backend.LiftOutput{
 			Dir:    rc.LiftOutDir(),
-			Target: backend2.ToDefault,
+			Target: backend.ToDefault,
 		},
 	}
 }

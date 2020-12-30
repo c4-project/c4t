@@ -8,11 +8,10 @@ package coverage
 import (
 	"errors"
 
-	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service/backend"
 
 	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/c4-project/c4t/internal/stage/lifter"
 	"github.com/mitchellh/go-homedir"
 
 	"github.com/c4-project/c4t/internal/model/id"
@@ -38,7 +37,7 @@ type Profile struct {
 	Arch id.ID `toml:"arch"`
 
 	// Backend directly feeds in the target backend for the profile, if it uses one.
-	Backend *backend2.Spec `toml:"backend"`
+	Backend *backend.Spec `toml:"backend"`
 
 	// Run specifies, if this is a standalone profile, how to run the generator.
 	Run *service.RunInfo `toml:"run"`
@@ -97,10 +96,10 @@ func UseStatDumper(d litmus.StatDumper) Option {
 	}
 }
 
-// UseLifter adds support for l as the source of lifters.
-func UseLifter(l lifter.SingleLifter) Option {
+// UseBackendResolver adds support for r as the source of backends.
+func UseBackendResolver(r backend.Resolver) Option {
 	return func(maker *Maker) error {
-		maker.lift = l
+		maker.bresolver = r
 		return nil
 	}
 }

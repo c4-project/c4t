@@ -14,8 +14,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/c4-project/c4t/internal/serviceimpl/backend"
-
 	"github.com/c4-project/c4t/internal/model/service"
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 )
@@ -43,5 +41,5 @@ func (Rmem) LiftStandalone(ctx context.Context, j backend2.LiftJob, r service.Ru
 
 // LiftExe doesn't work.
 func (Rmem) LiftExe(context.Context, backend2.LiftJob, service.RunInfo, service.Runner) error {
-	return fmt.Errorf("%w: harness making", backend.ErrNotSupported)
+	return fmt.Errorf("%w: harness making", backend2.ErrNotSupported)
 }

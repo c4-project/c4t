@@ -11,6 +11,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
+
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
 	"github.com/c4-project/c4t/internal/plan"
@@ -38,7 +40,7 @@ type Mach struct {
 	fwd *forward.Observer
 }
 
-func New(cdriver interpreter.Driver, rdriver runner.ObsParser, opts ...Option) (*Mach, error) {
+func New(cdriver interpreter.Driver, bresolve *backend.Resolver, opts ...Option) (*Mach, error) {
 	// The respective constructors will check that cdriver and rdriver are ok.
 
 	m := &Mach{}
@@ -46,14 +48,14 @@ func New(cdriver interpreter.Driver, rdriver runner.ObsParser, opts ...Option) (
 	if err := Options(opts...)(m); err != nil {
 		return nil, err
 	}
-	return m, m.makeCompilerAndRunner(cdriver, rdriver)
+	return m, m.makeCompilerAndRunner(cdriver, bresolve)
 }
 
-func (m *Mach) makeCompilerAndRunner(cdriver interpreter.Driver, rdriver runner.ObsParser) error {
+func (m *Mach) makeCompilerAndRunner(cdriver interpreter.Driver, bresolve *backend.Resolver) error {
 	if err := m.makeCompiler(cdriver); err != nil {
 		return err
 	}
-	return m.makeRunner(rdriver)
+	return m.makeRunner(bresolve)
 }
 
 func (m *Mach) makeCompiler(driver interpreter.Driver) error {
@@ -63,10 +65,10 @@ func (m *Mach) makeCompiler(driver interpreter.Driver) error {
 	return err
 }
 
-func (m *Mach) makeRunner(driver runner.ObsParser) error {
+func (m *Mach) makeRunner(r *backend.Resolver) error {
 	var err error
 	ps := runner.NewPathset(m.path)
-	m.runner, err = runner.New(driver, ps, m.roptions...)
+	m.runner, err = runner.New(r, ps, m.roptions...)
 	return err
 }
 

@@ -13,12 +13,12 @@ import (
 	"math/rand"
 	"path/filepath"
 
+	"github.com/c4-project/c4t/internal/model/service/backend"
+
 	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/c4-project/c4t/internal/model/litmus"
 	"github.com/c4-project/c4t/internal/observing"
-
-	"github.com/c4-project/c4t/internal/stage/lifter"
 
 	"github.com/c4-project/c4t/internal/stage/fuzzer"
 
@@ -49,8 +49,8 @@ type Maker struct {
 	// fuzz tells the maker how to run its internal fuzzer.
 	fuzz fuzzer.SingleFuzzer
 
-	// lift tells the maker how to run its internal lifter.
-	lift lifter.SingleLifter
+	// bresolver tells the maker how to resolve backends.
+	bresolver backend.Resolver
 
 	// sdump tells the maker how to dump statistics.
 	sdump litmus.StatDumper
@@ -247,9 +247,14 @@ func (m *Maker) knownRunner(p Profile) (Runner, error) {
 	if p.Backend == nil {
 		return nil, ErrNeedBackend
 	}
+	b, err := m.bresolver.Resolve(p.Backend)
+	if err != nil {
+		return nil, err
+	}
+
 	return &FuzzRunner{
 		Fuzzer:     m.fuzz,
-		Lifter:     m.lift,
+		Lifter:     b,
 		StatDumper: m.sdump,
 		Config:     p.Fuzz,
 		Arch:       p.Arch,

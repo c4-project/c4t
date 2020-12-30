@@ -30,8 +30,6 @@ import (
 
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/c4-project/c4t/internal/serviceimpl/backend"
-
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/parser"
 
 	"github.com/c4-project/c4t/internal/model/recipe"
@@ -46,7 +44,7 @@ const standaloneOut = "output.txt"
 // Backend represents herd-style backends such as Herd and Litmus.
 type Backend struct {
 	// OptCapabilities contains the capability flags for this backend not implied by being a herdstyle backend.
-	OptCapabilities backend.Capability
+	OptCapabilities backend2.Capability
 
 	// Arches describes the architectures of Litmus test this backend can deal with.
 	Arches []id.ID
@@ -59,8 +57,8 @@ type Backend struct {
 }
 
 // Capabilities returns OptCapabilities (as well as the implied backend.CanLiftLitmus and backend.CanRunStandalone).
-func (h Backend) Capabilities(_ *backend2.Spec) backend.Capability {
-	return backend.CanLiftLitmus | backend.CanRunStandalone | h.OptCapabilities
+func (h Backend) Capabilities(_ *backend2.Spec) backend2.Capability {
+	return backend2.CanLiftLitmus | backend2.CanRunStandalone | h.OptCapabilities
 }
 
 // LitmusArches returns Arches, to satisfy the backend interface.
@@ -132,7 +130,7 @@ func (h Backend) checkAndAmendJob(j *backend2.LiftJob) error {
 	}
 
 	if !j.Arch.IsEmpty() && !j.In.Litmus.IsC() {
-		return fmt.Errorf("%w: can only set lifting architecture for C litmus tests", backend.ErrNotSupported)
+		return fmt.Errorf("%w: can only set lifting architecture for C litmus tests", backend2.ErrNotSupported)
 	}
 
 	if err := h.checkAndAmendInput(&j.In); err != nil {
@@ -143,10 +141,10 @@ func (h Backend) checkAndAmendJob(j *backend2.LiftJob) error {
 
 func (h Backend) checkAndAmendInput(i *backend2.LiftInput) error {
 	if i.Source != backend2.LiftLitmus {
-		return fmt.Errorf("%w: can only lift litmus files", backend.ErrNotSupported)
+		return fmt.Errorf("%w: can only lift litmus files", backend2.ErrNotSupported)
 	}
 	if !h.supportsLitmusArch(i.Litmus.Arch) {
-		return fmt.Errorf("%w: architecture %q not supported", backend.ErrNotSupported, i.Litmus.Arch)
+		return fmt.Errorf("%w: architecture %q not supported", backend2.ErrNotSupported, i.Litmus.Arch)
 	}
 	return nil
 }
@@ -167,11 +165,11 @@ func (h Backend) checkAndAmendOutput(o *backend2.LiftOutput) error {
 		fallthrough
 	case backend2.ToStandalone:
 	case backend2.ToExeRecipe:
-		if (h.OptCapabilities & backend.CanProduceExe) == 0 {
-			return fmt.Errorf("%w: cannot produce executables", backend.ErrNotSupported)
+		if (h.OptCapabilities & backend2.CanProduceExe) == 0 {
+			return fmt.Errorf("%w: cannot produce executables", backend2.ErrNotSupported)
 		}
 	case backend2.ToObjRecipe:
-		return fmt.Errorf("%w: cannot produce objects", backend.ErrNotSupported)
+		return fmt.Errorf("%w: cannot produce objects", backend2.ErrNotSupported)
 	}
 	return nil
 }

@@ -11,17 +11,13 @@ import (
 	"errors"
 	"io"
 
-	"github.com/c4-project/c4t/internal/helper/srvrun"
-
-	"github.com/c4-project/c4t/internal/model/service"
-
 	"github.com/c4-project/c4t/internal/model/service/backend"
+
+	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/c4-project/c4t/internal/subject/corpus"
 
 	"github.com/c4-project/c4t/internal/plan/stage"
-
-	"github.com/c4-project/c4t/internal/model/recipe"
 
 	"github.com/c4-project/c4t/internal/subject"
 
@@ -40,20 +36,10 @@ var (
 	ErrNoBackend = errors.New("no backend provided")
 )
 
-// SingleLifter is an interface capturing the ability to lift single jobs into recipes.
-type SingleLifter interface {
-	// Lift performs the lifting described by j.
-	// It returns a recipe describing the files (C files, header files, etc.) created and how to use them, or an error.
-	// Any external service running should happen by sr.
-	Lift(ctx context.Context, j backend.LiftJob, sr service.Runner) (recipe.Recipe, error)
-}
-
-//go:generate mockery --name=SingleLifter
-
 // Lifter holds the main configuration for the lifter part of the tester framework.
 type Lifter struct {
-	// driver is a single-job lifter.
-	driver SingleLifter
+	// resolver resolves backend specifications.
+	resolver backend.Resolver
 
 	// obs track the lifter's progress across a corpus.
 	obs []builder.Observer
@@ -65,20 +51,20 @@ type Lifter struct {
 	errw io.Writer
 }
 
-// New constructs a new Lifter given driver d, path resolver p, and options os.
-func New(d SingleLifter, p Pather, os ...Option) (*Lifter, error) {
-	if err := checkConfig(d, p); err != nil {
+// New constructs a new Lifter given backend resolver r, path resolver p, and options os.
+func New(r backend.Resolver, p Pather, os ...Option) (*Lifter, error) {
+	if err := checkConfig(r, p); err != nil {
 		return nil, err
 	}
-	l := Lifter{driver: d, paths: p}
+	l := Lifter{resolver: r, paths: p}
 	if err := Options(os...)(&l); err != nil {
 		return nil, err
 	}
 	return &l, nil
 }
 
-func checkConfig(d SingleLifter, p Pather) error {
-	if d == nil {
+func checkConfig(r backend.Resolver, p Pather) error {
+	if r == nil {
 		return ErrDriverNil
 	}
 	if p == nil {
@@ -125,6 +111,12 @@ func (l *Lifter) lift(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, error) {
+	spec := p.Backend.Spec
+	b, err := l.resolver.Resolve(&spec)
+	if err != nil {
+		return nil, err
+	}
+
 	cfg := builder.Config{
 		Init:      p.Corpus,
 		Observers: l.obs,
@@ -135,17 +127,19 @@ func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, e
 	}
 	// TODO(@MattWindsor91): extract this 20 into configuration.
 	return builder.ParBuild(ctx, 20, p.Corpus, cfg, func(ctx context.Context, s subject.Named, rq chan<- builder.Request) error {
-		j := l.makeJob(p, s, rq)
+		j := l.makeJob(p, b, spec, s, rq)
 		return j.Lift(ctx)
 	})
 }
 
-func (l *Lifter) makeJob(p *plan.Plan, s subject.Named, resCh chan<- builder.Request) Instance {
+func (l *Lifter) makeJob(p *plan.Plan, b backend.SingleLifter, spec backend.Spec, s subject.Named, resCh chan<- builder.Request) Instance {
+
 	return Instance{
-		Arches:  p.Arches(),
-		Backend: &p.Backend.Spec,
+		Arches: p.Arches(),
+		// TODO(@MattWindsor91): remove this
+		Backend: &spec,
 		Paths:   l.paths,
-		Driver:  l.driver,
+		Driver:  b,
 		Subject: s,
 		ResCh:   resCh,
 		// TODO(@MattWindsor91): push this further up

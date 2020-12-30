@@ -14,6 +14,8 @@ import (
 	"runtime/pprof"
 	"strings"
 
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
+
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 	"github.com/c4-project/c4t/internal/ux/directorobs"
 	"golang.org/x/sync/errgroup"
@@ -26,7 +28,6 @@ import (
 	"github.com/c4-project/c4t/internal/config"
 	"github.com/c4-project/c4t/internal/director"
 	"github.com/c4-project/c4t/internal/model/id"
-	br "github.com/c4-project/c4t/internal/serviceimpl/backend/resolver"
 	"github.com/c4-project/c4t/internal/serviceimpl/compiler"
 	"github.com/c4-project/c4t/internal/stage/planner"
 
@@ -210,7 +211,7 @@ func makeGlob(mfilter string) (id.ID, error) {
 func makeEnv(a *act.Runner, c *config.Config) director.Env {
 	return director.Env{
 		Fuzzer:     a,
-		Lifter:     &br.Resolve,
+		BResolver:  &backend.Resolve,
 		CInspector: &compiler.CResolve,
 		Planner: planner.Source{
 			BProbe:  c,

@@ -9,6 +9,8 @@ package runner
 import (
 	"context"
 
+	"github.com/c4-project/c4t/internal/model/service/backend"
+
 	"github.com/c4-project/c4t/internal/quantity"
 	"github.com/c4-project/c4t/internal/stage/mach/observer"
 
@@ -27,8 +29,8 @@ type Runner struct {
 	// observers observe the runner's progress across a corpus.
 	observers []observer.Observer
 
-	// parser handles the parsing of observations.
-	parser ObsParser
+	// resolver resolves backend references in the plan.
+	resolver backend.Resolver
 
 	// paths contains the pathset used for this runner's outputs.
 	paths *Pathset
@@ -40,16 +42,16 @@ type Runner struct {
 // New creates a new batch compiler instance using the config c and plan p.
 // It can fail if various safety checks fail on the config,
 // or if there is no obvious machine that the compiler can target.
-func New(parser ObsParser, paths *Pathset, opts ...Option) (*Runner, error) {
-	if parser == nil {
+func New(resolver backend.Resolver, paths *Pathset, opts ...Option) (*Runner, error) {
+	if resolver == nil {
 		return nil, ErrParserNil
 	}
 	if paths == nil {
 		return nil, iohelp.ErrPathsetNil
 	}
 	r := &Runner{
-		parser: parser,
-		paths:  paths,
+		resolver: resolver,
+		paths:    paths,
 	}
 	if err := Options(opts...)(r); err != nil {
 		return nil, err
@@ -68,10 +70,16 @@ func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	observer.OnRunStart(r.quantities, r.observers...)
 
+	spec := p.Backend.Spec
+	b, err := r.resolver.Resolve(&spec)
+	if err != nil {
+		return nil, err
+	}
+
 	bcfg := r.builderConfig(p)
 	c, err := builder.ParBuild(ctx, r.quantities.NWorkers, p.Corpus, bcfg,
 		func(ctx context.Context, named subject.Named, requests chan<- builder.Request) error {
-			return r.instance(requests, named, p).Run(ctx)
+			return r.instance(requests, named, b, spec).Run(ctx)
 		})
 	if err != nil {
 		return nil, err
@@ -103,10 +111,11 @@ func checkPlan(p *plan.Plan) error {
 	return p.Metadata.RequireStage(stage.Compile)
 }
 
-func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, p *plan.Plan) *Instance {
+func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, backend backend.Backend, spec backend.Spec) *Instance {
+
 	return &Instance{
-		backend:    &p.Backend.Spec,
-		parser:     r.parser,
+		backend:    backend,
+		spec:       spec,
 		quantities: r.quantities,
 		resCh:      requests,
 		subject:    &named,

@@ -9,6 +9,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/model/service/backend"
+
+	mocks2 "github.com/c4-project/c4t/internal/model/service/backend/mocks"
+
 	"github.com/c4-project/c4t/internal/stage/lifter/mocks"
 
 	"github.com/c4-project/c4t/internal/helper/iohelp"
@@ -26,7 +30,7 @@ func TestNew_errors(t *testing.T) {
 
 	cases := map[string]struct {
 		// ddelta modifies the driver from a known-working value.
-		ddelta func(*mocks.SingleLifter) lifter.SingleLifter
+		ddelta func(*mocks2.Resolver) backend.Resolver
 		// padelta modifies the pather from a known-working value.
 		pdelta func(*mocks.Pather) lifter.Pather
 		// os adds options to the constructor.
@@ -38,7 +42,7 @@ func TestNew_errors(t *testing.T) {
 			err: nil,
 		},
 		"nil-driver": {
-			ddelta: func(l *mocks.SingleLifter) lifter.SingleLifter {
+			ddelta: func(l *mocks2.Resolver) backend.Resolver {
 				return nil
 			},
 			err: lifter.ErrDriverNil,
@@ -63,18 +67,18 @@ func TestNew_errors(t *testing.T) {
 			t.Parallel()
 
 			var (
-				msl mocks.SingleLifter
-				sl  lifter.SingleLifter
+				mr  mocks2.Resolver
+				r   backend.Resolver
 				mpl mocks.Pather
 				pl  lifter.Pather
 			)
-			msl.Test(t)
+			mr.Test(t)
 			mpl.Test(t)
 
 			if f := c.ddelta; f != nil {
-				sl = f(&msl)
+				r = f(&mr)
 			} else {
-				sl = &msl
+				r = &mr
 			}
 			if f := c.pdelta; f != nil {
 				pl = f(&mpl)
@@ -82,9 +86,10 @@ func TestNew_errors(t *testing.T) {
 				pl = &mpl
 			}
 
-			_, err := lifter.New(sl, pl, c.os...)
+			_, err := lifter.New(r, pl, c.os...)
 			testhelp.ExpectErrorIs(t, err, c.err, "in New()")
-			msl.AssertExpectations(t)
+			mr.AssertExpectations(t)
+			mpl.AssertExpectations(t)
 		})
 	}
 }

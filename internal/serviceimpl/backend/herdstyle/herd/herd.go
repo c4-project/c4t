@@ -13,8 +13,6 @@ import (
 
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/c4-project/c4t/internal/serviceimpl/backend"
-
 	"github.com/c4-project/c4t/internal/model/service"
 )
 
@@ -23,7 +21,7 @@ type Herd struct{}
 
 // Run fails to run Herd to generate executables.
 func (h Herd) LiftExe(context.Context, backend2.LiftJob, service.RunInfo, service.Runner) error {
-	return fmt.Errorf("%w: harness making", backend.ErrNotSupported)
+	return fmt.Errorf("%w: harness making", backend2.ErrNotSupported)
 }
 
 // Run runs Herd standalone.

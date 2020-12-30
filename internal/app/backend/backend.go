@@ -30,7 +30,6 @@ import (
 	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/model/service/backend"
 	backend2 "github.com/c4-project/c4t/internal/serviceimpl/backend"
-	"github.com/c4-project/c4t/internal/serviceimpl/backend/resolver"
 	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
@@ -153,7 +152,7 @@ func makeRunner(ctx *c.Context, errw io.Writer) service.Runner {
 	return srvrun.NewExecRunner(srvrun.StderrTo(errw), srvrun.WithGrace(ctx.Duration(flagGrace)))
 }
 
-func runParseAndDump(ctx *c.Context, outw io.Writer, b backend2.Backend, j backend.LiftJob, xr service.Runner) error {
+func runParseAndDump(ctx *c.Context, outw io.Writer, b backend.Backend, j backend.LiftJob, xr service.Runner) error {
 	var o obs.Obs
 
 	to := ctx.Duration(flagTimeout)
@@ -166,7 +165,7 @@ func runParseAndDump(ctx *c.Context, outw io.Writer, b backend2.Backend, j backe
 	return e.Encode(o)
 }
 
-func runAndParse(ctx context.Context, to time.Duration, b backend2.Backend, j backend.LiftJob, o *obs.Obs, xr service.Runner) error {
+func runAndParse(ctx context.Context, to time.Duration, b backend.Backend, j backend.LiftJob, o *obs.Obs, xr service.Runner) error {
 	// TODO(@MattWindsor91): clean this function up, eg making a separate struct...
 
 	r, err := liftWithTimeout(ctx, to, b, j, xr)
@@ -186,7 +185,7 @@ func runAndParse(ctx context.Context, to time.Duration, b backend2.Backend, j ba
 	return nil
 }
 
-func liftWithTimeout(ctx context.Context, to time.Duration, b backend2.Backend, j backend.LiftJob, xr service.Runner) (recipe.Recipe, error) {
+func liftWithTimeout(ctx context.Context, to time.Duration, b backend.Backend, j backend.LiftJob, xr service.Runner) (recipe.Recipe, error) {
 	cf := func() {}
 	if to != 0 {
 		ctx, cf = context.WithTimeout(ctx, to)
@@ -197,7 +196,7 @@ func liftWithTimeout(ctx context.Context, to time.Duration, b backend2.Backend, 
 	return b.Lift(ctx, j, xr)
 }
 
-func parseFile(ctx context.Context, b backend2.Backend, j backend.LiftJob, o *obs.Obs, fname string) error {
+func parseFile(ctx context.Context, b backend.Backend, j backend.LiftJob, o *obs.Obs, fname string) error {
 	f, err := os.Open(fname)
 	if err != nil {
 		return fmt.Errorf("can't open output file %s: %w", fname, err)
@@ -214,14 +213,14 @@ func inputNameFromCli(ctx *c.Context) (string, error) {
 	return ctx.Args().First(), nil
 }
 
-func getBackend(cfg *config.Config, c backend.Criteria) (*backend.Spec, backend2.Backend, error) {
+func getBackend(cfg *config.Config, c backend.Criteria) (*backend.Spec, backend.Backend, error) {
 	spec, err := cfg.FindBackend(c)
 	if err != nil {
 		return nil, nil, fmt.Errorf("while finding backend: %w", err)
 	}
 
 	s := &spec.Spec
-	b, err := resolver.Resolve.Get(s)
+	b, err := backend2.Resolve.Resolve(s)
 	if err != nil {
 		return nil, nil, fmt.Errorf("while resolving backend %s: %w", spec.ID, err)
 	}

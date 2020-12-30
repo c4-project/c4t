@@ -11,7 +11,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/c4-project/c4t/internal/serviceimpl/backend/resolver"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/ux/singleobs"
 
@@ -69,7 +69,7 @@ func run(ctx *c.Context, errw io.Writer) error {
 		coverage.SendStderrTo(errw),
 		coverage.UseFuzzer(a),
 		coverage.UseStatDumper(a),
-		coverage.UseLifter(&resolver.Resolve),
+		coverage.UseBackendResolver(&backend.Resolve),
 		coverage.ObserveWith(singleobs.Coverage(l, stdflag.Verbose(ctx))...),
 	)
 	if err != nil {

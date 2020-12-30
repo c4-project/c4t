@@ -244,7 +244,7 @@ func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {
 
 func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 	return lifter.New(
-		i.Env.Lifter,
+		i.Env.BResolver,
 		lifter.NewPathset(i.Pathset.Scratch.DirLift),
 		// TODO(@MattWindsor91): why does the lifter still take a logger?
 		//lifter.LogTo(i.Logger),

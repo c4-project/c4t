@@ -18,8 +18,6 @@ import (
 
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/c4-project/c4t/internal/serviceimpl/backend"
-
 	"github.com/c4-project/c4t/internal/act"
 	"github.com/c4-project/c4t/internal/model/recipe"
 	"github.com/c4-project/c4t/internal/subject/obs"
@@ -41,8 +39,8 @@ type Delitmus struct {
 }
 
 // Capabilities reports that this backend can lift (and nothing else).
-func (d Delitmus) Capabilities(_ *backend2.Spec) backend.Capability {
-	return backend.CanLiftLitmus | backend.CanProduceObj
+func (d Delitmus) Capabilities(_ *backend2.Spec) backend2.Capability {
+	return backend2.CanLiftLitmus | backend2.CanProduceObj
 }
 
 // LitmusArches reports that this backend understands C litmus (and nothing else).
@@ -80,20 +78,20 @@ func (d Delitmus) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runne
 
 func checkAndAmendJob(j *backend2.LiftJob) error {
 	if j.In.Source != backend2.LiftLitmus {
-		return fmt.Errorf("%w: source must be litmus", backend.ErrNotSupported)
+		return fmt.Errorf("%w: source must be litmus", backend2.ErrNotSupported)
 	}
 	if !j.In.Litmus.IsC() {
-		return fmt.Errorf("%w: source must be C litmus", backend.ErrNotSupported)
+		return fmt.Errorf("%w: source must be C litmus", backend2.ErrNotSupported)
 	}
 	if j.Out.Target == backend2.ToDefault {
 		j.Out.Target = backend2.ToObjRecipe
 	} else if j.Out.Target != backend2.ToObjRecipe {
-		return fmt.Errorf("%w: output must be object", backend.ErrNotSupported)
+		return fmt.Errorf("%w: output must be object", backend2.ErrNotSupported)
 	}
 	return nil
 }
 
 // ParseObs errors, for we cannot parse the observations of a delitmus run.
 func (d Delitmus) ParseObs(_ context.Context, _ *backend2.Spec, _ io.Reader, _ *obs.Obs) error {
-	return backend.ErrNotSupported
+	return backend2.ErrNotSupported
 }

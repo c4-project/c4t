@@ -8,6 +8,8 @@ package director
 import (
 	"errors"
 
+	"github.com/c4-project/c4t/internal/model/service/backend"
+
 	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 
 	"github.com/c4-project/c4t/internal/plan/analysis"
@@ -155,8 +157,8 @@ type Env struct {
 	// TODO(@MattWindsor91): this overlaps nontrivially with Planner; both should use the same dumper!
 	Fuzzer fuzzer.Driver
 
-	// Lifter is a single-shot recipe lifter.
-	Lifter lifter.SingleLifter
+	// BResolver is a backend resolver.
+	BResolver backend.Resolver
 
 	// CInspector is the compiler inspector used for perturbing compiler optimisation levels.
 	CInspector compiler.Inspector
@@ -170,7 +172,8 @@ func (e Env) Check() error {
 	if e.Fuzzer == nil {
 		return fuzzer.ErrDriverNil
 	}
-	if e.Lifter == nil {
+	if e.BResolver == nil {
+		// TODO(@MattWindsor91): move this error
 		return lifter.ErrDriverNil
 	}
 	if e.CInspector == nil {

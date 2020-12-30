@@ -10,11 +10,12 @@ import (
 	"io"
 	"strings"
 
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
+
 	"github.com/c4-project/c4t/internal/app/invoke"
 
 	"github.com/c4-project/c4t/internal/helper/iohelp"
 
-	br "github.com/c4-project/c4t/internal/serviceimpl/backend/resolver"
 	cimpl "github.com/c4-project/c4t/internal/serviceimpl/compiler"
 	"github.com/c4-project/c4t/internal/stage/mach"
 	"github.com/c4-project/c4t/internal/stage/mach/forward"
@@ -70,7 +71,7 @@ func makeMach(ctx *c.Context, errw io.Writer) (*mach.Mach, error) {
 	fwd := forward.NewObserver(errw)
 	return mach.New(
 		&cimpl.CResolve,
-		&br.Resolve,
+		&backend.Resolve,
 		mach.OutputDir(stdflag.OutDirFromCli(ctx)),
 		mach.OverrideQuantities(stdflag.MachNodeQuantitySetFromCli(ctx)),
 		mach.ForwardTo(fwd),

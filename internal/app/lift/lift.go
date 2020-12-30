@@ -10,7 +10,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/c4-project/c4t/internal/serviceimpl/backend/resolver"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/stage/lifter"
 
@@ -62,7 +62,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 
 func makeLifter(ctx *c.Context, l *log.Logger, errw io.Writer) (*lifter.Lifter, error) {
 	return lifter.New(
-		&resolver.Resolve,
+		&backend.Resolve,
 		lifter.NewPathset(stdflag.OutDirFromCli(ctx)),
 		lifter.ObserveWith(singleobs.Builder(l, stdflag.Verbose(ctx))...),
 		lifter.SendStderrTo(errw),

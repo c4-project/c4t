@@ -11,7 +11,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/model/service"
 
-	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
+	"github.com/c4-project/c4t/internal/model/service/backend"
 
 	"github.com/c4-project/c4t/internal/model/id"
 
@@ -26,10 +26,10 @@ type Instance struct {
 	Arches []id.ID
 
 	// Backend is the backend that this job will use.
-	Backend *backend2.Spec
+	Backend *backend.Spec
 
 	// Driver is the single-lift driver for this job.
-	Driver SingleLifter
+	Driver backend.SingleLifter
 
 	// Paths is the path resolver for this job.
 	Paths Pather
@@ -83,13 +83,13 @@ func (j *Instance) liftArch(ctx context.Context, arch id.ID) error {
 	}
 
 	// TODO(@MattWindsor91): don't hardcode this
-	spec := backend2.LiftJob{
+	spec := backend.LiftJob{
 		Backend: j.Backend,
 		Arch:    arch,
-		In:      backend2.LiftLitmusInput(lit),
-		Out: backend2.LiftOutput{
+		In:      backend.LiftLitmusInput(lit),
+		Out: backend.LiftOutput{
 			Dir:    dir,
-			Target: backend2.ToExeRecipe,
+			Target: backend.ToExeRecipe,
 		},
 	}
 
