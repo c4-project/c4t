@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act
+package c4f
 
 import (
 	"bytes"
@@ -44,7 +44,7 @@ func (a *Runner) ProbeSubject(ctx context.Context, path string) (*subject.Named,
 	return s.AddName(h.Name), nil
 }
 
-// DumpHeader runs act-c dump-header on the subject at path, writing the results to h.
+// DumpHeader runs c4f-c dump-header on the subject at path, writing the results to h.
 func (a *Runner) DumpHeader(ctx context.Context, h *Header, path string) error {
 	var obuf bytes.Buffer
 	cs := CmdSpec{
@@ -59,7 +59,7 @@ func (a *Runner) DumpHeader(ctx context.Context, h *Header, path string) error {
 	return h.Read(&obuf)
 }
 
-// DumpStats runs act-c dump-stats on the subject at path, writing the stats to s.
+// DumpStats runs c4f-c dump-stats on the subject at path, writing the stats to s.
 func (a *Runner) DumpStats(ctx context.Context, s *litmus.Statset, path string) error {
 	var obuf bytes.Buffer
 	cs := CmdSpec{
@@ -98,12 +98,24 @@ func (d DelitmusJob) Args() []string {
 	return append(args, d.InLitmus)
 }
 
-// Delitmus runs act-c delitmus as directed by d.
+// Delitmus runs c4f-c delitmus as directed by d.
 func (a *Runner) Delitmus(ctx context.Context, d DelitmusJob) error {
+	return a.Run(ctx, CmdSpec{Cmd: BinActC, Subcmd: "delitmus", Args: d.Args()})
+}
+
+/// CVersion gets the version of the c4f-c tool.
+func (a *Runner) CVersion(ctx context.Context) (string, error) {
+	var obuf bytes.Buffer
+	// For some reason, just passing 'c4f-c version' gives the build info too.
 	cs := CmdSpec{
 		Cmd:    BinActC,
-		Subcmd: "delitmus",
-		Args:   d.Args(),
+		Subcmd: "version",
+		Args:   []string{"-version"},
+		Stdout: &obuf,
 	}
-	return a.Run(ctx, cs)
+
+	if err := a.Run(ctx, cs); err != nil {
+		return "", err
+	}
+	return obuf.String(), nil
 }

@@ -3,5 +3,5 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package act contains wrappers for various external programs in the OCaml ACT toolbox.
-package act
+// Package c4f contains wrappers for various external programs in the OCaml ACT toolbox.
+package c4f

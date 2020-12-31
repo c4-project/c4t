@@ -15,7 +15,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
@@ -102,7 +102,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("while getting config: %w", err)
 	}
-	c4f := stdflag.ActRunnerFromCli(ctx, errw)
+	crun := stdflag.ActRunnerFromCli(ctx, errw)
 
 	td, err := ioutil.TempDir("", "c4t-backend")
 	if err != nil {
@@ -119,7 +119,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 		return err
 	}
 
-	j, err := jobFromCli(ctx, fn, c4f, td)
+	j, err := jobFromCli(ctx, fn, crun, td)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	return errhelp.FirstError(perr, derr)
 }
 
-func jobFromCli(ctx *c.Context, fn string, c4f *act.Runner, td string) (backend.LiftJob, error) {
+func jobFromCli(ctx *c.Context, fn string, c4f *c4f.Runner, td string) (backend.LiftJob, error) {
 	in, err := backend.InputFromFile(ctx.Context, fn, c4f)
 	if err != nil {
 		return backend.LiftJob{}, err

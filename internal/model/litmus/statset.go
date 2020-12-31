@@ -43,7 +43,7 @@ func (s *AtomicStatset) AddMemOrder(id id.ID, k int) {
 	s.MemOrders[id.String()] += k
 }
 
-// Statset contains a set of statistics acquired from `act-c dump-stats`.
+// Statset contains a set of statistics acquired from `c4f-c dump-stats`.
 type Statset struct {
 	// Threads is the number of threads.
 	Threads int `toml:"threads,omitzero" json:"threads,omitempty"`

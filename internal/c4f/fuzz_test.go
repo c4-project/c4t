@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act_test
+package c4f_test
 
 import (
 	"context"
@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/machine"
 	"github.com/c4-project/c4t/internal/model/service/fuzzer"
 )
@@ -57,7 +57,7 @@ func TestRunner_Fuzz(t *testing.T) {
 				return checkFuzzCmdSpec(c, j)
 			})).Return(nil).Once()
 
-			a := act.Runner{Base: cr}
+			a := c4f.Runner{Base: cr}
 
 			err := a.Fuzz(context.Background(), j)
 			require.NoError(t, err, "mocked fuzzing should succeed")
@@ -79,7 +79,7 @@ func checkFuzzCmdSpec(c service.RunInfo, j fuzzer.Job) bool {
 	if haveTrace && (c.Args[7] != "-trace-output" || c.Args[8] != j.OutTrace) {
 		return false
 	}
-	return c.Cmd == act.BinActFuzz &&
+	return c.Cmd == c4f.BinActFuzz &&
 		c.Args[0] == "run" &&
 		c.Args[1] == "-config" &&
 		// TODO(@MattWindsor91): check config file?

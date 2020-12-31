@@ -26,7 +26,7 @@ const (
 	usage = "interpret observation files"
 
 	readme = `
-    This program interprets observation JSON files of the form produced by act-backend.`
+    This program interprets observation JSON files of the form produced by c4f-backend.`
 
 	flagShowInteresting        = "show-interesting"
 	flagShowInterestingShort   = "i"

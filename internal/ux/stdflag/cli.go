@@ -13,7 +13,7 @@ import (
 	"github.com/c4-project/c4t/internal/helper/srvrun"
 	"github.com/c4-project/c4t/internal/stage/fuzzer"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/config"
 
 	// It's 2020, and tools _still_ can't understand the use of 'v2' unless you do silly hacks like this.
@@ -54,8 +54,8 @@ func ActRunnerCliFlags() []c.Flag {
 }
 
 // ActRunnerFromCli makes an ACT runner using the flags previously set up by ActRunnerCliFlags.
-func ActRunnerFromCli(ctx *c.Context, errw io.Writer) *act.Runner {
-	return &act.Runner{
+func ActRunnerFromCli(ctx *c.Context, errw io.Writer) *c4f.Runner {
+	return &c4f.Runner{
 		DuneExec: ctx.Bool(flagActDuneExec),
 		Base:     srvrun.NewExecRunner(srvrun.StderrTo(errw)),
 	}

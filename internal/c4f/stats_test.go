@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act_test
+package c4f_test
 
 import (
 	"strings"
@@ -11,7 +11,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/model/litmus"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -89,7 +89,7 @@ mem-orders.statement.memory_order_seq_cst 0`)
 	}
 
 	var got litmus.Statset
-	err := act.ParseStats(&got, r)
+	err := c4f.ParseStats(&got, r)
 	require.NoError(t, err)
 	assert.Equal(t, got, want)
 }

@@ -8,8 +8,10 @@ package delitmus
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/c4-project/c4t/internal/model/id"
@@ -18,7 +20,7 @@ import (
 
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/model/recipe"
 	"github.com/c4-project/c4t/internal/subject/obs"
 )
@@ -34,8 +36,8 @@ const (
 // the tester to compile C code without running it.  Instead, its main purpose is to serve as the target of a coverage
 // run.
 type Delitmus struct {
-	// BaseRunner is the base configuration of the act runner, which is copied and overridden for each lifting.
-	BaseRunner act.Runner
+	// BaseRunner is the base configuration of the c4f runner, which is copied and overridden for each lifting.
+	BaseRunner c4f.Runner
 }
 
 var dlMeta = backend2.Metadata{
@@ -58,6 +60,22 @@ func (d Delitmus) Class() backend2.Class {
 	return d
 }
 
+// Probe probes to see if there is a c4f installation we can use for delitmusifying.
+func (Delitmus) Probe(ctx context.Context, sr service.Runner, style id.ID) ([]backend2.NamedSpec, error) {
+	cr := c4f.Runner{DuneExec: false, Base: sr}
+
+	// There's no actual information in the version flag yet.
+	_, err := cr.CVersion(ctx)
+	if err != nil {
+		if errors.Is(err, exec.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	id.FromString("delitmus")
+	return []backend2.NamedSpec{{ID: style, Spec: backend2.Spec{Style: style}}}, nil
+}
+
 // Lift delitmusifies the litmus file specified in j, using errw for standard output.
 // It outputs a delitmusified C file and auxiliary file to j's output directory, and produces a recipe that suggests
 // compiling that C file as an object.
@@ -71,7 +89,7 @@ func (d Delitmus) Lift(ctx context.Context, j backend2.LiftJob, sr service.Runne
 	a := d.BaseRunner
 	a.Base = sr
 
-	dj := act.DelitmusJob{
+	dj := c4f.DelitmusJob{
 		InLitmus: j.In.Litmus.Filepath(),
 		OutAux:   filepath.Join(j.Out.Dir, outAux),
 		OutC:     filepath.Join(j.Out.Dir, outC),

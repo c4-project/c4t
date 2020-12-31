@@ -24,7 +24,7 @@ import (
 
 	"github.com/1set/gut/ystring"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/config"
 	"github.com/c4-project/c4t/internal/director"
 	"github.com/c4-project/c4t/internal/model/id"
@@ -154,7 +154,7 @@ func setupPprof(cppath string) (func(), error) {
 	}, nil
 }
 
-func runWithArgs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args) error {
+func runWithArgs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *c4f.Runner, args args) error {
 	o, err := directorobs.NewObs(cfg, args.dash)
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func runWithArgs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a
 	return errhelp.FirstError(err, cerr)
 }
 
-func runWithObs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args, o *directorobs.Obs) error {
+func runWithObs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *c4f.Runner, args args, o *directorobs.Obs) error {
 	d, err := makeDirector(cfg, qs, a, args, o)
 	if err != nil {
 		return err
@@ -184,7 +184,7 @@ func runWithObs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a 
 	return eg.Wait()
 }
 
-func makeDirector(cfg *config.Config, qs quantity.RootSet, a *act.Runner, args args, obs *directorobs.Obs) (*director.Director, error) {
+func makeDirector(cfg *config.Config, qs quantity.RootSet, a *c4f.Runner, args args, obs *directorobs.Obs) (*director.Director, error) {
 	glob, err := makeGlob(args.mfilter)
 	if err != nil {
 		return nil, err
@@ -208,7 +208,7 @@ func makeGlob(mfilter string) (id.ID, error) {
 	return id.TryFromString(mfilter)
 }
 
-func makeEnv(a *act.Runner, c *config.Config) director.Env {
+func makeEnv(a *c4f.Runner, c *config.Config) director.Env {
 	return director.Env{
 		Fuzzer:     a,
 		BResolver:  &backend.Resolve,

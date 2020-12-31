@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act_test
+package c4f_test
 
 import (
 	"bytes"
@@ -16,13 +16,13 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/machine"
 )
 
 // ExampleWriteFuzzConf_empty is a testable example for WriteFuzzConf, showing an empty config.
 func ExampleWriteFuzzConf_empty() {
-	if err := act.WriteFuzzConf(os.Stdout, (fuzzer.Job{})); err != nil {
+	if err := c4f.WriteFuzzConf(os.Stdout, (fuzzer.Job{})); err != nil {
 		fmt.Println("ERROR:", err)
 	}
 
@@ -35,7 +35,7 @@ func ExampleWriteFuzzConf_empty() {
 // ExampleWriteFuzzConf_machine is a testable example for WriteFuzzConf, showing the effect of adding a machine.
 func ExampleWriteFuzzConf_machine() {
 	f := fuzzer.Job{Machine: &machine.Machine{Cores: 4}}
-	if err := act.WriteFuzzConf(os.Stdout, f); err != nil {
+	if err := c4f.WriteFuzzConf(os.Stdout, f); err != nil {
 		fmt.Println("ERROR:", err)
 	}
 
@@ -63,7 +63,7 @@ func ExampleWriteFuzzConf_params() {
 		"nonsuch":                       "thing",
 		"":                              "nope",
 	}}}
-	if err := act.WriteFuzzConf(os.Stdout, f); err != nil {
+	if err := c4f.WriteFuzzConf(os.Stdout, f); err != nil {
 		fmt.Println("ERROR:", err)
 	}
 
@@ -99,10 +99,10 @@ func TestMakeFuzzConfFile(t *testing.T) {
 			t.Parallel()
 
 			var buf bytes.Buffer
-			require.NoError(t, act.WriteFuzzConf(&buf, c), "writing config to buffer shouldn't error")
+			require.NoError(t, c4f.WriteFuzzConf(&buf, c), "writing config to buffer shouldn't error")
 			want := buf.String()
 
-			cf, cerr := act.MakeFuzzConfFile(c)
+			cf, cerr := c4f.MakeFuzzConfFile(c)
 			require.NoError(t, cerr, "saving config to file shouldn't error")
 			require.FileExists(t, cf, "config file should exist")
 			defer func() { _ = os.Remove(cf) }()

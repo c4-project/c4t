@@ -3,7 +3,10 @@
 package mocks
 
 import (
+	context "context"
+
 	backend "github.com/c4-project/c4t/internal/model/service/backend"
+
 	mock "github.com/stretchr/testify/mock"
 
 	service "github.com/c4-project/c4t/internal/model/service"
@@ -14,22 +17,22 @@ type Resolver struct {
 	mock.Mock
 }
 
-// Probe provides a mock function with given fields: sr
-func (_m *Resolver) Probe(sr service.Runner) ([]backend.Spec, error) {
-	ret := _m.Called(sr)
+// Probe provides a mock function with given fields: ctx, sr
+func (_m *Resolver) Probe(ctx context.Context, sr service.Runner) ([]backend.NamedSpec, error) {
+	ret := _m.Called(ctx, sr)
 
-	var r0 []backend.Spec
-	if rf, ok := ret.Get(0).(func(service.Runner) []backend.Spec); ok {
-		r0 = rf(sr)
+	var r0 []backend.NamedSpec
+	if rf, ok := ret.Get(0).(func(context.Context, service.Runner) []backend.NamedSpec); ok {
+		r0 = rf(ctx, sr)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]backend.Spec)
+			r0 = ret.Get(0).([]backend.NamedSpec)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(service.Runner) error); ok {
-		r1 = rf(sr)
+	if rf, ok := ret.Get(1).(func(context.Context, service.Runner) error); ok {
+		r1 = rf(ctx, sr)
 	} else {
 		r1 = ret.Error(1)
 	}

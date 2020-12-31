@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act
+package c4f
 
 import (
 	"reflect"

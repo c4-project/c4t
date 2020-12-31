@@ -29,7 +29,7 @@ type profileMaker struct {
 	rng     *rand.Rand
 	jobCh   chan<- workerJob
 
-	// index of current step in the profile run; we use 32-bit to make it possible to serve this as an act-fuzz seed.
+	// index of current step in the profile run; we use 32-bit to make it possible to serve this as an c4f-fuzz seed.
 	nrun int32
 }
 

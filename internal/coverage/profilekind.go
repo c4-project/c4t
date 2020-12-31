@@ -19,7 +19,7 @@ type ProfileKind uint8
 
 const (
 	// Known is a profile kind that tells the coverage generator to run a mutating fuzzer known to it.
-	// At time of writing, there is only one such fuzzer (act-fuzz).
+	// At time of writing, there is only one such fuzzer (c4f-fuzz).
 	Known ProfileKind = iota
 	// Standalone is a profile kind that tells the coverage generator to run an external, stand-alone fuzzer.
 	Standalone

@@ -39,7 +39,7 @@ var (
 	ErrNoInput = errors.New("this runner needs input testcases, but got none")
 )
 
-// FuzzRunner is a coverage runner that uses the act fuzzer.
+// FuzzRunner is a coverage runner that uses the c4f fuzzer.
 type FuzzRunner struct {
 	// TODO(@MattWindsor91): this overlaps with Env in director.
 	// Fuzzer is the fuzzer this fuzz runner uses.

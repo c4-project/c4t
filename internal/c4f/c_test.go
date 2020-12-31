@@ -3,10 +3,11 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act_test
+package c4f_test
 
 import (
 	"context"
+	"io"
 	"testing"
 
 	"github.com/c4-project/c4t/internal/model/service"
@@ -14,7 +15,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,19 +26,45 @@ func TestRunner_Delitmus(t *testing.T) {
 	m := new(mocks.Runner)
 	m.Test(t)
 	m.On("Run", mock.Anything, service.RunInfo{
-		Cmd:  act.BinActC,
+		Cmd:  c4f.BinActC,
 		Args: []string{"delitmus", "-aux-output", "aux.json", "-output", "c.json", "in.litmus"},
 	}).Return(nil).Once()
 
-	dj := act.DelitmusJob{
+	dj := c4f.DelitmusJob{
 		InLitmus: "in.litmus",
 		OutAux:   "aux.json",
 		OutC:     "c.json",
 	}
 
-	a := act.Runner{Base: m}
+	a := c4f.Runner{Base: m}
 	err := a.Delitmus(context.Background(), dj)
 	require.NoError(t, err, "mocked delitmus shouldn't error")
+
+	m.AssertExpectations(t)
+}
+
+// TestRunner_CVersion tests the happy path of CVersion using a mock runner.
+func TestRunner_CVersion(t *testing.T) {
+	t.Parallel()
+
+	var w io.Writer
+	want := "test-version\n"
+
+	m := new(mocks.Runner)
+	m.Test(t)
+	m.On("WithStdout", mock.Anything).Return(m).Run(func(args mock.Arguments) {
+		w = args.Get(0).(io.Writer)
+	}).Once()
+	m.On("Run", mock.Anything, service.RunInfo{
+		Cmd:  c4f.BinActC,
+		Args: []string{"version", "-version"},
+	}).Run(func(mock.Arguments) {
+		_, _ = w.Write([]byte(want))
+	}).Return(nil).Once()
+
+	got, err := (&c4f.Runner{Base: m}).CVersion(context.Background())
+	require.NoError(t, err, "mocked c-version shouldn't error")
+	require.Equal(t, want, got, "c-version didn't match")
 
 	m.AssertExpectations(t)
 }

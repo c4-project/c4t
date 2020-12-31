@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act
+package c4f
 
 import (
 	"fmt"
@@ -107,7 +107,7 @@ func WriteFuzzConf(w io.Writer, j fuzzer.Job) error {
 // MakeFuzzConfFile creates a temporary file, then outputs WriteFuzzConf of j to it and returns the filepath.
 // It is the caller's responsibility to delete the file.
 func MakeFuzzConfFile(j fuzzer.Job) (string, error) {
-	cf, err := ioutil.TempFile("", "act.*.conf")
+	cf, err := ioutil.TempFile("", "c4f.*.conf")
 	if err != nil {
 		return "", fmt.Errorf("creating temporary fuzzer config file: %w", err)
 	}

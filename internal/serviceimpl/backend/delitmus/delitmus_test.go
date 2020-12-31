@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/model/litmus"
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/delitmus"
 )
@@ -41,7 +41,7 @@ func TestDelitmus_Lift(t *testing.T) {
 	}
 
 	cr.On("Run", mock.Anything, service.RunInfo{
-		Cmd: act.BinActC,
+		Cmd: c4f.BinActC,
 		Args: []string{
 			"delitmus",
 			"-aux-output", filepath.Join("out", "aux.json"),
@@ -50,7 +50,7 @@ func TestDelitmus_Lift(t *testing.T) {
 		},
 	}).Return(nil).Once()
 
-	dl := delitmus.Delitmus{BaseRunner: act.Runner{}}
+	dl := delitmus.Delitmus{BaseRunner: c4f.Runner{}}
 	recipe, err := dl.Lift(context.Background(), j, cr)
 	require.NoError(t, err, "lifting with mock delitmus run")
 

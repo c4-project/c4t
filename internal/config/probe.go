@@ -6,17 +6,21 @@
 package config
 
 import (
+	"context"
 	"strings"
+
+	"github.com/c4-project/c4t/internal/model/service"
+	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/machine"
 )
 
 // Probe populates this configuration with information found by scrutinising the current machine.
-func (c *Config) Probe(m machine.Prober) error {
+func (c *Config) Probe(ctx context.Context, sr service.Runner, m machine.Prober) error {
 	if err := c.probeMachines(m); err != nil {
 		return err
 	}
-	return nil
+	return c.probeBackends(ctx, sr)
 }
 
 func (c *Config) probeMachines(m machine.Prober) error {
@@ -30,6 +34,13 @@ func (c *Config) probeMachines(m machine.Prober) error {
 		c.Machines[hname], err = probeConfig(m)
 	}
 
+	return err
+}
+
+func (c *Config) probeBackends(ctx context.Context, sr service.Runner) error {
+	var err error
+	// TODO(@MattWindsor91): should this be hardcoded?
+	c.Backends, err = backend.Resolve.Probe(ctx, sr)
 	return err
 }
 

@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package herdstyle contains backends that act in a similar way to the Herd memory simulator.
+// Package herdstyle contains backends that c4f in a similar way to the Herd memory simulator.
 //
 // Herd is a de facto standard in the area of concurrency exploration, so various tools have the same flow, which
 // has the following characteristics:
@@ -77,6 +77,12 @@ func (c Class) Metadata() backend2.Metadata {
 // capabilities returns OptCapabilities (as well as the implied backend.CanLiftLitmus and backend.CanRunStandalone).
 func (c Class) capabilities() backend2.Capability {
 	return backend2.CanLiftLitmus | backend2.CanRunStandalone | c.OptCapabilities
+}
+
+// Probe probes for this particular kind of herdstyle backend.
+func (c Class) Probe(_ context.Context, _ service.Runner, _ id.ID) ([]backend2.NamedSpec, error) {
+	// TODO(@MattWindsor91): implement this
+	return nil, nil
 }
 
 // Backend represents instantiated herd-style backends.

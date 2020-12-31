@@ -37,8 +37,13 @@ type Class interface {
 	// Metadata gets information about this type of backend.
 	Metadata() Metadata
 
-	// Instantiate instantiates an archetype, producing a backend.
+	// Instantiate instantiates a class, producing a backend.
 	Instantiate(spec Spec) Backend
+
+	// Probe probes the local system for specifications that can be used to produce backends of this class.
+	// It takes a runner sr and context ctx, for any external programs, and a style ID style that the resolver will
+	// resolve to one of these specifications.
+	Probe(ctx context.Context, sr service.Runner, style id.ID) ([]NamedSpec, error)
 }
 
 // Metadata contains metadata for a backend archetype.
@@ -103,7 +108,7 @@ type Resolver interface {
 	Resolve(s Spec) (Backend, error)
 
 	// Probe uses sr to probe for backend specifications on this machine.
-	Probe(sr service.Runner) ([]Spec, error)
+	Probe(ctx context.Context, sr service.Runner) ([]NamedSpec, error)
 }
 
 //go:generate mockery --name=Resolver

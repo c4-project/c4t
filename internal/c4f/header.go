@@ -3,14 +3,14 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package act
+package c4f
 
 import (
 	"encoding/json"
 	"io"
 )
 
-// Metadata represents a Litmus test header in the form that act-c accepts and dumps.
+// Metadata represents a Litmus test header in the form that c4f-c accepts and dumps.
 type Header struct {
 	// Name is the name of the Litmus test.
 	Name string `json:"name"`

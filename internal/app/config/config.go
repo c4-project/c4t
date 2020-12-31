@@ -3,11 +3,13 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package config implements the act-config app.
+// Package config implements the c4f-config app.
 package config
 
 import (
 	"io"
+
+	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/c4-project/c4t/internal/config"
 	"github.com/c4-project/c4t/internal/machine"
@@ -43,9 +45,9 @@ func flags() []c.Flag {
 	return []c.Flag{}
 }
 
-func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
+func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	cfg := config.Config{}
-	if err := cfg.Probe(machine.LocalProber{}); err != nil {
+	if err := cfg.Probe(ctx.Context, srvrun.NewExecRunner(srvrun.StderrTo(errw)), machine.LocalProber{}); err != nil {
 		return err
 	}
 	return cfg.Dump(outw)

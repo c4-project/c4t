@@ -21,7 +21,7 @@ import (
 
 	"github.com/1set/gut/yos"
 
-	"github.com/c4-project/c4t/internal/act"
+	"github.com/c4-project/c4t/internal/c4f"
 
 	"github.com/c4-project/c4t/internal/config"
 	"github.com/c4-project/c4t/internal/plan"
@@ -172,7 +172,7 @@ func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.P
 	)
 }
 
-func source(a *act.Runner, cfg *config.Config) planner.Source {
+func source(a *c4f.Runner, cfg *config.Config) planner.Source {
 	return planner.Source{
 		BProbe:  cfg,
 		CLister: cfg.Machines,

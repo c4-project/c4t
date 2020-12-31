@@ -7,6 +7,7 @@
 package backend
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -77,7 +78,19 @@ func (r *Resolver) Resolve(b backend2.Spec) (backend2.Backend, error) {
 	return bi.Instantiate(b), nil
 }
 
-// Probe does nothing yet.
-func (r *Resolver) Probe(_ service.Runner) ([]backend2.Spec, error) {
-	return []backend2.Spec{}, nil
+// Probe probes every class in this resolver, and aggregates the specifications.
+func (r *Resolver) Probe(ctx context.Context, sr service.Runner) ([]backend2.NamedSpec, error) {
+	// As an educated guess, assume every class has one spec.
+	ns := make([]backend2.NamedSpec, 0, len(r.Backends))
+	var (
+		cns []backend2.NamedSpec
+		err error
+	)
+	for style, c := range r.Backends {
+		if cns, err = c.Probe(ctx, sr, id.FromString(style)); err != nil {
+			return nil, err
+		}
+		ns = append(ns, cns...)
+	}
+	return ns, nil
 }

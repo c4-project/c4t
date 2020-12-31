@@ -4,7 +4,7 @@
 // Licenced under the MIT licence; see `LICENSE`.
 
 // Package fuzzer contains a test-plan batch fuzzer.
-// It relies on the existence of a single-file fuzzer such as act-fuzz.
+// It relies on the existence of a single-file fuzzer such as c4f-fuzz.
 package fuzzer
 
 import (
