@@ -38,14 +38,24 @@ type Delitmus struct {
 	BaseRunner act.Runner
 }
 
-// Capabilities reports that this backend can lift (and nothing else).
-func (d Delitmus) Capabilities() backend2.Capability {
-	return backend2.CanLiftLitmus | backend2.CanProduceObj
+var dlMeta = backend2.Metadata{
+	Capabilities: backend2.CanLiftLitmus | backend2.CanProduceObj,
+	LitmusArches: []id.ID{id.ArchC},
 }
 
-// LitmusArches reports that this backend understands C litmus (and nothing else).
-func (Delitmus) LitmusArches() []id.ID {
-	return []id.ID{id.ArchC}
+// Metadata gets the metadata for the delitmusifier.
+func (Delitmus) Metadata() backend2.Metadata {
+	return dlMeta
+}
+
+// Instantiate 'instantiates' the delitmusifier; in fact, there isn't anything to instantiate.
+func (d Delitmus) Instantiate(_ backend2.Spec) backend2.Backend {
+	return d
+}
+
+// Class gets the 'class' of the delitmusifier (which is just the delitmusifier).
+func (d Delitmus) Class() backend2.Class {
+	return d
 }
 
 // Lift delitmusifies the litmus file specified in j, using errw for standard output.

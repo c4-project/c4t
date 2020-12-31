@@ -21,25 +21,40 @@ import (
 
 // Backend contains the various interfaces that a backend can implement.
 type Backend interface {
-	// Capabilities gets the capability set reported for this backend.
-	Capabilities() Capability
-
-	// LitmusArches gets the list of Litmus architectures understood by this backend (capability CanLiftLitmus).
-	LitmusArches() []id.ID
-
 	// Some backends can lift test-cases into recipes (capability CanLift).
 	SingleLifter
 
 	// Backends that can be run standalone or produce executables (capability CanRunStandalone | CanProduceExe)
 	// must give an observation parser for interpreting their stdout as observations.
 	ObsParser
+
+	// Class gets the archetype of this backend.
+	Class() Class
+}
+
+// Class contains information about a style of backend.
+type Class interface {
+	// Metadata gets information about this type of backend.
+	Metadata() Metadata
+
+	// Instantiate instantiates an archetype, producing a backend.
+	Instantiate(spec Spec) Backend
+}
+
+// Metadata contains metadata for a backend archetype.
+type Metadata struct {
+	// Capabilities is the set of capability flags enabled on this backend.
+	Capabilities Capability
+
+	// LitmusArches is the list of Litmus architectures understood by this backend (capability CanLiftLitmus).
+	LitmusArches []id.ID
 }
 
 // ErrNotSupported is the error that backends should return if we try to do something they don't support.
 var ErrNotSupported = errors.New("service doesn't support action")
 
-// BackendRunner is the interface that backends must implement to slot into the machine node runner.
-type BackendRunner interface {
+// Runner is the interface that backends must implement to slot into the machine node runner.
+type Runner interface {
 	// RunBackend runs the backend run job j.
 	RunBackend(ctx context.Context, j *RunJob) error
 }
@@ -76,7 +91,7 @@ func RunExeAndParse(ctx context.Context, j *RunJob, r service.RunInfo, p ObsPars
 		return fmt.Errorf("while starting program: %w", err)
 	}
 
-	perr := p.ParseObs(ctx, j.Backend, obsr, j.Obs)
+	perr := p.ParseObs(ctx, obsr, j.Obs)
 	werr := cmd.Wait()
 	return errhelp.FirstError(perr, werr)
 }
@@ -85,7 +100,10 @@ func RunExeAndParse(ctx context.Context, j *RunJob, r service.RunInfo, p ObsPars
 // Resolver is the interface of things that can resolve backends.
 type Resolver interface {
 	// Resolve tries to resolve the spec s into a backend.
-	Resolve(s *Spec) (Backend, error)
+	Resolve(s Spec) (Backend, error)
+
+	// Probe uses sr to probe for backend specifications on this machine.
+	Probe(sr service.Runner) ([]Spec, error)
 }
 
 //go:generate mockery --name=Resolver

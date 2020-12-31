@@ -34,37 +34,37 @@ var (
 	rmemArches = []id.ID{id.ArchAArch64}
 
 	// Resolve is a pre-populated backend resolver.
-	Resolve = Resolver{Backends: map[string]func(r *service.RunInfo) backend2.Backend{
-		"delitmus": func(*service.RunInfo) backend2.Backend { return delitmus.Delitmus{} },
-		"herdtools.herd": herdstyle.Backend{
+	Resolve = Resolver{Backends: map[string]backend2.Class{
+		"delitmus": delitmus.Delitmus{},
+		"herdtools.herd": herdstyle.Class{
 			OptCapabilities: 0,
 			Arches:          herdArches,
-			RunInfo:         service.RunInfo{Cmd: "herd7"},
+			DefaultRunInfo:  service.RunInfo{Cmd: "herd7"},
 			Impl:            herd.Herd{},
-		}.Instantiate,
-		"herdtools.litmus": herdstyle.Backend{
+		},
+		"herdtools.litmus": herdstyle.Class{
 			OptCapabilities: backend2.CanProduceExe,
 			Arches:          litmusArches,
-			RunInfo:         service.RunInfo{Cmd: "litmus7"},
+			DefaultRunInfo:  service.RunInfo{Cmd: "litmus7"},
 			Impl:            litmus.Litmus{},
-		}.Instantiate,
-		"rmem": herdstyle.Backend{
+		},
+		"rmem": herdstyle.Class{
 			OptCapabilities: backend2.CanLiftLitmus,
 			Arches:          rmemArches,
-			RunInfo:         service.RunInfo{Cmd: "rmem"},
+			DefaultRunInfo:  service.RunInfo{Cmd: "rmem"},
 			Impl:            rmem.Rmem{},
-		}.Instantiate,
+		},
 	}}
 )
 
-// Resolver maps backend styles to backends.
+// Resolver maps backend styles to classes, and implements a resolver accordingly.
 type Resolver struct {
 	// Backends is the raw map from style strings to backend constructors.
-	Backends map[string]func(ri *service.RunInfo) backend2.Backend
+	Backends map[string]backend2.Class
 }
 
 // Resolve tries to look up the backend specified by b in this resolver.
-func (r *Resolver) Resolve(b *backend2.Spec) (backend2.Backend, error) {
+func (r *Resolver) Resolve(b backend2.Spec) (backend2.Backend, error) {
 	if r == nil {
 		return nil, ErrNil
 	}
@@ -74,5 +74,10 @@ func (r *Resolver) Resolve(b *backend2.Spec) (backend2.Backend, error) {
 	if !ok {
 		return nil, fmt.Errorf("%w: %s", ErrUnknownStyle, sstr)
 	}
-	return bi(b.Run), nil
+	return bi.Instantiate(b), nil
+}
+
+// Probe does nothing yet.
+func (r *Resolver) Probe(_ service.Runner) ([]backend2.Spec, error) {
+	return []backend2.Spec{}, nil
 }

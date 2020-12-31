@@ -70,8 +70,7 @@ func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	observer.OnRunStart(r.quantities, r.observers...)
 
-	spec := p.Backend.Spec
-	b, err := r.resolver.Resolve(&spec)
+	b, err := r.resolver.Resolve(p.Backend.Spec)
 	if err != nil {
 		return nil, err
 	}

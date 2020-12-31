@@ -218,8 +218,7 @@ func getBackend(cfg *config.Config, c backend.Criteria) (backend.Backend, error)
 		return nil, fmt.Errorf("while finding backend: %w", err)
 	}
 
-	s := &spec.Spec
-	b, err := backend2.Resolve.Resolve(s)
+	b, err := backend2.Resolve.Resolve(spec.Spec)
 	if err != nil {
 		return nil, fmt.Errorf("while resolving backend %s: %w", spec.ID, err)
 	}

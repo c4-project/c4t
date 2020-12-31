@@ -41,42 +41,60 @@ import (
 // standaloneOut is the name of the file in the output directory to which we should write standalone output.
 const standaloneOut = "output.txt"
 
-// Backend represents herd-style backends such as Herd and Litmus.
-type Backend struct {
+// Class represents a class of herd-style backends such as Herd and Litmus.
+type Class struct {
 	// OptCapabilities contains the capability flags for this backend not implied by being a herdstyle backend.
 	OptCapabilities backend2.Capability
 
 	// Arches describes the architectures of Litmus test this backend can deal with.
 	Arches []id.ID
 
-	// RunInfo is the run information for the particular backend.
-	RunInfo service.RunInfo
+	// DefaultRunInfo is the default run information for this backend archetype.
+	DefaultRunInfo service.RunInfo
 
 	// Impl provides parts of the Backend backend setup that differ between the various tools.
 	Impl BackendImpl
 }
 
 // Instantiate overrides the run info in this backend, and returns a new backend in an interface wrapper.
-//
-// This slightly strange implementation is designed to slot into function tables in resolvers.
-func (h Backend) Instantiate(new *service.RunInfo) backend2.Backend {
-	h.RunInfo.OverrideIfNotNil(new)
-	return h
+func (c Class) Instantiate(s backend2.Spec) backend2.Backend {
+	b := Backend{
+		class:   c,
+		runInfo: c.DefaultRunInfo,
+	}
+	b.runInfo.OverrideIfNotNil(s.Run)
+	return b
 }
 
-// Capabilities returns OptCapabilities (as well as the implied backend.CanLiftLitmus and backend.CanRunStandalone).
-func (h Backend) Capabilities() backend2.Capability {
-	return backend2.CanLiftLitmus | backend2.CanRunStandalone | h.OptCapabilities
+// Metadata gets the metadata for this class.
+func (c Class) Metadata() backend2.Metadata {
+	return backend2.Metadata{
+		Capabilities: c.capabilities(),
+		LitmusArches: c.Arches,
+	}
 }
 
-// LitmusArches returns Arches, to satisfy the backend interface.
-func (h Backend) LitmusArches() []id.ID {
-	return h.Arches
+// capabilities returns OptCapabilities (as well as the implied backend.CanLiftLitmus and backend.CanRunStandalone).
+func (c Class) capabilities() backend2.Capability {
+	return backend2.CanLiftLitmus | backend2.CanRunStandalone | c.OptCapabilities
+}
+
+// Backend represents instantiated herd-style backends.
+type Backend struct {
+	// class is the archetype of this backend.
+	class Class
+
+	// runInfo is the run information for the particular backend.
+	runInfo service.RunInfo
+}
+
+func (h Backend) Class() backend2.Class {
+	return h.class
 }
 
 // ParseObs parses an observation from r into o.
 func (h Backend) ParseObs(_ context.Context, r io.Reader, o *obs.Obs) error {
-	return parser.Parse(h.Impl, r, o)
+	return parser.Parse(h.class.Impl, r, o)
 }
 
 func (h Backend) Lift(ctx context.Context, j backend2.LiftJob, x service.Runner) (recipe.Recipe, error) {
@@ -101,7 +119,7 @@ func (h Backend) liftStandalone(ctx context.Context, j backend2.LiftJob, x servi
 }
 
 func (h Backend) liftExe(ctx context.Context, j backend2.LiftJob, x service.Runner) (recipe.Recipe, error) {
-	if err := h.Impl.LiftExe(ctx, j, h.RunInfo, x); err != nil {
+	if err := h.class.Impl.LiftExe(ctx, j, h.runInfo, x); err != nil {
 		return recipe.Recipe{}, err
 	}
 	return h.makeExeRecipe(j.Out)
@@ -112,7 +130,7 @@ func (h Backend) runStandalone(ctx context.Context, j backend2.LiftJob, x servic
 	if err != nil {
 		return fmt.Errorf("couldn't create standalone output file: %s", err)
 	}
-	rerr := h.Impl.LiftStandalone(ctx, j, h.RunInfo, x, f)
+	rerr := h.class.Impl.LiftStandalone(ctx, j, h.runInfo, x, f)
 	cerr := f.Close()
 	return errhelp.FirstError(rerr, cerr)
 }
@@ -143,7 +161,7 @@ func (h Backend) checkAndAmendInput(i *backend2.LiftInput) error {
 }
 
 func (h Backend) supportsLitmusArch(a id.ID) bool {
-	for _, a2 := range h.Arches {
+	for _, a2 := range h.class.Arches {
 		if a.HasPrefix(a2) {
 			return true
 		}
@@ -158,7 +176,7 @@ func (h Backend) checkAndAmendOutput(o *backend2.LiftOutput) error {
 		fallthrough
 	case backend2.ToStandalone:
 	case backend2.ToExeRecipe:
-		if (h.OptCapabilities & backend2.CanProduceExe) == 0 {
+		if (h.class.OptCapabilities & backend2.CanProduceExe) == 0 {
 			return fmt.Errorf("%w: cannot produce executables", backend2.ErrNotSupported)
 		}
 	case backend2.ToObjRecipe:

@@ -111,8 +111,7 @@ func (l *Lifter) lift(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 }
 
 func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, error) {
-	spec := p.Backend.Spec
-	b, err := l.resolver.Resolve(&spec)
+	b, err := l.resolver.Resolve(p.Backend.Spec)
 	if err != nil {
 		return nil, err
 	}

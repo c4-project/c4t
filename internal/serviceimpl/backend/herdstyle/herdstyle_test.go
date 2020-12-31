@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/model/service/backend"
+
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/herd"
@@ -38,7 +40,7 @@ func TestBackend_ParseObs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			b := herdstyle.Backend{Impl: i}
+			b := herdstyle.Class{Impl: i}.Instantiate(backend.Spec{})
 
 			indir := filepath.Join("testdata", name, "in")
 			fs, err := ioutil.ReadDir(indir)

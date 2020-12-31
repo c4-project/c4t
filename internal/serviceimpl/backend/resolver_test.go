@@ -33,11 +33,10 @@ func TestResolver_Get_capabilities(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			spec := &backend2.Spec{Style: id.FromString(name)}
-			r, err := backend.Resolve.Resolve(spec)
+			r, err := backend.Resolve.Resolve(backend2.Spec{Style: id.FromString(name)})
 			require.NoError(t, err, "resolution should pass")
 
-			assert.Equal(t, c, r.Capabilities())
+			assert.Equal(t, c, r.Class().Metadata().Capabilities)
 		})
 	}
 }
