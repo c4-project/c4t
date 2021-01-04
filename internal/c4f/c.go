@@ -17,8 +17,8 @@ import (
 	"github.com/c4-project/c4t/internal/subject"
 )
 
-// BinActC is the name of the c4f C services binary.
-const BinActC = "act-c"
+// BinC4fC is the name of the c4f C services binary.
+const BinC4fC = "c4f-c"
 
 // ProbeSubject probes the litmus test at path, returning a named subject record.
 func (a *Runner) ProbeSubject(ctx context.Context, path string) (*subject.Named, error) {
@@ -48,7 +48,7 @@ func (a *Runner) ProbeSubject(ctx context.Context, path string) (*subject.Named,
 func (a *Runner) DumpHeader(ctx context.Context, h *Header, path string) error {
 	var obuf bytes.Buffer
 	cs := CmdSpec{
-		Cmd:    BinActC,
+		Cmd:    BinC4fC,
 		Subcmd: "dump-header",
 		Args:   []string{path},
 		Stdout: &obuf,
@@ -63,7 +63,7 @@ func (a *Runner) DumpHeader(ctx context.Context, h *Header, path string) error {
 func (a *Runner) DumpStats(ctx context.Context, s *litmus.Statset, path string) error {
 	var obuf bytes.Buffer
 	cs := CmdSpec{
-		Cmd:    BinActC,
+		Cmd:    BinC4fC,
 		Subcmd: "dump-stats",
 		Args:   []string{path},
 		Stdout: &obuf,
@@ -100,7 +100,7 @@ func (d DelitmusJob) Args() []string {
 
 // Delitmus runs c4f-c delitmus as directed by d.
 func (a *Runner) Delitmus(ctx context.Context, d DelitmusJob) error {
-	return a.Run(ctx, CmdSpec{Cmd: BinActC, Subcmd: "delitmus", Args: d.Args()})
+	return a.Run(ctx, CmdSpec{Cmd: BinC4fC, Subcmd: "delitmus", Args: d.Args()})
 }
 
 /// CVersion gets the version of the c4f-c tool.
@@ -108,7 +108,7 @@ func (a *Runner) CVersion(ctx context.Context) (string, error) {
 	var obuf bytes.Buffer
 	// For some reason, just passing 'c4f-c version' gives the build info too.
 	cs := CmdSpec{
-		Cmd:    BinActC,
+		Cmd:    BinC4fC,
 		Subcmd: "version",
 		Args:   []string{"-version"},
 		Stdout: &obuf,

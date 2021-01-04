@@ -29,5 +29,5 @@ c4t-coverage [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-d**="": `directory` to which outputs will be written (default: coverage)
 
-**-x**: if true, use 'dune exec' to run OCaml ACT binaries
+**-x**: if true, use 'dune exec' to run c4f binaries
 

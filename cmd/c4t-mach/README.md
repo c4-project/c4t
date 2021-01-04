@@ -2,7 +2,7 @@
 
 # NAME
 
-c4t-mach - runs the machine-dependent phase of an ACT test
+c4t-mach - runs the machine-dependent phase of a C4 test
 
 # SYNOPSIS
 

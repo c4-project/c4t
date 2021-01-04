@@ -103,7 +103,7 @@ func flags() []c.Flag {
 		stdflag.CorpusSizeCliFlag(),
 		stdflag.CPUProfileCliFlag(),
 	}
-	return append(nflags, stdflag.ActRunnerCliFlags()...)
+	return append(nflags, stdflag.C4fRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, errw io.Writer) error {
@@ -115,7 +115,7 @@ func run(ctx *c.Context, errw io.Writer) error {
 		defer stop()
 	}
 
-	a := stdflag.ActRunnerFromCli(ctx, errw)
+	a := stdflag.C4fRunnerFromCli(ctx, errw)
 	cfg, err := stdflag.ConfFileFromCli(ctx)
 	if err != nil {
 		return err

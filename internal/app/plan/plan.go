@@ -43,7 +43,7 @@ const (
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  "c4t-plan",
-		Usage: "runs the planning phase of an ACT test standalone",
+		Usage: "runs the planning phase of a C4 test standalone",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, os.Stdout, os.Stderr)
@@ -71,7 +71,7 @@ func flags() []c.Flag {
 		stdflag.WorkerCountCliFlag(),
 		stdflag.OutDirCliFlag(""),
 	}
-	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
+	return append(ownFlags, stdflag.C4fRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
@@ -157,7 +157,7 @@ func writePlansToDir(outdir string, ps map[string]plan.Plan) error {
 }
 
 func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.Planner, error) {
-	a := stdflag.ActRunnerFromCli(ctx, errw)
+	a := stdflag.C4fRunnerFromCli(ctx, errw)
 
 	qs := quantities(ctx)
 	src := source(a, cfg)

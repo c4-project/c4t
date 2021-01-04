@@ -2,7 +2,7 @@
 
 # NAME
 
-c4t-lift - runs the lifter phase of an ACT test
+c4t-lift - runs the lifter phase of a C4 test
 
 # SYNOPSIS
 
@@ -26,5 +26,5 @@ c4t-lift [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-d**="": `directory` to which outputs will be written (default: lift_results)
 
-**-x**: if true, use 'dune exec' to run OCaml ACT binaries
+**-x**: if true, use 'dune exec' to run c4f binaries
 

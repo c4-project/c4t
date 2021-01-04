@@ -2,7 +2,7 @@
 
 # NAME
 
-c4t-invoke - runs the machine-dependent phase of an ACT test, potentially remotely
+c4t-invoke - runs the machine-dependent phase of a C4 test, potentially remotely
 
 # SYNOPSIS
 

@@ -26,7 +26,7 @@ func TestRunner_Delitmus(t *testing.T) {
 	m := new(mocks.Runner)
 	m.Test(t)
 	m.On("Run", mock.Anything, service.RunInfo{
-		Cmd:  c4f.BinActC,
+		Cmd:  c4f.BinC4fC,
 		Args: []string{"delitmus", "-aux-output", "aux.json", "-output", "c.json", "in.litmus"},
 	}).Return(nil).Once()
 
@@ -56,7 +56,7 @@ func TestRunner_CVersion(t *testing.T) {
 		w = args.Get(0).(io.Writer)
 	}).Once()
 	m.On("Run", mock.Anything, service.RunInfo{
-		Cmd:  c4f.BinActC,
+		Cmd:  c4f.BinC4fC,
 		Args: []string{"version", "-version"},
 	}).Run(func(mock.Arguments) {
 		_, _ = w.Write([]byte(want))

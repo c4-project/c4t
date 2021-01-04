@@ -94,7 +94,7 @@ func flags() []c.Flag {
 		&c.DurationFlag{Name: flagTimeout, Aliases: []string{flagTimeoutShort}, Usage: usageTimeout},
 		&c.DurationFlag{Name: flagGrace, Aliases: []string{flagGraceShort}, Usage: usageGrace},
 	}
-	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
+	return append(ownFlags, stdflag.C4fRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
@@ -102,7 +102,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("while getting config: %w", err)
 	}
-	crun := stdflag.ActRunnerFromCli(ctx, errw)
+	crun := stdflag.C4fRunnerFromCli(ctx, errw)
 
 	td, err := ioutil.TempDir("", "c4t-backend")
 	if err != nil {

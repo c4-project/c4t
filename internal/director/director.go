@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package director contains the top-level ACT test director, which manages a full testing campaign.
+// Package director contains the top-level C4 test director, which manages a full testing campaign.
 package director
 
 import (

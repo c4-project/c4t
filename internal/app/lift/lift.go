@@ -30,7 +30,7 @@ const defaultOutDir = "lift_results"
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  "c4t-lift",
-		Usage: "runs the lifter phase of an ACT test",
+		Usage: "runs the lifter phase of a C4 test",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
@@ -44,7 +44,7 @@ func flags() []c.Flag {
 		stdflag.VerboseFlag(),
 		stdflag.OutDirCliFlag(defaultOutDir),
 	}
-	return append(fs, stdflag.ActRunnerCliFlags()...)
+	return append(fs, stdflag.C4fRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {

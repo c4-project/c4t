@@ -24,7 +24,7 @@ const (
 	FlagCompilerTimeout = "t"
 	// FlagRunTimeout is a short flag for run timeout.
 	FlagRunTimeout  = "T"
-	flagActDuneExec = "x"
+	flagC4fDuneExec = "x"
 
 	// FlagCPUProfile is a standard flag for specifying a CPU profile output.
 	FlagCPUProfile = "cpuprofile"
@@ -43,7 +43,7 @@ const (
 
 	usageConfFile      = "read tester config from this `file`"
 	usageCorpusSize    = "`number` of corpus files to select for this test plan"
-	usageActDuneExec   = "if true, use 'dune exec' to run OCaml ACT binaries"
+	usageC4fDuneExec   = "if true, use 'dune exec' to run c4f binaries"
 	usageOutDir        = "`directory` to which outputs will be written"
 	usageSubjectCycles = "number of `cycles` to run for each subject in the corpus"
 	usageCPUProfile    = "`file` into which we should dump pprof information"

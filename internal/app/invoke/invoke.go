@@ -40,7 +40,7 @@ const (
 func App(outw, errw io.Writer) *c.App {
 	a := c.App{
 		Name:  Name,
-		Usage: "runs the machine-dependent phase of an ACT test, potentially remotely",
+		Usage: "runs the machine-dependent phase of a C4 test, potentially remotely",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)

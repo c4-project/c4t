@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package id describes ACT's dot-delimited IDs.
+// Package id describes C4's dot-delimited IDs.
 package id
 
 import (
@@ -26,12 +26,12 @@ var (
 	ErrTagEmpty = errors.New("tag empty")
 )
 
-// ID represents an ACT ID.
+// ID represents a C4 ID.
 type ID struct {
 	tags []string
 }
 
-// New tries to construct an ACT ID from tags.
+// New tries to construct a C4 ID from tags.
 // It fails if any of the tags is empty (unless there is only one such tag), or contains a separator.
 func New(tags ...string) (ID, error) {
 	// Normalise the empty tag.
@@ -71,13 +71,13 @@ func validateTag(t string) error {
 	return nil
 }
 
-// TryFromString tries to convert a string to an ACT ID.
+// TryFromString tries to convert a string to a C4 ID.
 // It returns any validation error arising.
 func TryFromString(s string) (ID, error) {
 	return New(strings.Split(s, string(SepTag))...)
 }
 
-//FromString converts a string to an ACT ID.
+//FromString converts a string to a C4 ID.
 // It returns the empty ID if there is an error.
 func FromString(s string) ID {
 	id, err := TryFromString(s)
@@ -97,7 +97,7 @@ func (i ID) Tags() []string {
 	return i.tags
 }
 
-// String converts an ACT ID to a string.
+// String converts a C4 ID to a string.
 func (i ID) String() string {
 	return strings.Join(i.tags, string(SepTag))
 }

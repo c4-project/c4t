@@ -43,20 +43,20 @@ func OutDirCliFlag(defaultdir string) c.Flag {
 	}
 }
 
-// ActRunnerCliFlags gets the 'cli' flags needed to set up an ACT runner.
-func ActRunnerCliFlags() []c.Flag {
+// C4fRunnerCliFlags gets the 'cli' flags needed to set up a c4f runner.
+func C4fRunnerCliFlags() []c.Flag {
 	return []c.Flag{
 		&c.BoolFlag{
-			Name:  flagActDuneExec,
-			Usage: usageActDuneExec,
+			Name:  flagC4fDuneExec,
+			Usage: usageC4fDuneExec,
 		},
 	}
 }
 
-// ActRunnerFromCli makes an ACT runner using the flags previously set up by ActRunnerCliFlags.
-func ActRunnerFromCli(ctx *c.Context, errw io.Writer) *c4f.Runner {
+// C4fRunnerFromCli makes a c4f runner using the flags previously set up by C4fRunnerCliFlags.
+func C4fRunnerFromCli(ctx *c.Context, errw io.Writer) *c4f.Runner {
 	return &c4f.Runner{
-		DuneExec: ctx.Bool(flagActDuneExec),
+		DuneExec: ctx.Bool(flagC4fDuneExec),
 		Base:     srvrun.NewExecRunner(srvrun.StderrTo(errw)),
 	}
 }

@@ -32,7 +32,7 @@ const defaultOutDir = "fuzz_results"
 func App(outw, errw io.Writer) *c.App {
 	a := &c.App{
 		Name:  "c4t-fuzz",
-		Usage: "runs the batch-fuzzer phase of an ACT test",
+		Usage: "runs the batch-fuzzer phase of a C4 test",
 		Flags: flags(),
 		Action: func(ctx *c.Context) error {
 			return run(ctx, outw, errw)
@@ -49,7 +49,7 @@ func flags() []c.Flag {
 		stdflag.CorpusSizeCliFlag(),
 		stdflag.SubjectCyclesCliFlag(),
 	}
-	return append(fs, stdflag.ActRunnerCliFlags()...)
+	return append(fs, stdflag.C4fRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
@@ -58,7 +58,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 		return err
 	}
 
-	a := stdflag.ActRunnerFromCli(ctx, errw)
+	a := stdflag.C4fRunnerFromCli(ctx, errw)
 	l := log.New(errw, "", 0)
 	f, err := makeFuzzer(ctx, cfg, a, l)
 	if err != nil {

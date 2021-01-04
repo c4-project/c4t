@@ -38,5 +38,5 @@ c4t [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-k**="": number of `cycles` to run for each subject in the corpus (default: 10)
 
-**-x**: if true, use 'dune exec' to run OCaml ACT binaries
+**-x**: if true, use 'dune exec' to run c4f binaries
 

@@ -8,7 +8,7 @@ package obs
 
 import "github.com/c4-project/c4t/internal/subject/status"
 
-// Obs represents an observation in ACT's JSON-based format.
+// Obs represents an observation in C4's JSON-based format.
 type Obs struct {
 	// Flags contains any flags that are active on Obs.
 	Flags Flag `json:"flags,omitempty" toml:"flags,omitzero"`

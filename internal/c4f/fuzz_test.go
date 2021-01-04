@@ -79,7 +79,7 @@ func checkFuzzCmdSpec(c service.RunInfo, j fuzzer.Job) bool {
 	if haveTrace && (c.Args[7] != "-trace-output" || c.Args[8] != j.OutTrace) {
 		return false
 	}
-	return c.Cmd == c4f.BinActFuzz &&
+	return c.Cmd == c4f.BinC4fFuzz &&
 		c.Args[0] == "run" &&
 		c.Args[1] == "-config" &&
 		// TODO(@MattWindsor91): check config file?

@@ -22,9 +22,8 @@ out_dir = "~/Documents/git/act/test_out"
 
 # We now define the machines that will be run in the test.
 [machines.localhost]
-    # Eventually, the number of cores given here will set a hard cap on the number of threads that litmus tests can
+    # The number of cores given here will set a hard cap on the number of threads that litmus tests can
     # have to be run by the tester.
-    # This isn't quite set-up yet, so you'll need to set the cap in the fuzzer's 'act.conf' instead.
 	cores = 4
 
     # Here is a compiler definition for 'gcc-9', a GCC-style compiler targeting x86-64.

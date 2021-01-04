@@ -55,7 +55,7 @@ func flags() []c.Flag {
 		},
 		stdflag.OutDirCliFlag(defaultOutDir),
 	}
-	return append(ownFlags, stdflag.ActRunnerCliFlags()...)
+	return append(ownFlags, stdflag.C4fRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, errw io.Writer) error {
@@ -64,7 +64,7 @@ func run(ctx *c.Context, errw io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("opening coverage config file: %w", err)
 	}
-	a := stdflag.ActRunnerFromCli(ctx, errw)
+	a := stdflag.C4fRunnerFromCli(ctx, errw)
 	cm, err := ccfg.MakeMaker(
 		coverage.SendStderrTo(errw),
 		coverage.UseFuzzer(a),

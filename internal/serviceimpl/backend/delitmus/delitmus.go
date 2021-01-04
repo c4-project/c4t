@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package delitmus lifts the ACT delitmusifier into a backend.
+// Package delitmus lifts the c4f delitmusifier into a backend.
 package delitmus
 
 import (
@@ -30,7 +30,7 @@ const (
 	outC   = "delitmus.c"
 )
 
-// Delitmus partially implements the backend specification by delegating to ACT's delitmusifier.
+// Delitmus partially implements the backend specification by delegating to C4's delitmusifier.
 //
 // The delitmus backend can't actually produce standalone C code, and, at time of writing, there is no way to get
 // the tester to compile C code without running it.  Instead, its main purpose is to serve as the target of a coverage

@@ -17,10 +17,10 @@ import (
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 )
 
-// BinActFuzz is the name of the ACT fuzzer binary.
-const BinActFuzz = "act-fuzz"
+// BinC4fFuzz is the name of the c4f fuzzer binary.
+const BinC4fFuzz = "c4f"
 
-// Fuzz wraps the ACT one-file fuzzer, supplying the given seed.
+// Fuzz wraps the c4f one-file fuzzer, supplying the given seed.
 func (a *Runner) Fuzz(ctx context.Context, j fuzzer.Job) error {
 	cf, err := MakeFuzzConfFile(j)
 	if err != nil {
@@ -34,7 +34,7 @@ func (a *Runner) Fuzz(ctx context.Context, j fuzzer.Job) error {
 	args = append(args, j.In)
 
 	cs := CmdSpec{
-		Cmd:    BinActFuzz,
+		Cmd:    BinC4fFuzz,
 		Subcmd: "run",
 		Args:   args,
 	}

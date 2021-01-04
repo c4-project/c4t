@@ -41,7 +41,7 @@ func TestDelitmus_Lift(t *testing.T) {
 	}
 
 	cr.On("Run", mock.Anything, service.RunInfo{
-		Cmd: c4f.BinActC,
+		Cmd: c4f.BinC4fC,
 		Args: []string{
 			"delitmus",
 			"-aux-output", filepath.Join("out", "aux.json"),

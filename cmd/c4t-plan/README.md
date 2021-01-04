@@ -2,7 +2,7 @@
 
 # NAME
 
-c4t-plan - runs the planning phase of an ACT test standalone
+c4t-plan - runs the planning phase of a C4 test standalone
 
 # SYNOPSIS
 
@@ -38,5 +38,5 @@ c4t-plan [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-d**="": `directory` to which outputs will be written
 
-**-x**: if true, use 'dune exec' to run OCaml ACT binaries
+**-x**: if true, use 'dune exec' to run c4f binaries
 

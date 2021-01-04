@@ -2,7 +2,7 @@
 
 # NAME
 
-c4t-fuzz - runs the batch-fuzzer phase of an ACT test
+c4t-fuzz - runs the batch-fuzzer phase of a C4 test
 
 # SYNOPSIS
 
@@ -35,5 +35,5 @@ c4t-fuzz [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **-k**="": number of `cycles` to run for each subject in the corpus (default: 10)
 
-**-x**: if true, use 'dune exec' to run OCaml ACT binaries
+**-x**: if true, use 'dune exec' to run c4f binaries
 
