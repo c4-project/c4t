@@ -12,7 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/1set/gut/yos"
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+
 	"github.com/c4-project/c4t/internal/app/obs"
 	"github.com/stretchr/testify/require"
 )
@@ -21,20 +22,17 @@ import (
 func TestApp_valid(t *testing.T) {
 	t.Parallel()
 
-	fs, err := yos.ListMatch(filepath.Join("testdata", "valid"), yos.ListIncludeFile, "*.json")
-	require.NoError(t, err, "testdata listing shouldn't fail")
-
-	for _, f := range fs {
-		path := f.Path
-		pprefix := strings.TrimSuffix(path, ".json")
+	dir := filepath.Join("testdata", "valid")
+	testhelp.TestFilesOfExt(t, dir, ".json", func(t *testing.T, name, path string) {
+		t.Parallel()
 
 		for _, flags := range []string{"i", "p", "ip"} {
 			flags := flags
-			name := strings.Join([]string{pprefix, flags}, "-")
+			name := strings.Join([]string{name, flags}, "-")
 			t.Run(name, func(t *testing.T) {
 				t.Parallel()
 
-				fpath := name + ".txt"
+				fpath := filepath.Join(dir, name+".txt")
 				require.FileExists(t, fpath, "want-file should exist")
 
 				want, err := ioutil.ReadFile(fpath)
@@ -47,5 +45,5 @@ func TestApp_valid(t *testing.T) {
 				require.Equal(t, string(want), buf.String(), "mismatch between output")
 			})
 		}
-	}
+	})
 }

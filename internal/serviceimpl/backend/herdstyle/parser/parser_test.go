@@ -14,7 +14,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/1set/gut/yos"
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/rmem"
 
 	"github.com/stretchr/testify/require"
@@ -65,48 +64,40 @@ func TestParse_error(t *testing.T) {
 func TestParse_valid(t *testing.T) {
 	t.Parallel()
 
-	fs, err := yos.ListMatch(filepath.Join("testdata", "valid"), yos.ListIncludeFile, "*.json")
-	require.NoError(t, err, "testdata listing shouldn't fail")
+	dir := filepath.Join("testdata", "valid")
+	testhelp.TestFilesOfExt(t, dir, ".json", func(t *testing.T, name, path string) {
+		t.Parallel()
 
-	for _, f := range fs {
-		path := f.Path
-		pprefix := strings.TrimSuffix(path, ".json")
-		name := filepath.Base(pprefix)
+		pfields := strings.SplitN(name, "-", 2)
+		require.NotEmpty(t, pfields, "malformed test name, should be 'type-*.json'")
 
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
+		var c parser.Impl
+		switch pfields[0] {
+		case "herd":
+			c = herd.Herd{}
+		case "litmus":
+			c = litmus.Litmus{}
+		case "rmem":
+			c = rmem.Rmem{}
+		default:
+			require.Failf(t, "unsupported parser subtype", "got %q", pfields[0])
+		}
 
-			pfields := strings.SplitN(name, "-", 2)
-			require.NotEmpty(t, pfields, "malformed test name, should be 'type-*.json'")
+		f, err := os.Open(filepath.Join(dir, name+".txt"))
+		require.NoError(t, err, "missing input file")
+		defer func() { _ = f.Close() }()
 
-			var c parser.Impl
-			switch pfields[0] {
-			case "herd":
-				c = herd.Herd{}
-			case "litmus":
-				c = litmus.Litmus{}
-			case "rmem":
-				c = rmem.Rmem{}
-			default:
-				require.Failf(t, "unsupported parser subtype", "got %q", pfields[0])
-			}
+		out, err := ioutil.ReadFile(path)
+		require.NoError(t, err, "missing output file")
 
-			f, err := os.Open(pprefix + ".txt")
-			require.NoError(t, err, "missing input file")
-			defer func() { _ = f.Close() }()
+		o := new(obs.Obs)
+		err = parser.Parse(c, f, o)
+		require.NoError(t, err, "parse should not error")
 
-			out, err := ioutil.ReadFile(path)
-			require.NoError(t, err, "missing output file")
+		var b bytes.Buffer
+		err = json.NewEncoder(&b).Encode(o)
+		require.NoError(t, err, "observation should encode into buffer")
 
-			o := new(obs.Obs)
-			err = parser.Parse(c, f, o)
-			require.NoError(t, err, "parse should not error")
-
-			var b bytes.Buffer
-			err = json.NewEncoder(&b).Encode(o)
-			require.NoError(t, err, "observation should encode into buffer")
-
-			require.JSONEq(t, string(out), b.String(), "observation JSON not as expected")
-		})
-	}
+		require.JSONEq(t, string(out), b.String(), "observation JSON not as expected")
+	})
 }
