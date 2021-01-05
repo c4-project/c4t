@@ -6,6 +6,7 @@
 package pretty
 
 import (
+	"strings"
 	"text/template"
 
 	"github.com/c4-project/c4t/internal/subject/obs"
@@ -91,12 +92,12 @@ const (
 {{- if eq $status .Status }}      - {{ $compiler }}
 {{ end -}}
 
-{{- with .Obs -}}{{- template "obs" . -}}{{- end -}}
+{{- with .Obs -}}{{- template "interesting" . -}}{{- end -}}
 
 {{- end -}}
 {{- end -}}
-{{- end }}
-{{ end -}}
+{{- end -}}
+{{- end -}}
 {{- else }}  No subject outcomes available.
 {{- end -}}
 `
@@ -108,21 +109,25 @@ const (
 {{ end -}}
 {{- if .ShowCompilers -}}
 # Compilers
-{{ template "compilers" . }}
-{{ end -}}
+{{ template "compilers" . -}}
+{{/* 'compilers' adds its own newline */}}{{- end -}}
 {{- if .ShowSubjects -}}
 # Subject Outcomes
-{{ template "byStatus" . }}
-{{ end -}}
+{{ template "byStatus" . -}}
+{{/* 'byStatus' adds its own newline */}}{{- end -}}
 `
 )
+
+func indent(n int) string {
+	return "        " + strings.Repeat("  ", n+1)
+}
 
 func getTemplate() (*template.Template, error) {
 	t, err := template.New("root").Parse(tmplRoot)
 	if err != nil {
 		return nil, err
 	}
-	if t, err = obs.AddObsTemplates(t, func(n int) string { return "" }); err != nil {
+	if t, err = obs.AddObsTemplates(t, indent); err != nil {
 		return nil, err
 	}
 	return iohelp.ParseTemplateStrings(t, map[string]string{
