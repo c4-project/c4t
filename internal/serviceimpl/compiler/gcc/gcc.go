@@ -8,9 +8,6 @@ package gcc
 import (
 	"context"
 	"fmt"
-	"io"
-
-	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
@@ -26,9 +23,7 @@ type GCC struct {
 }
 
 // RunCompiler compiles j using a GCC-friendly invocation.
-func (g GCC) RunCompiler(ctx context.Context, j compiler.Job, errw io.Writer) error {
-	// TODO(@MattWindsor91): don't hardcode this service runner.
-	sr := srvrun.NewExecRunner(srvrun.StderrTo(errw))
+func (g GCC) RunCompiler(ctx context.Context, j compiler.Job, sr service.Runner) error {
 	return sr.Run(ctx, g.makeRunInfo(j))
 }
 

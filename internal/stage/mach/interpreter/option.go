@@ -5,11 +5,7 @@
 
 package interpreter
 
-import (
-	"io"
-
-	"github.com/c4-project/c4t/internal/helper/iohelp"
-)
+import "github.com/c4-project/c4t/internal/model/service/compiler"
 
 // Option is the type of options to the interpreter.
 type Option func(*Interpreter)
@@ -23,9 +19,10 @@ func Options(os ...Option) Option {
 	}
 }
 
-// LogTo logs compiler error output to w.
-func LogTo(w io.Writer) Option {
-	return func(i *Interpreter) { i.logw = iohelp.EnsureWriter(w) }
+// CompileWith sets the interpreter's compiler to driver d and config c.
+// This is required to interpret recipes that involve compilation.
+func CompileWith(d Driver, c *compiler.Configuration) Option {
+	return func(i *Interpreter) { i.driver = d; i.compiler = c }
 }
 
 // SetMaxObjs sets the maximum number of object files the interpreter can create.

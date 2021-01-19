@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
@@ -92,10 +91,10 @@ func (r *Resolver) DefaultMOpts(c *mdl.Compiler) (stringhelp.Set, error) {
 }
 
 // RunCompiler runs the compiler specified by nc on job j, using this resolver to map the style to a concrete compiler.
-func (r *Resolver) RunCompiler(ctx context.Context, j mdl.Job, errw io.Writer) error {
+func (r *Resolver) RunCompiler(ctx context.Context, j mdl.Job, sr service.Runner) error {
 	cp, err := r.Get(&j.Compiler.Compiler)
 	if err != nil {
 		return err
 	}
-	return cp.RunCompiler(ctx, j, errw)
+	return cp.RunCompiler(ctx, j, sr)
 }

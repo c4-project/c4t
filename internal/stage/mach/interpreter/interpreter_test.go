@@ -8,9 +8,11 @@ package interpreter_test
 import (
 	"context"
 	"errors"
-	"io/ioutil"
 	"path"
 	"testing"
+
+	mocks2 "github.com/c4-project/c4t/internal/model/service/mocks"
+	mocks3 "github.com/c4-project/c4t/internal/stage/mach/interpreter/mocks"
 
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
@@ -20,19 +22,20 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/c4-project/c4t/internal/model/service/compiler"
 	mdl "github.com/c4-project/c4t/internal/model/service/compiler"
 	"github.com/stretchr/testify/require"
 
 	"github.com/c4-project/c4t/internal/model/recipe"
-	"github.com/c4-project/c4t/internal/serviceimpl/compiler/mocks"
 )
 
 // TestInterpreter_Interpret tests Interpret on an example recipe.
 func TestInterpreter_Interpret(t *testing.T) {
 	t.Parallel()
 
-	var mc mocks.Compiler
+	mc := new(mocks3.Driver)
+	mr := new(mocks2.Runner)
+	mc.Test(t)
+	mr.Test(t)
 
 	r, err := recipe.New(
 		"in",
@@ -44,17 +47,17 @@ func TestInterpreter_Interpret(t *testing.T) {
 	require.NoError(t, err, "error while making recipe")
 
 	c := mdl.Configuration{}
-	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r)
+	it, err := interpreter.New("a.out", r, mr, interpreter.CompileWith(mc, &c))
 	require.NoError(t, err, "error while making interpreter")
 
 	mc.On("RunCompiler",
 		mock.Anything,
 		*mdl.NewJob(mdl.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
-		ioutil.Discard,
+		mr,
 	).Return(nil).Once().On("RunCompiler",
 		mock.Anything,
 		*mdl.NewJob(mdl.Exe, &c, "a.out", path.Join("in", "obj_0.o"), path.Join("in", "harness.c")),
-		ioutil.Discard,
+		mr,
 	).Return(nil).Once()
 
 	err = it.Interpret(context.Background())
@@ -67,7 +70,10 @@ func TestInterpreter_Interpret(t *testing.T) {
 func TestInterpreter_Interpret_compileError(t *testing.T) {
 	t.Parallel()
 
-	var mc mocks.Compiler
+	mc := new(mocks3.Driver)
+	mr := new(mocks2.Runner)
+	mc.Test(t)
+	mr.Test(t)
 
 	werr := errors.New("no me gusta")
 
@@ -82,13 +88,13 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 	require.NoError(t, err, "error while making recipe")
 
 	c := mdl.Configuration{}
-	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r)
+	it, err := interpreter.New("a.out", r, mr, interpreter.CompileWith(mc, &c))
 	require.NoError(t, err, "error while making interpreter")
 
 	mc.On("RunCompiler",
 		mock.Anything,
 		*mdl.NewJob(mdl.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
-		ioutil.Discard,
+		mr,
 	).Return(werr).Once()
 	// The second compile job should not be run.
 
@@ -96,6 +102,7 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 	testhelp.ExpectErrorIs(t, err, werr, "wrong error while running interpreter")
 
 	mc.AssertExpectations(t)
+	mr.AssertExpectations(t)
 }
 
 // TestInterpreter_Interpret_badInstruction tests whether a bad interpreter instruction is caught correctly.
@@ -125,8 +132,10 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			var mc mocks.Compiler
+			mc := new(mocks3.Driver)
+			mr := new(mocks2.Runner)
 			mc.Test(t)
+			mr.Test(t)
 
 			r, err := recipe.New(
 				"in",
@@ -137,13 +146,14 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 			require.NoError(t, err, "error while making recipe")
 
 			cmp := mdl.Configuration{}
-			it, err := interpreter.NewInterpreter(&mc, &cmp, "a.out", r)
+			it, err := interpreter.New("a.out", r, mr, interpreter.CompileWith(mc, &cmp))
 			require.NoError(t, err, "error while making interpreter")
 
 			err = it.Interpret(context.Background())
 			testhelp.ExpectErrorIs(t, err, c.err, "running interpreter on bad instruction")
 
 			mc.AssertExpectations(t)
+			mr.AssertExpectations(t)
 		})
 	}
 }
@@ -153,8 +163,10 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 	t.Parallel()
 
-	var mc mocks.Compiler
+	mc := new(mocks3.Driver)
+	mr := new(mocks2.Runner)
 	mc.Test(t)
+	mr.Test(t)
 
 	r, err := recipe.New(
 		"in",
@@ -168,67 +180,14 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 	mc.On("RunCompiler",
 		mock.Anything,
 		*mdl.NewJob(mdl.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),
-		ioutil.Discard).Return(nil).Once()
+		mr).Return(nil).Once()
 
-	it, err := interpreter.NewInterpreter(&mc, &c, "a.out", r, interpreter.SetMaxObjs(1))
+	it, err := interpreter.New("a.out", r, mr, interpreter.SetMaxObjs(1), interpreter.CompileWith(mc, &c))
 	require.NoError(t, err, "error while making interpreter")
 
 	err = it.Interpret(context.Background())
 	testhelp.ExpectErrorIs(t, err, interpreter.ErrObjOverflow, "running interpreter with overflowing objs")
 
 	mc.AssertExpectations(t)
-}
-
-// TestNewInterpreter_errors tests NewInterpreter in various error conditions.
-func TestNewInterpreter_errors(t *testing.T) {
-	t.Parallel()
-
-	r, err := recipe.New(
-		"in",
-		recipe.OutExe,
-		recipe.AddFiles("body.c", "harness.c", "body.h"),
-		recipe.CompileFileToObj(path.Join("in", "body.c")),
-		recipe.CompileFileToObj(path.Join("in", "harness.c")),
-	)
-	require.NoError(t, err, "error while making recipe")
-
-	cmp := mdl.Configuration{}
-
-	cases := map[string]struct {
-		useDriver bool
-		compiler  *compiler.Configuration
-		err       error
-	}{
-		"no-driver": {
-			useDriver: false,
-			compiler:  &cmp,
-			err:       interpreter.ErrDriverNil,
-		},
-		"no-compiler-cfg": {
-			useDriver: true,
-			compiler:  nil,
-			err:       interpreter.ErrCompilerConfigNil,
-		},
-		"ok": {
-			useDriver: true,
-			compiler:  &cmp,
-		},
-	}
-
-	for name, c := range cases {
-		c := c
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			var mc mocks.Compiler
-			mc.Test(t)
-			var d interpreter.Driver
-			if c.useDriver {
-				d = &mc
-			}
-
-			_, err := interpreter.NewInterpreter(d, c.compiler, "a.out", r)
-			testhelp.ExpectErrorIs(t, err, c.err, "constructing new interpreter")
-		})
-	}
+	mr.AssertExpectations(t)
 }

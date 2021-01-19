@@ -12,6 +12,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/c4-project/c4t/internal/helper/srvrun"
+
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
@@ -123,9 +125,12 @@ func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, res *com
 	return err
 }
 
-func (j *Instance) runCompilerJob(ctx context.Context, nc *compiler.Named, sp compilation.CompileFileset, h recipe.Recipe, logf io.Writer) error {
+func (j *Instance) runCompilerJob(ctx context.Context, nc *compiler.Named, sp compilation.CompileFileset, r recipe.Recipe, logf io.Writer) error {
+	// TODO(@MattWindsor91): maybe push the service runner further up.
+	// No point having grace here; either a compiler compiles or it doesn't.
+	sr := srvrun.NewExecRunner(srvrun.StderrTo(logf))
 
-	i, err := interpreter.NewInterpreter(j.driver, &nc.Configuration, sp.Bin, h, interpreter.LogTo(logf))
+	i, err := interpreter.New(sp.Bin, r, sr, interpreter.CompileWith(j.driver, &nc.Configuration))
 	if err != nil {
 		return err
 	}

@@ -10,11 +10,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"math"
 	"path"
 	"path/filepath"
+
+	"github.com/c4-project/c4t/internal/model/service"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
@@ -32,7 +32,7 @@ type Driver interface {
 	// If applicable, errw will be connected to the compiler's standard error.
 	//
 	// Implementors should note that the paths in j are slash-paths, and will need converting to filepaths.
-	RunCompiler(ctx context.Context, j compiler.Job, errw io.Writer) error
+	RunCompiler(ctx context.Context, j compiler.Job, sr service.Runner) error
 }
 
 //go:generate mockery --name=Driver
@@ -53,8 +53,8 @@ type Interpreter struct {
 	nobjs uint64
 	// maxobjs is the maximum permitted number of object files.
 	maxobjs uint64
-	// logw is the writer used for compiler outputs.
-	logw io.Writer
+	// sr is the runner used for launching compiler binaries.
+	sr service.Runner
 	// inPool maps each input file to a Boolean that is true if it hasn't been consumed yet.
 	inPool map[string]bool
 	// fileStack is the file stack.
@@ -74,16 +74,9 @@ var (
 	ErrObjOverflow = errors.New("object file count overflow")
 )
 
-// NewInterpreter creates a new recipe processor using the compiler driver d, configuration c, runner r, and job j.
-func NewInterpreter(d Driver, c *compiler.Configuration, ofile string, r recipe.Recipe, os ...Option) (*Interpreter, error) {
-	if d == nil {
-		return nil, ErrDriverNil
-	}
-	if c == nil {
-		return nil, ErrCompilerConfigNil
-	}
-
-	p := Interpreter{driver: d, compiler: c, ofile: ofile, recipe: r, logw: ioutil.Discard, maxobjs: math.MaxUint64}
+// New creates a new interpreter using the recipe r, service runner sr, options os, and output file ofile.
+func New(ofile string, r recipe.Recipe, sr service.Runner, os ...Option) (*Interpreter, error) {
+	p := Interpreter{ofile: ofile, recipe: r, sr: sr, maxobjs: math.MaxUint64}
 	Options(os...)(&p)
 
 	p.inPool = p.initPool()
@@ -176,7 +169,14 @@ func (p *Interpreter) compileExe(ctx context.Context, npops int) error {
 }
 
 func (p *Interpreter) compile(ctx context.Context, out string, kind compiler.Target, npops int) error {
-	return p.driver.RunCompiler(ctx, *p.singleCompile(out, kind, npops), p.logw)
+	if p.driver == nil {
+		return ErrDriverNil
+	}
+	if p.compiler == nil {
+		return ErrCompilerConfigNil
+	}
+
+	return p.driver.RunCompiler(ctx, *p.singleCompile(out, kind, npops), p.sr)
 }
 
 func (p *Interpreter) singleCompile(out string, kind compiler.Target, npops int) *compiler.Job {

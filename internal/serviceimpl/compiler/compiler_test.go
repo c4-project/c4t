@@ -7,8 +7,9 @@ package compiler_test
 
 import (
 	"context"
-	"io/ioutil"
 	"testing"
+
+	mocks2 "github.com/c4-project/c4t/internal/model/service/mocks"
 
 	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/serviceimpl/compiler"
@@ -20,8 +21,12 @@ import (
 
 // TestResolver_RunCompiler tests that RunCompiler delegates properly.
 func TestResolver_RunCompiler(t *testing.T) {
-	var mc mocks.Compiler
-	r := compiler.Resolver{Compilers: map[string]compiler.Compiler{"gcc": &mc}}
+	mc := new(mocks.Compiler)
+	mr := new(mocks2.Runner)
+	mc.Test(t)
+	mr.Test(t)
+
+	r := compiler.Resolver{Compilers: map[string]compiler.Compiler{"gcc": mc}}
 
 	ctx := context.Background()
 	j := *mdl.NewJob(
@@ -36,11 +41,11 @@ func TestResolver_RunCompiler(t *testing.T) {
 		"a.out",
 		"foo", "bar", "baz",
 	)
-	errw := ioutil.Discard
 
-	mc.On("RunCompiler", ctx, j, errw).Return(nil).Once()
+	mc.On("RunCompiler", ctx, j, mr).Return(nil).Once()
 
-	err := r.RunCompiler(ctx, j, errw)
+	err := r.RunCompiler(ctx, j, mr)
 	require.NoError(t, err)
 	mc.AssertExpectations(t)
+	mr.AssertExpectations(t)
 }

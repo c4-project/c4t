@@ -30,8 +30,6 @@ import (
 	"github.com/c4-project/c4t/internal/plan"
 )
 
-//go:generate mockery --name=Driver
-
 // SubjectPather is the interface of types that can produce path sets for compilations.
 type SubjectPather interface {
 	// Prepare sets up the directories ready to serve through SubjectPaths.
