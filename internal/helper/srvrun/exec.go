@@ -54,22 +54,17 @@ func (e ExecRunner) hasGrace() bool {
 
 // Run runs the command specified by r using exec, on context ctx.
 func (e ExecRunner) Run(ctx context.Context, r service.RunInfo) error {
+	c := e.makeCmd(ctx, r)
 	if e.hasGrace() {
-		return e.runWithGrace(ctx, r)
+		return e.runWithGrace(ctx, c)
 	}
-	c := exec.CommandContext(ctx, r.Cmd, r.Args...)
-	c.Stderr = e.errw
-	c.Stdout = e.outw
 	return c.Run()
 }
 
-func (e ExecRunner) runWithGrace(ctx context.Context, r service.RunInfo) error {
+func (e ExecRunner) runWithGrace(ctx context.Context, c *exec.Cmd) error {
 	cdone := make(chan struct{})
 	defer close(cdone)
 
-	c := exec.Command(r.Cmd, r.Args...)
-	c.Stderr = e.errw
-	c.Stdout = e.outw
 	if err := c.Start(); err != nil {
 		return err
 	}
@@ -92,6 +87,14 @@ func (e ExecRunner) runWithGrace(ctx context.Context, r service.RunInfo) error {
 	}()
 
 	return c.Wait()
+}
+
+func (e ExecRunner) makeCmd(ctx context.Context, r service.RunInfo) *exec.Cmd {
+	c := exec.CommandContext(ctx, r.Cmd, r.Args...)
+	c.Stderr = e.errw
+	c.Stdout = e.outw
+	c.Env = r.EnvStrings()
+	return c
 }
 
 // ExecOption is the type of options used when constructing a ExecRunner.

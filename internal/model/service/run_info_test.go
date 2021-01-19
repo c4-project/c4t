@@ -31,5 +31,5 @@ func ExampleRunInfo_Override() {
 	fmt.Println(r1)
 
 	// Output:
-	// BAR="baz" FOO="" clang -std=c11 -pthread -pedantic -funroll-loops
+	// BAR=baz FOO= clang -std=c11 -pthread -pedantic -funroll-loops
 }

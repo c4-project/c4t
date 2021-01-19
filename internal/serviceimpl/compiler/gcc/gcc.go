@@ -9,7 +9,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os/exec"
+
+	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
@@ -26,19 +27,24 @@ type GCC struct {
 
 // RunCompiler compiles j using a GCC-friendly invocation.
 func (g GCC) RunCompiler(ctx context.Context, j compiler.Job, errw io.Writer) error {
+	// TODO(@MattWindsor91): don't hardcode this service runner.
+	sr := srvrun.NewExecRunner(srvrun.StderrTo(errw))
+	return sr.Run(ctx, g.makeRunInfo(j))
+}
+
+func (g GCC) makeRunInfo(j compiler.Job) service.RunInfo {
 	run := g.DefaultRun
 	if nr := j.CompilerRun(); nr != nil {
 		run.Override(*nr)
 	}
-	cmd := exec.CommandContext(ctx, run.Cmd, Args(run, j)...)
-	cmd.Stderr = errw
-	return cmd.Run()
+	run.AppendArgs(Args(j)...)
+	return run
 }
 
-// Args computes the arguments to pass to GCC for running job j with run info run.
+// Args computes the arguments to pass to GCC for running job j.
 // It does not take j's run info into consideration, and assumes this has already been done.
-func Args(run service.RunInfo, j compiler.Job) []string {
-	args := run.Args
+func Args(j compiler.Job) []string {
+	var args []string
 	args = AddStringArg(args, "O", j.SelectedOptName())
 	args = AddStringArg(args, "m", j.SelectedMOptName())
 	args = AddKindArg(args, j.Kind)

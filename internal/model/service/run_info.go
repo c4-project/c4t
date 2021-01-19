@@ -56,6 +56,7 @@ func (r *RunInfo) Invocation() []string {
 }
 
 // EnvStrings is the environment as a set of key-value pairs.
+// This is compatible with exec.Cmd's Env field.
 func (r *RunInfo) EnvStrings() []string {
 	if len(r.Env) == 0 {
 		return nil
@@ -67,7 +68,7 @@ func (r *RunInfo) EnvStrings() []string {
 	}
 	sort.Strings(ks)
 	for i, k := range ks {
-		ks[i] = fmt.Sprintf("%s=%q", k, r.Env[k])
+		ks[i] = fmt.Sprintf("%s=%s", k, r.Env[k])
 	}
 
 	return ks
@@ -83,8 +84,13 @@ func (r *RunInfo) String() string {
 func (r *RunInfo) Override(new RunInfo) {
 	r.Cmd = overrideCmd(r.Cmd, new.Cmd)
 	// TODO(@MattWindsor91): we might need a way to replace arguments rather than appending to them.
-	r.Args = append(r.Args, new.Args...)
+	r.AppendArgs(new.Args...)
 	r.overrideEnv(new.Env)
+}
+
+// AppendArgs overlays new arguments onto this run info.
+func (r *RunInfo) AppendArgs(new ...string) {
+	r.Args = append(r.Args, new...)
 }
 
 // OverrideIfNotNil is Override if new is non-nil, and no-op otherwise.

@@ -22,7 +22,6 @@ import (
 // ExampleArgs is a runnable example for Args.
 func ExampleArgs() {
 	args := gcc.Args(
-		*service.NewRunInfo("gcc7", "-funroll-loops"),
 		*compiler.NewJob(compiler.Exe, nil, "a.out", "foo.c", "bar.c"),
 	)
 	for _, arg := range args {
@@ -30,7 +29,6 @@ func ExampleArgs() {
 	}
 
 	// Output:
-	// -funroll-loops
 	// -o
 	// a.out
 	// foo.c
@@ -40,7 +38,6 @@ func ExampleArgs() {
 // ExampleArgs_opt is a runnable example for Args that shows optimisation level selection.
 func ExampleArgs_opt() {
 	args := gcc.Args(
-		*service.NewRunInfo("gcc7", "-funroll-loops"),
 		*compiler.NewJob(
 			compiler.Exe,
 			&compiler.Configuration{SelectedOpt: &optlevel.Named{Name: "size"}},
@@ -53,7 +50,6 @@ func ExampleArgs_opt() {
 	}
 
 	// Output:
-	// -funroll-loops
 	// -Osize
 	// -o
 	// a.out
@@ -65,12 +61,10 @@ func TestArgs(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		run service.RunInfo
 		job compiler.Job
 		out []string
 	}{
 		"default": {
-			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
 			job: *compiler.NewJob(
 				compiler.Exe,
 				nil,
@@ -78,20 +72,18 @@ func TestArgs(t *testing.T) {
 				"foo.c",
 				"bar.c",
 			),
-			out: []string{"-funroll-loops", "-o", "a.out", "foo.c", "bar.c"},
+			out: []string{"-o", "a.out", "foo.c", "bar.c"},
 		},
 		"obj": {
-			run: *service.NewRunInfo("gcc7", "-funroll-loops"),
 			job: *compiler.NewJob(
 				compiler.Obj,
 				nil,
 				"foo.o",
 				"foo.c",
 			),
-			out: []string{"-funroll-loops", "-c", "-o", "foo.o", "foo.c"},
+			out: []string{"-c", "-o", "foo.o", "foo.c"},
 		},
 		"with-mopt": {
-			run: *service.NewRunInfo("gcc8"),
 			job: *compiler.NewJob(
 				compiler.Exe,
 				&compiler.Configuration{
@@ -104,7 +96,6 @@ func TestArgs(t *testing.T) {
 			out: []string{"-march=nehalem", "-o", "a.out", "foo.c", "bar.c"},
 		},
 		"with-opt": {
-			run: *service.NewRunInfo("gcc8"),
 			job: *compiler.NewJob(
 				compiler.Exe,
 				&compiler.Configuration{
@@ -124,7 +115,6 @@ func TestArgs(t *testing.T) {
 			out: []string{"-O3", "-o", "a.out", "foo.c", "bar.c"},
 		},
 		"do-not-override-run": {
-			run: *service.NewRunInfo("gcc4", "-funroll-loops"),
 			job: *compiler.NewJob(
 				compiler.Exe,
 				&compiler.Configuration{
@@ -136,7 +126,7 @@ func TestArgs(t *testing.T) {
 				"foo.c",
 				"bar.c",
 			),
-			out: []string{"-funroll-loops", "-o", "a.out", "foo.c", "bar.c"},
+			out: []string{"-o", "a.out", "foo.c", "bar.c"},
 		},
 	}
 
@@ -145,8 +135,8 @@ func TestArgs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			args := gcc.Args(c.run, c.job)
-			assert.Equalf(t, c.out, args, "Args(%v, %v) didn't match", c.run, c.job)
+			args := gcc.Args(c.job)
+			assert.Equalf(t, c.out, args, "Args(%v) didn't match", c.job)
 		})
 	}
 }
