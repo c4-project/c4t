@@ -28,6 +28,12 @@ const (
 	// This variant is, for example, that used on the Raspberry Pi 4.
 	ArchVariantArmCortexA72 = "cortex-a72"
 
+	// ArchVariantAArch648 is the tag representing the arm8.x(-a) AArch64 variant.
+	ArchVariantAArch648 = "8"
+
+	// ArchSubVariantAArch6481 is the tag representing the arm8.1(-a) AArch64 variant.
+	ArchSubVariantAArch6481 = "1"
+
 	// ArchVariantPPC64LE is the tag representing the 64-bit little-endian PPC variant.
 	ArchVariantPPC64LE = "64le"
 
@@ -73,6 +79,10 @@ var (
 
 	// ArchAArch64 is the architecture ID for ARM (generic, 64-bit).
 	ArchAArch64 = ID{[]string{ArchFamilyAArch64}}
+	// ArchAArch648 is the architecture ID for ARM 64-bit version 8.x.
+	ArchAArch648 = ID{[]string{ArchFamilyAArch64, ArchVariantAArch648}}
+	// ArchAArch648 is the architecture ID for ARM 64-bit version 8.1.
+	ArchAArch6481 = ID{[]string{ArchFamilyAArch64, ArchVariantAArch648, ArchSubVariantAArch6481}}
 
 	// ArchPPC is the architecture ID for PowerPC.
 	ArchPPC = ID{[]string{ArchFamilyPPC}}
