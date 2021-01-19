@@ -7,9 +7,13 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"time"
+
+	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // Runner is the interface of things that can run, or pretend to run, services.
@@ -36,6 +40,9 @@ type RunInfo struct {
 
 	// Args specifies (extra) arguments to supply to the service.
 	Args []string `toml:"args,omitempty" json:"args,omitempty"`
+
+	// Env defines environment variables to be set if the runner supports it.
+	Env map[string]string `toml:"env,omitempty" json:"env,omitempty"`
 }
 
 // NewRunInfo programmatically creates a RunInfo using command cmd and arguments args.
@@ -48,9 +55,28 @@ func (r *RunInfo) Invocation() []string {
 	return append([]string{r.Cmd}, r.Args...)
 }
 
-// String is defined as the space-joined form of Invocation.
+// EnvStrings is the environment as a set of key-value pairs.
+func (r *RunInfo) EnvStrings() []string {
+	if len(r.Env) == 0 {
+		return nil
+	}
+
+	ks, err := stringhelp.MapKeys(r.Env)
+	if err != nil {
+		return []string{fmt.Sprintf("(err: %s)", err)}
+	}
+	sort.Strings(ks)
+	for i, k := range ks {
+		ks[i] = fmt.Sprintf("%s=%q", k, r.Env[k])
+	}
+
+	return ks
+}
+
+// String is defined as the space-joined form of EnvString and Invocation.
 func (r *RunInfo) String() string {
-	return strings.Join(r.Invocation(), " ")
+	parts := append(r.EnvStrings(), r.Invocation()...)
+	return strings.Join(parts, " ")
 }
 
 // Override overlays this run information with that in new.
@@ -58,12 +84,22 @@ func (r *RunInfo) Override(new RunInfo) {
 	r.Cmd = overrideCmd(r.Cmd, new.Cmd)
 	// TODO(@MattWindsor91): we might need a way to replace arguments rather than appending to them.
 	r.Args = append(r.Args, new.Args...)
+	r.overrideEnv(new.Env)
 }
 
 // OverrideIfNotNil is Override if new is non-nil, and no-op otherwise.
 func (r *RunInfo) OverrideIfNotNil(new *RunInfo) {
 	if new != nil {
 		r.Override(*new)
+	}
+}
+
+func (r *RunInfo) overrideEnv(env map[string]string) {
+	if len(r.Env) == 0 {
+		r.Env = env
+	}
+	for k, v := range env {
+		r.Env[k] = v
 	}
 }
 
