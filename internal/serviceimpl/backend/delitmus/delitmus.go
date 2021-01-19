@@ -111,12 +111,19 @@ func checkAndAmendJob(j *backend2.LiftJob) error {
 	if !j.In.Litmus.IsC() {
 		return fmt.Errorf("%w: source must be C litmus", backend2.ErrNotSupported)
 	}
-	if j.Out.Target == backend2.ToDefault {
-		j.Out.Target = backend2.ToObjRecipe
-	} else if j.Out.Target != backend2.ToObjRecipe {
-		return fmt.Errorf("%w: output must be object", backend2.ErrNotSupported)
+	return checkAndAmendTarget(&j.Out.Target)
+}
+
+func checkAndAmendTarget(t *backend2.Target) error {
+	switch *t {
+	case backend2.ToDefault:
+		*t = backend2.ToObjRecipe
+		fallthrough
+	case backend2.ToObjRecipe:
+		return nil
+	default:
+		return fmt.Errorf("%w: cannot produce %q, only objects", backend2.ErrNotSupported, *t)
 	}
-	return nil
 }
 
 // ParseObs errors, for we cannot parse the observations of a delitmus run.

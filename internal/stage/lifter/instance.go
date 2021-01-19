@@ -8,6 +8,7 @@ package lifter
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/c4-project/c4t/internal/model/service"
 
@@ -31,10 +32,10 @@ type Instance struct {
 	// Paths is the path resolver for this job.
 	Paths Pather
 
-	// Stderr is the runner on which the lifter should be run.
+	// Runner is the runner on which the lifter should be run.
 	Runner service.Runner
 
-	// Normalise is the subject that we are trying to lift.
+	// Subject is the subject that we are trying to lift.
 	Subject subject.Named
 
 	// ResCh is the channel onto which each fuzzed subject should be sent.
@@ -88,8 +89,41 @@ func (j *Instance) liftArch(ctx context.Context, arch id.ID) error {
 
 	r, err := j.Driver.Lift(ctx, spec, j.Runner)
 	if err != nil {
-		return fmt.Errorf("when lifting %s (arch %s): %w", j.Subject.Name, arch, err)
+		sname := reflect.TypeOf(j.Driver).Name()
+		return &Error{Subject: &j.Subject, ServiceName: sname, Job: spec, Inner: err}
 	}
 
 	return builder.RecipeRequest(j.Subject.Name, arch, r).SendTo(ctx, j.ResCh)
+}
+
+// Error contains an error that occurred while lifting, as well as context.
+type Error struct {
+	// ServiceName is a guess at the name of the service.
+	ServiceName string
+
+	// Subject is, if non-nil, the name of the subject being lifted.
+	Subject *subject.Named
+
+	// Job is the job that was being processed when the error occurred.
+	Job backend.LiftJob
+	// Spec is
+	// Inner is the inner error.
+	Inner error
+}
+
+// SubjectName gets any subject name for this error.
+func (e *Error) SubjectName() string {
+	if e.Subject == nil {
+		return "(unknown)"
+	}
+	return e.Subject.Name
+}
+
+// Error gets the error string for this error.
+func (e *Error) Error() string {
+	return fmt.Sprintf("when lifting %s with %s (arch %s): %s", e.SubjectName(), e.ServiceName, e.Job.Arch, e.Inner)
+}
+
+func (e *Error) Unwrap() error {
+	return e.Inner
 }
