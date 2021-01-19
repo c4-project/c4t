@@ -6,8 +6,12 @@
 package gcc_test
 
 import (
+	"context"
 	"fmt"
+	"os"
 	"testing"
+
+	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,6 +22,31 @@ import (
 
 	"github.com/c4-project/c4t/internal/model/service"
 )
+
+// ExampleGCC_RunCompiler is a runnable example for GCC.RunCompiler.
+func ExampleGCC_RunCompiler() {
+	g := gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc"}}
+	j := compiler.Job{
+		Compiler: &compiler.Configuration{
+			SelectedMOpt: "arch=skylake",
+			SelectedOpt: &optlevel.Named{
+				Name:  "3",
+				Level: optlevel.Level{Optimises: true, Bias: optlevel.BiasSpeed, BreaksStandards: false},
+			},
+			Compiler: compiler.Compiler{
+				Run: &service.RunInfo{Env: map[string]string{"TMPDIR": "/tmp"}},
+			},
+		},
+		In:   []string{"foo.c", "bar.c"},
+		Out:  "a.out",
+		Kind: compiler.Exe,
+	}
+	sr := srvrun.DryRunner{Writer: os.Stdout}
+	_ = g.RunCompiler(context.Background(), j, sr)
+
+	// Output:
+	// TMPDIR=/tmp gcc -O3 -march=skylake -o a.out foo.c bar.c
+}
 
 // ExampleArgs is a runnable example for Args.
 func ExampleArgs() {
