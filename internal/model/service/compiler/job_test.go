@@ -7,6 +7,7 @@ package compiler_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
@@ -47,6 +48,29 @@ func TestCompile_CompilerRun(t *testing.T) {
 			out: service.RunInfo{
 				Cmd:  "foo",
 				Args: []string{"bar", "baz"},
+			},
+		},
+		"with-expansions": {
+			in: compiler.Job{
+				Compiler: &compiler.Configuration{
+					ConfigTime: time.Unix(8675309, 0),
+					Compiler: compiler.Compiler{
+						Run: &service.RunInfo{
+							Cmd:  "foo",
+							Args: []string{"--time", "${time}"},
+							Env: map[string]string{
+								"TIME": "${time}",
+							},
+						},
+					},
+				},
+			},
+			out: service.RunInfo{
+				Cmd:  "foo",
+				Args: []string{"--time", "8675309"},
+				Env: map[string]string{
+					"TIME": "8675309",
+				},
 			},
 		},
 	}

@@ -11,10 +11,14 @@ type Version uint32
 // CurrentVer is the current plan version.
 // It changes when the interface between various bits of the tester (generally manifested within the plan version)
 // changes.
-const CurrentVer Version = 2020_12_10
+const CurrentVer Version = 2021_01_20
 
 // Version history since 2020_05_29:
 //
+// 2021_01_20: Service run info now contains an 'env' key mapping environment variable names to values.  If 'env' is
+//             not provided, the parent process's environment is used.  On compilers only, we now have shell-style
+//             variable interpolation in args and env: the only variable available so far is '${time}' which expands to
+//             the UNIX timestamp at which the compiler was configured.
 // 2020_12_10: Plan backends are now NamedSpecs rather than Specs, and so contain the backend ID.
 // 2020_11_12: Compile results now hold the ID of the recipe used.  Recipes have extended information about targets.
 // 2020_09_24: SSH configuration now uses camel_case tags.  The 'compiles' and 'runs' maps have become one

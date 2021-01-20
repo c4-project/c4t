@@ -34,5 +34,7 @@ func (c Configuration) AddNameString(name string) (*Named, error) {
 // FullID gets a fully qualified identifier for this configuration, consisting of the compiler name, followed by
 // 'oOpt' where 'Opt' is its selected optimisation name, and 'mMopt' where 'Mopt' is its selected machine profile.
 func (n Named) FullID() (id.ID, error) {
+	// We don't append in the config time, which means that this ID doesn't fully capture the compiler specification;
+	// that said, maybe the config time being a part of the specification is a rare enough case that we needn't worry.
 	return id.New(append(n.ID.Tags(), "o"+n.SelectedOptName(), "m"+n.SelectedMOpt)...)
 }

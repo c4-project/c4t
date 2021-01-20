@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"github.com/1set/gut/ystring"
 	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
@@ -131,6 +132,9 @@ func (c *CompilerSetter) Run(_ context.Context, p *plan.Plan) (*plan.Plan, error
 }
 
 func (c *CompilerSetter) set(cnf *compiler.Configuration) error {
+	// TODO(@MattWindsor91): allow overriding this.
+	cnf.ConfigTime = time.Now()
+
 	if err := c.setOpt(cnf); err != nil {
 		return err
 	}

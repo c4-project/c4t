@@ -24,6 +24,7 @@ type GCC struct {
 
 // RunCompiler compiles j using a GCC-friendly invocation.
 func (g GCC) RunCompiler(ctx context.Context, j compiler.Job, sr service.Runner) error {
+	// TODO(@MattWindsor91): this probably should be done before we get to gcc.
 	return sr.Run(ctx, g.makeRunInfo(j))
 }
 

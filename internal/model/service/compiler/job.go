@@ -6,6 +6,8 @@
 package compiler
 
 import (
+	"strconv"
+
 	"github.com/c4-project/c4t/internal/model/service"
 )
 
@@ -38,7 +40,18 @@ func (j *Job) CompilerRun() *service.RunInfo {
 	if j.Compiler == nil {
 		return nil
 	}
-	return j.Compiler.Run
+	// TODO(@MattWindsor91): handle this properly
+	r := j.Compiler.Run
+	if r != nil {
+		_ = r.Interpolate(j.interpolations())
+	}
+	return r
+}
+
+func (j *Job) interpolations() map[string]string {
+	return map[string]string{
+		"time": strconv.FormatInt(j.Compiler.ConfigTime.Unix(), 10),
+	}
 }
 
 // SelectedOptName gets the name of this job's compiler's selected optimisation level, if present; else, "".

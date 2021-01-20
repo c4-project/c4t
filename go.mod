@@ -6,6 +6,7 @@ require (
 	github.com/1set/gut v0.0.0-20201117175203-a82363231997
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alessio/shellescape v1.4.1
+	github.com/buildkite/interpolate v0.0.0-20200526001904-07f35b4ae251
 	github.com/cheggaaa/pb/v3 v3.0.5
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/fatih/color v1.10.0 // indirect

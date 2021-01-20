@@ -8,6 +8,7 @@ package perturber
 import (
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/c4-project/c4t/internal/plan"
 
@@ -82,6 +83,7 @@ func (c *compilerPerturber) fullCompilerName(nc *compiler.Named) (id.ID, error) 
 }
 
 func (c *compilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) (*compiler.Named, error) {
+
 	opt, err := c.perturbCompilerOpt(cmp)
 	if err != nil {
 		return nil, err
@@ -91,6 +93,7 @@ func (c *compilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) 
 		return nil, err
 	}
 	comp := compiler.Configuration{
+		ConfigTime:   time.Now(),
 		SelectedOpt:  opt,
 		SelectedMOpt: mopt,
 		Compiler:     cmp,

@@ -9,6 +9,7 @@ package compiler
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/1set/gut/ystring"
 
@@ -44,6 +45,12 @@ type Configuration struct {
 	SelectedMOpt string `toml:"selected_mopt,optempty" json:"selected_mopt,omitempty"`
 	// SelectedOpt refers to an optimisation level chosen using the compiler's configured optimisation selection.
 	SelectedOpt *optlevel.Named `toml:"selected_opt,omitempty" json:"selected_opt,omitempty"`
+	// ConfigTime captures the time at which this compiler configuration was generated.
+	//
+	// An example of when this may be useful is when using a compiler with run-time mutations enabled; we can use the
+	// configuration time as a seed (by interpolating it out into the arguments or environment variables) to choose
+	// mutations.
+	ConfigTime time.Time `toml:"config_time,omitempty" json:"config_time,omitempty"`
 
 	Compiler
 }

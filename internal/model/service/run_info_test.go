@@ -33,3 +33,7 @@ func ExampleRunInfo_Override() {
 	// Output:
 	// BAR=baz FOO= clang -std=c11 -pthread -pedantic -funroll-loops
 }
+
+func ExampleRunInfo_Interpolate() {
+
+}

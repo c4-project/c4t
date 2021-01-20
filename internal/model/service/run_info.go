@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/buildkite/interpolate"
 	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
@@ -91,6 +92,35 @@ func (r *RunInfo) Override(new RunInfo) {
 // AppendArgs overlays new arguments onto this run info.
 func (r *RunInfo) AppendArgs(new ...string) {
 	r.Args = append(r.Args, new...)
+}
+
+// Interpolate expands any interpolations in this run info's arguments and environment according to expansions.
+func (r *RunInfo) Interpolate(expansions map[string]string) error {
+	env := interpolate.NewMapEnv(expansions)
+	if err := r.interpolateArgs(env); err != nil {
+		return err
+	}
+	return r.interpolateEnv(env)
+}
+
+func (r *RunInfo) interpolateArgs(env interpolate.Env) error {
+	var err error
+	for i, arg := range r.Args {
+		if r.Args[i], err = interpolate.Interpolate(env, arg); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *RunInfo) interpolateEnv(env interpolate.Env) error {
+	var err error
+	for k, v := range r.Env {
+		if r.Env[k], err = interpolate.Interpolate(env, v); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // OverrideIfNotNil is Override if new is non-nil, and no-op otherwise.
