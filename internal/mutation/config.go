@@ -36,8 +36,8 @@ func (c Config) IsActive() bool {
 //
 // Mutants appear in the order defined, without deduplication.
 // If Enabled is false, Mutants will be empty.
-func (c Config) Mutants() []uint {
-	var m []uint
+func (c Config) Mutants() []Mutant {
+	var m []Mutant
 
 	if !c.Enabled {
 		return m
@@ -53,9 +53,9 @@ func (c Config) Mutants() []uint {
 // Range defines an inclusive numeric range of mutant numbers to consider.
 type Range struct {
 	// Start is the first mutant number to consider in this range.
-	Start uint `toml:"from"`
+	Start Mutant `toml:"from"`
 	// End is one past the last mutant number to consider in this range.
-	End uint `toml:"to"`
+	End Mutant `toml:"to"`
 }
 
 // IsEmpty gets whether this range defines no mutant numbers.
@@ -64,12 +64,12 @@ func (r Range) IsEmpty() bool {
 }
 
 // Mutants expands a range into the slice of mutant numbers falling within it.
-func (r Range) Mutants() []uint {
+func (r Range) Mutants() []Mutant {
 	if r.IsEmpty() {
-		return []uint{}
+		return []Mutant{}
 	}
 
-	m := make([]uint, r.End-r.Start)
+	m := make([]Mutant, r.End-r.Start)
 	for i := r.Start; i < r.End; i++ {
 		m[i-r.Start] = i
 	}

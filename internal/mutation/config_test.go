@@ -72,23 +72,23 @@ func TestRange_Mutants(t *testing.T) {
 
 	cases := map[string]struct {
 		in  mutation.Range
-		out []uint
+		out []mutation.Mutant
 	}{
 		"empty": {
 			in:  mutation.Range{},
-			out: []uint{},
+			out: []mutation.Mutant{},
 		},
 		"singleton": {
 			in:  mutation.Range{Start: 42, End: 43},
-			out: []uint{42},
+			out: []mutation.Mutant{42},
 		},
 		"inverted": {
 			in:  mutation.Range{Start: 53, End: 27},
-			out: []uint{},
+			out: []mutation.Mutant{},
 		},
 		"ok": {
 			in:  mutation.Range{Start: 10, End: 20},
-			out: []uint{10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
+			out: []mutation.Mutant{10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
 		},
 	}
 
