@@ -12,6 +12,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
 	"github.com/c4-project/c4t/internal/copier"
@@ -122,16 +124,27 @@ type MachineStatset struct {
 	// SessionStatusTotals contains status totals since this session started.
 	// It may be empty if this machine has not yet been active this session.
 	SessionStatusTotals map[status.Status]uint64 `json:"session_status_totals,omitempty"`
+
+	// Mutation contains totals for mutation testing since this statset started.
+	Mutation mutation.Statset `json:"mutation,omitempty"`
+	// Mutation contains totals for mutation testing since this session started.
+	SessionMutation mutation.Statset `json:"session_mutation,omitempty"`
 }
 
 // ResetForSession removes from this statset any statistics that no longer apply across session boundaries.
 func (m *MachineStatset) ResetForSession() {
 	m.LastCycle = director.Cycle{}
 	m.SessionStatusTotals = make(map[status.Status]uint64)
+	m.SessionMutation.Reset()
 }
 
 // AddAnalysis adds the information from analysis a to this machine statset.
 func (m *MachineStatset) AddAnalysis(a analysis.Analysis) {
+	m.addStatusTotals(a)
+	m.addMutation(a)
+}
+
+func (m *MachineStatset) addStatusTotals(a analysis.Analysis) {
 	if m.StatusTotals == nil {
 		m.StatusTotals = make(map[status.Status]uint64)
 	}
@@ -143,6 +156,14 @@ func (m *MachineStatset) AddAnalysis(a analysis.Analysis) {
 		m.StatusTotals[i] += count
 		m.SessionStatusTotals[i] += count
 	}
+}
+
+func (m *MachineStatset) addMutation(a analysis.Analysis) {
+	if len(a.Mutation) == 0 {
+		return
+	}
+	m.Mutation.AddAnalysis(a.Mutation)
+	m.SessionMutation.AddAnalysis(a.Mutation)
 }
 
 // StatPersister is a forward handler that maintains and persists a statistics set on disk.
@@ -232,7 +253,7 @@ func (s *StatPersister) tryReadStats() error {
 	if empty, err := iohelp.IsFileEmpty(s.f); err != nil {
 		return fmt.Errorf("while checking file for existing stats: %w", err)
 	} else if empty {
-		s.set.StartTime = time.Now()
+		s.set.Init()
 		return nil
 	}
 	return s.set.Load(s.f)

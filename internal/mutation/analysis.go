@@ -20,7 +20,7 @@ func (a Analysis) AddCompilation(comp compilation.Name, log string, killer bool)
 	for mut, hits := range ScanLines(strings.NewReader(log)) {
 		ana := HitAnalysis{
 			// TODO(@MattWindsor91): get rid of this cast somehow
-			NumHits: int(hits),
+			NumHits: hits,
 			Killed:  killer && hits != 0,
 			HitBy:   comp,
 		}
@@ -35,7 +35,7 @@ type MutantAnalysis []HitAnalysis
 type HitAnalysis struct {
 	// NumHits is the number of times this compilation hit the mutant.
 	// If this is 0, the mutant was selected but never hit.
-	NumHits int `json:"num_hits"`
+	NumHits uint64 `json:"num_hits"`
 
 	// Killed is true provided that this hit resulted in a kill.
 	// If the compilation failed, this will be true unless the mutant was never hit (NumHits == 0).
