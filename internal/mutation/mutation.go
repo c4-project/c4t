@@ -10,11 +10,3 @@ package mutation
 //
 // Some day, this might not be hard-coded.
 const EnvVar = "C4_MUTATION"
-
-// TODO(@MattWindsor91): move these
-const (
-	// MutantHitPrefix is the prefix of lines from compilers specifying that a mutant has been hit.
-	MutantHitPrefix = "MUTATION HIT:"
-	// MutantSelectPrefix is the prefix of lines from compilers specifying that a mutant has been selected.
-	MutantSelectPrefix = "MUTATION SELECTED:"
-)
