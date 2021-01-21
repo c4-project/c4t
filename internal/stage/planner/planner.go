@@ -57,14 +57,17 @@ func (p *Planner) Plan(ctx context.Context, ms machine.ConfigMap, fs ...string) 
 	start := time.Now()
 	p.announce(Message{Kind: KindStart, Quantities: &p.quantities})
 
-	ps := make(map[string]plan.Plan, len(ms))
-
 	p.announce(Message{Kind: KindPlanningCorpus})
 	corp, err := p.planCorpus(ctx, fs...)
 	if err != nil {
 		return nil, err
 	}
 
+	return p.planWithCorpus(ctx, ms, start, corp)
+}
+
+func (p *Planner) planWithCorpus(ctx context.Context, ms machine.ConfigMap, start time.Time, corp corpus.Corpus) (map[string]plan.Plan, error) {
+	ps := make(map[string]plan.Plan, len(ms))
 	for n, m := range ms {
 		nid, err := id.TryFromString(n)
 		if err != nil {
