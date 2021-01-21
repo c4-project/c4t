@@ -50,6 +50,8 @@ type Plan struct {
 
 	// Mutation contains configuration specific to mutation testing.
 	// If nil or marked disabled, no mutation testing is occurring.
+	//
+	// Note that the type of this field may change to an expanded form at some point.
 	Mutation *mutation.Config `json:"mutation"`
 }
 

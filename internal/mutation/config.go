@@ -17,6 +17,11 @@ type Config struct {
 
 	// Ranges contains the list of mutation number ranges that the campaign should use.
 	Ranges []Range `toml:"ranges,omitempty"`
+
+	// Selection contains any selected mutation.
+	//
+	// This can theoretically be set in the tester's config file, but will get overridden by
+	Selection Mutant
 }
 
 // IsActive gets whether this Config is enabled and has a functional set of ranges, without evaluating the mutant set.

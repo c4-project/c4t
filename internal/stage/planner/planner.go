@@ -70,7 +70,7 @@ func (p *Planner) Plan(ctx context.Context, ms machine.ConfigMap, fs ...string) 
 		if err != nil {
 			return nil, err
 		}
-		ps[n], err = p.makeMachinePlan(ctx, start, machine.Named{ID: nid, Machine: m.Machine}, corp)
+		ps[n], err = p.makeMachinePlan(ctx, start, nid, m, corp)
 		if err != nil {
 			return nil, err
 		}
@@ -78,24 +78,24 @@ func (p *Planner) Plan(ctx context.Context, ms machine.ConfigMap, fs ...string) 
 	return ps, nil
 }
 
-func (p *Planner) makeMachinePlan(ctx context.Context, start time.Time, nm machine.Named, corp corpus.Corpus) (plan.Plan, error) {
-
+func (p *Planner) makeMachinePlan(ctx context.Context, start time.Time, mid id.ID, m machine.Config, corp corpus.Corpus) (plan.Plan, error) {
 	var (
 		pn  plan.Plan
 		err error
 	)
 
-	pn.Machine = nm
+	pn.Machine = machine.Named{ID: mid, Machine: m.Machine}
 	pn.Corpus = corp
+	pn.Mutation = m.Mutation
 
-	p.announce(Message{Kind: KindPlanningBackend, MachineID: nm.ID})
+	p.announce(Message{Kind: KindPlanningBackend, MachineID: mid})
 	pn.Backend, err = p.planBackend()
 	if err != nil {
 		return pn, err
 	}
 
-	p.announce(Message{Kind: KindPlanningCompilers, MachineID: nm.ID})
-	pn.Compilers, err = p.planCompilers(ctx, nm.ID)
+	p.announce(Message{Kind: KindPlanningCompilers, MachineID: mid})
+	pn.Compilers, err = p.planCompilers(ctx, mid)
 	if err != nil {
 		return pn, err
 	}

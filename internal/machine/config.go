@@ -11,6 +11,9 @@ import (
 )
 
 // Config is a config record for a particular machine.
+//
+// The difference between a Machine and a Config is that the latter contains raw configuration data for things that get
+// mapped into expanded forms in the plan, for instance compilers.
 type Config struct {
 	Machine
 
