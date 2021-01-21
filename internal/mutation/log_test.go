@@ -6,11 +6,34 @@
 package mutation_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/c4-project/c4t/internal/mutation"
 	"github.com/stretchr/testify/assert"
 )
+
+// ExampleScanLines is a testable example for ScanLines.
+func ExampleScanLines() {
+	lines := []string{
+		"warning: overfull hbox",
+		"MUTATION SELECTED: 42",
+		"warning: ineffective assign",
+		"MUTATION HIT: 42 (barely)",
+		"info: don't do this",
+		"this statement is false",
+		"MUTATION SELECTED: 8",
+		"MUTATION HIT: 42 (somewhat)",
+	}
+
+	for mutant, hits := range mutation.ScanLines(lines) {
+		fmt.Println(mutant, "=", hits)
+	}
+
+	// Unordered output:
+	// 42 = 2
+	// 8 = 0
+}
 
 // TestScanLine tests ScanLine on various cases.
 func TestScanLine(t *testing.T) {
