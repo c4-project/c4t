@@ -52,6 +52,20 @@ func ExampleRange_Mutants() {
 	// 10..20: 10 11 12 13 14 15 16 17 18 19
 }
 
+// ExampleRange_IsEmpty is a runnable example for IsEmpty.
+func ExampleRange_IsEmpty() {
+	fmt.Println("10..20:", mutation.Range{Start: 10, End: 20}.IsEmpty())
+	fmt.Println("10..10:", mutation.Range{Start: 10, End: 10}.IsEmpty())
+	fmt.Println("20..10:", mutation.Range{Start: 20, End: 10}.IsEmpty())
+	fmt.Println("10..11:", mutation.Range{Start: 10, End: 11}.IsEmpty())
+
+	// Output:
+	// 10..20: false
+	// 10..10: true
+	// 20..10: true
+	// 10..11: false
+}
+
 // TestRange_Mutants tests Range.Mutants with various cases.
 func TestRange_Mutants(t *testing.T) {
 	t.Parallel()

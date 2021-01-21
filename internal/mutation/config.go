@@ -19,9 +19,23 @@ type Config struct {
 	Ranges []Range `toml:"ranges,omitempty"`
 }
 
+// IsActive gets whether this Config is enabled and has a functional set of ranges, without evaluating the mutant set.
+func (c Config) IsActive() bool {
+	if !c.Enabled {
+		return false
+	}
+	for _, r := range c.Ranges {
+		if !r.IsEmpty() {
+			return true
+		}
+	}
+	return false
+}
+
 // Mutants returns a list of all mutant numbers to consider in this testing campaign.
 //
 // Mutants appear in the order defined, without deduplication.
+// If Enabled is false, Mutants will be empty.
 func (c Config) Mutants() []uint {
 	var m []uint
 
@@ -44,9 +58,14 @@ type Range struct {
 	End uint `toml:"to"`
 }
 
+// IsEmpty gets whether this range defines no mutant numbers.
+func (r Range) IsEmpty() bool {
+	return r.End <= r.Start
+}
+
 // Mutants expands a range into the slice of mutant numbers falling within it.
 func (r Range) Mutants() []uint {
-	if r.End <= r.Start {
+	if r.IsEmpty() {
 		return []uint{}
 	}
 

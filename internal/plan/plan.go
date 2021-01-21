@@ -11,6 +11,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
 	"github.com/c4-project/c4t/internal/plan/stage"
@@ -45,6 +47,10 @@ type Plan struct {
 
 	// Corpus contains each test corpus entry chosen for this plan.
 	Corpus corpus.Corpus `json:"corpus"`
+
+	// Mutation contains configuration specific to mutation testing.
+	// If nil or marked disabled, no mutation testing is occurring.
+	Mutation *mutation.Config `json:"mutation"`
 }
 
 // Check checks various basic properties on a plan.
@@ -92,4 +98,11 @@ func (p *Plan) archSet() map[string]struct{} {
 // It fails if any of the IDs are invalid.
 func (p *Plan) CompilerIDs() ([]id.ID, error) {
 	return id.MapKeys(p.Compilers)
+}
+
+// IsMutationTest gets whether this plan is defining a mutation test.
+//
+// This is shorthand for checking if the plan has an active mutation configuration.
+func (p *Plan) IsMutationTest() bool {
+	return p.Mutation != nil && p.Mutation.IsActive()
 }
