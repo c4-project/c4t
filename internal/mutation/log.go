@@ -6,6 +6,8 @@
 package mutation
 
 import (
+	"bufio"
+	"io"
 	"strconv"
 	"strings"
 )
@@ -17,9 +19,11 @@ const (
 	MutantSelectPrefix = "MUTATION SELECTED:"
 )
 
-// ScanLines scans each line in lines, building a map of mutant numbers to hit counts.
+// ScanLines scans each line in r, building a map of mutant numbers to hit counts.
 // If a mutant is present in the map, it was selected, even if its hit count is 0.
-func ScanLines(lines []string) map[Mutant]uint64 {
+func ScanLines(r io.Reader) map[Mutant]uint64 {
+	sc := bufio.NewScanner(r)
+
 	mp := make(map[Mutant]uint64)
 	onHit := func(i Mutant) {
 		mp[i] = mp[i] + 1
@@ -28,8 +32,8 @@ func ScanLines(lines []string) map[Mutant]uint64 {
 		// Defines mp[i] with 0 if it hasn't already been defined.
 		mp[i] = mp[i] + 0
 	}
-	for _, l := range lines {
-		ScanLine(l, onHit, onSelect)
+	for sc.Scan() {
+		ScanLine(sc.Text(), onHit, onSelect)
 	}
 	return mp
 }

@@ -7,6 +7,7 @@ package mutation_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/c4-project/c4t/internal/mutation"
@@ -26,7 +27,7 @@ func ExampleScanLines() {
 		"MUTATION HIT: 42 (somewhat)",
 	}
 
-	for mutant, hits := range mutation.ScanLines(lines) {
+	for mutant, hits := range mutation.ScanLines(strings.NewReader(strings.Join(lines, "\n"))) {
 		fmt.Println(mutant, "=", hits)
 	}
 
