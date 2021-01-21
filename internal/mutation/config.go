@@ -10,6 +10,12 @@ package mutation
 // This currently just tracks ranges of mutation numbers, but may be generalised if we branch to supporting more than
 // one kind of mutation test.
 type Config struct {
+	// Enabled gets whether mutation testing is enabled.
+	//
+	// Setting this to false is equivalent to setting Ranges to empty.
+	Enabled bool `toml:"enabled,omitempty"`
+
+	// Ranges contains the list of mutation number ranges that the campaign should use.
 	Ranges []Range `toml:"ranges,omitempty"`
 }
 
@@ -18,6 +24,10 @@ type Config struct {
 // Mutants appear in the order defined, without deduplication.
 func (c Config) Mutants() []uint {
 	var m []uint
+
+	if !c.Enabled {
+		return m
+	}
 
 	for _, r := range c.Ranges {
 		m = append(m, r.Mutants()...)

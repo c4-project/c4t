@@ -17,6 +17,7 @@ import (
 // ExampleConfig_Mutants is a runnable example for Config.
 func ExampleConfig_Mutants() {
 	cfg := mutation.Config{
+		Enabled: true,
 		Ranges: []mutation.Range{
 			{Start: 1, End: 4},
 			{Start: 10, End: 11},
@@ -30,8 +31,13 @@ func ExampleConfig_Mutants() {
 	}
 	fmt.Println()
 
+	// Disabling mutation is equivalent to removing all ranges.
+	cfg.Enabled = false
+	fmt.Println("no mutants when empty:", len(cfg.Mutants()) == 0)
+
 	// Output:
 	// mutants: 1 2 3 10 27 28 29 30
+	// no mutants when empty: true
 }
 
 // ExampleRange_Mutants is a runnable example for Range.
