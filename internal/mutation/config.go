@@ -13,15 +13,15 @@ type Config struct {
 	// Enabled gets whether mutation testing is enabled.
 	//
 	// Setting this to false is equivalent to setting Ranges to empty.
-	Enabled bool `toml:"enabled,omitempty"`
+	Enabled bool `json:"enabled,omitempty" toml:"enabled,omitempty"`
 
 	// Ranges contains the list of mutation number ranges that the campaign should use.
-	Ranges []Range `toml:"ranges,omitempty"`
+	Ranges []Range `json:"ranges,omitempty" toml:"ranges,omitempty"`
 
 	// Selection contains any selected mutation.
 	//
 	// This can theoretically be set in the tester's config file, but will get overridden by
-	Selection Mutant
+	Selection Mutant `json:"selection,omitempty" toml:"selection,omitempty"`
 }
 
 // IsActive gets whether this Config is enabled and has a functional set of ranges, without evaluating the mutant set.
@@ -58,9 +58,9 @@ func (c Config) Mutants() []Mutant {
 // Range defines an inclusive numeric range of mutant numbers to consider.
 type Range struct {
 	// Start is the first mutant number to consider in this range.
-	Start Mutant `toml:"start"`
+	Start Mutant `json:"start" toml:"start"`
 	// End is one past the last mutant number to consider in this range.
-	End Mutant `toml:"end"`
+	End Mutant `json:"end" toml:"end"`
 }
 
 // IsEmpty gets whether this range defines no mutant numbers.
