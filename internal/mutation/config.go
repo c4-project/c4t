@@ -58,9 +58,9 @@ func (c Config) Mutants() []Mutant {
 // Range defines an inclusive numeric range of mutant numbers to consider.
 type Range struct {
 	// Start is the first mutant number to consider in this range.
-	Start Mutant `toml:"from"`
+	Start Mutant `toml:"start"`
 	// End is one past the last mutant number to consider in this range.
-	End Mutant `toml:"to"`
+	End Mutant `toml:"end"`
 }
 
 // IsEmpty gets whether this range defines no mutant numbers.
