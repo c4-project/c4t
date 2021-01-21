@@ -59,6 +59,16 @@ func TestGccnt_DryRun(t *testing.T) {
             The following optimisation levels will trigger an error: 1
 			invocation: gcc -o a.out -O hello.c`,
 		},
+		"passthrough-mutant-miss-noperiods": {
+			in: Gccnt{
+				Bin:    "gcc",
+				In:     []string{"hello.c"},
+				Out:    "a.out",
+				Mutant: 2,
+			},
+			out: `MUTATION SELECTED: 2
+			invocation: gcc -o a.out -O hello.c`,
+		},
 		"passthrough-mutant-miss": {
 			in: Gccnt{
 				Bin:    "gcc",

@@ -12,6 +12,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	"github.com/c4-project/c4t/internal/ux/stdflag"
 
 	"github.com/c4-project/c4t/internal/serviceimpl/compiler/gcc"
@@ -35,15 +37,19 @@ func App(outw, errw io.Writer) *c.App {
 }
 
 const (
-	flagOutput       = "o"
-	flagBin          = "nt-bin"
-	flagDryRun       = "nt-dryrun"
-	flagDivergeOnOpt = "nt-diverge-opt"
-	flagErrorOnOpt   = "nt-error-opt"
-	flagPthread      = "pthread"
-	flagStd          = "std"
-	flagMarch        = "march"
-	flagMcpu         = "mcpu"
+	flagOutput           = "o"
+	flagBin              = "nt-bin"
+	flagDryRun           = "nt-dryrun"
+	flagDivergeOnOpt     = "nt-diverge-opt"
+	flagErrorOnOpt       = "nt-error-opt"
+	flagDivergeMutPeriod = "nt-diverge-mutant-period"
+	flagErrorMutPeriod   = "nt-error-mutant-period"
+	flagHitMutPeriod     = "nt-hit-mutant-period"
+	flagMutant           = "nt-mutant"
+	flagPthread          = "pthread"
+	flagStd              = "std"
+	flagMarch            = "march"
+	flagMcpu             = "mcpu"
 )
 
 func flags() []c.Flag {
@@ -65,26 +71,45 @@ func flags() []c.Flag {
 			Usage: "print the outcome of running gccn't instead of doing it",
 		},
 		&c.StringSliceFlag{
-			Name:    flagErrorOnOpt,
-			Aliases: nil,
-			Usage:   "o-levels (minus the '-O') on which gccn't should exit with an error",
+			Name:  flagErrorOnOpt,
+			Usage: "optimisation `levels` (minus the '-O') on which gccn't should exit with an error",
 		},
 		&c.StringSliceFlag{
-			Name:    flagDivergeOnOpt,
-			Aliases: nil,
-			Usage:   "o-levels (minus the '-O') on which gccn't should diverge",
+			Name:  flagDivergeOnOpt,
+			Usage: "optimisation `levels` (minus the '-O') on which gccn't should diverge",
+		},
+		&c.Uint64Flag{
+			Name:        flagDivergeMutPeriod,
+			Usage:       "diverge when the mutant number is a multiple of this `period`",
+			DefaultText: "disabled",
+		},
+		&c.Uint64Flag{
+			Name:        flagErrorMutPeriod,
+			Usage:       "error when the mutant number is a multiple of this `period`",
+			DefaultText: "disabled",
+		},
+		&c.Uint64Flag{
+			Name:        flagHitMutPeriod,
+			Usage:       "report a hit when the mutant number is a multiple of this `period`",
+			DefaultText: "disabled",
+		},
+		&c.Uint64Flag{
+			Name:        flagMutant,
+			EnvVars:     []string{mutation.EnvVar},
+			Usage:       "the mutant `number` to use if simulating mutation testing",
+			DefaultText: "mutation disabled",
 		},
 		&c.StringFlag{
 			Name:  flagStd,
-			Usage: "standard to pass through to gcc",
+			Usage: "`standard` to pass through to gcc",
 		},
 		&c.StringFlag{
 			Name:  flagMarch,
-			Usage: "architecture optimisation to pass through to gcc",
+			Usage: "architecture optimisation `spec` to pass through to gcc",
 		},
 		&c.StringFlag{
 			Name:  flagMcpu,
-			Usage: "cpu optimisation to pass through to gcc",
+			Usage: "cpu optimisation `spec` to pass through to gcc",
 		},
 		&c.BoolFlag{
 			Name:  flagPthread,
@@ -112,22 +137,36 @@ func run(ctx *c.Context) error {
 	}
 
 	g := gccnt.Gccnt{
-		Bin:         ctx.String(flagBin),
-		In:          ctx.Args().Slice(),
-		Out:         ctx.Path(flagOutput),
-		OptLevel:    olevel,
-		DivergeOpts: ctx.StringSlice(flagDivergeOnOpt),
-		ErrorOpts:   ctx.StringSlice(flagErrorOnOpt),
-		March:       ctx.String(flagMarch),
-		Mcpu:        ctx.String(flagMcpu),
-		Pthread:     ctx.Bool(flagPthread),
-		Std:         ctx.String(flagStd),
+		Mutant:   ctx.Uint64(flagMutant),
+		Bin:      ctx.String(flagBin),
+		In:       ctx.Args().Slice(),
+		Out:      ctx.Path(flagOutput),
+		OptLevel: olevel,
+		Conds:    makeConditionSet(ctx),
+		March:    ctx.String(flagMarch),
+		Mcpu:     ctx.String(flagMcpu),
+		Pthread:  ctx.Bool(flagPthread),
+		Std:      ctx.String(flagStd),
 	}
 
 	if ctx.Bool(flagDryRun) {
 		return g.DryRun(ctx.Context, os.Stderr)
 	}
 	return g.Run(ctx.Context, os.Stdout, os.Stderr)
+}
+
+func makeConditionSet(ctx *c.Context) gccnt.ConditionSet {
+	return gccnt.ConditionSet{
+		Diverge: gccnt.Condition{
+			Opts:      ctx.StringSlice(flagDivergeOnOpt),
+			MutPeriod: ctx.Uint64(flagDivergeMutPeriod),
+		},
+		Error: gccnt.Condition{
+			Opts:      ctx.StringSlice(flagErrorOnOpt),
+			MutPeriod: ctx.Uint64(flagErrorMutPeriod),
+		},
+		MutHitPeriod: ctx.Uint64(flagHitMutPeriod),
+	}
 }
 
 func geto(ctx *c.Context) (string, error) {
@@ -146,3 +185,12 @@ func geto(ctx *c.Context) (string, error) {
 
 	return o, nil
 }
+
+/*
+if g.Mutant, err = getMutant(); err != nil || g.Mutant == 0 {
+return err
+}
+func getMutant() (uint64, error) {
+	return strconv.ParseUint(os.Getenv(mutation.EnvVar), 10, 64)
+}
+*/

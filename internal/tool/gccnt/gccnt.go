@@ -169,7 +169,7 @@ func (g *Gccnt) should(c Condition) bool {
 }
 
 func (g *Gccnt) mutantActive(period uint64) bool {
-	return 0 < g.Mutant && g.Mutant%period == 0
+	return 0 < g.Mutant && 0 < period && g.Mutant%period == 0
 }
 
 func present(x string, xs []string) bool {

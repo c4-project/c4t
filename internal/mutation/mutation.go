@@ -6,6 +6,11 @@
 // Package mutation contains support for mutation testing using c4t.
 package mutation
 
+// EnvVar is the environment variable used for mutation testing.
+//
+// Some day, this might not be hard-coded.
+const EnvVar = "C4_MUTATION"
+
 // TODO(@MattWindsor91): move these
 const (
 	// MutantHitPrefix is the prefix of lines from compilers specifying that a mutant has been hit.
