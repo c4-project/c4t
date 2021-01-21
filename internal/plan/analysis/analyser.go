@@ -10,6 +10,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/subject/compilation"
+
 	"github.com/c4-project/c4t/internal/subject/status"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
@@ -152,6 +155,7 @@ func (a *analyser) apply(r subjectAnalysis) {
 	a.analysis.Flags |= r.flags
 	a.applyCompilers(r)
 	a.applyTimes(r)
+	a.applyMutants(r)
 
 	for i := status.Ok; i <= status.Last; i++ {
 		a.applyByStatus(i, r)
@@ -195,5 +199,18 @@ func (a *analyser) applyTimes(r subjectAnalysis) {
 	}
 	for cstr, ts := range r.rtimes {
 		a.runTimes[cstr] = append(a.runTimes[cstr], ts...)
+	}
+}
+
+func (a *analyser) applyMutants(r subjectAnalysis) {
+	// This will just waste time if we're not in a mutation test.
+	if !a.analysis.Plan.IsMutationTest() {
+		return
+	}
+	// TODO(@MattWindsor91): test this.
+	for cidstr, clog := range r.clogs {
+		killed := r.cflags[cidstr]&(status.FlagBad) == 0
+		comp := compilation.Name{SubjectName: r.sub.Name, CompilerID: id.FromString(cidstr)}
+		a.analysis.Mutants.AddCompilation(comp, clog, killed)
 	}
 }

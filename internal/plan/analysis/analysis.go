@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	"github.com/c4-project/c4t/internal/plan"
 
 	"github.com/c4-project/c4t/internal/subject/status"
@@ -31,6 +33,9 @@ type Analysis struct {
 
 	// Flags aggregates all flags found during the analysis.
 	Flags status.Flag
+
+	// Mutants, if non-nil, contains information about mutation testing done over this plan.
+	Mutants mutation.Analysis
 }
 
 // Compiler represents information about a compiler in a corpus analysis.
@@ -58,6 +63,7 @@ func newAnalysis(p *plan.Plan) *Analysis {
 		Plan:      p,
 		ByStatus:  make(map[status.Status]corpus.Corpus, status.Last),
 		Compilers: make(map[string]Compiler, len(p.Compilers)),
+		Mutants:   make(mutation.Analysis),
 	}
 }
 

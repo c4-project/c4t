@@ -6,11 +6,27 @@
 package mutation
 
 import (
+	"strings"
+
 	"github.com/c4-project/c4t/internal/subject/compilation"
 )
 
 // Analysis is the type of mutation testing analyses.
-type Analysis map[uint64]MutantAnalysis
+type Analysis map[Mutant]MutantAnalysis
+
+// AddCompilation merges any mutant information extracted from log to this analysis.
+// Such analysis is filed under compilation name comp, and killer determines whether hit mutants was killed.
+func (a Analysis) AddCompilation(comp compilation.Name, log string, killer bool) {
+	for mut, hits := range ScanLines(strings.NewReader(log)) {
+		ana := HitAnalysis{
+			// TODO(@MattWindsor91): get rid of this cast somehow
+			NumHits: int(hits),
+			Killed:  killer && hits != 0,
+			HitBy:   comp,
+		}
+		a[mut] = append(a[mut], ana)
+	}
+}
 
 // MutantAnalysis is the type of individual mutant analyses.
 type MutantAnalysis []HitAnalysis
