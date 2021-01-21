@@ -14,7 +14,7 @@ import (
 	"github.com/c4-project/c4t/internal/mutation"
 )
 
-// ExampleConfig_Mutants is a runnable example for Config.
+// ExampleConfig_Mutants is a runnable example for Config.Mutants.
 func ExampleConfig_Mutants() {
 	cfg := mutation.Config{
 		Enabled: true,
@@ -38,6 +38,27 @@ func ExampleConfig_Mutants() {
 	// Output:
 	// mutants: 1 2 3 10 27 28 29 30
 	// no mutants when empty: true
+}
+
+// ExampleConfig_IsActive is a runnable example for Config.IsActive.
+func ExampleConfig_IsActive() {
+	cfg := mutation.Config{
+		Enabled: false,
+		Ranges:  []mutation.Range{{Start: 1, End: 4}},
+	}
+
+	fmt.Println("disabled with ranges:", cfg.IsActive())
+
+	cfg.Enabled = true
+	fmt.Println("enabled with ranges:", cfg.IsActive())
+
+	cfg.Ranges[0].Start = 4
+	fmt.Println("enabled with bad ranges:", cfg.IsActive())
+
+	// Output:
+	// disabled with ranges: false
+	// enabled with ranges: true
+	// enabled with bad ranges: false
 }
 
 // ExampleRange_Mutants is a runnable example for Range.
