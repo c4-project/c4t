@@ -35,6 +35,9 @@ type WriteContext struct {
 
 	// ShowSubjects is true if subject information should be shown.
 	ShowSubjects bool
+
+	// ShowMutation is true if mutation testing information should be shown.
+	ShowMutation bool
 }
 
 const (
@@ -102,6 +105,14 @@ const (
 {{- end -}}
 `
 
+	tmplMutations = `
+{{- range $mut, $analysis := .Analysis.Mutation }}  ## Mutant {{ $mut }}
+{{ range $analysis }}    - {{ .HitBy }}: {{ .NumHits }} hit(s){{ if .Killed }} *KILLED*{{ end }}
+{{ end -}}
+{{- else }}  No mutations were enabled.
+{{- end -}}
+`
+
 	tmplRoot = `
 {{- if .ShowPlanInfo -}}
 # Plan
@@ -115,6 +126,10 @@ const (
 # Subject Outcomes
 {{ template "byStatus" . -}}
 {{/* 'byStatus' adds its own newline */}}{{- end -}}
+{{- if .ShowMutation -}}
+# Mutation Testing
+{{ template "mutations" . -}}
+{{/* 'mutations' adds its own newline */}}{{- end -}}
 `
 )
 
@@ -137,6 +152,7 @@ func getTemplate() (*template.Template, error) {
 		"compilerCounts": tmplCompilerCounts,
 		"compilerInfo":   tmplCompilerInfo,
 		"compilerLogs":   tmplCompilerLogs,
+		"mutations":      tmplMutations,
 		"planInfo":       tmplPlanInfo,
 		"stages":         tmplStages,
 	})

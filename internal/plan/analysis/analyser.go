@@ -211,6 +211,6 @@ func (a *analyser) applyMutants(r subjectAnalysis) {
 	for cidstr, clog := range r.clogs {
 		killed := r.cflags[cidstr]&(status.FlagBad) == 0
 		comp := compilation.Name{SubjectName: r.sub.Name, CompilerID: id.FromString(cidstr)}
-		a.analysis.Mutants.AddCompilation(comp, clog, killed)
+		a.analysis.Mutation.AddCompilation(comp, clog, killed)
 	}
 }

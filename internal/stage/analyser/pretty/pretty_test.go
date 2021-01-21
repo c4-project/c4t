@@ -80,6 +80,7 @@ func TestPrinter_OnAnalysis_regress(t *testing.T) {
 			"cs":  pretty.Options(pretty.ShowCompilers(true), pretty.ShowSubjects(true)),
 			"ps":  pretty.Options(pretty.ShowPlanInfo(true), pretty.ShowSubjects(true)),
 			"cps": pretty.Options(pretty.ShowCompilers(true), pretty.ShowPlanInfo(true), pretty.ShowSubjects(true)),
+			"mut": pretty.Options(pretty.ShowMutation(true)),
 		}
 
 		var gotw bytes.Buffer

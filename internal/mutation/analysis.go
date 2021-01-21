@@ -34,9 +34,11 @@ type MutantAnalysis []HitAnalysis
 // HitAnalysis is the type of analyses for a one or more hits of a mutant by a compilation.
 type HitAnalysis struct {
 	// NumHits is the number of times this compilation hit the mutant.
+	// If this is 0, the mutant was selected but never hit.
 	NumHits int `json:"num_hits"`
 
 	// Killed is true provided that this hit resulted in a kill.
+	// If the compilation failed, this will be true unless the mutant was never hit (NumHits == 0).
 	Killed bool `json:"killed"`
 
 	// HitBy is the name of the compilation that hit this mutant.

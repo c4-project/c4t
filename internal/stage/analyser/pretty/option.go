@@ -58,8 +58,16 @@ func ShowPlanInfo(show bool) Option {
 	}
 }
 
+// ShowCompilerLogs sets whether the printer should show compiler metadata, according to show.
 func ShowCompilerLogs(show bool) Option {
 	return func(aw *Printer) {
 		aw.ctx.ShowCompilerLogs = show
+	}
+}
+
+// ShowMutation sets whether the printer should show mutation testing results, according to show.
+func ShowMutation(show bool) Option {
+	return func(aw *Printer) {
+		aw.ctx.ShowMutation = show
 	}
 }

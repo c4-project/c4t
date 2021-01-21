@@ -58,6 +58,9 @@ const (
 	flagShowCompilerLogs      = "show-compiler-logs"
 	flagShowCompilerLogsShort = "L"
 	usageShowCompilerLogs     = "show breakdown of compiler logs (requires -" + flagShowCompilers + ")"
+	flagShowMutation          = "show-mutation"
+	flagShowMutationShort     = "M"
+	usageShowMutation         = "show results of any mutation testing involved in this plan"
 	flagShowOk                = "show-ok"
 	flagShowOkShort           = "O"
 	usageShowOk               = "show subjects that did not have compile or run issues"
@@ -93,9 +96,10 @@ func flags() []c.Flag {
 		&c.BoolFlag{Name: flagCsvStages, Usage: usageCsvStages},
 		&c.BoolFlag{Name: flagShowCompilers, Aliases: []string{flagShowCompilersShort}, Usage: usageShowCompilers},
 		&c.BoolFlag{Name: flagShowCompilerLogs, Aliases: []string{flagShowCompilerLogsShort}, Usage: usageShowCompilerLogs},
+		&c.BoolFlag{Name: flagShowMutation, Aliases: []string{flagShowMutationShort}, Usage: usageShowMutation},
 		&c.BoolFlag{Name: flagShowOk, Aliases: []string{flagShowOkShort}, Usage: usageShowOk},
-		&c.BoolFlag{Name: flagShowSubjects, Aliases: []string{flagShowSubjectsShort}, Usage: usageShowSubjects},
 		&c.BoolFlag{Name: flagShowPlanInfo, Aliases: []string{flagShowPlanInfoShort}, Usage: usageShowPlanInfo},
+		&c.BoolFlag{Name: flagShowSubjects, Aliases: []string{flagShowSubjectsShort}, Usage: usageShowSubjects},
 		&c.PathFlag{
 			Name:        flagSaveDir,
 			Aliases:     []string{stdflag.FlagOutDir},
@@ -143,19 +147,21 @@ func prettyObserver(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error)
 	showCompilers := ctx.Bool(flagShowCompilers)
 	// showCompilerLogs depends on showCompilers
 	showOk := ctx.Bool(flagShowOk)
+	showMutation := ctx.Bool(flagShowMutation)
 	showSubjects := ctx.Bool(flagShowSubjects)
 	showPlanInfo := ctx.Bool(flagShowPlanInfo)
 
-	if !(showCompilers || showOk || showSubjects || showPlanInfo) {
+	if !(showCompilers || showOk || showSubjects || showMutation || showPlanInfo) {
 		return nil, nil
 	}
 	po, err := pretty.NewPrinter(
 		pretty.WriteTo(outw),
 		pretty.ShowCompilers(showCompilers),
 		pretty.ShowCompilerLogs(ctx.Bool(flagShowCompilerLogs)),
+		pretty.ShowMutation(showMutation),
 		pretty.ShowOk(showOk),
-		pretty.ShowSubjects(showSubjects),
 		pretty.ShowPlanInfo(showPlanInfo),
+		pretty.ShowSubjects(showSubjects),
 	)
 	return []analyser.Observer{po}, err
 }
