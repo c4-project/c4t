@@ -24,6 +24,9 @@ var (
 
 // Gccnt holds all configuration needed to perform a GCCn't run.
 type Gccnt struct {
+	// Conds stores the conditions for which gccn't will fail.
+	Conds ConditionSet
+
 	// Bin is the name of the 'real' compiler binary to run.
 	Bin string
 
@@ -36,11 +39,8 @@ type Gccnt struct {
 	// OptLevel contains the raw optimisation level string to run GCC with.
 	OptLevel string
 
-	// ErrorOpts contains the optimisation levels at which gccn't will error.
-	ErrorOpts []string
-
-	// DivergeOpts contains the optimisation levels at which gccn't will diverge.
-	DivergeOpts []string
+	// Mutant is, if nonzero, the current mutant.
+	Mutant uint64
 
 	// March specifies whether to pass -march to gcc, and, if so, what value.
 	March string
@@ -63,8 +63,14 @@ type runner interface {
 	// DoError should [pretend to] return an error that causes gccn't to fail.
 	DoError() error
 
+	// MutantSelect should log a mutant selection.
+	MutantSelect(mutant uint64) error
+
+	// MutantHit should log a mutant hit.
+	MutantHit(mutant uint64) error
+
 	// Init gives the Runner a chance to dump information about its configuration.
-	Init(errorOpts []string, divergeOpts []string) error
+	Init(conds ConditionSet) error
 
 	// RunGCC should run, or pretend to run, GCC with the given command bin and arguments args.
 	RunGCC(ctx context.Context, bin string, args ...string) error
@@ -76,14 +82,19 @@ func (g *Gccnt) Run(ctx context.Context, outw, errw io.Writer) error {
 }
 
 func (g *Gccnt) runOnRunner(ctx context.Context, r runner) error {
-	if err := g.check(); err != nil {
+	var err error
+
+	if err = g.check(); err != nil {
 		return err
 	}
 
-	sort.Strings(g.DivergeOpts)
-	sort.Strings(g.ErrorOpts)
+	g.Conds.sort()
 
-	if err := r.Init(g.ErrorOpts, g.DivergeOpts); err != nil {
+	if err = g.handleMutant(r); err != nil {
+		return err
+	}
+
+	if err := r.Init(g.Conds); err != nil {
 		return err
 	}
 
@@ -95,6 +106,30 @@ func (g *Gccnt) runOnRunner(ctx context.Context, r runner) error {
 	default:
 		return r.RunGCC(ctx, g.Bin, g.args()...)
 	}
+}
+
+func (g *Gccnt) handleMutant(r runner) error {
+	if g.Mutant == 0 {
+		return nil
+	}
+	var err error
+	if err = r.MutantSelect(g.Mutant); err != nil {
+		return err
+	}
+	if !g.mutantHit() {
+		return nil
+	}
+	return r.MutantHit(g.Mutant)
+}
+
+func (g *Gccnt) mutantHit() bool {
+	c := g.Conds
+	for _, p := range []uint64{c.MutHitPeriod, c.Diverge.MutPeriod, c.Error.MutPeriod} {
+		if g.mutantActive(p) {
+			return true
+		}
+	}
+	return false
 }
 
 func (g *Gccnt) check() error {
@@ -121,15 +156,23 @@ func (g *Gccnt) args() []string {
 
 // shouldDiverge checks whether gccn't should diverge.
 func (g *Gccnt) shouldDiverge() bool {
-	return g.should(g.DivergeOpts)
+	return g.should(g.Conds.Diverge)
 }
 
 // shouldError checks whether gccn't should run an error.
 func (g *Gccnt) shouldError() bool {
-	return g.should(g.ErrorOpts)
+	return g.should(g.Conds.Error)
 }
 
-func (g *Gccnt) should(opts []string) bool {
-	i := sort.SearchStrings(opts, g.OptLevel)
-	return i < len(opts) && opts[i] == g.OptLevel
+func (g *Gccnt) should(c Condition) bool {
+	return g.mutantActive(c.MutPeriod) || present(g.OptLevel, c.Opts)
+}
+
+func (g *Gccnt) mutantActive(period uint64) bool {
+	return 0 < g.Mutant && g.Mutant%period == 0
+}
+
+func present(x string, xs []string) bool {
+	i := sort.SearchStrings(xs, x)
+	return i < len(xs) && xs[i] == x
 }

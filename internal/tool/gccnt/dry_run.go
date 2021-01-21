@@ -9,6 +9,8 @@ import (
 	"context"
 	"fmt"
 	"io"
+
+	"github.com/c4-project/c4t/internal/mutation"
 )
 
 // DryRun works out what GCCn't is going to do, then prints it onto errw.
@@ -35,24 +37,52 @@ func (d *dryRunner) DoError() error {
 }
 
 // Init logs the error and divergence optimisation levels.
-func (d *dryRunner) Init(errorOpts []string, divergeOpts []string) error {
+func (d *dryRunner) Init(conds ConditionSet) error {
 	for _, c := range []struct {
 		name string
-		opts []string
+		cnd  Condition
 	}{
-		{name: "an error", opts: errorOpts},
-		{name: "divergence", opts: divergeOpts},
+		// Not a map, to make sure we get a consistent ordering.
+		{name: "divergence", cnd: conds.Diverge},
+		{name: "an error", cnd: conds.Error},
 	} {
-		if len(c.opts) == 0 {
-			continue
-		}
-
-		d.dumpf("The following optimisation levels will trigger %s:", c.name)
-		for _, o := range c.opts {
-			d.dumpf(" %s", o)
-		}
-		d.dumpln()
+		d.dumpCondition(c.name, c.cnd)
 	}
+	return d.err
+}
+
+func (d *dryRunner) dumpCondition(name string, c Condition) {
+	d.dumpMut(name, c.MutPeriod)
+	d.dumpOpts(name, c.Opts)
+}
+
+func (d *dryRunner) dumpMut(name string, period uint64) {
+	if period == 0 {
+		return
+	}
+	d.dumpf("Mutation numbers that are multiples of %d will trigger %s\n", period, name)
+}
+
+func (d *dryRunner) dumpOpts(name string, opts []string) {
+	if len(opts) == 0 {
+		return
+	}
+	d.dumpf("The following optimisation levels will trigger %s:", name)
+	for _, o := range opts {
+		d.dumpf(" %s", o)
+	}
+	d.dumpln()
+}
+
+// MutantHit dumps the mutation hit stanza.
+func (d *dryRunner) MutantHit(n uint64) error {
+	d.dumpln(mutation.MutantHitPrefix, n)
+	return d.err
+}
+
+// MutantSelect dumps the mutation selection stanza.
+func (d *dryRunner) MutantSelect(n uint64) error {
+	d.dumpln(mutation.MutantSelectPrefix, n)
 	return d.err
 }
 

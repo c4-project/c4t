@@ -47,41 +47,118 @@ func TestGccnt_DryRun(t *testing.T) {
 		},
 		"passthrough-addopts": {
 			in: Gccnt{
-				Bin:         "gcc",
-				In:          []string{"hello.c"},
-				Out:         "a.out",
-				DivergeOpts: []string{"2", "3"},
-				ErrorOpts:   []string{"1"},
+				Bin: "gcc",
+				In:  []string{"hello.c"},
+				Out: "a.out",
+				Conds: ConditionSet{
+					Diverge: Condition{Opts: []string{"2", "3"}},
+					Error:   Condition{Opts: []string{"1"}},
+				},
 			},
-			out: `The following optimisation levels will trigger an error: 1
-			The following optimisation levels will trigger divergence: 2 3
+			out: `The following optimisation levels will trigger divergence: 2 3
+            The following optimisation levels will trigger an error: 1
+			invocation: gcc -o a.out -O hello.c`,
+		},
+		"passthrough-mutant-miss": {
+			in: Gccnt{
+				Bin:    "gcc",
+				In:     []string{"hello.c"},
+				Out:    "a.out",
+				Mutant: 2,
+				Conds: ConditionSet{
+					MutHitPeriod: 4,
+					Diverge:      Condition{MutPeriod: 3},
+					Error:        Condition{MutPeriod: 5},
+				},
+			},
+			out: `MUTATION SELECTED: 2
+			Mutation numbers that are multiples of 3 will trigger divergence
+			Mutation numbers that are multiples of 5 will trigger an error
+			invocation: gcc -o a.out -O hello.c`,
+		},
+		"passthrough-mutant-hit": {
+			in: Gccnt{
+				Bin:    "gcc",
+				In:     []string{"hello.c"},
+				Out:    "a.out",
+				Mutant: 4,
+				Conds: ConditionSet{
+					MutHitPeriod: 4,
+					Diverge:      Condition{MutPeriod: 3},
+					Error:        Condition{MutPeriod: 5},
+				},
+			},
+			out: `MUTATION SELECTED: 4
+            MUTATION HIT: 4
+			Mutation numbers that are multiples of 3 will trigger divergence
+			Mutation numbers that are multiples of 5 will trigger an error
 			invocation: gcc -o a.out -O hello.c`,
 		},
 		"diverge": {
 			in: Gccnt{
-				Bin:         "gcc",
-				In:          []string{"hello.c"},
-				Out:         "a.out",
-				OptLevel:    "3",
-				DivergeOpts: []string{"2", "3"},
-				ErrorOpts:   []string{"1"},
+				Bin:      "gcc",
+				In:       []string{"hello.c"},
+				Out:      "a.out",
+				OptLevel: "3",
+				Conds: ConditionSet{
+					Diverge: Condition{Opts: []string{"2", "3"}},
+					Error:   Condition{Opts: []string{"1"}},
+				},
 			},
-			out: `The following optimisation levels will trigger an error: 1
-			The following optimisation levels will trigger divergence: 2 3
+			out: `The following optimisation levels will trigger divergence: 2 3
+            The following optimisation levels will trigger an error: 1
             gccn't would diverge here`,
+		},
+		"diverge-mutant": {
+			in: Gccnt{
+				Bin:    "gcc",
+				In:     []string{"hello.c"},
+				Out:    "a.out",
+				Mutant: 3,
+				Conds: ConditionSet{
+					MutHitPeriod: 4,
+					Diverge:      Condition{MutPeriod: 3},
+					Error:        Condition{MutPeriod: 5},
+				},
+			},
+			out: `MUTATION SELECTED: 3
+            MUTATION HIT: 3
+			Mutation numbers that are multiples of 3 will trigger divergence
+			Mutation numbers that are multiples of 5 will trigger an error
+			gccn't would diverge here`,
 		},
 		"error": {
 			in: Gccnt{
-				Bin:         "gcc",
-				In:          []string{"hello.c"},
-				Out:         "a.out",
-				OptLevel:    "1",
-				DivergeOpts: []string{"2", "3"},
-				ErrorOpts:   []string{"1"},
+				Bin:      "gcc",
+				In:       []string{"hello.c"},
+				Out:      "a.out",
+				OptLevel: "1",
+				Conds: ConditionSet{
+					Diverge: Condition{Opts: []string{"2", "3"}},
+					Error:   Condition{Opts: []string{"1"}},
+				},
 			},
-			out: `The following optimisation levels will trigger an error: 1
-			The following optimisation levels will trigger divergence: 2 3
+			out: `The following optimisation levels will trigger divergence: 2 3
+            The following optimisation levels will trigger an error: 1
             gccn't would error here`,
+		},
+		"error-mutant": {
+			in: Gccnt{
+				Bin:    "gcc",
+				In:     []string{"hello.c"},
+				Out:    "a.out",
+				Mutant: 5,
+				Conds: ConditionSet{
+					MutHitPeriod: 4,
+					Diverge:      Condition{MutPeriod: 3},
+					Error:        Condition{MutPeriod: 5},
+				},
+			},
+			out: `MUTATION SELECTED: 5
+            MUTATION HIT: 5
+			Mutation numbers that are multiples of 3 will trigger divergence
+			Mutation numbers that are multiples of 5 will trigger an error
+			gccn't would error here`,
 		},
 	}
 

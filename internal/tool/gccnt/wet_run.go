@@ -7,8 +7,11 @@ package gccnt
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os/exec"
+
+	"github.com/c4-project/c4t/internal/mutation"
 )
 
 // wetRunner implements the low-level running logic of gccn't for real, as opposed to dry-running.
@@ -29,8 +32,20 @@ func (f *wetRunner) DoError() error {
 }
 
 // Init does nothing.
-func (f *wetRunner) Init(_, _ []string) error {
+func (f *wetRunner) Init(_ ConditionSet) error {
 	return nil
+}
+
+// MutantHit dumps the mutation hit stanza.
+func (f *wetRunner) MutantHit(n uint64) error {
+	_, err := fmt.Fprintln(f.errw, mutation.MutantHitPrefix, n)
+	return err
+}
+
+// MutantSelect dumps the mutation selection stanza.
+func (f *wetRunner) MutantSelect(n uint64) error {
+	_, err := fmt.Fprintln(f.errw, mutation.MutantSelectPrefix, n)
+	return err
 }
 
 // RunGCC runs GCC.
