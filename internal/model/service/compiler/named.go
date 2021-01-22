@@ -6,6 +6,8 @@
 package compiler
 
 import (
+	"strings"
+
 	"github.com/c4-project/c4t/internal/model/id"
 )
 
@@ -33,8 +35,15 @@ func (c Instance) AddNameString(name string) (*Named, error) {
 
 // FullID gets a fully qualified identifier for this configuration, consisting of the compiler name, followed by
 // 'oOpt' where 'Opt' is its selected optimisation name, and 'mMopt' where 'Mopt' is its selected machine profile.
+//
+// Where Opt or Mopt contain '.', these become '_'.  This behaviour may change.
 func (n Named) FullID() (id.ID, error) {
+	// In case of things like '-march=armv8.1-a'.
+	repl := strings.NewReplacer(".", "_")
+	o := repl.Replace(n.SelectedOptName())
+	m := repl.Replace(n.SelectedMOpt)
+
 	// We don't append in the config time, which means that this ID doesn't fully capture the compiler specification;
 	// that said, maybe the config time being a part of the specification is a rare enough case that we needn't worry.
-	return id.New(append(n.ID.Tags(), "o"+n.SelectedOptName(), "m"+n.SelectedMOpt)...)
+	return id.New(append(n.ID.Tags(), "o"+o, "m"+m)...)
 }

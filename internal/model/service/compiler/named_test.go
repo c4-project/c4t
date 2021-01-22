@@ -84,3 +84,14 @@ func ExampleNamed_FullID() {
 	// Output:
 	// gcc.4.o3.march=skylake
 }
+
+// ExampleNamed_FullID_dotarch is a runnable example for Named.FullID where the mopt contains dots.
+func ExampleNamed_FullID_dotarch() {
+	c := compiler.Instance{SelectedMOpt: "arch=armv8.1-a"}
+	n, _ := c.AddNameString("gcc.8")
+	i, _ := n.FullID()
+	fmt.Println(i)
+
+	// Output:
+	// gcc.8.o.march=armv8_1-a
+}
