@@ -28,6 +28,18 @@ func (a Analysis) AddCompilation(comp compilation.Name, log string, killer bool)
 	}
 }
 
+// HasKills determines whether there is at least one killed mutant in this analysis.
+func (a Analysis) HasKills() bool {
+	for _, mut := range a {
+		for _, hit := range mut {
+			if hit.Killed {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // MutantAnalysis is the type of individual mutant analyses.
 type MutantAnalysis []HitAnalysis
 

@@ -79,6 +79,9 @@ type Instance struct {
 	// Mutant is the current mutant that is in use on this instance, if any.
 	mutant mutation.Mutant
 
+	// mutantCh stores a channel that will receive mutations, if any.
+	mutantCh <-chan mutation.Mutant
+
 	// timeoutCh stores the current error cooldown channel, if any.
 	// This is refreshed whenever an error occurs.
 	timeoutCh <-chan time.Time
@@ -115,28 +118,40 @@ type Machine struct {
 
 // Run runs this instance's testing loop.
 func (i *Instance) Run(ctx context.Context) error {
-	if err := i.check(); err != nil {
+	err := i.runInner(ctx)
+	cerr := i.cleanUp()
+	OnInstanceClose(i.Observers...)
+	return errhelp.FirstError(err, cerr)
+}
+
+// runInner runs the instance's testing loop, less some closedown boilerplate.
+func (i *Instance) runInner(ctx context.Context) error {
+	if err := i.prepare(); err != nil {
 		return err
 	}
-
-	if err := i.Machine.Pathset.Scratch.Prepare(); err != nil {
+	// TODO(@MattWindsor91): move this out of the instance, if possible.
+	if err := i.prepareMutation(ctx); err != nil {
 		return err
 	}
+	return i.mainLoop(ctx)
+}
 
+func (i *Instance) prepare() error {
 	var err error
+	if err = i.check(); err != nil {
+		return err
+	}
+	if err = i.Machine.Pathset.Scratch.Prepare(); err != nil {
+		return err
+	}
 	if i.Machine.stageConfig, err = i.makeStageConfig(); err != nil {
 		return err
 	}
-	if err := i.Machine.stageConfig.Check(); err != nil {
+	if err = i.Machine.stageConfig.Check(); err != nil {
 		return err
 	}
 
-	err = i.mainLoop(ctx)
-
-	OnInstanceClose(i.Observers...)
-	cerr := i.cleanUp()
-
-	return errhelp.FirstError(err, cerr)
+	return nil
 }
 
 // cleanUp closes things that should be gracefully closed after an instance terminates.
@@ -175,6 +190,7 @@ func (m *Machine) check() error {
 	return nil
 }
 
+// cycleResult is the type of results from cycle goroutines.
 type cycleResult struct {
 	cycle Cycle
 	err   error
@@ -188,6 +204,8 @@ func (i *Instance) mainLoop(ctx context.Context) error {
 		case <-ctx.Done():
 			i.drainCycleCh()
 			return ctx.Err()
+		case m := <-i.mutantCh:
+			i.handleMutantChange(m)
 		case res := <-i.cycleCh:
 			i.handleCycleEnd(ctx, res)
 		case <-i.timeoutCh:
