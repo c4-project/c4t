@@ -146,6 +146,8 @@ type Ticker interface {
 	Stop()
 }
 
+//go:generate mockery --name Ticker
+
 // StandardTicker gets a standard Go ticker if d is nonzero, and a no-op otherwise.
 // In the latter case, the returned channel is nil.
 func StandardTicker(d time.Duration) (<-chan time.Time, Ticker) {
