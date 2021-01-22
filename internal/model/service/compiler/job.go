@@ -38,12 +38,7 @@ func (j *Job) CompilerRun() *service.RunInfo {
 	if j.Compiler == nil {
 		return nil
 	}
-	// TODO(@MattWindsor91): handle this properly
-	r := j.Compiler.Run
-	if r != nil {
-		_ = r.Interpolate(j.Compiler.Interpolations())
-	}
-	return r
+	return j.Compiler.Run
 }
 
 // SelectedOptName gets the name of this job's compiler's selected optimisation level, if present; else, "".

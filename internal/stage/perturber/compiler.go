@@ -105,6 +105,12 @@ func (c *compilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) 
 		Compiler:     cmp,
 	}
 
+	if comp.Run != nil {
+		if err := comp.Run.Interpolate(comp.Interpolations()); err != nil {
+			return nil, err
+		}
+	}
+
 	nid, err := id.TryFromString(name)
 	if err != nil {
 		return nil, fmt.Errorf("%s not a valid ID: %w", name, err)
