@@ -54,12 +54,13 @@ func TestCompile_CompilerRun(t *testing.T) {
 			in: compiler.Job{
 				Compiler: &compiler.Instance{
 					ConfigTime: time.Unix(8675309, 0),
+					Mutant:     42,
 					Compiler: compiler.Compiler{
 						Run: &service.RunInfo{
 							Cmd:  "foo",
 							Args: []string{"--time", "${config_time}"},
 							Env: map[string]string{
-								"TIME": "${config_time}",
+								"C4_MUTATION": "${mutant}",
 							},
 						},
 					},
@@ -69,7 +70,7 @@ func TestCompile_CompilerRun(t *testing.T) {
 				Cmd:  "foo",
 				Args: []string{"--time", "8675309"},
 				Env: map[string]string{
-					"TIME": "8675309",
+					"C4_MUTATION": "42",
 				},
 			},
 		},
