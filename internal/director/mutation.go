@@ -38,6 +38,7 @@ func (i *Instance) prepareMutation(ctx context.Context) error {
 func (i *Instance) handleMutantChange(m mutation.Mutant) {
 	// This shouldn't fire unless .Mutation exists.
 	i.Machine.InitialPlan.Mutation.Selection = m
+	OnInstance(InstanceMutantMessage(m), i.Observers...)
 }
 
 // killObserver is the kill channel of a mutation automator adapted to observe instances.
@@ -47,9 +48,11 @@ type killObserver chan<- struct{}
 func (k killObserver) OnCycle(CycleMessage) {
 }
 
-// OnInstanceClose does nothing.
-func (k killObserver) OnInstanceClose() {
-	close(k)
+// OnInstance closes the kill channel if the instance is closing.
+func (k killObserver) OnInstance(m InstanceMessage) {
+	if m.Kind == KindInstanceClosed {
+		close(k)
+	}
 }
 
 func (k killObserver) OnAnalysis(a analysis.Analysis) {

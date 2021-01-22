@@ -56,7 +56,7 @@ func ExampleLogger_OnCycle() {
 		director.OnCycle(director.CycleStartMessage(c), i)
 		director.OnCycle(director.CycleErrorMessage(c, errors.New("the front fell off")), i)
 		// Important, else the logger will keep waiting for the instance to provide observations.
-		i.OnInstanceClose()
+		i.OnInstance(director.InstanceClosedMessage())
 	}()
 	_ = r.Run(context.Background())
 
@@ -78,7 +78,7 @@ func ExampleLogger_OnCycleSave() {
 		saver.OnArchiveFileMissing("subj", "compile.log", 1, i)
 		saver.OnArchiveFinish("subj", i)
 		// Important, else the logger will keep waiting for the instance to provide observations.
-		i.OnInstanceClose()
+		i.OnInstance(director.InstanceClosedMessage())
 	}()
 	_ = r.Run(context.Background())
 
@@ -123,7 +123,7 @@ func ExampleLogger_OnCycleCompiler() {
 			}, i)
 		compiler.OnCompilerConfigEnd(i)
 		// Important, else the logger will keep waiting for the instance to provide observations.
-		i.OnInstanceClose()
+		i.OnInstance(director.InstanceClosedMessage())
 	}()
 	_ = r.Run(context.Background())
 
@@ -157,7 +157,7 @@ func TestLogger_Run_noMessages(t *testing.T) {
 	i, err := r.Instance(id.FromString("foo"))
 	require.NoError(t, err, "instance should construct without errors")
 	go func() {
-		i.OnInstanceClose()
+		i.OnInstance(director.InstanceClosedMessage())
 	}()
 	err = r.Run(context.Background())
 	require.NoError(t, err, "should have stopped running with no error")

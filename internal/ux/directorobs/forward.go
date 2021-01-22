@@ -39,6 +39,9 @@ type Forward struct {
 	// Kind is the kind of message that has been forwarded.
 	Kind ForwardKind
 
+	// Instance is, when Kind is ForwardInstance, a forwarded instance message.
+	Instance *director.InstanceMessage
+
 	// Analysis is, when Kind is ForwardAnalysis, an analysis message.
 	Analysis *analysis.Analysis
 
@@ -61,6 +64,8 @@ type ForwardKind uint8
 const (
 	// ForwardCycle delimits a forwarding message where Cycle is populated.
 	ForwardCycle ForwardKind = iota
+	// ForwardInstance delimits a forwarding message where Instance is populated (Cycle contains the cycle structure).
+	ForwardInstance
 	// ForwardAnalysis delimits a forwarding message where Analysis is populated (Cycle contains the cycle structure).
 	ForwardAnalysis
 	// ForwardCompiler delimits a forwarding message where Compiler is populated (Cycle contains the cycle structure).
@@ -103,6 +108,11 @@ func ForwardCopyMessage(c director.Cycle, m copier.Message) Forward {
 	return Forward{Cycle: director.CycleMessage{Cycle: c}, Kind: ForwardCopy, Copy: &m}
 }
 
+// ForwardInstanceMessage constructs a forwarding message for m over cycle c.
+func ForwardInstanceMessage(c director.Cycle, m director.InstanceMessage) Forward {
+	return Forward{Cycle: director.CycleMessage{Cycle: c}, Kind: ForwardInstance, Instance: &m}
+}
+
 // ForwardReceiver holds receive channels for Forward messages.
 //
 // It is effectively a more type-safe form of observing.FanIn, and will usually be used inside a ForwardObserver.
@@ -141,19 +151,22 @@ type ForwardHandler interface {
 	// ForwardHandler instances can observe preparations.
 	director.PrepareObserver
 
+	// OnCycleInstance handles a message for the instance of a particular cycle.
+	OnCycleInstance(director.Cycle, director.InstanceMessage)
+
 	// OnCycleAnalysis should handle an analysis for a particular cycle.
 	OnCycleAnalysis(director.CycleAnalysis)
 
 	// OnCycleBuild should handle a corpus build for a particular cycle.
 	OnCycleBuild(director.Cycle, builder.Message)
 
-	// OnCycleCompiler handles a compiler message for a particular cycle.
+	// OnCycleCompiler should handle a compiler message for a particular cycle.
 	OnCycleCompiler(director.Cycle, compiler.Message)
 
-	// OnCycleCopy handles a copy message for a particular cycle.
+	// OnCycleCopy should handle a copy message for a particular cycle.
 	OnCycleCopy(director.Cycle, copier.Message)
 
-	// OnCycleSave handles an archive message for a particular cycle.
+	// OnCycleSave should handle an archive message for a particular cycle.
 	OnCycleSave(director.Cycle, saver.ArchiveMessage)
 }
 
@@ -307,10 +320,13 @@ func (l *ForwardingInstanceObserver) OnCopy(m copier.Message) {
 // OnMachineNodeAction does nothing.
 func (l *ForwardingInstanceObserver) OnMachineNodeAction(observer.Message) {}
 
-// OnInstanceClose doesn't (yet) log the instance closure, but closes the forwarding channel.
-func (l *ForwardingInstanceObserver) OnInstanceClose() {
+// OnInstance forwards an instance message, and closes the forwarding channel if the instance has closed.
+func (l *ForwardingInstanceObserver) OnInstance(m director.InstanceMessage) {
 	// TODO(@MattWindsor91): forward a message about this?
-	close(l.fwd)
+	l.forward(ForwardInstanceMessage(l.cycle, m))
+	if m.Kind == director.KindInstanceClosed {
+		close(l.fwd)
+	}
 }
 
 func (l *ForwardingInstanceObserver) forward(f Forward) {

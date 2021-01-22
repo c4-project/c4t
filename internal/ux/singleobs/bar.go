@@ -57,8 +57,8 @@ func (p *Bar) OnMachineNodeAction(observer.Message) {}
 // OnCycle does nothing.
 func (p *Bar) OnCycle(director.CycleMessage) {}
 
-// OnInstanceClose does nothing.
-func (p *Bar) OnInstanceClose() {}
+// OnInstance does nothing.
+func (p *Bar) OnInstance(director.InstanceMessage) {}
 
 // OnAnalysis does nothing.
 func (p *Bar) OnAnalysis(analysis.Analysis) {}

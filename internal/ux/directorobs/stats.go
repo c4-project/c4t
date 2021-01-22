@@ -78,6 +78,9 @@ func (s *Statset) OnCycleCompiler(director.Cycle, compiler.Message) {}
 // OnCycleCopy does nothing, for now.
 func (s *Statset) OnCycleCopy(director.Cycle, copier.Message) {}
 
+// OnCycleInstance does nothing, for now.
+func (s *Statset) OnCycleInstance(director.Cycle, director.InstanceMessage) {}
+
 // OnCycleSave does nothing, for now.
 func (s *Statset) OnCycleSave(director.Cycle, saver.ArchiveMessage) {}
 
@@ -216,6 +219,12 @@ func (s *StatPersister) OnPrepare(m director.PrepareMessage) {
 // OnCycle feeds the information from c into the stats set.
 func (s *StatPersister) OnCycle(c director.CycleMessage) {
 	s.set.OnCycle(c)
+	s.flush()
+}
+
+// OnCycleInstance feeds the information from c and m into the stats set.
+func (s *StatPersister) OnCycleInstance(c director.Cycle, m director.InstanceMessage) {
+	s.set.OnCycleInstance(c, m)
 	s.flush()
 }
 

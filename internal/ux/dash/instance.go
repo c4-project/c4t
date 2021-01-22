@@ -149,8 +149,10 @@ func (o *Instance) onCycleStart(r director.Cycle) {
 	o.action.reset()
 }
 
-func (o *Instance) OnInstanceClose() {
-	o.action.onInstanceClose()
+// OnInstance forwards the instance message to relevant bits of the dash.
+func (o *Instance) OnInstance(m director.InstanceMessage) {
+	// TODO(@MattWindsor91): store mutant somewhere else
+	o.action.onInstance(m)
 }
 
 // OnAnalysis observes an analysis by adding failure/timeout/flag rates to the sparklines.

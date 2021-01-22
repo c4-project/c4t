@@ -120,7 +120,7 @@ type Machine struct {
 func (i *Instance) Run(ctx context.Context) error {
 	err := i.runInner(ctx)
 	cerr := i.cleanUp()
-	OnInstanceClose(i.Observers...)
+	OnInstance(InstanceClosedMessage(), i.Observers...)
 	return errhelp.FirstError(err, cerr)
 }
 

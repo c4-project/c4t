@@ -118,6 +118,16 @@ func (j *Logger) OnCycleAnalysis(s director.CycleAnalysis) {
 	}
 }
 
+// OnCycleInstance records a message about a cycle's instance.
+func (j *Logger) OnCycleInstance(c director.Cycle, m director.InstanceMessage) {
+	switch m.Kind {
+	case director.KindInstanceClosed:
+		j.l.Printf("[instance %d has closed]\n", c.Instance)
+	case director.KindInstanceMutant:
+		j.l.Printf("[instance %d has changed mutant to %d]\n", c.Instance, m.Mutant)
+	}
+}
+
 // OnCycleBuild does nothing, for now.
 func (j *Logger) OnCycleBuild(director.Cycle, builder.Message) {}
 

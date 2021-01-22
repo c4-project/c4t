@@ -8,6 +8,8 @@ package dash
 import (
 	"fmt"
 
+	"github.com/c4-project/c4t/internal/director"
+
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
 	"github.com/c4-project/c4t/internal/subject/compilation"
@@ -174,7 +176,13 @@ func idQualSubjectDesc(sname string, id id.ID) string {
 	return fmt.Sprintf("%s (@%s)", sname, id)
 }
 
-func (o *actionObserver) onInstanceClose() {
-	err := o.log.Write("-- INSTANCE CLOSED --\n")
+func (o *actionObserver) onInstance(m director.InstanceMessage) {
+	var err error
+	switch m.Kind {
+	case director.KindInstanceClosed:
+		err = o.log.Write("-- INSTANCE CLOSED --\n")
+	case director.KindInstanceMutant:
+		err = o.log.Write(fmt.Sprintf("-- INSTANCE MUTANT NOW %d --\n", m.Mutant))
+	}
 	o.logError(err)
 }

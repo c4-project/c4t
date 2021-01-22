@@ -8,6 +8,7 @@ package director
 
 import (
 	"github.com/c4-project/c4t/internal/director/pathset"
+	"github.com/c4-project/c4t/internal/mutation"
 	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/c4-project/c4t/internal/copier"
@@ -113,9 +114,8 @@ type InstanceObserver interface {
 	// InstanceObserver observers can observe cycles.
 	CycleObserver
 
-	// OnInstanceClose observes that the instance this observer is observing has closed.
-	// This gives the observer the opportunity to free any resources.
-	OnInstanceClose()
+	// OnInstance observes something about that the instance this observer is observing.
+	OnInstance(m InstanceMessage)
 
 	// InstanceObserver observers can observe plan analyses.
 	analyser.Observer
@@ -133,13 +133,41 @@ type InstanceObserver interface {
 	mach.Observer
 }
 
-// OnInstanceClose sends OnInstanceClose to each observer in obs.
-func OnInstanceClose(obs ...InstanceObserver) {
+// InstanceMessage is the type of observer messages pertaining to the control flow of an instance.
+type InstanceMessage struct {
+	Kind   InstanceMessageKind
+	Mutant mutation.Mutant
+}
+
+// InstanceMessageKind is the enumeration of kinds of instance message.
+type InstanceMessageKind uint8
+
+const (
+	// The instance has closed.
+	// Observers should free any resources specific to this instance.
+	KindInstanceClosed InstanceMessageKind = iota
+	// The instance has changed to a new mutant (in Mutant).
+	KindInstanceMutant
+)
+
+// InstanceClosedMessage constructs an InstanceMessage stating that the instance has closed.
+func InstanceClosedMessage() InstanceMessage {
+	return InstanceMessage{Kind: KindInstanceClosed}
+}
+
+// InstanceMutantMessage constructs an InstanceMessage stating that the instance has changed mutant to m.
+func InstanceMutantMessage(m mutation.Mutant) InstanceMessage {
+	return InstanceMessage{Kind: KindInstanceMutant, Mutant: m}
+}
+
+// OnInstance sends OnInstance to each observer in obs.
+func OnInstance(m InstanceMessage, obs ...InstanceObserver) {
 	for _, o := range obs {
-		o.OnInstanceClose()
+		o.OnInstance(m)
 	}
 }
 
+// CycleMessage is the type of observer messages pertaining to the control flow of a specific cycle.
 type CycleMessage struct {
 	// Cycle names the cycle on which this message is occurring.
 	Cycle Cycle

@@ -64,6 +64,11 @@ func (d *Dash) OnCycle(m director.CycleMessage) {
 	d.onInstance(m.Cycle.Instance, func(i *Instance) { i.OnCycle(m) })
 }
 
+// OnCycleInstance forwards the instance message m to the instance mentioned in c.
+func (d *Dash) OnCycleInstance(c director.Cycle, m director.InstanceMessage) {
+	d.onInstance(c.Instance, func(i *Instance) { i.OnInstance(m) })
+}
+
 // OnCycleAnalysis forwards the analysis m to the relevant instance.
 func (d *Dash) OnCycleAnalysis(m director.CycleAnalysis) {
 	d.onInstance(m.Cycle.Instance, func(i *Instance) { i.OnAnalysis(m.Analysis) })

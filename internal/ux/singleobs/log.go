@@ -139,8 +139,15 @@ func (l *Logger) OnMachineNodeAction(m observer.Message) {
 // OnCycle does nothing, for now.
 func (l *Logger) OnCycle(director.CycleMessage) {}
 
-// OnInstanceClose does nothing.
-func (l *Logger) OnInstanceClose() {}
+// OnInstance logs instance messages.
+func (l *Logger) OnInstance(m director.InstanceMessage) {
+	switch m.Kind {
+	case director.KindInstanceClosed:
+		(*log.Logger)(l).Println("[instance closed]")
+	case director.KindInstanceMutant:
+		(*log.Logger)(l).Println("instance selecting mutant", m.Mutant)
+	}
+}
 
 // OnAnalysis does nothing, for now.
 func (l *Logger) OnAnalysis(analysis.Analysis) {}
