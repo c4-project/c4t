@@ -104,7 +104,7 @@ func (p *Plan) CompilerIDs() ([]id.ID, error) {
 
 // IsMutationTest gets whether this plan is defining a mutation test.
 //
-// This is shorthand for checking if the plan has an active mutation configuration.
+// This is shorthand for checking if the plan has an enabled mutation configuration.
 func (p *Plan) IsMutationTest() bool {
-	return p.Mutation != nil && p.Mutation.IsActive()
+	return p.Mutation != nil && p.Mutation.Enabled
 }

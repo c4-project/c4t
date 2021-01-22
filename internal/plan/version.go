@@ -11,10 +11,11 @@ type Version uint32
 // CurrentVer is the current plan version.
 // It changes when the interface between various bits of the tester (generally manifested within the plan version)
 // changes.
-const CurrentVer Version = 2021_01_21
+const CurrentVer Version = 2021_01_22
 
 // Version history since 2020_05_29:
 //
+// 2021_02_22: Changes to 'mutation' key; auto-incrementing config is now in an 'auto' subkey.
 // 2021_02_21: Added 'mutation' key to plan, containing information about mutation testing.
 // 2021_01_20: Service run info now contains an 'env' key mapping environment variable names to values.  If 'env' is
 //             not provided, the parent process's environment is used.  On compilers only, we now have shell-style

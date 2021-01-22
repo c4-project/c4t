@@ -5,6 +5,10 @@
 
 package mutation
 
+import (
+	"github.com/c4-project/c4t/internal/quantity"
+)
+
 // Config configures a particular mutation testing campaign.
 //
 // This currently just tracks ranges of mutation numbers, but may be generalised if we branch to supporting more than
@@ -15,20 +19,38 @@ type Config struct {
 	// Setting this to false is equivalent to setting Ranges to empty.
 	Enabled bool `json:"enabled,omitempty" toml:"enabled,omitempty"`
 
-	// Ranges contains the list of mutation number ranges that the campaign should use.
-	Ranges []Range `json:"ranges,omitempty" toml:"ranges,omitempty"`
-
 	// Selection contains any selected mutation.
 	//
-	// This can theoretically be set in the tester's config file, but will get overridden by
+	// This can be set in the tester's config file, in addition to or instead of Ranges, but will be overridden by
+	// any automatic mutant selection.
 	Selection Mutant `json:"selection,omitempty" toml:"selection,omitempty"`
+
+	// Auto gathers configuration about how to automate mutation selection.
+	Auto AutoConfig `json:"auto,omitempty" toml:"auto,omitempty"`
 }
 
-// IsActive gets whether this Config is enabled and has a functional set of ranges, without evaluating the mutant set.
-func (c Config) IsActive() bool {
-	if !c.Enabled {
-		return false
-	}
+// AutoConfig specifies configuration pertaining to automatically selecting mutants.
+//
+// The mutation tester can be used with a manual selection, but is probably not very exciting.
+type AutoConfig struct {
+	// Ranges contains the list of mutation number ranges that the campaign should use for automatic mutant selection.
+	Ranges []Range `json:"ranges,omitempty" toml:"ranges,omitempty"`
+
+	// ChangeMutantAfter is the (minimum) duration that each mutant gets before being automatically incremented.
+	// If 0, this sort of auto-increment
+	ChangeAfter quantity.Timeout `json:"change_after,omitempty" toml:"change_after,omitempty"`
+
+	// ChangeKilled specifies whether mutants should be automatically incremented after being killed.
+	ChangeKilled bool `json:"change_killed" toml:"change_killed"`
+}
+
+// IsActive gets whether automatic selection is enabled.
+func (c AutoConfig) IsActive() bool {
+	return c.HasRanges() && (c.HasChangeAfter() || c.ChangeKilled)
+}
+
+// HasRanges gets whether at least one viable range exists, without expanding the ranges themselves.
+func (c AutoConfig) HasRanges() bool {
 	for _, r := range c.Ranges {
 		if !r.IsEmpty() {
 			return true
@@ -37,16 +59,17 @@ func (c Config) IsActive() bool {
 	return false
 }
 
+// HasChangeAfter gets whether ChangeAfter is set to something other than zero.
+func (c AutoConfig) HasChangeAfter() bool {
+	return c.ChangeAfter.IsActive()
+}
+
 // Mutants returns a list of all mutant numbers to consider in this testing campaign.
 //
 // Mutants appear in the order defined, without deduplication.
 // If Enabled is false, Mutants will be empty.
-func (c Config) Mutants() []Mutant {
+func (c AutoConfig) Mutants() []Mutant {
 	var m []Mutant
-
-	if !c.Enabled {
-		return m
-	}
 
 	for _, r := range c.Ranges {
 		m = append(m, r.Mutants()...)

@@ -8,16 +8,18 @@ package mutation_test
 import (
 	"fmt"
 	"testing"
+	"time"
+
+	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/c4-project/c4t/internal/mutation"
 )
 
-// ExampleConfig_Mutants is a runnable example for Config.Mutants.
-func ExampleConfig_Mutants() {
-	cfg := mutation.Config{
-		Enabled: true,
+// ExampleAutoConfig_Mutants is a runnable example for Config.Mutants.
+func ExampleAutoConfig_Mutants() {
+	cfg := mutation.AutoConfig{
 		Ranges: []mutation.Range{
 			{Start: 1, End: 4},
 			{Start: 10, End: 11},
@@ -31,34 +33,33 @@ func ExampleConfig_Mutants() {
 	}
 	fmt.Println()
 
-	// Disabling mutation is equivalent to removing all ranges.
-	cfg.Enabled = false
-	fmt.Println("no mutants when empty:", len(cfg.Mutants()) == 0)
-
 	// Output:
 	// mutants: 1 2 3 10 27 28 29 30
-	// no mutants when empty: true
 }
 
-// ExampleConfig_IsActive is a runnable example for Config.IsActive.
-func ExampleConfig_IsActive() {
-	cfg := mutation.Config{
-		Enabled: false,
-		Ranges:  []mutation.Range{{Start: 1, End: 4}},
+// ExampleAutoConfig_IsActive is a runnable example for Config.IsActive.
+func ExampleAutoConfig_IsActive() {
+	cfg := mutation.AutoConfig{
+		Ranges: []mutation.Range{{Start: 1, End: 4}},
 	}
 
 	fmt.Println("disabled with ranges:", cfg.IsActive())
 
-	cfg.Enabled = true
-	fmt.Println("enabled with ranges:", cfg.IsActive())
+	cfg.ChangeKilled = true
+	fmt.Println("after-killed with ranges:", cfg.IsActive())
+
+	cfg.ChangeKilled = false
+	cfg.ChangeAfter = quantity.Timeout(1 * time.Minute)
+	fmt.Println("after-time with ranges:", cfg.IsActive())
 
 	cfg.Ranges[0].Start = 4
-	fmt.Println("enabled with bad ranges:", cfg.IsActive())
+	fmt.Println("after-time with bad ranges:", cfg.IsActive())
 
 	// Output:
 	// disabled with ranges: false
-	// enabled with ranges: true
-	// enabled with bad ranges: false
+	// after-killed with ranges: true
+	// after-time with ranges: true
+	// after-time with bad ranges: false
 }
 
 // ExampleRange_Mutants is a runnable example for Range.
