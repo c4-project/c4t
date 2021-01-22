@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 
 	"github.com/c4-project/c4t/internal/plan/analysis"
@@ -51,9 +53,6 @@ import (
 	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
-// The maximum permitted number of times a loop can error out consecutively before the tester fails.
-const maxConsecutiveErrors = 10
-
 // Instance contains the state necessary to run a single loop of a director.
 type Instance struct {
 	// Index is the index of the instance in the director.
@@ -69,13 +68,24 @@ type Instance struct {
 	// Filters contains the precompiled filter set for this instance.
 	Filters analysis.FilterSet
 
+	// CycleHooks contains a number of callbacks that are executed before beginning a cycle.
+	CycleHooks []func(*Instance) error
+
 	// TODO(@MattWindsor91): this configuration should ideally be per-machine, and then should be moved to Machine.
 
 	// FuzzerConfig contains the fuzzer config for this instance.
 	FuzzerConfig *fuzzer2.Configuration
 
-	// stageConfig is the configuration for this instance's stages.
-	stageConfig *StageConfig
+	// Mutant is the current mutant that is in use on this instance, if any.
+	mutant mutation.Mutant
+
+	// timeoutCh stores the current error cooldown channel, if any.
+	// This is refreshed whenever an error occurs.
+	timeoutCh <-chan time.Time
+
+	// cycleCh stores the current cycle result channel, if any.
+	// This is refreshed whenever a new cycle is launched.
+	cycleCh <-chan cycleResult
 }
 
 // Machine contains the state for a particular machine attached to an instance.
@@ -94,6 +104,13 @@ type Machine struct {
 
 	// Config contains the machine config for this machine.
 	Config machine.Config
+
+	// cycle is the number of the current cycle for the machine.
+	// This is held separately from the instance as an instance may (eventually) run cycles for multiple machines.
+	cycle uint64
+
+	// stageConfig is the configuration for this instance's stages.
+	stageConfig *StageConfig
 }
 
 // Run runs this instance's testing loop.
@@ -107,10 +124,10 @@ func (i *Instance) Run(ctx context.Context) error {
 	}
 
 	var err error
-	if i.stageConfig, err = i.makeStageConfig(); err != nil {
+	if i.Machine.stageConfig, err = i.makeStageConfig(); err != nil {
 		return err
 	}
-	if err := i.stageConfig.Check(); err != nil {
+	if err := i.Machine.stageConfig.Check(); err != nil {
 		return err
 	}
 
@@ -124,8 +141,15 @@ func (i *Instance) Run(ctx context.Context) error {
 
 // cleanUp closes things that should be gracefully closed after an instance terminates.
 func (i *Instance) cleanUp() error {
-	if i.stageConfig != nil && i.stageConfig.Invoke != nil {
-		return i.stageConfig.Invoke.Close()
+	if i.Machine == nil {
+		return nil
+	}
+	return i.Machine.cleanUp()
+}
+
+func (m *Machine) cleanUp() error {
+	if m.stageConfig != nil && m.stageConfig.Invoke != nil {
+		return m.stageConfig.Invoke.Close()
 	}
 	return nil
 }
@@ -151,54 +175,98 @@ func (m *Machine) check() error {
 	return nil
 }
 
+type cycleResult struct {
+	cycle Cycle
+	err   error
+}
+
 // mainLoop performs the main testing loop for one machine.
 func (i *Instance) mainLoop(ctx context.Context) error {
-	var (
-		nCycle  uint64
-		nErrors uint
-	)
+	i.launch(ctx)
 	for {
-		if err := i.iterate(ctx, nCycle); err != nil {
-			// This serves to stop the tester if we get stuck in a rapid failure loop on a particular machine.
-			// TODO(@MattWindsor91): ideally this should be timing the gap between errors, so that we stop if there
-			// are too many errors happening too quickly.
-			nErrors++
-			if maxConsecutiveErrors < nErrors {
-				return fmt.Errorf("too many consecutive errors; last error was: %w", err)
-			}
-		} else {
-			nErrors = 0
+		select {
+		case <-ctx.Done():
+			i.drainCycleCh()
+			return ctx.Err()
+		case res := <-i.cycleCh:
+			i.handleCycleEnd(ctx, res)
+		case <-i.timeoutCh:
+			i.launch(ctx)
 		}
-		if err := ctx.Err(); err != nil {
-			return err
-		}
-		nCycle++
 	}
 }
 
-// iterate performs one iteration of the main testing loop (number ncycle) for one machine.
-func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
-	// Important to _copy_ the plan
-	pcopy := i.Machine.InitialPlan
+func (i *Instance) handleCycleEnd(ctx context.Context, res cycleResult) {
+	i.cycleCh = nil
+	if res.err != nil {
+		i.handleError(res.err, res)
+		return
+	}
+	// Don't clean up scratch after a failing iteration; we might need the information in the scratch
+	if err := i.cleanUpCycle(); err != nil {
+		i.handleError(err, res)
+		return
+	}
+	// Only re-launch if we actually managed to complete the cycle without any errors; otherwise, wait on i.timeoutCh
+	i.launch(ctx)
+}
 
-	c := cycleInstance{
+func (i *Instance) drainCycleCh() {
+	if i.cycleCh == nil {
+		return
+	}
+	for range i.cycleCh {
+	}
+}
+
+func (i *Instance) handleError(err error, res cycleResult) {
+	OnCycle(CycleErrorMessage(res.cycle, err), i.Observers...)
+	i.timeoutCh = time.After(5 * time.Second)
+	// TODO(@MattWindsor91): exponential backoff timeout
+}
+
+// launch launches one iteration of the main testing loop for one machine.
+func (i *Instance) launch(ctx context.Context) {
+	i.timeoutCh = nil
+
+	c := i.makeCycleInstance()
+	OnCycle(CycleStartMessage(c.cycle), i.Observers...)
+
+	i.Machine.cycle++
+
+	ch := make(chan cycleResult)
+	go func() {
+		err := c.run(ctx)
+		select {
+		case <-ctx.Done():
+		case ch <- cycleResult{cycle: c.cycle, err: err}:
+		}
+		close(ch)
+	}()
+
+	i.cycleCh = ch
+}
+
+func (i *Instance) makeCycleInstance() cycleInstance {
+	return cycleInstance{
 		cycle: Cycle{
 			Instance:  i.Index,
 			MachineID: i.Machine.ID,
-			Iter:      nCycle,
+			Iter:      i.Machine.cycle,
 			Start:     time.Now(),
 		},
-		p:  &pcopy,
-		sc: i.stageConfig,
+		p:  i.plan(),
+		sc: i.Machine.stageConfig,
 	}
-	OnCycle(CycleStartMessage(c.cycle), i.Observers...)
-	if err := c.run(ctx); err != nil {
-		OnCycle(CycleErrorMessage(c.cycle, err), i.Observers...)
-		return err
+}
+
+func (i *Instance) plan() *plan.Plan {
+	// Important to _copy_ the plan
+	pcopy := i.Machine.InitialPlan
+	if pcopy.IsMutationTest() {
+		pcopy.Mutation.Selection = i.mutant
 	}
-	// Don't clean up scratch after a failing iteration;
-	// we might need the information in the scratch
-	return i.cleanUpCycle()
+	return &pcopy
 }
 
 func (i *Instance) makeStageConfig() (*StageConfig, error) {
