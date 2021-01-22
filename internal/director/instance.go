@@ -7,6 +7,7 @@ package director
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -57,35 +58,42 @@ const maxConsecutiveErrors = 10
 type Instance struct {
 	// Index is the index of the instance in the director.
 	Index int
-
-	// MachConfig contains the machine config for this machine.
-	MachConfig machine.Config
+	// Env contains the parts of the director's config that tell it how to do various environmental tasks.
+	Env Env
+	// Machine is the machine installed into the instance.
+	Machine *Machine
+	// Observers is this machine's observer set.
+	Observers []InstanceObserver
 	// SSHConfig contains top-level SSH configuration.
 	SSHConfig *remote.Config
-	// FuzzerConfig contains the fuzzer config for this machine.
+	// Filters contains the precompiled filter set for this instance.
+	Filters analysis.FilterSet
+
+	// TODO(@MattWindsor91): this configuration should ideally be per-machine, and then should be moved to Machine.
+
+	// FuzzerConfig contains the fuzzer config for this instance.
 	FuzzerConfig *fuzzer2.Configuration
+
 	// stageConfig is the configuration for this instance's stages.
 	stageConfig *StageConfig
+}
 
+// Machine contains the state for a particular machine attached to an instance.
+type Machine struct {
 	// ID is the ID for this machine.
 	ID id.ID
 
 	// InitialPlan is the plan that is perturbed to form the plan for each test cycle.
 	InitialPlan plan.Plan
 
-	// Env contains the parts of the director's config that tell it how to do various environmental tasks.
-	Env Env
-
-	// Observers is this machine's observer set.
-	Observers []InstanceObserver
-
 	// Pathset contains the pathset for this instance.
 	Pathset *pathset.Instance
 
 	// Quantities contains the quantity set for this machine.
 	Quantities quantity.MachineSet
-	// Filters contains the precompiled filter set for this machine.
-	Filters analysis.FilterSet
+
+	// Config contains the machine config for this machine.
+	Config machine.Config
 }
 
 // Run runs this instance's testing loop.
@@ -94,7 +102,7 @@ func (i *Instance) Run(ctx context.Context) error {
 		return err
 	}
 
-	if err := i.Pathset.Scratch.Prepare(); err != nil {
+	if err := i.Machine.Pathset.Scratch.Prepare(); err != nil {
 		return err
 	}
 
@@ -122,15 +130,25 @@ func (i *Instance) cleanUp() error {
 	return nil
 }
 
-// check makes sure this machine has a valid configuration before starting loops.
+// check makes sure this instance has a valid configuration before starting loops.
 func (i *Instance) check() error {
-	if i.Pathset == nil {
-		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, i.ID.String())
+	if i.Machine == nil {
+		return errors.New("machine nil")
+	}
+	if err := i.Machine.check(); err != nil {
+		return err
 	}
 
 	// TODO(@MattWindsor): check SSHConfig?
 
 	return i.Env.Check()
+}
+
+func (m *Machine) check() error {
+	if m.Pathset == nil {
+		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, m.ID.String())
+	}
+	return nil
 }
 
 // mainLoop performs the main testing loop for one machine.
@@ -161,12 +179,12 @@ func (i *Instance) mainLoop(ctx context.Context) error {
 // iterate performs one iteration of the main testing loop (number ncycle) for one machine.
 func (i *Instance) iterate(ctx context.Context, nCycle uint64) error {
 	// Important to _copy_ the plan
-	pcopy := i.InitialPlan
+	pcopy := i.Machine.InitialPlan
 
 	c := cycleInstance{
 		cycle: Cycle{
 			Instance:  i.Index,
-			MachineID: i.ID,
+			MachineID: i.Machine.ID,
 			Iter:      nCycle,
 			Start:     time.Now(),
 		},
@@ -218,7 +236,7 @@ func (i *Instance) makeAnalyser(aobs []analyser.Observer, sobs []saver.Observer)
 			analysis.WithWorkerCount(10), // TODO(@MattWindsor91): get this from somewhere
 			analysis.WithFilters(i.Filters),
 		),
-		analyser.SaveToPathset(&i.Pathset.Saved),
+		analyser.SaveToPathset(&i.Machine.Pathset.Saved),
 	)
 }
 
@@ -226,7 +244,7 @@ func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber
 	return perturber.New(
 		i.Env.CInspector,
 		perturber.ObserveWith(obs...),
-		perturber.OverrideQuantities(i.Quantities.Perturb),
+		perturber.OverrideQuantities(i.Machine.Quantities.Perturb),
 		perturber.UseFullCompilerIDs(true),
 	)
 }
@@ -234,20 +252,17 @@ func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber
 func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {
 	return fuzzer.New(
 		i.Env.Fuzzer,
-		fuzzer.NewPathset(i.Pathset.Scratch.DirFuzz),
+		fuzzer.NewPathset(i.Machine.Pathset.Scratch.DirFuzz),
 		fuzzer.ObserveWith(obs...),
-		// TODO(@MattWindsor91): why does the fuzzer still take a logger?
-		//fuzzer.LogWith(i.Logger),
-		fuzzer.OverrideQuantities(i.Quantities.Fuzz),
+		fuzzer.OverrideQuantities(i.Machine.Quantities.Fuzz),
+		fuzzer.UseConfig(i.FuzzerConfig),
 	)
 }
 
 func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 	return lifter.New(
 		i.Env.BResolver,
-		lifter.NewPathset(i.Pathset.Scratch.DirLift),
-		// TODO(@MattWindsor91): why does the lifter still take a logger?
-		//lifter.LogTo(i.Logger),
+		lifter.NewPathset(i.Machine.Pathset.Scratch.DirLift),
 		lifter.ObserveWith(obs...),
 	)
 }
@@ -255,20 +270,20 @@ func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
 func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer) (*invoker.Invoker, error) {
 	// Unlike the single-shot, we don't late-bind the factory using the plan.  This is because we've already
 	// got the machine configuration without it.
-	f, err := runner.FactoryFromRemoteConfig(i.SSHConfig, i.MachConfig.SSH)
+	f, err := runner.FactoryFromRemoteConfig(i.SSHConfig, i.Machine.Config.SSH)
 	if err != nil {
 		return nil, err
 	}
-	return invoker.New(i.Pathset.Scratch.DirRun,
+	return invoker.New(i.Machine.Pathset.Scratch.DirRun,
 		f,
 		invoker.ObserveCopiesWith(cobs...),
 		invoker.ObserveMachWith(mobs...),
 		// As above, there is no loading of quantities using the plan, as we already know which machine the plan is
 		// targeting without consulting the plan.
-		invoker.OverrideBaseQuantities(i.Quantities.Mach),
+		invoker.OverrideBaseQuantities(i.Machine.Quantities.Mach),
 	)
 }
 
 func (i *Instance) cleanUpCycle() error {
-	return iohelp.Rmdirs(i.Pathset.Scratch.Dirs()...)
+	return iohelp.Rmdirs(i.Machine.Pathset.Scratch.Dirs()...)
 }

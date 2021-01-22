@@ -114,15 +114,18 @@ func (d *Director) initInstance(i int, midstr string, c machine.Config) error {
 	if err != nil {
 		return err
 	}
+	m := Machine{
+		ID:         mid,
+		Config:     c,
+		Pathset:    d.paths.Instance(mid),
+		Quantities: d.machineQuantities(&c),
+	}
 	d.instances[i] = Instance{
 		Index:        i,
-		MachConfig:   c,
 		SSHConfig:    d.ssh,
 		Env:          d.env,
-		ID:           mid,
 		Observers:    obs,
-		Pathset:      d.paths.Instance(mid),
-		Quantities:   d.machineQuantities(&c),
+		Machine:      &m,
 		Filters:      d.filters,
 		FuzzerConfig: d.fcfg,
 	}
@@ -188,7 +191,7 @@ func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) err
 	eg, ectx := errgroup.WithContext(ctx)
 	for _, m := range d.instances {
 		m := m
-		m.InitialPlan = plans[m.ID.String()]
+		m.Machine.InitialPlan = plans[m.Machine.ID.String()]
 		eg.Go(func() error { return m.Run(ectx) })
 	}
 	return eg.Wait()
