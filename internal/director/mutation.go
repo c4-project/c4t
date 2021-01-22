@@ -49,6 +49,7 @@ func (k killObserver) OnCycle(CycleMessage) {
 
 // OnInstanceClose does nothing.
 func (k killObserver) OnInstanceClose() {
+	close(k)
 }
 
 func (k killObserver) OnAnalysis(a analysis.Analysis) {
