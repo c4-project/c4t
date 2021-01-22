@@ -41,7 +41,7 @@ type Driver interface {
 type Interpreter struct {
 	driver Driver
 	// compiler is the compiler configuration.
-	compiler *compiler.Configuration
+	compiler *compiler.Instance
 	// ofile is the output filepath.
 	ofile string
 	// recipe is the recipe to interpret.

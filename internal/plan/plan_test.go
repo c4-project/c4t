@@ -28,7 +28,7 @@ import (
 
 // ExamplePlan_CompilerIDs is a runnable example for Plan.CompilerIDs.
 func ExamplePlan_CompilerIDs() {
-	p := plan.Plan{Compilers: map[string]compiler.Configuration{
+	p := plan.Plan{Compilers: map[string]compiler.Instance{
 		"gcc.ppc":   {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
 		"clang.ppc": {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
 		"gcc":       {Compiler: compiler.Compiler{Arch: id.ArchArm}},
@@ -55,14 +55,14 @@ func TestPlan_Arches(t *testing.T) {
 		want []id.ID
 	}{
 		"no arches": {plan.Plan{}, []id.ID{}},
-		"one compiler": {plan.Plan{Compilers: map[string]compiler.Configuration{
+		"one compiler": {plan.Plan{Compilers: map[string]compiler.Instance{
 			"gcc": {Compiler: compiler.Compiler{Arch: id.ArchX8664}},
 		}}, []id.ID{id.ArchX8664}},
-		"same arch": {plan.Plan{Compilers: map[string]compiler.Configuration{
+		"same arch": {plan.Plan{Compilers: map[string]compiler.Instance{
 			"gcc":   {Compiler: compiler.Compiler{Arch: id.ArchArm}},
 			"clang": {Compiler: compiler.Compiler{Arch: id.ArchArm}},
 		}}, []id.ID{id.ArchArm}},
-		"two arches": {plan.Plan{Compilers: map[string]compiler.Configuration{
+		"two arches": {plan.Plan{Compilers: map[string]compiler.Instance{
 			"gcc-ppc":   {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
 			"clang-ppc": {Compiler: compiler.Compiler{Arch: id.ArchPPC}},
 			"gcc":       {Compiler: compiler.Compiler{Arch: id.ArchArm}},

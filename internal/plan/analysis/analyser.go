@@ -123,7 +123,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (a *analyser) initCompilers(cs map[string]compiler.Configuration) error {
+func (a *analyser) initCompilers(cs map[string]compiler.Instance) error {
 	for cn, c := range cs {
 		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Logs: map[string]string{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}

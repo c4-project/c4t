@@ -57,7 +57,7 @@ func TestFilterSet_FilteredStatus(t *testing.T) {
 	require.NoError(t, err, "loading filter set should not error")
 
 	cases := map[string]struct {
-		inComp     compiler.Configuration
+		inComp     compiler.Instance
 		inLog      string
 		inStatus   status.Status
 		fsOverride analysis.FilterSet

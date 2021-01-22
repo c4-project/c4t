@@ -27,7 +27,7 @@ import (
 func ExampleGCC_RunCompiler() {
 	g := gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc"}}
 	j := compiler.Job{
-		Compiler: &compiler.Configuration{
+		Compiler: &compiler.Instance{
 			SelectedMOpt: "arch=skylake",
 			SelectedOpt: &optlevel.Named{
 				Name:  "3",
@@ -69,7 +69,7 @@ func ExampleArgs_opt() {
 	args := gcc.Args(
 		*compiler.NewJob(
 			compiler.Exe,
-			&compiler.Configuration{SelectedOpt: &optlevel.Named{Name: "size"}},
+			&compiler.Instance{SelectedOpt: &optlevel.Named{Name: "size"}},
 			"a.out",
 			"foo.c", "bar.c",
 		),
@@ -115,7 +115,7 @@ func TestArgs(t *testing.T) {
 		"with-mopt": {
 			job: *compiler.NewJob(
 				compiler.Exe,
-				&compiler.Configuration{
+				&compiler.Instance{
 					SelectedMOpt: "arch=nehalem",
 				},
 				"a.out",
@@ -127,7 +127,7 @@ func TestArgs(t *testing.T) {
 		"with-opt": {
 			job: *compiler.NewJob(
 				compiler.Exe,
-				&compiler.Configuration{
+				&compiler.Instance{
 					SelectedOpt: &optlevel.Named{
 						Name: "3",
 						Level: optlevel.Level{
@@ -146,7 +146,7 @@ func TestArgs(t *testing.T) {
 		"do-not-override-run": {
 			job: *compiler.NewJob(
 				compiler.Exe,
-				&compiler.Configuration{
+				&compiler.Instance{
 					Compiler: compiler.Compiler{
 						Run: service.NewRunInfo("gcc8", "-pthread"),
 					},

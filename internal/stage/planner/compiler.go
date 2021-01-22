@@ -34,7 +34,7 @@ type CompilerPlanner struct {
 	MachineID id.ID
 }
 
-func (p *Planner) planCompilers(ctx context.Context, nid id.ID) (map[string]compiler.Configuration, error) {
+func (p *Planner) planCompilers(ctx context.Context, nid id.ID) (map[string]compiler.Instance, error) {
 	c := CompilerPlanner{
 		Filter:    id.FromString(p.filter),
 		Lister:    p.source.CLister,
@@ -45,7 +45,7 @@ func (p *Planner) planCompilers(ctx context.Context, nid id.ID) (map[string]comp
 }
 
 // Plan constructs the compiler set for a plan.
-func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Configuration, error) {
+func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Instance, error) {
 	cfgs, err := c.Lister.ListCompilers(ctx, c.MachineID)
 	if err != nil {
 		return nil, fmt.Errorf("listing compilers: %w", err)
@@ -58,7 +58,7 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Configu
 	nenabled := resolveDisabled(cfgs)
 	compiler.OnCompilerConfigStart(nenabled, c.Observers...)
 
-	cmps := make(map[string]compiler.Configuration, len(cfgs))
+	cmps := make(map[string]compiler.Instance, len(cfgs))
 	i := 0
 	for n, cfg := range cfgs {
 		nc, err := c.maybePlanCompiler(cmps, n, cfg)
@@ -97,7 +97,7 @@ func resolveDisabled(cfgs map[string]compiler.Compiler) (nenabled int) {
 	return nenabled
 }
 
-func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Configuration, n string, cfg compiler.Compiler) (*compiler.Named, error) {
+func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Instance, n string, cfg compiler.Compiler) (*compiler.Named, error) {
 	if cfg.Disabled {
 		return nil, nil
 	}
@@ -108,6 +108,6 @@ func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Configurati
 	}
 
 	// Everything that used to be here is now in the perturber.
-	into[n] = compiler.Configuration{Compiler: cfg}
+	into[n] = compiler.Instance{Compiler: cfg}
 	return into[n].AddName(nid), nil
 }

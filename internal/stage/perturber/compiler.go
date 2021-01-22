@@ -46,10 +46,10 @@ func (p *Perturber) perturbCompilers(rng *rand.Rand, pn *plan.Plan) error {
 }
 
 // Perturb perturbs the compiler set for a plan.
-func (c *compilerPerturber) Perturb(cfgs map[string]compiler.Configuration) (map[string]compiler.Configuration, error) {
+func (c *compilerPerturber) Perturb(cfgs map[string]compiler.Instance) (map[string]compiler.Instance, error) {
 	compiler.OnCompilerConfigStart(len(cfgs), c.observers...)
 
-	ncfgs := make(map[string]compiler.Configuration, len(cfgs))
+	ncfgs := make(map[string]compiler.Instance, len(cfgs))
 	i := 0
 	for n, cfg := range cfgs {
 		nc, err := c.perturbCompiler(n, cfg.Compiler)
@@ -60,7 +60,7 @@ func (c *compilerPerturber) Perturb(cfgs map[string]compiler.Configuration) (map
 		if err != nil {
 			return nil, err
 		}
-		ncfgs[nid.String()] = nc.Configuration
+		ncfgs[nid.String()] = nc.Instance
 		compiler.OnCompilerConfigStep(i, *nc, c.observers...)
 		i++
 	}
@@ -92,7 +92,7 @@ func (c *compilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) 
 	if err != nil {
 		return nil, err
 	}
-	comp := compiler.Configuration{
+	comp := compiler.Instance{
 		ConfigTime:   time.Now(),
 		SelectedOpt:  opt,
 		SelectedMOpt: mopt,

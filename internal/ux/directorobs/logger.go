@@ -152,6 +152,6 @@ func (j *Logger) OnCycleSave(c director.Cycle, s saver.ArchiveMessage) {
 func (j *Logger) logCompilers(c director.Cycle, cs []compiler.Named) {
 	j.l.Printf("%s compilers %d:\n", c, len(cs))
 	for _, c := range cs {
-		j.l.Printf("- %s: %s\n", c.ID, c.Configuration)
+		j.l.Printf("- %s: %s\n", c.ID, c.Instance)
 	}
 }

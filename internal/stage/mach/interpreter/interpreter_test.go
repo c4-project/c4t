@@ -46,7 +46,7 @@ func TestInterpreter_Interpret(t *testing.T) {
 	)
 	require.NoError(t, err, "error while making recipe")
 
-	c := mdl.Configuration{}
+	c := mdl.Instance{}
 	it, err := interpreter.New("a.out", r, mr, interpreter.CompileWith(mc, &c))
 	require.NoError(t, err, "error while making interpreter")
 
@@ -87,7 +87,7 @@ func TestInterpreter_Interpret_compileError(t *testing.T) {
 	)
 	require.NoError(t, err, "error while making recipe")
 
-	c := mdl.Configuration{}
+	c := mdl.Instance{}
 	it, err := interpreter.New("a.out", r, mr, interpreter.CompileWith(mc, &c))
 	require.NoError(t, err, "error while making interpreter")
 
@@ -145,7 +145,7 @@ func TestInterpreter_Interpret_badInstruction(t *testing.T) {
 			)
 			require.NoError(t, err, "error while making recipe")
 
-			cmp := mdl.Configuration{}
+			cmp := mdl.Instance{}
 			it, err := interpreter.New("a.out", r, mr, interpreter.CompileWith(mc, &cmp))
 			require.NoError(t, err, "error while making interpreter")
 
@@ -176,7 +176,7 @@ func TestInterpreter_Interpret_tooManyObjs(t *testing.T) {
 		recipe.CompileFileToObj(path.Join("in", "harness.c")),
 	)
 	require.NoError(t, err, "error while making recipe")
-	c := mdl.Configuration{}
+	c := mdl.Instance{}
 	mc.On("RunCompiler",
 		mock.Anything,
 		*mdl.NewJob(mdl.Obj, &c, path.Join("in", "obj_0.o"), path.Join("in", "body.c")),

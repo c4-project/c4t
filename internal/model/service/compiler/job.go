@@ -6,20 +6,13 @@
 package compiler
 
 import (
-	"strconv"
-
 	"github.com/c4-project/c4t/internal/model/service"
-)
-
-const (
-	// varConfigTime is the interpolation variable for config time (UNIX timestamp).
-	varConfigTime = "config_time"
 )
 
 // Job represents a request to compile a list of files to a particular target given a particular compiler.
 type Job struct {
 	// Compiler describes the compiler to use for the compilation.
-	Compiler *Configuration
+	Compiler *Instance
 
 	// In is the list of files to be sent to the compiler.
 	In []string
@@ -31,7 +24,7 @@ type Job struct {
 }
 
 // NewJob is a convenience constructor for compiles.
-func NewJob(k Target, c *Configuration, out string, in ...string) *Job {
+func NewJob(k Target, c *Instance, out string, in ...string) *Job {
 	return &Job{
 		Kind:     k,
 		Compiler: c,
@@ -48,19 +41,9 @@ func (j *Job) CompilerRun() *service.RunInfo {
 	// TODO(@MattWindsor91): handle this properly
 	r := j.Compiler.Run
 	if r != nil {
-		_ = r.Interpolate(j.interpolations())
+		_ = r.Interpolate(j.Compiler.Interpolations())
 	}
 	return r
-}
-
-func (j *Job) interpolations() map[string]string {
-	return map[string]string{
-		varConfigTime: j.unixTimeString(),
-	}
-}
-
-func (j *Job) unixTimeString() string {
-	return strconv.FormatInt(j.Compiler.ConfigTime.Unix(), 10)
 }
 
 // SelectedOptName gets the name of this job's compiler's selected optimisation level, if present; else, "".

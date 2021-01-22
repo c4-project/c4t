@@ -58,7 +58,7 @@ func TestCompiler_Run(t *testing.T) {
 		c[n] = cn
 	}
 
-	cmp := mdl.Configuration{
+	cmp := mdl.Instance{
 		SelectedMOpt: "arch=skylake",
 		SelectedOpt: &optlevel.Named{
 			Name: "3",
@@ -86,7 +86,7 @@ func TestCompiler_Run(t *testing.T) {
 				Cores: 4,
 			},
 		},
-		Compilers: map[string]mdl.Configuration{
+		Compilers: map[string]mdl.Instance{
 			"gcc": cmp,
 		},
 		Corpus: c,

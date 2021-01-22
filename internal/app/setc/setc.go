@@ -131,7 +131,7 @@ func (c *CompilerSetter) Run(_ context.Context, p *plan.Plan) (*plan.Plan, error
 	return p, nil
 }
 
-func (c *CompilerSetter) set(cnf *compiler.Configuration) error {
+func (c *CompilerSetter) set(cnf *compiler.Instance) error {
 	// TODO(@MattWindsor91): allow overriding this.
 	cnf.ConfigTime = time.Now()
 
@@ -143,7 +143,7 @@ func (c *CompilerSetter) set(cnf *compiler.Configuration) error {
 
 // TODO(@MattWindsor91): move some of this to optlevel?
 
-func (c *CompilerSetter) setOpt(cnf *compiler.Configuration) error {
+func (c *CompilerSetter) setOpt(cnf *compiler.Instance) error {
 	if ystring.IsBlank(c.opt) {
 		cnf.SelectedOpt = nil
 		return nil
@@ -161,7 +161,7 @@ func (c *CompilerSetter) setOpt(cnf *compiler.Configuration) error {
 	return nil
 }
 
-func (c *CompilerSetter) setMOpt(cnf *compiler.Configuration) error {
+func (c *CompilerSetter) setMOpt(cnf *compiler.Instance) error {
 	if ystring.IsBlank(c.mopt) {
 		cnf.SelectedMOpt = ""
 		return nil
@@ -181,14 +181,14 @@ func (c *CompilerSetter) setMOpt(cnf *compiler.Configuration) error {
 
 // TODO(@MattWindsor91): move all of these onto a 'config map' type.
 
-func getCompiler(m map[string]compiler.Configuration, id id.ID) (compiler.Configuration, error) {
+func getCompiler(m map[string]compiler.Instance, id id.ID) (compiler.Instance, error) {
 	cmp, ok := m[id.String()]
 	if !ok {
-		return compiler.Configuration{}, fmt.Errorf("%w: %s", ErrCompilerMissing, id)
+		return compiler.Instance{}, fmt.Errorf("%w: %s", ErrCompilerMissing, id)
 	}
 	return cmp, nil
 }
 
-func setCompiler(m map[string]compiler.Configuration, id id.ID, c compiler.Configuration) {
+func setCompiler(m map[string]compiler.Instance, id id.ID, c compiler.Instance) {
 	m[id.String()] = c
 }

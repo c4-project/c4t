@@ -30,13 +30,13 @@ func TestCompile_CompilerRun(t *testing.T) {
 		},
 		"no-runinfo": {
 			in: compiler.Job{
-				Compiler: &compiler.Configuration{},
+				Compiler: &compiler.Instance{},
 			},
 			isNil: true,
 		},
 		"present": {
 			in: compiler.Job{
-				Compiler: &compiler.Configuration{
+				Compiler: &compiler.Instance{
 					Compiler: compiler.Compiler{
 						Run: &service.RunInfo{
 							Cmd:  "foo",
@@ -52,7 +52,7 @@ func TestCompile_CompilerRun(t *testing.T) {
 		},
 		"with-expansions": {
 			in: compiler.Job{
-				Compiler: &compiler.Configuration{
+				Compiler: &compiler.Instance{
 					ConfigTime: time.Unix(8675309, 0),
 					Compiler: compiler.Compiler{
 						Run: &service.RunInfo{

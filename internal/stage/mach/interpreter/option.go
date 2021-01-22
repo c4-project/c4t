@@ -21,7 +21,7 @@ func Options(os ...Option) Option {
 
 // CompileWith sets the interpreter's compiler to driver d and config c.
 // This is required to interpret recipes that involve compilation.
-func CompileWith(d Driver, c *compiler.Configuration) Option {
+func CompileWith(d Driver, c *compiler.Instance) Option {
 	return func(i *Interpreter) { i.driver = d; i.compiler = c }
 }
 

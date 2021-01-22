@@ -48,7 +48,7 @@ type Instance struct {
 	subject subject.Named
 
 	// compilers points to the compilers to run.
-	compilers map[string]compiler.Configuration
+	compilers map[string]compiler.Instance
 
 	// driver tells the instance how to run the compiler.
 	driver interpreter.Driver
@@ -130,7 +130,7 @@ func (j *Instance) runCompilerJob(ctx context.Context, nc *compiler.Named, sp co
 	// No point having grace here; either a compiler compiles or it doesn't.
 	sr := srvrun.NewExecRunner(srvrun.StderrTo(logf))
 
-	i, err := interpreter.New(sp.Bin, r, sr, interpreter.CompileWith(j.driver, &nc.Configuration))
+	i, err := interpreter.New(sp.Bin, r, sr, interpreter.CompileWith(j.driver, &nc.Instance))
 	if err != nil {
 		return err
 	}

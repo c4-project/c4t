@@ -46,7 +46,7 @@ func (a *analyser) analyseSubject(s subject.Named) subjectAnalysis {
 	return c
 }
 
-func (c *subjectAnalysis) classifyCompilations(crs map[string]compilation.Compilation, ccs map[string]compiler.Configuration, fs FilterSet) {
+func (c *subjectAnalysis) classifyCompilations(crs map[string]compilation.Compilation, ccs map[string]compiler.Instance, fs FilterSet) {
 	for n, cm := range crs {
 		conf := ccs[n]
 
@@ -59,7 +59,7 @@ func (c *subjectAnalysis) classifyCompilations(crs map[string]compilation.Compil
 	}
 }
 
-func (c *subjectAnalysis) classifyCompiler(cidstr string, cm *compilation.CompileResult, conf compiler.Configuration, fs FilterSet) {
+func (c *subjectAnalysis) classifyCompiler(cidstr string, cm *compilation.CompileResult, conf compiler.Instance, fs FilterSet) {
 	c.clogs[cidstr] = c.compileLog(cm)
 	st, err := fs.FilteredStatus(cm.Status, conf, c.clogs[cidstr])
 	if err != nil {

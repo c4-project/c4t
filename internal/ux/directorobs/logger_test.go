@@ -99,7 +99,7 @@ func ExampleLogger_OnCycleCompiler() {
 		compiler.OnCompilerConfigStep(0,
 			compiler.Named{
 				ID: id.FromString("gcc.4"),
-				Configuration: compiler.Configuration{
+				Instance: compiler.Instance{
 					SelectedMOpt: "arch=native",
 					SelectedOpt:  &optlevel.Named{Name: "3", Level: optlevel.Level{}},
 					Compiler:     compiler.Compiler{Style: id.CStyleGCC, Arch: id.ArchArm7},
@@ -108,7 +108,7 @@ func ExampleLogger_OnCycleCompiler() {
 		compiler.OnCompilerConfigStep(1,
 			compiler.Named{
 				ID: id.FromString("gcc.9"),
-				Configuration: compiler.Configuration{
+				Instance: compiler.Instance{
 					SelectedMOpt: "arch=skylake",
 					SelectedOpt:  &optlevel.Named{Name: "2", Level: optlevel.Level{}},
 					Compiler:     compiler.Compiler{Style: id.CStyleGCC, Arch: id.ArchArm8},
@@ -117,7 +117,7 @@ func ExampleLogger_OnCycleCompiler() {
 		compiler.OnCompilerConfigStep(2,
 			compiler.Named{
 				ID: id.FromString("msvc"),
-				Configuration: compiler.Configuration{
+				Instance: compiler.Instance{
 					Compiler: compiler.Compiler{Style: id.FromString("msvc"), Arch: id.ArchX8664},
 				},
 			}, i)

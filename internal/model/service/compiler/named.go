@@ -9,21 +9,21 @@ import (
 	"github.com/c4-project/c4t/internal/model/id"
 )
 
-// Named wraps a Configuration with its ID.
+// Named wraps an Instance with its ID.
 type Named struct {
 	// ID is the ID of the compiler.
 	ID id.ID `toml:"id" json:"id"`
 
-	Configuration
+	Instance
 }
 
-// AddName names this Configuration with ID name, lifting it to a Named.
-func (c Configuration) AddName(name id.ID) *Named {
-	return &Named{ID: name, Configuration: c}
+// AddName names this Instance with ID name, lifting it to a Named.
+func (c Instance) AddName(name id.ID) *Named {
+	return &Named{ID: name, Instance: c}
 }
 
-// AddNameString tries to resolve name into an ID then name this Configuration with it.
-func (c Configuration) AddNameString(name string) (*Named, error) {
+// AddNameString tries to resolve name into an ID then name this Instance with it.
+func (c Instance) AddNameString(name string) (*Named, error) {
 	nid, err := id.TryFromString(name)
 	if err != nil {
 		return nil, err

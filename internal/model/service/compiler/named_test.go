@@ -17,9 +17,9 @@ import (
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 )
 
-// ExampleConfiguration_AddName is a runnable example for AddName.
-func ExampleConfiguration_AddName() {
-	c := compiler.Configuration{
+// ExampleInstance_AddName is a runnable example for Instance.AddName.
+func ExampleInstance_AddName() {
+	c := compiler.Instance{
 		Compiler: compiler.Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX8664,
@@ -37,9 +37,9 @@ func ExampleConfiguration_AddName() {
 	// gcc
 }
 
-// ExampleConfiguration_AddNameString is a runnable example for AddName.
-func ExampleConfiguration_AddNameString() {
-	c := compiler.Configuration{
+// ExampleInstance_AddNameString is a runnable example for Instance.AddName.
+func ExampleInstance_AddNameString() {
+	c := compiler.Instance{
 		Compiler: compiler.Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX8664,
@@ -57,11 +57,11 @@ func ExampleConfiguration_AddNameString() {
 	// gcc
 }
 
-// TestConfiguration_AddNameString_error exercises AddNameString's error path.
-func TestConfiguration_AddNameString_error(t *testing.T) {
+// TestInstance_AddNameString_error exercises Instance.AddNameString's error path.
+func TestInstance_AddNameString_error(t *testing.T) {
 	t.Parallel()
 
-	c := compiler.Configuration{
+	c := compiler.Instance{
 		Compiler: compiler.Compiler{
 			Style: id.CStyleGCC,
 			Arch:  id.ArchX8664,
@@ -73,7 +73,7 @@ func TestConfiguration_AddNameString_error(t *testing.T) {
 
 // ExampleNamed_FullID is a runnable example for Named.FullID.
 func ExampleNamed_FullID() {
-	c := compiler.Configuration{SelectedMOpt: "arch=skylake", SelectedOpt: &optlevel.Named{
+	c := compiler.Instance{SelectedMOpt: "arch=skylake", SelectedOpt: &optlevel.Named{
 		Name:  "3",
 		Level: optlevel.Level{},
 	}}

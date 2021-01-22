@@ -41,7 +41,7 @@ type Analysis struct {
 // Compiler represents information about a compiler in a corpus analysis.
 type Compiler struct {
 	// Info contains the compiler's plan record.
-	Info compiler.Configuration
+	Info compiler.Instance
 
 	// Counts maps each status to the number of times it was observed across the corpus.
 	Counts map[status.Status]int

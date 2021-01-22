@@ -73,7 +73,7 @@ func LoadFilterSet(fpath string) (FilterSet, error) {
 }
 
 // Filter returns true if, and only if, at least one filter in this set matches ci, and log.
-func (f FilterSet) Filter(ci compiler.Configuration, log string) (bool, error) {
+func (f FilterSet) Filter(ci compiler.Instance, log string) (bool, error) {
 	for _, fl := range f {
 		matched, err := fl.Filter(ci, log)
 		if err != nil {
@@ -87,7 +87,7 @@ func (f FilterSet) Filter(ci compiler.Configuration, log string) (bool, error) {
 }
 
 // FilteredStatus returns s if FilterSet.Filter returns false over ci and log, or Filtered otherwise.
-func (f FilterSet) FilteredStatus(s status.Status, ci compiler.Configuration, log string) (status.Status, error) {
+func (f FilterSet) FilteredStatus(s status.Status, ci compiler.Instance, log string) (status.Status, error) {
 	filtered, err := f.Filter(ci, log)
 	if filtered {
 		s = status.Filtered
@@ -96,7 +96,7 @@ func (f FilterSet) FilteredStatus(s status.Status, ci compiler.Configuration, lo
 }
 
 // Filter returns true if, and only if, this filter matches cm, ci, and log.
-func (f Filter) Filter(ci compiler.Configuration, log string) (bool, error) {
+func (f Filter) Filter(ci compiler.Instance, log string) (bool, error) {
 	styleMatch, err := ci.Style.Matches(f.Style)
 	if err != nil || !styleMatch {
 		return false, err

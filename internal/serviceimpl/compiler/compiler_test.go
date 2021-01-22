@@ -31,7 +31,7 @@ func TestResolver_RunCompiler(t *testing.T) {
 	ctx := context.Background()
 	j := *mdl.NewJob(
 		mdl.Exe,
-		&mdl.Configuration{
+		&mdl.Instance{
 			SelectedMOpt: "plop",
 			Compiler: mdl.Compiler{
 				Style: id.FromString("gcc"),
