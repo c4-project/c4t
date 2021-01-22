@@ -7,7 +7,6 @@ package compiler_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
@@ -48,30 +47,6 @@ func TestCompile_CompilerRun(t *testing.T) {
 			out: service.RunInfo{
 				Cmd:  "foo",
 				Args: []string{"bar", "baz"},
-			},
-		},
-		"with-expansions": {
-			in: compiler.Job{
-				Compiler: &compiler.Instance{
-					ConfigTime: time.Unix(8675309, 0),
-					Mutant:     42,
-					Compiler: compiler.Compiler{
-						Run: &service.RunInfo{
-							Cmd:  "foo",
-							Args: []string{"--time", "${config_time}"},
-							Env: map[string]string{
-								"C4_MUTATION": "${mutant}",
-							},
-						},
-					},
-				},
-			},
-			out: service.RunInfo{
-				Cmd:  "foo",
-				Args: []string{"--time", "8675309"},
-				Env: map[string]string{
-					"C4_MUTATION": "42",
-				},
 			},
 		},
 	}
