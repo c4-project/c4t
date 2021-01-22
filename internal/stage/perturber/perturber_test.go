@@ -10,6 +10,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler/mocks"
@@ -33,6 +35,10 @@ import (
 // TestPerturber_Run tests the happy path of a perturber using copious amounts of mocking.
 func TestPerturber_Run(t *testing.T) {
 	pm := plan.Mock()
+	pm.Mutation = &mutation.Config{
+		Enabled:   true,
+		Selection: 42,
+	}
 
 	// This should give us a degree of sampling.
 	sampleSize := len(pm.Corpus) / 2
@@ -141,6 +147,7 @@ func TestPerturber_Run(t *testing.T) {
 			continue
 		}
 		assert.Equal(t, c.Arch, pm.Compilers[n].Arch, "compiler randomisation changed arch")
+		assert.Equal(t, c.Mutant, pm.Mutation.Selection, "compiler randomisation didn't copy mutant ID")
 		// TODO(@MattWindsor91): other assertions?  merge with other tests?
 	}
 

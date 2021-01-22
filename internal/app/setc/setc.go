@@ -6,6 +6,8 @@
 // Package setc contains the app definition for c4t-setc.
 package setc
 
+// TODO(@MattWindsor91): make this work more orthogonally with perturber, or merge the two.
+
 import (
 	"context"
 	"errors"
@@ -134,6 +136,7 @@ func (c *CompilerSetter) Run(_ context.Context, p *plan.Plan) (*plan.Plan, error
 func (c *CompilerSetter) set(cnf *compiler.Instance) error {
 	// TODO(@MattWindsor91): allow overriding this.
 	cnf.ConfigTime = time.Now()
+	// TODO(@MattWindsor91): copy mutant ID?
 
 	if err := c.setOpt(cnf); err != nil {
 		return err

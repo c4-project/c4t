@@ -10,6 +10,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	"github.com/c4-project/c4t/internal/plan"
 
 	"github.com/c4-project/c4t/internal/helper/stringhelp"
@@ -31,6 +33,8 @@ type compilerPerturber struct {
 	rng *rand.Rand
 	// useFullIDs tells the perturber whether to map compilers to full IDs.
 	useFullIDs bool
+	// mutant is the mutant ID to insert into compilers.
+	mutant mutation.Mutant
 }
 
 func (p *Perturber) perturbCompilers(rng *rand.Rand, pn *plan.Plan) error {
@@ -39,6 +43,7 @@ func (p *Perturber) perturbCompilers(rng *rand.Rand, pn *plan.Plan) error {
 		observers:  lowerToCompiler(p.observers),
 		rng:        rng,
 		useFullIDs: p.useFullIDs,
+		mutant:     pn.Mutant(),
 	}
 	var err error
 	pn.Compilers, err = c.Perturb(pn.Compilers)
@@ -94,6 +99,7 @@ func (c *compilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) 
 	}
 	comp := compiler.Instance{
 		ConfigTime:   time.Now(),
+		Mutant:       c.mutant,
 		SelectedOpt:  opt,
 		SelectedMOpt: mopt,
 		Compiler:     cmp,

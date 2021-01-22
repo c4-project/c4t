@@ -108,3 +108,13 @@ func (p *Plan) CompilerIDs() ([]id.ID, error) {
 func (p *Plan) IsMutationTest() bool {
 	return p.Mutation != nil && p.Mutation.Enabled
 }
+
+// Mutant gets the currently selected mutant ID according to this plan, or 0 if mutation is disabled.
+//
+// This assumes that the plan is being repeatedly refreshed with the appropriate mutant ID.
+func (p *Plan) Mutant() mutation.Mutant {
+	if !p.IsMutationTest() {
+		return 0
+	}
+	return p.Mutation.Selection
+}
