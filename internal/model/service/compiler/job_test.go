@@ -57,9 +57,9 @@ func TestCompile_CompilerRun(t *testing.T) {
 					Compiler: compiler.Compiler{
 						Run: &service.RunInfo{
 							Cmd:  "foo",
-							Args: []string{"--time", "${time}"},
+							Args: []string{"--time", "${config_time}"},
 							Env: map[string]string{
-								"TIME": "${time}",
+								"TIME": "${config_time}",
 							},
 						},
 					},
