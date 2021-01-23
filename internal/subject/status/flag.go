@@ -26,8 +26,15 @@ const (
 	FlagFail = FlagCompileFail | FlagRunFail
 	// FlagTimeout is the union of all timeout flags.
 	FlagTimeout = FlagCompileTimeout | FlagRunTimeout
+	// FlagMutantKill is the union of all flags that constitute a mutant kill.
+	//
+	// We conservatively don't class timeouts as mutant kills, as they are on the balance of probability more likely to
+	// come from system resource issues.
+	FlagMutantKill = FlagFail | FlagFlagged
 	// FlagBad is the union of all 'bad' flags; it should match the calculation in Status.IsBad.
 	FlagBad = FlagFail | FlagTimeout | FlagFlagged
+
+	// TODO(@MattWindsor91): stop classing timeouts as bad across the board?
 )
 
 // Matches tests whether this Flag has all flag bits in expected present.

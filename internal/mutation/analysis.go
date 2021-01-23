@@ -18,13 +18,11 @@ type Analysis map[Mutant]MutantAnalysis
 // Such analysis is filed under compilation name comp, and killer determines whether hit mutants was killed.
 func (a Analysis) AddCompilation(comp compilation.Name, log string, killer bool) {
 	for mut, hits := range ScanLines(strings.NewReader(log)) {
-		ana := HitAnalysis{
-			// TODO(@MattWindsor91): get rid of this cast somehow
+		a[mut] = append(a[mut], HitAnalysis{
 			NumHits: hits,
 			Killed:  killer && hits != 0,
 			HitBy:   comp,
-		}
-		a[mut] = append(a[mut], ana)
+		})
 	}
 }
 
