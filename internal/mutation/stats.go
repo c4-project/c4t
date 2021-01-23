@@ -28,10 +28,10 @@ func (s *Statset) AddAnalysis(a Analysis) {
 
 	for mut, hits := range a {
 		for _, h := range hits {
-			s.Selections[mut] += 1
+			s.Selections[mut]++
 			s.Hits[mut] += h.NumHits
 			if h.Killed {
-				s.Kills[mut] += h.NumHits
+				s.Kills[mut]++
 			}
 		}
 	}

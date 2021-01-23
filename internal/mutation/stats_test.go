@@ -44,7 +44,7 @@ func ExampleStatset_AddAnalysis() {
 				HitBy:   compilation.Name{SubjectName: "marco", CompilerID: id.FromString("polo")},
 			},
 			{
-				NumHits: 3,
+				NumHits: 4,
 				Killed:  true,
 				HitBy:   compilation.Name{SubjectName: "mint", CompilerID: id.FromString("polo")},
 			},
@@ -62,6 +62,6 @@ func ExampleStatset_AddAnalysis() {
 	fmt.Println("53 selected:", s.Selections[53], "hit:", s.Hits[53], "killed:", s.Kills[53])
 
 	// Output:
-	// 27 selected: 3 hit: 5 killed: 3
+	// 27 selected: 3 hit: 6 killed: 1
 	// 53 selected: 1 hit: 0 killed: 0
 }
