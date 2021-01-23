@@ -63,6 +63,7 @@ func ExampleLogger_OnCycle() {
 	// Output:
 	// * localhost starts cycle 10 *
 	// * localhost ERROR: the front fell off *
+	// [instance 0 has closed]
 }
 
 // ExampleLogger_OnCycleSave is a runnable example indirectly exercising Logger.OnCycleSave.
@@ -85,6 +86,7 @@ func ExampleLogger_OnCycleSave() {
 	// Output:
 	// saving (cycle [0:  #0 (Jan  1 00:00:00)]) subj to subj.tar.gz
 	// when saving (cycle [0:  #0 (Jan  1 00:00:00)]) subj: missing file compile.log
+	// [instance 0 has closed]
 }
 
 // ExampleLogger_OnCycleCompiler is a runnable example indirectly exercising Logger.OnCycleCompiler.
@@ -132,6 +134,7 @@ func ExampleLogger_OnCycleCompiler() {
 	// - gcc.4: gcc@arm.7 opt "3" march "arch=native"
 	// - gcc.9: gcc@arm.8 opt "2" march "arch=skylake"
 	// - msvc: msvc@x86.64
+	// [instance 0 has closed]
 }
 
 // TestLogger_Run_empty tests that running a logger with no attached instances works out.
