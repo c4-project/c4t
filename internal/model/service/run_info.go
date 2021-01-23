@@ -95,6 +95,7 @@ func (r *RunInfo) AppendArgs(new ...string) {
 }
 
 // Interpolate expands any interpolations in this run info's arguments and environment according to expansions.
+// While it modifies this RunInfo in place, it creates a new argument slice and environment map.
 func (r *RunInfo) Interpolate(expansions map[string]string) error {
 	env := interpolate.NewMapEnv(expansions)
 	if err := r.interpolateArgs(env); err != nil {
@@ -105,21 +106,25 @@ func (r *RunInfo) Interpolate(expansions map[string]string) error {
 
 func (r *RunInfo) interpolateArgs(env interpolate.Env) error {
 	var err error
+	args := make([]string, len(r.Args))
 	for i, arg := range r.Args {
-		if r.Args[i], err = interpolate.Interpolate(env, arg); err != nil {
+		if args[i], err = interpolate.Interpolate(env, arg); err != nil {
 			return err
 		}
 	}
+	r.Args = args
 	return nil
 }
 
 func (r *RunInfo) interpolateEnv(env interpolate.Env) error {
 	var err error
+	nenv := make(map[string]string, len(r.Env))
 	for k, v := range r.Env {
-		if r.Env[k], err = interpolate.Interpolate(env, v); err != nil {
+		if nenv[k], err = interpolate.Interpolate(env, v); err != nil {
 			return err
 		}
 	}
+	r.Env = nenv
 	return nil
 }
 

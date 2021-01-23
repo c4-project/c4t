@@ -34,6 +34,22 @@ func ExampleRunInfo_Override() {
 	// BAR=baz FOO= clang -std=c11 -pthread -pedantic -funroll-loops
 }
 
+// ExampleRunInfo_Interpolate is a runnable example for the Interpolate method.
 func ExampleRunInfo_Interpolate() {
+	r1 := service.RunInfo{
+		Cmd:  "gcc",
+		Args: []string{"-std=${standard}"},
+		Env:  map[string]string{"C4_MUTATION": "${mutant}"},
+	}
+	// Shallow copies shouldn't be affected by the interpolation
+	r2 := r1
+	_ = r1.Interpolate(map[string]string{"standard": "c11", "mutant": "4"})
+	_ = r2.Interpolate(map[string]string{"standard": "c99", "mutant": "3"})
 
+	fmt.Println(&r1)
+	fmt.Println(&r2)
+
+	// Output:
+	// C4_MUTATION=4 gcc -std=c11
+	// C4_MUTATION=3 gcc -std=c99
 }
