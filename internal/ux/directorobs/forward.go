@@ -231,6 +231,10 @@ func (f *ForwardObserver) Run(ctx context.Context) error {
 
 func (f *ForwardObserver) runStep(fwd Forward) error {
 	switch fwd.Kind {
+	case ForwardInstance:
+		for _, h := range f.handlers {
+			h.OnCycleInstance(fwd.Cycle.Cycle, *fwd.Instance)
+		}
 	case ForwardAnalysis:
 		ca := director.CycleAnalysis{Cycle: fwd.Cycle.Cycle, Analysis: *fwd.Analysis}
 		for _, h := range f.handlers {
