@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/mutation"
+
 	"github.com/c4-project/c4t/internal/plan/stage"
 
 	"github.com/c4-project/c4t/internal/subject/corpus"
@@ -138,4 +140,22 @@ func TestPlan_RunStage_error(t *testing.T) {
 	})
 
 	testhelp.ExpectErrorIs(t, got, want, "running stage with error")
+}
+
+// ExamplePlan_SetMutant is a runnable example for Plan.SetMutant.
+func ExamplePlan_SetMutant() {
+	p := plan.Mock()
+	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+	p.SetMutant(42)
+	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+	p.Mutation = &mutation.Config{Enabled: true}
+	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+	p.SetMutant(42)
+	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+
+	// Output:
+	// plan mutant: 0 (is mutation test: false)
+	// plan mutant: 0 (is mutation test: false)
+	// plan mutant: 0 (is mutation test: true)
+	// plan mutant: 42 (is mutation test: true)
 }
