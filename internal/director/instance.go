@@ -21,24 +21,17 @@ import (
 
 	observer2 "github.com/c4-project/c4t/internal/stage/mach/observer"
 
-	"github.com/c4-project/c4t/internal/quantity"
-
 	"github.com/c4-project/c4t/internal/stage/perturber"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
 	"github.com/c4-project/c4t/internal/copier"
-	"github.com/c4-project/c4t/internal/machine"
 
 	"github.com/c4-project/c4t/internal/stage/analyser"
 
 	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
 	"github.com/c4-project/c4t/internal/subject/corpus/builder"
-
-	"github.com/c4-project/c4t/internal/director/pathset"
-
-	"github.com/c4-project/c4t/internal/model/id"
 
 	"github.com/c4-project/c4t/internal/remote"
 
@@ -76,9 +69,6 @@ type Instance struct {
 	// FuzzerConfig contains the fuzzer config for this instance.
 	FuzzerConfig *fuzzer2.Configuration
 
-	// Mutant is the current mutant that is in use on this instance, if any.
-	mutant mutation.Mutant
-
 	// mutantCh stores a channel that will receive mutations, if any.
 	mutantCh <-chan mutation.Mutant
 
@@ -89,31 +79,6 @@ type Instance struct {
 	// cycleCh stores the current cycle result channel, if any.
 	// This is refreshed whenever a new cycle is launched.
 	cycleCh <-chan cycleResult
-}
-
-// Machine contains the state for a particular machine attached to an instance.
-type Machine struct {
-	// ID is the ID for this machine.
-	ID id.ID
-
-	// InitialPlan is the plan that is perturbed to form the plan for each test cycle.
-	InitialPlan plan.Plan
-
-	// Pathset contains the pathset for this instance.
-	Pathset *pathset.Instance
-
-	// Quantities contains the quantity set for this machine.
-	Quantities quantity.MachineSet
-
-	// Config contains the machine config for this machine.
-	Config machine.Config
-
-	// cycle is the number of the current cycle for the machine.
-	// This is held separately from the instance as an instance may (eventually) run cycles for multiple machines.
-	cycle uint64
-
-	// stageConfig is the configuration for this instance's stages.
-	stageConfig *StageConfig
 }
 
 // Run runs this instance's testing loop.
@@ -281,9 +246,6 @@ func (i *Instance) makeCycleInstance() cycleInstance {
 func (i *Instance) plan() *plan.Plan {
 	// Important to _copy_ the plan
 	pcopy := i.Machine.InitialPlan
-	if pcopy.IsMutationTest() {
-		pcopy.Mutation.Selection = i.mutant
-	}
 	return &pcopy
 }
 

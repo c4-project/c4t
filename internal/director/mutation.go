@@ -36,8 +36,7 @@ func (i *Instance) prepareMutation(ctx context.Context) error {
 }
 
 func (i *Instance) handleMutantChange(m mutation.Mutant) {
-	// This shouldn't fire unless .Mutation exists.
-	i.Machine.InitialPlan.Mutation.Selection = m
+	i.Machine.InitialPlan.SetMutant(m)
 	OnInstance(InstanceMutantMessage(m), i.Observers...)
 }
 

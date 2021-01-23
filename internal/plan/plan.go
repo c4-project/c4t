@@ -118,3 +118,10 @@ func (p *Plan) Mutant() mutation.Mutant {
 	}
 	return p.Mutation.Selection
 }
+
+// SetMutant sets the current mutant ID to m, provided that mutation testing is active.
+func (p *Plan) SetMutant(m mutation.Mutant) {
+	if p.IsMutationTest() {
+		p.Mutation.Selection = m
+	}
+}
