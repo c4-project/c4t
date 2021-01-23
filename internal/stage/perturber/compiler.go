@@ -6,9 +6,10 @@
 package perturber
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/c4-project/c4t/internal/model/service"
 
 	"github.com/c4-project/c4t/internal/mutation"
 
@@ -88,34 +89,43 @@ func (c *compilerPerturber) fullCompilerName(nc *compiler.Named) (id.ID, error) 
 }
 
 func (c *compilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) (*compiler.Named, error) {
-
-	opt, err := c.perturbCompilerOpt(cmp)
+	inst, err := c.makeCompilerInstance(cmp)
 	if err != nil {
 		return nil, err
+	}
+	return inst.AddNameString(name)
+}
+
+func (c *compilerPerturber) makeCompilerInstance(cmp compiler.Compiler) (compiler.Instance, error) {
+	opt, err := c.perturbCompilerOpt(cmp)
+	if err != nil {
+		return compiler.Instance{}, err
 	}
 	mopt, err := c.perturbCompilerMOpt(cmp)
 	if err != nil {
-		return nil, err
+		return compiler.Instance{}, err
 	}
-	comp := compiler.Instance{
+	inst := compiler.Instance{
 		ConfigTime:   time.Now(),
 		Mutant:       c.mutant,
 		SelectedOpt:  opt,
 		SelectedMOpt: mopt,
 		Compiler:     cmp,
 	}
+	inst.Run, err = c.expandRun(inst.Run, inst.Interpolations())
+	return inst, err
+}
 
-	if comp.Run != nil {
-		if err := comp.Run.Interpolate(comp.Interpolations()); err != nil {
-			return nil, err
-		}
+func (c *compilerPerturber) expandRun(r *service.RunInfo, interps map[string]string) (*service.RunInfo, error) {
+	if r == nil {
+		return r, nil
 	}
-
-	nid, err := id.TryFromString(name)
-	if err != nil {
-		return nil, fmt.Errorf("%s not a valid ID: %w", name, err)
+	// r might point directly to the run information of the initial plan, so we need to make a copy of it.
+	newr := *r
+	if err := newr.Interpolate(interps); err != nil {
+		return nil, err
 	}
-	return comp.AddName(nid), err
+	return &newr, nil
 }
 
 func (c *compilerPerturber) perturbCompilerOpt(cfg compiler.Compiler) (*optlevel.Named, error) {
