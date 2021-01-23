@@ -1,14 +1,16 @@
-// Copyright (c) 2020 Matt Windsor and contributors
+// Copyright (c) 2021 Matt Windsor and contributors
 //
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package directorobs_test
+package stat_test
 
 import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/c4-project/c4t/internal/stat"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,20 +20,19 @@ import (
 	"github.com/c4-project/c4t/internal/subject/corpus"
 	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/c4-project/c4t/internal/ux/directorobs"
 	"github.com/stretchr/testify/require"
 )
 
-// TestNewStatPersister tests NewStatPersister, as well as various other statset manipulations.
-func TestNewStatPersister(t *testing.T) {
+// TestNewPersister tests NewPersister, as well as various other statset manipulations.
+func TestNewPersister(t *testing.T) {
 	t.Parallel()
 
 	td := t.TempDir()
 	path := filepath.Join(td, "stats.json")
-	f, err := directorobs.OpenStatFile(path)
+	f, err := stat.OpenStatFile(path)
 	require.NoError(t, err, "should be able to open stat file in temp dir")
 
-	sp, err := directorobs.NewStatPersister(f)
+	sp, err := stat.NewPersister(f)
 	require.NoError(t, err, "should be able to open stats persister on new file")
 
 	mid := id.FromString("foo.bar")
@@ -51,10 +52,10 @@ func TestNewStatPersister(t *testing.T) {
 
 	require.NoError(t, sp.Close(), "should be able to close file")
 	// assuming f has been closed here
-	f, err = directorobs.OpenStatFile(path)
+	f, err = stat.OpenStatFile(path)
 	require.NoError(t, err, "should be able to reopen stat file")
 
-	var s directorobs.Statset
+	var s stat.Statset
 	if assert.NoError(t, s.Load(f), "should be able to load stats from file") {
 		if assert.NotNil(t, s.Machines, "machines should be populated") {
 			// Can't compare cycles directly because the time might have been clipped

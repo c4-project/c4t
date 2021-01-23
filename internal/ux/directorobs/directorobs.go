@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/c4-project/c4t/internal/stat"
+
 	"github.com/c4-project/c4t/internal/director"
 
 	"github.com/c4-project/c4t/internal/config"
@@ -27,7 +29,7 @@ type Obs struct {
 	// resultLog is a forward handler that logs results and other significant cycle phenomena to a text file.
 	resultLog *Logger
 	// statPersister is a forward handler that persists statistics in a JSON file.
-	statPersister *StatPersister
+	statPersister *stat.Persister
 	// fwd contains the forwarding observer that hosts forward handlers.
 	fwd *ForwardObserver
 
@@ -107,16 +109,16 @@ func createResultLogFile(c *config.Config) (*os.File, error) {
 	return logw, nil
 }
 
-func statPersisterFromConfig(c *config.Config) (*StatPersister, error) {
+func statPersisterFromConfig(c *config.Config) (*stat.Persister, error) {
 	path, err := c.Paths.OutPath("stats.json")
 	if err != nil {
 		return nil, fmt.Errorf("expanding stat persister file path: %w", err)
 	}
-	f, err := OpenStatFile(path)
+	f, err := stat.OpenStatFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("opening stat persister file %q: %w", path, err)
 	}
-	return NewStatPersister(f)
+	return stat.NewPersister(f)
 }
 
 func (o *Obs) Observers() []director.Observer {
