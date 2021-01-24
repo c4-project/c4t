@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/c4-project/c4t/internal/copier"
@@ -24,8 +23,6 @@ import (
 	"github.com/c4-project/c4t/internal/stage/planner"
 
 	"github.com/mum4k/termdash/keyboard"
-
-	"github.com/mum4k/termdash/cell"
 
 	"github.com/c4-project/c4t/internal/machine"
 
@@ -45,11 +42,8 @@ type Dash struct {
 	container *container.Container
 	term      terminalapi.Terminal
 	startTime *text.Text
-	log       *text.Text
+	sysLog    *syslog
 	resultLog *ResultLog
-
-	// nlines is the number of lines written, so far, to the log.
-	nlines uint
 
 	// instances contains all instances currently allocated for the dashboard.
 	instances []*Instance
@@ -60,6 +54,9 @@ func (d *Dash) OnCycle(m director.CycleMessage) {
 	// TODO(@MattWindsor91): the instance itself should handle this
 	if m.Kind == director.CycleStart {
 		d.assignMachineID(m.Cycle.Instance, m.Cycle.MachineID)
+	}
+	if m.Kind == director.CycleError {
+		d.sysLog.reportCycleError(m.Cycle, m.Err)
 	}
 	d.onInstance(m.Cycle.Instance, func(i *Instance) { i.OnCycle(m) })
 }
@@ -130,25 +127,7 @@ func (d *Dash) ensureInstances(n int) error {
 const (
 	// idInstances is the container ID used to update the instance grid.
 	idInstances = "machines"
-
-	// MaxLogLines is the maximum number of lines that can be written to the log before it resets.
-	MaxLogLines = 1000
 )
-
-// Write lets one write to the text console in the dash as if it were stderr.
-func (d *Dash) Write(p []byte) (n int, err error) {
-	// TODO(@MattWindsor91): mitigate against invalid input
-	sp := string(p)
-
-	d.nlines += countNewlines(sp)
-	if MaxLogLines <= d.nlines {
-		d.nlines -= MaxLogLines
-		d.log.Reset()
-		_ = d.log.Write("[log reset]")
-	}
-
-	return len(sp), d.log.Write(sp)
-}
 
 func countNewlines(sp string) uint {
 	var n uint
@@ -178,7 +157,7 @@ func New() (*Dash, error) {
 		return nil, err
 	}
 
-	if d.log, err = text.New(text.RollContent(), text.WrapAtWords()); err != nil {
+	if d.sysLog, err = newSysLog(); err != nil {
 		return nil, err
 	}
 
@@ -208,7 +187,7 @@ func (d *Dash) OnMachines(machine.Message) {
 }
 
 func (d *Dash) logError(err error) {
-	_ = d.log.Write(err.Error(), text.WriteCellOpts(cell.FgColor(cell.ColorRed)))
+	d.sysLog.logError(err)
 }
 
 func makeLogPane(d Dash) container.Option {
@@ -220,7 +199,7 @@ func makeLogPane(d Dash) container.Option {
 					container.PlaceWidget(d.startTime),
 				),
 				container.Bottom(
-					container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(d.log),
+					container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(d.sysLog.log),
 				),
 				container.SplitFixed(3),
 			),
@@ -266,12 +245,7 @@ func (d *Dash) Close() error {
 // OnPrepare uses the instance calculation to prepare a machine grid.
 func (d *Dash) OnPrepare(m director.PrepareMessage) {
 	// TODO(@MattWindsor91): broadcast the quantities somewhere
-	if m.Kind != director.PrepareInstances {
-		return
-	}
-	if err := d.log.Write("Instances: " + strconv.Itoa(m.NumInstances)); err != nil {
-		d.logError(err)
-	}
+	d.sysLog.reportPrepare(m)
 	if err := d.ensureInstances(m.NumInstances); err != nil {
 		d.logError(err)
 	}
