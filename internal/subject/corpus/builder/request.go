@@ -57,10 +57,10 @@ func AddRequest(s *subject.Named) Request {
 // Compile is a request to add the given compiler result to the named subject.
 type Compile struct {
 	// CompilerID is the ID of the compiler that produced this result.
-	CompilerID id.ID
+	CompilerID id.ID `json:"compiler_id,omitempty"`
 
 	// Result is the compile result.
-	Result compilation.CompileResult
+	Result compilation.CompileResult `json:"result,omitempty"`
 }
 
 // CompileRequest constructs an add-compile request for the compilation with name name and result r.
@@ -71,10 +71,10 @@ func CompileRequest(name compilation.Name, r compilation.CompileResult) Request 
 // Recipe is a request to add the given recipe to the named subject, under the named architecture.
 type Recipe struct {
 	// Arch is the ID of the architecture for which this lifting is occurring.
-	Arch id.ID
+	Arch id.ID `json:"arch,omitempty"`
 
 	// Recipe is the produced recipe.
-	Recipe recipe.Recipe
+	Recipe recipe.Recipe `json:"recipe,omitempty"`
 }
 
 // RecipeRequest constructs an add-recipe request for the subject with name sname, arch ID arch, and recipe r.
@@ -85,10 +85,10 @@ func RecipeRequest(sname string, arch id.ID, r recipe.Recipe) Request {
 // Run is a request to add the given run result to the named subject.
 type Run struct {
 	// CompilerID is the ID of the compiler that produced this result.
-	CompilerID id.ID
+	CompilerID id.ID `json:"compiler_id,omitempty"`
 
 	// Run is the run result.
-	Result compilation.RunResult
+	Result compilation.RunResult `json:"result,omitempty"`
 }
 
 // RunRequest constructs an add-run request for the compilation with name name and result r.
