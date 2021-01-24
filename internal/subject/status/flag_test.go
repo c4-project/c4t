@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestFlag_Matches tests the behaviour of Flag.Matches on various input pairs.
-func TestFlag_Matches(t *testing.T) {
+// TestFlag_MatchesAll tests the behaviour of Flag.MatchesAll on various input pairs.
+func TestFlag_MatchesAll(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
@@ -25,6 +25,11 @@ func TestFlag_Matches(t *testing.T) {
 			toMatch:      status.FlagFlagged,
 			matchAgainst: status.FlagFlagged,
 			want:         true,
+		},
+		"flagged against c-fail": {
+			toMatch:      status.FlagFlagged,
+			matchAgainst: status.FlagCompileFail,
+			want:         false,
 		},
 		"fails against c-fail": {
 			toMatch:      status.FlagFail,
@@ -43,7 +48,47 @@ func TestFlag_Matches(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			assert.Equal(t, c.want, c.toMatch.Matches(c.matchAgainst))
+			assert.Equal(t, c.want, c.toMatch.MatchesAll(c.matchAgainst))
+		})
+	}
+}
+
+// TestFlag_MatchesAny tests the behaviour of Flag.MatchesAny on various input pairs.
+func TestFlag_MatchesAny(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		toMatch, matchAgainst status.Flag
+		want                  bool
+	}{
+		"flagged against flagged": {
+			toMatch:      status.FlagFlagged,
+			matchAgainst: status.FlagFlagged,
+			want:         true,
+		},
+		"flagged against c-fail": {
+			toMatch:      status.FlagFlagged,
+			matchAgainst: status.FlagCompileFail,
+			want:         false,
+		},
+		"fails against c-fail": {
+			toMatch:      status.FlagFail,
+			matchAgainst: status.FlagCompileFail,
+			want:         true,
+		},
+		"c-fail against fails": {
+			toMatch:      status.FlagCompileFail,
+			matchAgainst: status.FlagFail,
+			want:         true,
+		},
+	}
+
+	for name, c := range cases {
+		c := c
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			assert.Equal(t, c.want, c.toMatch.MatchesAny(c.matchAgainst))
 		})
 	}
 }

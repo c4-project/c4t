@@ -254,8 +254,8 @@ func TestID_Matches(t *testing.T) {
 			require.NoError(t, err)
 
 			matches, err := in.Matches(glob)
-			if testhelp.ExpectErrorIs(t, err, c.err, "Matches") {
-				assert.Equal(t, c.want, matches, "result of Matches")
+			if testhelp.ExpectErrorIs(t, err, c.err, "MatchesAll") {
+				assert.Equal(t, c.want, matches, "result of MatchesAll")
 			}
 		})
 	}

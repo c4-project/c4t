@@ -95,12 +95,12 @@ func (a *Analysis) HasFlagged() bool {
 	return a.Flags.MatchesStatus(status.Flagged)
 }
 
-// HasFailures tests whether a collation has failure cases.
+// HasFailures tests whether an analysis has failure cases.
 func (a *Analysis) HasFailures() bool {
-	return a.Flags&(status.FlagFail) != 0
+	return a.Flags.MatchesAny(status.FlagFail)
 }
 
-// HasBadOutcomes tests whether a collation has any bad (flagged, failed, or timed-out) cases.
+// HasBadOutcomes tests whether an analysis has any bad (flagged, failed, or timed-out) cases.
 func (a *Analysis) HasBadOutcomes() bool {
-	return a.Flags&(status.FlagBad) != 0
+	return a.Flags.MatchesAny(status.FlagBad)
 }

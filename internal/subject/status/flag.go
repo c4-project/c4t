@@ -37,18 +37,27 @@ const (
 	// TODO(@MattWindsor91): stop classing timeouts as bad across the board?
 )
 
-// Matches tests whether this Flag has all flag bits in expected present.
-func (f Flag) Matches(expected Flag) bool {
+// MatchesAll tests whether this Flag has all flag bits in expected present.
+//
+// Where there is only one bit set in expected, MatchesAny equals MatchesAll.
+func (f Flag) MatchesAll(expected Flag) bool {
 	return (f & expected) == expected
 }
 
+// MatchesAny tests whether this Flag has any flag bits in expected present.
+//
+// Where there is only one bit set in expected, MatchesAny equals MatchesAll.
+func (f Flag) MatchesAny(expected Flag) bool {
+	return (f & expected) != 0
+}
+
 // MatchesStatus tests whether this Flag matches the expected status.
-// Generally, this is a Matches test for Status.Flag, except that Ok only matches an absence of other flags.
+// Generally, this is a MatchesAll test for Status.Flag, except that Ok only matches an absence of other flags.
 func (f Flag) MatchesStatus(expected Status) bool {
 	if expected == Ok {
 		return f == 0
 	}
-	return f.Matches(expected.Flag())
+	return f.MatchesAll(expected.Flag())
 }
 
 // statusFlags matches statuses to flags.
