@@ -21,5 +21,5 @@ type Forward struct {
 	Build *builder.Message `json:"build,omitempty"`
 
 	// Action carries information about a machine-node action.
-	Action *observer.Message `json:"action.omitempty"`
+	Action *observer.Message `json:"action,omitempty"`
 }

@@ -37,7 +37,7 @@ type Instance struct {
 	// mutations.
 	ConfigTime time.Time `json:"config_time,omitempty"`
 	// Mutant captures any mutant ID attached to this compiler instance.
-	Mutant mutation.Mutant `toml:"mutant,omitempty"`
+	Mutant mutation.Mutant `json:"mutant,omitempty"`
 	Compiler
 }
 
