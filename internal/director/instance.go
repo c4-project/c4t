@@ -91,17 +91,13 @@ func (i *Instance) Run(ctx context.Context) error {
 
 // runInner runs the instance's testing loop, less some closedown boilerplate.
 func (i *Instance) runInner(ctx context.Context) error {
-	if err := i.prepare(); err != nil {
-		return err
-	}
-	// TODO(@MattWindsor91): move this out of the instance, if possible.
-	if err := i.prepareMutation(ctx); err != nil {
+	if err := i.prepare(ctx); err != nil {
 		return err
 	}
 	return i.mainLoop(ctx)
 }
 
-func (i *Instance) prepare() error {
+func (i *Instance) prepare(ctx context.Context) error {
 	var err error
 	if err = i.check(); err != nil {
 		return err
@@ -109,6 +105,11 @@ func (i *Instance) prepare() error {
 	if err = i.Machine.Pathset.Scratch.Prepare(); err != nil {
 		return err
 	}
+	// TODO(@MattWindsor91): move this out of the instance, if possible.
+	if err := i.prepareMutation(ctx); err != nil {
+		return err
+	}
+	// This must happen after preparing the mutation config, otherwise the kill channel won't be installed.
 	if i.Machine.stageConfig, err = i.makeStageConfig(); err != nil {
 		return err
 	}
