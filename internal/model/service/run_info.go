@@ -145,7 +145,7 @@ func (r *RunInfo) overrideEnv(env map[string]string) {
 		nenv[k] = v
 	}
 	for k, v := range env {
-		r.Env[k] = v
+		nenv[k] = v
 	}
 	r.Env = nenv
 }
