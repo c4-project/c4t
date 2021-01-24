@@ -39,6 +39,7 @@ func TestNewPersister(t *testing.T) {
 
 	cyc := director.Cycle{MachineID: mid, Iter: 42, Start: time.Now()}
 	sp.OnCycle(director.CycleStartMessage(cyc))
+	sp.OnCycle(director.CycleFinishMessage(cyc))
 
 	ana := analysis.Analysis{
 		ByStatus: map[status.Status]corpus.Corpus{
@@ -61,10 +62,13 @@ func TestNewPersister(t *testing.T) {
 			// Can't compare cycles directly because the time might have been clipped
 			assert.Equal(t, cyc.MachineID, s.Machines[mid.String()].LastCycle.MachineID, "last cycle should be the one sent")
 			assert.Equal(t, cyc.Iter, s.Machines[mid.String()].LastCycle.Iter, "last cycle should be the one sent")
+			assert.EqualValues(t, 1, s.Machines[mid.String()].Session.FinishedCycles, "should have one finished cycle")
+			assert.EqualValues(t, 1, s.Machines[mid.String()].Total.FinishedCycles, "should have one finished cycle")
+
 			for i := status.Ok; i <= status.Last; i++ {
 				want := uint64(len(ana.ByStatus[i]))
-				assert.Equal(t, want, s.Machines[mid.String()].StatusTotals[i], "status total didn't match")
-				assert.Equal(t, want, s.Machines[mid.String()].SessionStatusTotals[i], "session status total didn't match")
+				assert.Equal(t, want, s.Machines[mid.String()].Total.StatusTotals[i], "status total didn't match")
+				assert.Equal(t, want, s.Machines[mid.String()].Session.StatusTotals[i], "session status total didn't match")
 			}
 		}
 	}

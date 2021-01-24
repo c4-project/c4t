@@ -14,54 +14,85 @@ import (
 
 // Machine is a statistics set for a specific machine.
 type Machine struct {
-	// TotalCycles is the number of the cycles the machine has accrued.
-	TotalCycles uint64 `json:"total_cycles"`
 	// LastCycle is the last announced cycle in this session.
 	LastCycle director.Cycle `json:"last_cycle,omitempty"`
 
-	// StatusTotals contains status totals since this statset started.
-	StatusTotals map[status.Status]uint64 `json:"status_totals"`
-	// SessionStatusTotals contains status totals since this session started.
-	// It may be empty if this machine has not yet been active this session.
-	SessionStatusTotals map[status.Status]uint64 `json:"session_status_totals,omitempty"`
-
-	// Mutation contains totals for mutation testing since this statset started.
-	Mutation mutation.Statset `json:"mutation,omitempty"`
-	// Mutation contains totals for mutation testing since this session started.
-	SessionMutation mutation.Statset `json:"session_mutation,omitempty"`
+	// Session contains statistics for this session.
+	Session MachineSpan `json:"session,omitempty"`
+	// Total contains statistics across all sessions.
+	Total MachineSpan `json:"total,omitempty"`
 }
 
 // ResetForSession removes from this statset any statistics that no longer apply across session boundaries.
 func (m *Machine) ResetForSession() {
 	m.LastCycle = director.Cycle{}
-	m.SessionStatusTotals = make(map[status.Status]uint64)
-	m.SessionMutation.Reset()
+	m.Session.Reset()
+}
+
+// AddCycle adds the information from cycle message c to this machine statset.
+func (m *Machine) AddCycle(c director.CycleMessage) {
+	if c.Kind == director.CycleStart {
+		m.LastCycle = c.Cycle
+	}
+	m.Session.AddCycle(c)
+	m.Total.AddCycle(c)
 }
 
 // AddAnalysis adds the information from analysis a to this machine statset.
 func (m *Machine) AddAnalysis(a analysis.Analysis) {
+	m.Session.AddAnalysis(a)
+	m.Total.AddAnalysis(a)
+}
+
+// MachineSpan contains the timespan-specific part of Machine.
+type MachineSpan struct {
+	// FinishedCycles counts the number of cycles that finished.
+	FinishedCycles uint64 `json:"finished_cycles"`
+	// ErroredCycles counts the number of cycles that resulted in an error.
+	ErroredCycles uint64 `json:"errored_cycles"`
+	// Mutation contains totals for mutation testing since this span started.
+	Mutation mutation.Statset `json:"mutation,omitempty"`
+
+	// SessionStatusTotals contains status totals since this span started.
+	// It may be empty if this machine has not yet been active this span.
+	StatusTotals map[status.Status]uint64 `json:"status_totals,omitempty"`
+}
+
+// Reset resets a machine span.
+func (m *MachineSpan) Reset() {
+	m.StatusTotals = make(map[status.Status]uint64)
+	m.Mutation.Reset()
+}
+
+// AddCycle adds the information from cycle message c to this machine span.
+func (m *MachineSpan) AddCycle(c director.CycleMessage) {
+	switch c.Kind {
+	case director.CycleFinish:
+		m.FinishedCycles++
+	case director.CycleError:
+		m.ErroredCycles++
+	}
+}
+
+// AddAnalysis adds the information from analysis a to this machine statset.
+func (m *MachineSpan) AddAnalysis(a analysis.Analysis) {
 	m.addStatusTotals(a)
 	m.addMutation(a)
 }
 
-func (m *Machine) addStatusTotals(a analysis.Analysis) {
+func (m *MachineSpan) addStatusTotals(a analysis.Analysis) {
 	if m.StatusTotals == nil {
 		m.StatusTotals = make(map[status.Status]uint64)
-	}
-	if m.SessionStatusTotals == nil {
-		m.SessionStatusTotals = make(map[status.Status]uint64)
 	}
 	for i := status.Ok; i <= status.Last; i++ {
 		count := uint64(len(a.ByStatus[i]))
 		m.StatusTotals[i] += count
-		m.SessionStatusTotals[i] += count
 	}
 }
 
-func (m *Machine) addMutation(a analysis.Analysis) {
+func (m *MachineSpan) addMutation(a analysis.Analysis) {
 	if len(a.Mutation) == 0 {
 		return
 	}
 	m.Mutation.AddAnalysis(a.Mutation)
-	m.SessionMutation.AddAnalysis(a.Mutation)
 }

@@ -40,20 +40,17 @@ type Statset struct {
 // OnCycle incorporates cycle information from c into the statistics set.
 func (s *Statset) OnCycle(c director.CycleMessage) {
 	s.liftCycle(c.Cycle, func(m *Machine) {
-		if c.Kind == director.CycleStart {
-			m.TotalCycles++
-			m.LastCycle = c.Cycle
-			s.EventCount++
-		}
+		m.AddCycle(c)
 	})
+	s.EventCount++
 }
 
 // OnAnalysis incorporates cycle analysis from a into the statistics set.
 func (s *Statset) OnCycleAnalysis(a director.CycleAnalysis) {
 	s.liftCycle(a.Cycle, func(m *Machine) {
 		m.AddAnalysis(a.Analysis)
-		s.EventCount++
 	})
+	s.EventCount++
 }
 
 // OnCycleBuild does nothing, for now.

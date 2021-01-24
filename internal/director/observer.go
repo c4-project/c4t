@@ -184,7 +184,9 @@ const (
 	// CycleStart denotes the start of a cycle.
 	// Future messages from an InstanceObserver should be ascribed to this cycle, until another CycleStart.
 	CycleStart CycleMessageKind = iota
-	// CycleError denotes a message carrying an error from a cycle.
+	// CycleFinish denotes the successful completion of a cycle.
+	CycleFinish
+	// CycleError denotes a message carrying an error from a cycle (replacing CycleFinish).
 	// Errors in cycles generally cause the cycle to restart, maybe with backoff.
 	CycleError
 )
@@ -192,6 +194,11 @@ const (
 // CycleStartMessage constructs a CycleStart message with cycle c.
 func CycleStartMessage(c Cycle) CycleMessage {
 	return CycleMessage{Cycle: c, Kind: CycleStart}
+}
+
+// CycleFinishMessage constructs a CycleFinish message with cycle c.
+func CycleFinishMessage(c Cycle) CycleMessage {
+	return CycleMessage{Cycle: c, Kind: CycleFinish}
 }
 
 // CycleErrorMessage constructs a CycleError message with cycle c and error err.
