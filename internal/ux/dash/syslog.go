@@ -39,7 +39,7 @@ func (s *syslog) reportPrepare(m director.PrepareMessage) {
 	if m.Kind != director.PrepareInstances {
 		return
 	}
-	s.write("Instances: " + strconv.Itoa(m.NumInstances))
+	s.write(fmt.Sprintln("Instances:", strconv.Itoa(m.NumInstances)))
 }
 
 // reportCycleError logs a cycle error to the system log.
