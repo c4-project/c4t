@@ -60,6 +60,8 @@ type MachineSpan struct {
 
 // Reset resets a machine span.
 func (m *MachineSpan) Reset() {
+	m.FinishedCycles = 0
+	m.ErroredCycles = 0
 	m.StatusTotals = make(map[status.Status]uint64)
 	m.Mutation.Reset()
 }
