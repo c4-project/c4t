@@ -41,7 +41,7 @@ func (r *Replayer) Run(ctx context.Context) error {
 			if errors.Is(err, io.EOF) {
 				return ctx.Err()
 			}
-			return fmt.Errorf("while decoding updates: %w", err)
+			return fmt.Errorf("while decoding updates: %w (pos %d)", err, r.Decoder.InputOffset())
 		}
 
 		if err := r.forwardToObs(f); err != nil {

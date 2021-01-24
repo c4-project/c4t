@@ -139,9 +139,15 @@ func (r *RunInfo) overrideEnv(env map[string]string) {
 	if len(r.Env) == 0 {
 		r.Env = env
 	}
+	// In case we're sharing this environment by reference.
+	nenv := make(map[string]string, len(r.Env))
+	for k, v := range r.Env {
+		nenv[k] = v
+	}
 	for k, v := range env {
 		r.Env[k] = v
 	}
+	r.Env = nenv
 }
 
 func overrideCmd(old, new string) string {
