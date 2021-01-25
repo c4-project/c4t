@@ -110,7 +110,7 @@ func createResultLogFile(c *config.Config) (*os.File, error) {
 }
 
 func statPersisterFromConfig(c *config.Config) (*stat.Persister, error) {
-	path, err := c.Paths.OutPath("stats.json")
+	path, err := c.Paths.StatFile()
 	if err != nil {
 		return nil, fmt.Errorf("expanding stat persister file path: %w", err)
 	}

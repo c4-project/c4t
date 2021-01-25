@@ -28,7 +28,7 @@ import (
 // Persister is a forward handler that maintains and persists a statistics set on disk.
 type Persister struct {
 	// set is the statistics set being persisted.
-	set Statset
+	set Set
 	// f is the target file (we need a file to be able to truncate properly).
 	f *os.File
 	// enc is the encoder writing to f.

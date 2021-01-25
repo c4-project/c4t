@@ -56,7 +56,7 @@ func TestNewPersister(t *testing.T) {
 	f, err = stat.OpenStatFile(path)
 	require.NoError(t, err, "should be able to reopen stat file")
 
-	var s stat.Statset
+	var s stat.Set
 	if assert.NoError(t, s.Load(f), "should be able to load stats from file") {
 		if assert.NotNil(t, s.Machines, "machines should be populated") {
 			// Can't compare cycles directly because the time might have been clipped

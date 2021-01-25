@@ -11,6 +11,10 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/c4-project/c4t/internal/app/stat"
+
+	"github.com/c4-project/c4t/internal/app/config"
+
 	"github.com/c4-project/c4t/internal/app/backend"
 	"github.com/c4-project/c4t/internal/app/obs"
 
@@ -68,6 +72,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	analyse.App,
 	backend.App,
+	config.App,
 	coverage.App,
 	director.App,
 	fuzz.App,
@@ -79,6 +84,7 @@ var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	perturb.App,
 	plan.App,
 	setc.App,
+	stat.App,
 }
 
 func appsToDocument(ctx *c.Context, outw io.Writer, errw io.Writer) []*c.App {

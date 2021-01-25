@@ -25,9 +25,13 @@ c4t\-gccnt
 [\-\-march]=[value]
 [\-\-mcpu]=[value]
 [\-\-nt\-bin]=[value]
+[\-\-nt\-diverge\-mutant\-period]=[value]
 [\-\-nt\-diverge\-opt]=[value]
 [\-\-nt\-dryrun]
+[\-\-nt\-error\-mutant\-period]=[value]
 [\-\-nt\-error\-opt]=[value]
+[\-\-nt\-hit\-mutant\-period]=[value]
+[\-\-nt\-mutant]=[value]
 [\-\-pthread]
 [\-\-std]=[value]
 [\-O]
@@ -75,28 +79,40 @@ c4t\-gccnt [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 \fB\-\-Oz\fP: optimisation level 'z'
 
 .PP
-\fB\-\-march\fP="": architecture optimisation to pass through to gcc
+\fB\-\-march\fP="": architecture optimisation \fB\fCspec\fR to pass through to gcc
 
 .PP
-\fB\-\-mcpu\fP="": cpu optimisation to pass through to gcc
+\fB\-\-mcpu\fP="": cpu optimisation \fB\fCspec\fR to pass through to gcc
 
 .PP
 \fB\-\-nt\-bin\fP="": the 'real' compiler \fB\fCcommand\fR to run (default: gcc)
 
 .PP
-\fB\-\-nt\-diverge\-opt\fP="": o\-levels (minus the '\-O') on which gccn't should diverge
+\fB\-\-nt\-diverge\-mutant\-period\fP="": diverge when the mutant number is a multiple of this \fB\fCperiod\fR (default: 0)
+
+.PP
+\fB\-\-nt\-diverge\-opt\fP="": optimisation \fB\fClevels\fR (minus the '\-O') on which gccn't should diverge
 
 .PP
 \fB\-\-nt\-dryrun\fP: print the outcome of running gccn't instead of doing it
 
 .PP
-\fB\-\-nt\-error\-opt\fP="": o\-levels (minus the '\-O') on which gccn't should exit with an error
+\fB\-\-nt\-error\-mutant\-period\fP="": error when the mutant number is a multiple of this \fB\fCperiod\fR (default: 0)
+
+.PP
+\fB\-\-nt\-error\-opt\fP="": optimisation \fB\fClevels\fR (minus the '\-O') on which gccn't should exit with an error
+
+.PP
+\fB\-\-nt\-hit\-mutant\-period\fP="": report a hit when the mutant number is a multiple of this \fB\fCperiod\fR (default: 0)
+
+.PP
+\fB\-\-nt\-mutant\fP="": the mutant \fB\fCnumber\fR to use if simulating mutation testing (default: 0)
 
 .PP
 \fB\-\-pthread\fP: passes through pthread to gcc
 
 .PP
-\fB\-\-std\fP="": standard to pass through to gcc
+\fB\-\-std\fP="": \fB\fCstandard\fR to pass through to gcc
 
 .PP
 \fB\-O\fP: optimisation level ''

@@ -5,6 +5,14 @@
 
 package mutation
 
+import (
+	"encoding/csv"
+	"sort"
+	"strconv"
+
+	"github.com/c4-project/c4t/internal/helper/errhelp"
+)
+
 // Statset holds statistics for each mutant in a mutation testing campaign.
 type Statset struct {
 	// Selections records the number of times each mutant has been selected.
@@ -47,4 +55,39 @@ func (s *Statset) ensure() {
 	if s.Kills == nil {
 		s.Kills = map[Mutant]uint64{}
 	}
+}
+
+// Mutants returns a sorted list of all mutant IDs seen in this statset.
+func (s *Statset) Mutants() []Mutant {
+	muts := make([]Mutant, len(s.Selections))
+	i := 0
+	for k := range s.Selections {
+		// Including mutants that were selected 0 times, because that's interesting.
+		muts[i] = k
+		i++
+	}
+	sort.Slice(muts, func(i, j int) bool {
+		return muts[i] < muts[j]
+	})
+	return muts
+}
+
+// DumpMutationCSV dumps into w a CSV representation of this mutation statistics set.
+// Each line in the record has mid as a prefix.
+// The writer is flushed at the end of this dump.
+func (s *Statset) DumpCSV(w *csv.Writer, mid string) error {
+	var err error
+	for _, mut := range s.Mutants() {
+		mutstr := strconv.FormatUint(mut, 10)
+		selstr := strconv.FormatUint(s.Selections[mut], 10)
+		hitstr := strconv.FormatUint(s.Hits[mut], 10)
+		killstr := strconv.FormatUint(s.Kills[mut], 10)
+
+		if err = w.Write([]string{mid, mutstr, selstr, hitstr, killstr}); err != nil {
+			break
+		}
+	}
+
+	w.Flush()
+	return errhelp.FirstError(err, w.Error())
 }

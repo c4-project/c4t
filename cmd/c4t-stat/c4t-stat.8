@@ -1,0 +1,49 @@
+.nh
+.TH c4t\-stat 8
+
+.SH NAME
+.PP
+c4t\-stat \- inspects the statistics file
+
+
+.SH SYNOPSIS
+.PP
+c4t\-stat
+
+.PP
+.RS
+
+.nf
+[\-\-csv\-mutations]
+[\-\-input|\-i]=[value]
+[\-\-use\-totals|\-t]
+[\-C]=[value]
+
+.fi
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+c4t\-stat [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH GLOBAL OPTIONS
+.PP
+\fB\-\-csv\-mutations\fP: dump CSV of mutation testing results
+
+.PP
+\fB\-\-input, \-i\fP="": read statistics from this \fB\fCFILE\fR
+
+.PP
+\fB\-\-use\-totals, \-t\fP: use multi\-session totals rather than per\-session totals
+
+.PP
+\fB\-C\fP="": read tester config from this \fB\fCfile\fR

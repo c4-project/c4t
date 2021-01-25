@@ -20,6 +20,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestNewAutomator_error makes sure NewAutomator fails if we try to automate an inactive mutation test configuration.
+func TestNewAutomator_error(t *testing.T) {
+	_, err := mutation.NewAutomator(mutation.AutoConfig{})
+	require.ErrorIs(t, err, mutation.ErrNotActive, "shouldn't be able to construct this")
+}
+
 // TestAutomator_Run_killOnly is a test run of Automator.Run when kill signalling is active but time-slicing isn't.
 func TestAutomator_Run_killOnly(t *testing.T) {
 	t.Parallel()

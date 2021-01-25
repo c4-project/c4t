@@ -20,9 +20,13 @@ c4t-gccnt
 [--march]=[value]
 [--mcpu]=[value]
 [--nt-bin]=[value]
+[--nt-diverge-mutant-period]=[value]
 [--nt-diverge-opt]=[value]
 [--nt-dryrun]
+[--nt-error-mutant-period]=[value]
 [--nt-error-opt]=[value]
+[--nt-hit-mutant-period]=[value]
+[--nt-mutant]=[value]
 [--pthread]
 [--std]=[value]
 [-O]
@@ -53,21 +57,29 @@ c4t-gccnt [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--Oz**: optimisation level 'z'
 
-**--march**="": architecture optimisation to pass through to gcc
+**--march**="": architecture optimisation `spec` to pass through to gcc
 
-**--mcpu**="": cpu optimisation to pass through to gcc
+**--mcpu**="": cpu optimisation `spec` to pass through to gcc
 
 **--nt-bin**="": the 'real' compiler `command` to run (default: gcc)
 
-**--nt-diverge-opt**="": o-levels (minus the '-O') on which gccn't should diverge
+**--nt-diverge-mutant-period**="": diverge when the mutant number is a multiple of this `period` (default: 0)
+
+**--nt-diverge-opt**="": optimisation `levels` (minus the '-O') on which gccn't should diverge
 
 **--nt-dryrun**: print the outcome of running gccn't instead of doing it
 
-**--nt-error-opt**="": o-levels (minus the '-O') on which gccn't should exit with an error
+**--nt-error-mutant-period**="": error when the mutant number is a multiple of this `period` (default: 0)
+
+**--nt-error-opt**="": optimisation `levels` (minus the '-O') on which gccn't should exit with an error
+
+**--nt-hit-mutant-period**="": report a hit when the mutant number is a multiple of this `period` (default: 0)
+
+**--nt-mutant**="": the mutant `number` to use if simulating mutation testing (default: 0)
 
 **--pthread**: passes through pthread to gcc
 
-**--std**="": standard to pass through to gcc
+**--std**="": `standard` to pass through to gcc
 
 **-O**: optimisation level ''
 

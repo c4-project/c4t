@@ -35,5 +35,11 @@ func (p Pathset) FallbackToInputs(fs []string) ([]string, error) {
 
 // OutPath is shorthand for getting a homedir-expanded full path for the output filename file.
 func (p Pathset) OutPath(file string) (string, error) {
+	// TODO(@MattWindsor91): cache expanded homedir?
 	return homedir.Expand(filepath.Join(p.OutDir, file))
+}
+
+// StatFile is shorthand for getting the statistics file path.
+func (p Pathset) StatFile() (string, error) {
+	return p.OutPath("stats.json")
 }

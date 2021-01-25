@@ -6,7 +6,9 @@
 package mutation_test
 
 import (
+	"encoding/csv"
 	"fmt"
+	"os"
 
 	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/mutation"
@@ -64,4 +66,18 @@ func ExampleStatset_AddAnalysis() {
 	// Output:
 	// 27 selected: 3 hit: 6 killed: 1
 	// 53 selected: 1 hit: 0 killed: 0
+}
+
+// ExampleStatset_DumpCSV is a runnable example for Statset.DumpCSV.
+func ExampleStatset_DumpCSV() {
+	_ = (&mutation.Statset{
+		Selections: map[mutation.Mutant]uint64{2: 0, 42: 10, 53: 20},
+		Hits:       map[mutation.Mutant]uint64{42: 1, 53: 400},
+		Kills:      map[mutation.Mutant]uint64{53: 15},
+	}).DumpCSV(csv.NewWriter(os.Stdout), "localhost")
+
+	// Output:
+	// localhost,2,0,0,0
+	// localhost,42,10,1,0
+	// localhost,53,20,400,15
 }

@@ -17,6 +17,7 @@ c4t-analyse
 [--save-dir|-d]=[value]
 [--show-compiler-logs|-L]
 [--show-compilers|-C]
+[--show-mutation|-M]
 [--show-ok|-O]
 [--show-plan-info|-P]
 [--show-subjects|-S]
@@ -45,6 +46,8 @@ c4t-analyse [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 **--show-compiler-logs, -L**: show breakdown of compiler logs (requires -show-compilers)
 
 **--show-compilers, -C**: show breakdown of compilers and their run times
+
+**--show-mutation, -M**: show results of any mutation testing involved in this plan
 
 **--show-ok, -O**: show subjects that did not have compile or run issues
 
