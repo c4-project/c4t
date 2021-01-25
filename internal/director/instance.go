@@ -191,6 +191,7 @@ func (i *Instance) handleCycleEnd(ctx context.Context, res cycleResult) {
 		i.handleError(err, res)
 		return
 	}
+	OnCycle(CycleFinishMessage(res.cycle), i.Observers...)
 	i.Machine.cycle++
 	// Only re-launch if we actually managed to complete the cycle without any errors; otherwise, wait on i.timeoutCh
 	i.launch(ctx)
