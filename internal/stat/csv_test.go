@@ -51,11 +51,15 @@ func ExampleSet_DumpMutationCSV() {
 			},
 		},
 	}
-	_ = s.DumpMutationCSV(csv.NewWriter(os.Stdout), false)
+
+	w := csv.NewWriter(os.Stdout)
+	_ = s.DumpMutationCSVHeader(w)
+	_ = s.DumpMutationCSV(w, false)
 	fmt.Println("--")
-	_ = s.DumpMutationCSV(csv.NewWriter(os.Stdout), true)
+	_ = s.DumpMutationCSV(w, true)
 
 	// Output:
+	// Machine,Mutant,Selections,Hits,Kills,Ok,Filtered,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
 	// foo,2,1,0,0,0,1,0,0,0,0,0
 	// foo,42,10,1,0,9,0,0,0,1,0,0
 	// foo,53,20,400,15,0,0,15,3,0,2,0

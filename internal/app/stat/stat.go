@@ -84,13 +84,20 @@ func dump(ctx *c.Context, set *stat.Set, w io.Writer) error {
 	csvMutations := ctx.Bool(flagCsvMutations)
 
 	if csvMutations {
-		cw := csv.NewWriter(w)
-		if err := set.DumpMutationCSV(cw, totals); err != nil {
+		if err := dumpCsvMutations(w, set, totals); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func dumpCsvMutations(w io.Writer, set *stat.Set, totals bool) error {
+	cw := csv.NewWriter(w)
+	if err := set.DumpMutationCSVHeader(cw); err != nil {
+		return err
+	}
+	return set.DumpMutationCSV(cw, totals)
 }
 
 func getStatFile(ctx *c.Context) (io.ReadCloser, error) {

@@ -9,8 +9,25 @@ import (
 	"encoding/csv"
 	"sort"
 
+	"github.com/c4-project/c4t/internal/subject/status"
+
 	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
+
+// DumpMutationCSVHeader dumps into w a CSV header for mutation analysis.
+func (s *Set) DumpMutationCSVHeader(w *csv.Writer) error {
+	hdr := []string{
+		"Machine",
+		"Mutant",
+		"Selections",
+		"Hits",
+		"Kills",
+	}
+	for i := status.Ok; i <= status.Last; i++ {
+		hdr = append(hdr, i.String())
+	}
+	return w.Write(hdr)
+}
 
 // DumpMutationCSV dumps into w a CSV representation of the mutation statistics in this set.
 // Each machine record has its lines prefixed by its machine ID, is flushed separately, and appears in ID order.
