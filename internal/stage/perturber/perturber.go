@@ -51,13 +51,14 @@ func New(ci compiler.Inspector, opts ...Option) (*Perturber, error) {
 	return p, nil
 }
 
-// Run runs the test perturber on pn.
-// It returns a modified plan on success, which is guaranteed to be different from pn.
-func (p *Perturber) Run(ctx context.Context, pn *plan.Plan) (*plan.Plan, error) {
-	return pn.RunStage(ctx, stage.Perturb, p.perturbInner)
+// Stage gets the appropriate stage for the perturber.
+func (*Perturber) Stage() stage.Stage {
+	return stage.Perturb
 }
 
-func (p *Perturber) perturbInner(_ context.Context, inplan *plan.Plan) (*plan.Plan, error) {
+// Run runs the test perturber on inplan.
+// It returns a modified plan on success, which is guaranteed to be different from pn.
+func (p *Perturber) Run(_ context.Context, inplan *plan.Plan) (*plan.Plan, error) {
 	// Avoid modifying inplan in-place.
 	pn := *inplan
 

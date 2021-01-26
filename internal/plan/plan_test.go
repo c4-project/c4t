@@ -128,6 +128,18 @@ func TestPlan_Check(t *testing.T) {
 	}
 }
 
+type badStage struct {
+	err error
+}
+
+func (b badStage) Stage() stage.Stage {
+	return stage.Last
+}
+
+func (b badStage) Run(context.Context, *plan.Plan) (*plan.Plan, error) {
+	return nil, b.err
+}
+
 // TestPlan_RunStage_error tests that giving Plan.RunStage a body that errors propagates that error correctly.
 func TestPlan_RunStage_error(t *testing.T) {
 	t.Parallel()
@@ -135,9 +147,7 @@ func TestPlan_RunStage_error(t *testing.T) {
 	p := plan.Mock()
 	want := errors.New("oops")
 
-	_, got := p.RunStage(context.Background(), stage.Last, func(context.Context, *plan.Plan) (*plan.Plan, error) {
-		return nil, want
-	})
+	_, got := p.RunStage(context.Background(), badStage{err: want})
 
 	testhelp.ExpectErrorIs(t, got, want, "running stage with error")
 }

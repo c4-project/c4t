@@ -73,12 +73,24 @@ func checkConfig(r backend.Resolver, p Pather) error {
 	return nil
 }
 
+// Stage gets the stage for this Lifter.
+func (*Lifter) Stage() stage.Stage {
+	return stage.Lift
+}
+
 // Run runs a lifting job: taking every test subject in p and using a backend to lift each to a compilable recipe.
 func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
-	return p.RunStage(ctx, stage.Lift, l.lift)
+	if err := l.prepareDirs(p); err != nil {
+		return nil, err
+	}
+
+	var err error
+	outp := *p
+	outp.Corpus, err = l.liftCorpus(ctx, p)
+	return &outp, err
 }
 
 func (l *Lifter) prepareDirs(p *plan.Plan) error {
@@ -97,17 +109,6 @@ func checkPlan(p *plan.Plan) error {
 		return ErrNoBackend
 	}
 	return p.Metadata.RequireStage(stage.Plan)
-}
-
-func (l *Lifter) lift(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
-	if err := l.prepareDirs(p); err != nil {
-		return nil, err
-	}
-
-	var err error
-	outp := *p
-	outp.Corpus, err = l.liftCorpus(ctx, p)
-	return &outp, err
 }
 
 func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, error) {

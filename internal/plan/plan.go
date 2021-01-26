@@ -15,8 +15,6 @@ import (
 
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
 
-	"github.com/c4-project/c4t/internal/plan/stage"
-
 	"github.com/c4-project/c4t/internal/machine"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
@@ -67,14 +65,15 @@ func (p *Plan) Check() error {
 	return nil
 }
 
-// RunStage runs f with ctx and this plan, timing it using wall-clock, and marks s as completed on the resulting plan.
-func (p *Plan) RunStage(ctx context.Context, s stage.Stage, f func(context.Context, *Plan) (*Plan, error)) (*Plan, error) {
+// RunStage runs r with ctx and this plan.
+// If r is a StageRunner, we marks s as completed on the resulting plan, using wall clock.
+func (p *Plan) RunStage(ctx context.Context, r Runner) (*Plan, error) {
 	start := time.Now()
-	np, err := f(ctx, p)
+	np, err := r.Run(ctx, p)
 	if err != nil {
 		return nil, err
 	}
-	np.Metadata.ConfirmStage(s, start, time.Since(start))
+	np.Metadata.ConfirmStage(r.Stage(), start, time.Since(start))
 	return np, nil
 }
 

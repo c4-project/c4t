@@ -34,21 +34,27 @@ const (
 	// Lift is the required stage corresponding to generating test harnesses and build recipes for a corpus.
 	Lift
 
-	// Invoke is the required stage corresponding to running a plan against its machine node.
+	// Invoke is the required stage corresponding to compiling and running a plan.
 	Invoke
 
-	// Compile is a sub-stage of Invoke, corresponding to compiling the recipes in a plan.
+	// Mach is a sub-stage of Invoke, corresponding to operations residing on the machine node.
+	Mach
+
+	// Compile is a sub-stage of Mach, corresponding to compiling the recipes in a plan.
 	Compile
 
-	// Run is a sub-stage of Invoke, corresponding to running the compiled binaries in a plan.
+	// Run is a sub-stage of Mach, corresponding to running the compiled binaries in a plan.
 	Run
 
 	// Analyse is the optional stage corresponding to post-processing an invoked plan.
 	// Unlike other stages, it isn't logged in the plan file, and can be repeated.
 	Analyse
 
+	// SetCompiler is the stage corresponding to manually setting a compiler.
+	SetCompiler
+
 	// Last points to the last stage in the enumeration.
-	Last = Analyse
+	Last = SetCompiler
 )
 
 //go:generate stringer -type Stage

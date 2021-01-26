@@ -39,10 +39,12 @@ func ExampleStage_String() {
 	// Fuzz
 	// Lift
 	// Invoke
+	// Mach
 	// Compile
 	// Run
 	// Analyse
-	// Stage(9)
+	// SetCompiler
+	// Stage(11)
 }
 
 // ExampleStage_MarshalJSON is a runnable example for MarshalJSON.
@@ -58,9 +60,11 @@ func ExampleStage_MarshalJSON() {
 	// "Fuzz"
 	// "Lift"
 	// "Invoke"
+	// "Mach"
 	// "Compile"
 	// "Run"
 	// "Analyse"
+	// "SetCompiler"
 }
 
 // TestStage_MarshalJSON_roundTrip tests Op's marshalling and unmarshalling by round-trip.

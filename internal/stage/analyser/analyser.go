@@ -11,6 +11,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/c4-project/c4t/internal/plan/stage"
+
 	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
 	"github.com/c4-project/c4t/internal/plan/analysis"
@@ -37,6 +39,11 @@ func New(opts ...Option) (*Analyser, error) {
 	an := new(Analyser)
 	err := Options(opts...)(an)
 	return an, err
+}
+
+// Stage returns the appropriate stage information for the analyser.
+func (a *Analyser) Stage() stage.Stage {
+	return stage.Analyse
 }
 
 func (a *Analyser) newSaver() (*saver.Saver, error) {

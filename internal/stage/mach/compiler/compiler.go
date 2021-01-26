@@ -77,16 +77,17 @@ func New(driver interpreter.Driver, paths SubjectPather, opts ...Option) (*Compi
 	return c, nil
 }
 
+// Stage gets the appropriate stage record for compilation.
+func (*Compiler) Stage() stage.Stage {
+	return stage.Compile
+}
+
 // Run runs the batch compiler with context ctx and plan p.
 // On success, it returns an amended plan, now associating each subject with its compiler results.
 func (c *Compiler) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
-	return p.RunStage(ctx, stage.Compile, c.runInner)
-}
-
-func (c *Compiler) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := c.prepareDirs(p); err != nil {
 		return nil, err
 	}

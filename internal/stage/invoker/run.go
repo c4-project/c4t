@@ -31,11 +31,6 @@ func (m *Invoker) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := m.checkPlan(p); err != nil {
 		return nil, err
 	}
-	return p.RunStage(ctx, stage.Invoke, m.invoke)
-}
-
-// invoke runs the machine binary.
-func (m *Invoker) invoke(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	run, err := m.rfac.MakeRunner(m.ldir, p, m.copyObservers...)
 	if err != nil {
 		return nil, fmt.Errorf("while spawning runner: %w", err)

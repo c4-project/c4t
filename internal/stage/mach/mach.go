@@ -11,6 +11,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/c4-project/c4t/internal/plan/stage"
+
 	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
@@ -49,6 +51,11 @@ func New(cdriver interpreter.Driver, bresolve *backend.Resolver, opts ...Option)
 		return nil, err
 	}
 	return m, m.makeCompilerAndRunner(cdriver, bresolve)
+}
+
+// Stage returns the appropriate stage for the machine node.
+func (*Mach) Stage() stage.Stage {
+	return stage.Mach
 }
 
 func (m *Mach) makeCompilerAndRunner(cdriver interpreter.Driver, bresolve *backend.Resolver) error {
@@ -117,7 +124,7 @@ func (m *Mach) runCompiler(ctx context.Context, p *plan.Plan) (*plan.Plan, error
 	if m.compiler == nil {
 		return p, nil
 	}
-	return m.compiler.Run(ctx, p)
+	return p.RunStage(ctx, m.compiler)
 }
 
 // runRunner runs the batch runner on plan p.
@@ -126,5 +133,5 @@ func (m *Mach) runRunner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) 
 	if m.runner == nil {
 		return p, nil
 	}
-	return m.runner.Run(ctx, p)
+	return p.RunStage(ctx, m.runner)
 }

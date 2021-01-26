@@ -16,6 +16,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/c4-project/c4t/internal/plan/stage"
+
 	"github.com/1set/gut/ystring"
 	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 
@@ -116,6 +118,11 @@ type CompilerSetter struct {
 	cid       id.ID
 	opt       string
 	mopt      string
+}
+
+// Stage gets the stage record for a compiler setter.
+func (*CompilerSetter) Stage() stage.Stage {
+	return stage.SetCompiler
 }
 
 // ErrCompilerMissing occurs when we can't find the compiler with a given name.

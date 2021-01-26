@@ -9,6 +9,7 @@ package invoker
 import (
 	"github.com/1set/gut/ystring"
 	"github.com/c4-project/c4t/internal/copier"
+	"github.com/c4-project/c4t/internal/plan/stage"
 	"github.com/c4-project/c4t/internal/quantity"
 	"github.com/c4-project/c4t/internal/stage/invoker/runner"
 	"github.com/c4-project/c4t/internal/stage/mach/observer"
@@ -49,4 +50,9 @@ func New(ldir string, fac runner.Factory, o ...Option) (*Invoker, error) {
 		return nil, err
 	}
 	return &invoker, nil
+}
+
+// Stage gets the appropriate stage information for the invoker.
+func (*Invoker) Stage() stage.Stage {
+	return stage.Invoke
 }

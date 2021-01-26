@@ -89,15 +89,16 @@ func (f *Fuzzer) check() error {
 	return nil
 }
 
+// Stage gets the appropriate stage information for the fuzzer.
+func (f *Fuzzer) Stage() stage.Stage {
+	return stage.Fuzz
+}
+
 // Run runs the fuzzer with context ctx and plan p.
 func (f *Fuzzer) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := f.checkPlan(p); err != nil {
 		return nil, err
 	}
-	return p.RunStage(ctx, stage.Fuzz, f.fuzz)
-}
-
-func (f *Fuzzer) fuzz(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := f.paths.Prepare(); err != nil {
 		return nil, err
 	}

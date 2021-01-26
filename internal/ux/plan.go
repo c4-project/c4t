@@ -41,7 +41,8 @@ func RunOnPlanFile(ctx context.Context, r plan.Runner, inf string, outw io.Write
 	if perr != nil {
 		return perr
 	}
-	q, qerr := r.Run(ctx, p)
+
+	q, qerr := p.RunStage(ctx, r)
 	if qerr != nil {
 		return qerr
 	}

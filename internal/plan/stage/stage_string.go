@@ -14,14 +14,16 @@ func _() {
 	_ = x[Fuzz-3]
 	_ = x[Lift-4]
 	_ = x[Invoke-5]
-	_ = x[Compile-6]
-	_ = x[Run-7]
-	_ = x[Analyse-8]
+	_ = x[Mach-6]
+	_ = x[Compile-7]
+	_ = x[Run-8]
+	_ = x[Analyse-9]
+	_ = x[SetCompiler-10]
 }
 
-const _Stage_name = "UnknownPlanPerturbFuzzLiftInvokeCompileRunAnalyse"
+const _Stage_name = "UnknownPlanPerturbFuzzLiftInvokeMachCompileRunAnalyseSetCompiler"
 
-var _Stage_index = [...]uint8{0, 7, 11, 18, 22, 26, 32, 39, 42, 49}
+var _Stage_index = [...]uint8{0, 7, 11, 18, 22, 26, 32, 36, 43, 46, 53, 64}
 
 func (i Stage) String() string {
 	if i >= Stage(len(_Stage_index)-1) {

@@ -59,15 +59,16 @@ func New(resolver backend.Resolver, paths *Pathset, opts ...Option) (*Runner, er
 	return r, nil
 }
 
+// Stage gets the appropriate stage record for the runner.
+func (*Runner) Stage() stage.Stage {
+	return stage.Run
+}
+
 // Run runs the runner on the plan p.
 func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {
 		return nil, err
 	}
-	return p.RunStage(ctx, stage.Run, r.runInner)
-}
-
-func (r *Runner) runInner(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	observer.OnRunStart(r.quantities, r.observers...)
 
 	b, err := r.resolver.Resolve(p.Backend.Spec)

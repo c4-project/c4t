@@ -14,6 +14,5 @@ import (
 )
 
 func main() {
-	app := fuzz.App(os.Stdout, os.Stderr)
-	ux.LogTopError(app.Run(os.Args))
+	ux.LogTopError(fuzz.App(os.Stdout, os.Stderr).Run(os.Args))
 }
