@@ -22,14 +22,10 @@ func ExampleStatset_Reset() {
 	var s mutation.Statset
 	s.Reset()
 
-	fmt.Println("selections nil:", s.Selections == nil, "len:", len(s.Selections))
-	fmt.Println("hits nil:", s.Hits == nil, "len:", len(s.Hits))
-	fmt.Println("kills nil:", s.Kills == nil, "len:", len(s.Kills))
+	fmt.Println("by-mutant nil:", s.ByMutant == nil, "len:", len(s.ByMutant))
 
 	// Output:
-	// selections nil: false len: 0
-	// hits nil: false len: 0
-	// kills nil: false len: 0
+	// by-mutant nil: false len: 0
 }
 
 // ExampleStatset_AddAnalysis is a runnable example for AddAnalysis.
@@ -62,8 +58,8 @@ func ExampleStatset_AddAnalysis() {
 		},
 	})
 
-	fmt.Println("27 selected:", s.Selections[27], "hit:", s.Hits[27], "killed:", s.Kills[27])
-	fmt.Println("53 selected:", s.Selections[53], "hit:", s.Hits[53], "killed:", s.Kills[53])
+	fmt.Println("27 selected:", s.ByMutant[27].Selections, "hit:", s.ByMutant[27].Hits, "killed:", s.ByMutant[27].Kills)
+	fmt.Println("53 selected:", s.ByMutant[53].Selections, "hit:", s.ByMutant[53].Hits, "killed:", s.ByMutant[53].Kills)
 
 	// Output:
 	// 27 selected: 3 hit: 6 killed: 1
@@ -73,13 +69,15 @@ func ExampleStatset_AddAnalysis() {
 // ExampleStatset_DumpCSV is a runnable example for Statset.DumpCSV.
 func ExampleStatset_DumpCSV() {
 	_ = (&mutation.Statset{
-		Selections: map[mutation.Mutant]uint64{2: 0, 42: 10, 53: 20},
-		Hits:       map[mutation.Mutant]uint64{42: 1, 53: 400},
-		Kills:      map[mutation.Mutant]uint64{53: 15},
+		ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+			2:  {Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
+			42: {Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
+			53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+		},
 	}).DumpCSV(csv.NewWriter(os.Stdout), "localhost")
 
 	// Output:
-	// localhost,2,0,0,0
-	// localhost,42,10,1,0
-	// localhost,53,20,400,15
+	// localhost,2,1,0,0,0,1,0,0,0,0,0
+	// localhost,42,10,1,0,9,0,0,0,1,0,0
+	// localhost,53,20,400,15,0,0,15,3,0,2,0
 }

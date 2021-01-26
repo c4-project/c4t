@@ -10,24 +10,20 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/c4-project/c4t/internal/subject/status"
+
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 )
 
 // Statset holds statistics for each mutant in a mutation testing campaign.
 type Statset struct {
-	// Selections records the number of times each mutant has been selected.
-	Selections map[Mutant]uint64
-	// Hits records the number of times each mutant has been hit (including kills).
-	Hits map[Mutant]uint64
-	// Hits records the number of times each mutant has been hit (including kills).
-	Kills map[Mutant]uint64
+	// ByMutant records statsets for each mutant.
+	ByMutant map[Mutant]MutantStatset
 }
 
 // Reset resets all of this statset's maps to empty, but non-nil.
 func (s *Statset) Reset() {
-	s.Selections = map[Mutant]uint64{}
-	s.Hits = map[Mutant]uint64{}
-	s.Kills = map[Mutant]uint64{}
+	s.ByMutant = map[Mutant]MutantStatset{}
 }
 
 // AddAnalysis adds the information from mutation analysis a to this statset.
@@ -35,33 +31,54 @@ func (s *Statset) AddAnalysis(a Analysis) {
 	s.ensure()
 
 	for mut, hits := range a {
-		for _, h := range hits {
-			s.Selections[mut]++
-			s.Hits[mut] += h.NumHits
-			if h.Killed() {
-				s.Kills[mut]++
-			}
-		}
+		m := s.ByMutant[mut]
+		m.addAnalysis(hits)
+		s.ByMutant[mut] = m
 	}
 }
 
 func (s *Statset) ensure() {
-	if s.Selections == nil {
-		s.Selections = map[Mutant]uint64{}
+	if s.ByMutant == nil {
+		s.ByMutant = map[Mutant]MutantStatset{}
 	}
-	if s.Hits == nil {
-		s.Hits = map[Mutant]uint64{}
+}
+
+type MutantStatset struct {
+	// Selections records the number of times this mutant has been selected.
+	Selections uint64
+	// Hits records the number of times this mutant has been hit (including kills).
+	Hits uint64
+	// Kills records the number of selections that resulted in kills.
+	Kills uint64
+	// Statuses records, for each status, the number of selections that resulted in that status.
+	Statuses map[status.Status]uint64
+}
+
+func (s *MutantStatset) addAnalysis(hits MutantAnalysis) {
+	s.ensure()
+
+	for _, h := range hits {
+		s.Selections++
+		s.Hits += h.NumHits
+		if h.Killed() {
+			s.Kills++
+		}
+
+		s.Statuses[h.Status]++
 	}
-	if s.Kills == nil {
-		s.Kills = map[Mutant]uint64{}
+}
+
+func (s *MutantStatset) ensure() {
+	if s.Statuses == nil {
+		s.Statuses = map[status.Status]uint64{}
 	}
 }
 
 // Mutants returns a sorted list of all mutant IDs seen in this statset.
 func (s *Statset) Mutants() []Mutant {
-	muts := make([]Mutant, len(s.Selections))
+	muts := make([]Mutant, len(s.ByMutant))
 	i := 0
-	for k := range s.Selections {
+	for k := range s.ByMutant {
 		// Including mutants that were selected 0 times, because that's interesting.
 		muts[i] = k
 		i++
@@ -78,16 +95,24 @@ func (s *Statset) Mutants() []Mutant {
 func (s *Statset) DumpCSV(w *csv.Writer, mid string) error {
 	var err error
 	for _, mut := range s.Mutants() {
-		mutstr := strconv.FormatUint(mut, 10)
-		selstr := strconv.FormatUint(s.Selections[mut], 10)
-		hitstr := strconv.FormatUint(s.Hits[mut], 10)
-		killstr := strconv.FormatUint(s.Kills[mut], 10)
-
-		if err = w.Write([]string{mid, mutstr, selstr, hitstr, killstr}); err != nil {
+		if err = s.dumpMutant(w, mid, mut, s.ByMutant[mut]); err != nil {
 			break
 		}
 	}
 
 	w.Flush()
 	return errhelp.FirstError(err, w.Error())
+}
+
+func (s *Statset) dumpMutant(w *csv.Writer, mid string, m Mutant, mstats MutantStatset) error {
+	mstats.ensure()
+	cells := []string{mid, fint(m), fint(mstats.Selections), fint(mstats.Hits), fint(mstats.Kills)}
+	for i := status.Ok; i <= status.Last; i++ {
+		cells = append(cells, fint(mstats.Statuses[i]))
+	}
+	return w.Write(cells)
+}
+
+func fint(i uint64) string {
+	return strconv.FormatUint(i, 10)
 }

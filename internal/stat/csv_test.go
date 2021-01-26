@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/c4-project/c4t/internal/subject/status"
+
 	"github.com/c4-project/c4t/internal/mutation"
 	"github.com/c4-project/c4t/internal/stat"
 )
@@ -21,25 +23,29 @@ func ExampleSet_DumpMutationCSV() {
 			"foo": {
 				Session: stat.MachineSpan{
 					Mutation: mutation.Statset{
-						Selections: map[mutation.Mutant]uint64{2: 10, 3: 4},
-						Hits:       map[mutation.Mutant]uint64{2: 1000, 3: 999},
-						Kills:      map[mutation.Mutant]uint64{3: 2},
+						ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+							2:  {Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
+							42: {Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
+							53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+						},
 					},
 				},
 				Total: stat.MachineSpan{
 					Mutation: mutation.Statset{
-						Selections: map[mutation.Mutant]uint64{1: 1000, 2: 100, 3: 40},
-						Hits:       map[mutation.Mutant]uint64{1: 3000, 2: 2000, 3: 5000},
-						Kills:      map[mutation.Mutant]uint64{3: 20},
+						ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+							2:  {Selections: 41, Hits: 5000, Kills: 40, Statuses: map[status.Status]uint64{status.Flagged: 40, status.Filtered: 1}},
+							42: {Selections: 100, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 99, status.CompileTimeout: 1}},
+							53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+						},
 					},
 				},
 			},
 			"bar": {
 				Total: stat.MachineSpan{
 					Mutation: mutation.Statset{
-						Selections: map[mutation.Mutant]uint64{1: 500},
-						Hits:       map[mutation.Mutant]uint64{},
-						Kills:      map[mutation.Mutant]uint64{},
+						ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+							1: {Selections: 500, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 500}},
+						},
 					},
 				},
 			},
@@ -50,11 +56,12 @@ func ExampleSet_DumpMutationCSV() {
 	_ = s.DumpMutationCSV(csv.NewWriter(os.Stdout), true)
 
 	// Output:
-	// foo,2,10,1000,0
-	// foo,3,4,999,2
+	// foo,2,1,0,0,0,1,0,0,0,0,0
+	// foo,42,10,1,0,9,0,0,0,1,0,0
+	// foo,53,20,400,15,0,0,15,3,0,2,0
 	// --
-	// bar,1,500,0,0
-	// foo,1,1000,3000,0
-	// foo,2,100,2000,0
-	// foo,3,40,5000,20
+	// bar,1,500,0,0,500,0,0,0,0,0,0
+	// foo,2,41,5000,40,0,1,40,0,0,0,0
+	// foo,42,100,1,0,99,0,0,0,1,0,0
+	// foo,53,20,400,15,0,0,15,3,0,2,0
 }
