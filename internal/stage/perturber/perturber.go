@@ -56,6 +56,11 @@ func (*Perturber) Stage() stage.Stage {
 	return stage.Perturb
 }
 
+// Close does nothing.
+func (*Perturber) Close() error {
+	return nil
+}
+
 // Run runs the test perturber on inplan.
 // It returns a modified plan on success, which is guaranteed to be different from pn.
 func (p *Perturber) Run(_ context.Context, inplan *plan.Plan) (*plan.Plan, error) {

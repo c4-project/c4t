@@ -90,8 +90,13 @@ func (f *Fuzzer) check() error {
 }
 
 // Stage gets the appropriate stage information for the fuzzer.
-func (f *Fuzzer) Stage() stage.Stage {
+func (*Fuzzer) Stage() stage.Stage {
 	return stage.Fuzz
+}
+
+// Close does nothing.
+func (*Fuzzer) Close() error {
+	return nil
 }
 
 // Run runs the fuzzer with context ctx and plan p.

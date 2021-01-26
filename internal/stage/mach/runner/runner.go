@@ -64,6 +64,11 @@ func (*Runner) Stage() stage.Stage {
 	return stage.Run
 }
 
+// Close does nothing.
+func (*Runner) Close() error {
+	return nil
+}
+
 // Run runs the runner on the plan p.
 func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {

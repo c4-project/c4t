@@ -42,8 +42,13 @@ func New(opts ...Option) (*Analyser, error) {
 }
 
 // Stage returns the appropriate stage information for the analyser.
-func (a *Analyser) Stage() stage.Stage {
+func (*Analyser) Stage() stage.Stage {
 	return stage.Analyse
+}
+
+// Close does nothing.
+func (*Analyser) Close() error {
+	return nil
 }
 
 func (a *Analyser) newSaver() (*saver.Saver, error) {

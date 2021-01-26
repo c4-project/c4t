@@ -23,12 +23,12 @@ type cycleInstance struct {
 	// p points to the plan being built in this cycle.
 	p *plan.Plan
 
-	// sc points to the instance's stage config.
-	sc *StageConfig
+	// stages contains the stages to run in this cycle.
+	stages []plan.Runner
 }
 
 func (c *cycleInstance) run(ctx context.Context) error {
-	for _, s := range Stages {
+	for _, s := range c.stages {
 		if err := c.runStage(ctx, s); err != nil {
 			return err
 		}
@@ -36,10 +36,10 @@ func (c *cycleInstance) run(ctx context.Context) error {
 	return nil
 }
 
-func (c *cycleInstance) runStage(ctx context.Context, s stageRunner) error {
+func (c *cycleInstance) runStage(ctx context.Context, s plan.Runner) error {
 	var err error
-	if c.p, err = s.Run(c.sc, ctx, c.p); err != nil {
-		return fmt.Errorf("in %s stage: %w", s.Stage, err)
+	if c.p, err = c.p.RunStage(ctx, s); err != nil {
+		return fmt.Errorf("in %s stage: %w", s.Stage(), err)
 	}
 	return nil
 }

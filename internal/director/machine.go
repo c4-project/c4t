@@ -36,6 +36,6 @@ type Machine struct {
 	// This is held separately from the instance as an instance may (eventually) run cycles for multiple machines.
 	cycle uint64
 
-	// stageConfig is the configuration for this instance's stages.
-	stageConfig *StageConfig
+	// stages is the set of stages to run for this machine.
+	stages []plan.Runner
 }

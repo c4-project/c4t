@@ -125,6 +125,11 @@ func (*CompilerSetter) Stage() stage.Stage {
 	return stage.SetCompiler
 }
 
+// Close does nothing.
+func (*CompilerSetter) Close() error {
+	return nil
+}
+
 // ErrCompilerMissing occurs when we can't find the compiler with a given name.
 var ErrCompilerMissing = errors.New("compiler not found")
 

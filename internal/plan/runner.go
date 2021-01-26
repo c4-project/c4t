@@ -7,6 +7,7 @@ package plan
 
 import (
 	"context"
+	"io"
 
 	"github.com/c4-project/c4t/internal/plan/stage"
 )
@@ -20,4 +21,9 @@ type Runner interface {
 	// It also takes a context, which can be used to cancel the process.
 	// It returns an updated plan (which may or may not be p edited in-place), or an error.
 	Run(ctx context.Context, p *Plan) (*Plan, error)
+
+	// Some stages have resources that need to be freed after use.
+	io.Closer
+
+	// TODO(@MattWindsor91): implement Close() calls for parents of Runners other than the director.
 }

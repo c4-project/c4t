@@ -78,6 +78,11 @@ func (*Lifter) Stage() stage.Stage {
 	return stage.Lift
 }
 
+// Close does nothing.
+func (*Lifter) Close() error {
+	return nil
+}
+
 // Run runs a lifting job: taking every test subject in p and using a backend to lift each to a compilable recipe.
 func (l *Lifter) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	if err := checkPlan(p); err != nil {

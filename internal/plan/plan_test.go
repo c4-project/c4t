@@ -135,7 +135,9 @@ type badStage struct {
 func (b badStage) Stage() stage.Stage {
 	return stage.Last
 }
-
+func (b badStage) Close() error {
+	return nil
+}
 func (b badStage) Run(context.Context, *plan.Plan) (*plan.Plan, error) {
 	return nil, b.err
 }

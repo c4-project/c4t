@@ -19,19 +19,11 @@ import (
 
 	"github.com/c4-project/c4t/internal/stage/invoker/runner"
 
-	observer2 "github.com/c4-project/c4t/internal/stage/mach/observer"
-
 	"github.com/c4-project/c4t/internal/stage/perturber"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	"github.com/c4-project/c4t/internal/copier"
-
 	"github.com/c4-project/c4t/internal/stage/analyser"
-
-	"github.com/c4-project/c4t/internal/stage/analyser/saver"
-
-	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
 	"github.com/c4-project/c4t/internal/remote"
 
@@ -110,10 +102,7 @@ func (i *Instance) prepare(ctx context.Context) error {
 		return err
 	}
 	// This must happen after preparing the mutation config, otherwise the kill channel won't be installed.
-	if i.Machine.stageConfig, err = i.makeStageConfig(); err != nil {
-		return err
-	}
-	if err = i.Machine.stageConfig.Check(); err != nil {
+	if i.Machine.stages, err = i.makeStageConfig(); err != nil {
 		return err
 	}
 
@@ -129,10 +118,11 @@ func (i *Instance) cleanUp() error {
 }
 
 func (m *Machine) cleanUp() error {
-	if m.stageConfig != nil && m.stageConfig.Invoke != nil {
-		return m.stageConfig.Invoke.Close()
+	var err error
+	for _, r := range m.stages {
+		err = r.Close()
 	}
-	return nil
+	return err
 }
 
 // check makes sure this instance has a valid configuration before starting loops.
@@ -239,8 +229,8 @@ func (i *Instance) makeCycleInstance() cycleInstance {
 			Iter:      i.Machine.cycle,
 			Start:     time.Now(),
 		},
-		p:  i.plan(),
-		sc: i.Machine.stageConfig,
+		p:      i.plan(),
+		stages: i.Machine.stages,
 	}
 }
 
@@ -250,37 +240,31 @@ func (i *Instance) plan() *plan.Plan {
 	return &pcopy
 }
 
-func (i *Instance) makeStageConfig() (*StageConfig, error) {
-	bobs := LowerToBuilder(i.Observers)
-	cobs := LowerToCopy(i.Observers)
+func (i *Instance) makeStageConfig() ([]plan.Runner, error) {
+	var stages []plan.Runner
 
-	var (
-		err error
-		sc  StageConfig
-	)
-
-	if sc.Perturb, err = i.makePerturber(LowerToPerturber(i.Observers)); err != nil {
-		return nil, fmt.Errorf("when making planner: %w", err)
+	for _, f := range []func() (plan.Runner, error){
+		i.makePerturber,
+		i.makeFuzzer,
+		i.makeLifter,
+		i.makeInvoker,
+		i.makeAnalyser,
+	} {
+		s, err := f()
+		if err != nil {
+			return nil, err
+		}
+		if s != nil {
+			stages = append(stages, s)
+		}
 	}
-	if sc.Fuzz, err = i.makeFuzzer(bobs); err != nil {
-		return nil, fmt.Errorf("when making fuzzer config: %w", err)
-	}
-	if sc.Lift, err = i.makeLifter(bobs); err != nil {
-		return nil, fmt.Errorf("when making lifter config: %w", err)
-	}
-	if sc.Invoke, err = i.makeInvoker(cobs, LowerToMach(i.Observers)); err != nil {
-		return nil, fmt.Errorf("when making machine invoker: %w", err)
-	}
-	if sc.Analyser, err = i.makeAnalyser(LowerToAnalyser(i.Observers), LowerToSaver(i.Observers)); err != nil {
-		return nil, fmt.Errorf("when making analysis: %w", err)
-	}
-	return &sc, nil
+	return stages, nil
 }
 
-func (i *Instance) makeAnalyser(aobs []analyser.Observer, sobs []saver.Observer) (*analyser.Analyser, error) {
+func (i *Instance) makeAnalyser() (plan.Runner, error) {
 	return analyser.New(
-		analyser.ObserveWith(aobs...),
-		analyser.ObserveSaveWith(sobs...),
+		analyser.ObserveWith(LowerToAnalyser(i.Observers)...),
+		analyser.ObserveSaveWith(LowerToSaver(i.Observers)...),
 		analyser.Analysis(
 			analysis.WithWorkerCount(10), // TODO(@MattWindsor91): get this from somewhere
 			analysis.WithFilters(i.Filters),
@@ -289,34 +273,34 @@ func (i *Instance) makeAnalyser(aobs []analyser.Observer, sobs []saver.Observer)
 	)
 }
 
-func (i *Instance) makePerturber(obs []perturber.Observer) (*perturber.Perturber, error) {
+func (i *Instance) makePerturber() (plan.Runner, error) {
 	return perturber.New(
 		i.Env.CInspector,
-		perturber.ObserveWith(obs...),
+		perturber.ObserveWith(LowerToPerturber(i.Observers)...),
 		perturber.OverrideQuantities(i.Machine.Quantities.Perturb),
 		perturber.UseFullCompilerIDs(true),
 	)
 }
 
-func (i *Instance) makeFuzzer(obs []builder.Observer) (*fuzzer.Fuzzer, error) {
+func (i *Instance) makeFuzzer() (plan.Runner, error) {
 	return fuzzer.New(
 		i.Env.Fuzzer,
 		fuzzer.NewPathset(i.Machine.Pathset.Scratch.DirFuzz),
-		fuzzer.ObserveWith(obs...),
+		fuzzer.ObserveWith(LowerToBuilder(i.Observers)...),
 		fuzzer.OverrideQuantities(i.Machine.Quantities.Fuzz),
 		fuzzer.UseConfig(i.FuzzerConfig),
 	)
 }
 
-func (i *Instance) makeLifter(obs []builder.Observer) (*lifter.Lifter, error) {
+func (i *Instance) makeLifter() (plan.Runner, error) {
 	return lifter.New(
 		i.Env.BResolver,
 		lifter.NewPathset(i.Machine.Pathset.Scratch.DirLift),
-		lifter.ObserveWith(obs...),
+		lifter.ObserveWith(LowerToBuilder(i.Observers)...),
 	)
 }
 
-func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer) (*invoker.Invoker, error) {
+func (i *Instance) makeInvoker() (plan.Runner, error) {
 	// Unlike the single-shot, we don't late-bind the factory using the plan.  This is because we've already
 	// got the machine configuration without it.
 	f, err := runner.FactoryFromRemoteConfig(i.SSHConfig, i.Machine.Config.SSH)
@@ -325,8 +309,8 @@ func (i *Instance) makeInvoker(cobs []copier.Observer, mobs []observer2.Observer
 	}
 	return invoker.New(i.Machine.Pathset.Scratch.DirRun,
 		f,
-		invoker.ObserveCopiesWith(cobs...),
-		invoker.ObserveMachWith(mobs...),
+		invoker.ObserveCopiesWith(LowerToCopy(i.Observers)...),
+		invoker.ObserveMachWith(LowerToMach(i.Observers)...),
 		// As above, there is no loading of quantities using the plan, as we already know which machine the plan is
 		// targeting without consulting the plan.
 		invoker.OverrideBaseQuantities(i.Machine.Quantities.Mach),

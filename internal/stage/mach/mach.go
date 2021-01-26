@@ -11,6 +11,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/c4-project/c4t/internal/helper/errhelp"
+
 	"github.com/c4-project/c4t/internal/plan/stage"
 
 	"github.com/c4-project/c4t/internal/serviceimpl/backend"
@@ -56,6 +58,18 @@ func New(cdriver interpreter.Driver, bresolve *backend.Resolver, opts ...Option)
 // Stage returns the appropriate stage for the machine node.
 func (*Mach) Stage() stage.Stage {
 	return stage.Mach
+}
+
+// Close delegates to the compiler and runner closers.
+func (m *Mach) Close() error {
+	var cerr, rerr error
+	if m.compiler != nil {
+		cerr = m.compiler.Close()
+	}
+	if m.runner != nil {
+		rerr = m.runner.Close()
+	}
+	return errhelp.FirstError(cerr, rerr)
 }
 
 func (m *Mach) makeCompilerAndRunner(cdriver interpreter.Driver, bresolve *backend.Resolver) error {

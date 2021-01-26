@@ -82,6 +82,11 @@ func (*Compiler) Stage() stage.Stage {
 	return stage.Compile
 }
 
+// Close does nothing.
+func (*Compiler) Close() error {
+	return nil
+}
+
 // Run runs the batch compiler with context ctx and plan p.
 // On success, it returns an amended plan, now associating each subject with its compiler results.
 func (c *Compiler) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
