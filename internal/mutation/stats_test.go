@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/c4-project/c4t/internal/subject/status"
+
 	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/mutation"
 	"github.com/c4-project/c4t/internal/subject/compilation"
@@ -37,24 +39,24 @@ func ExampleStatset_AddAnalysis() {
 		27: mutation.MutantAnalysis{
 			{
 				NumHits: 0,
-				Killed:  false,
+				Status:  status.Ok,
 				HitBy:   compilation.Name{SubjectName: "smooth", CompilerID: id.FromString("criminal")},
 			},
 			{
 				NumHits: 2,
-				Killed:  false,
+				Status:  status.RunFail,
 				HitBy:   compilation.Name{SubjectName: "marco", CompilerID: id.FromString("polo")},
 			},
 			{
 				NumHits: 4,
-				Killed:  true,
+				Status:  status.Flagged,
 				HitBy:   compilation.Name{SubjectName: "mint", CompilerID: id.FromString("polo")},
 			},
 		},
 		53: mutation.MutantAnalysis{
 			{
 				NumHits: 0,
-				Killed:  false,
+				Status:  status.Filtered,
 				HitBy:   compilation.Name{SubjectName: "marco", CompilerID: id.FromString("polo")},
 			},
 		},

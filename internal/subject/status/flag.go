@@ -26,11 +26,6 @@ const (
 	FlagFail = FlagCompileFail | FlagRunFail
 	// FlagTimeout is the union of all timeout flags.
 	FlagTimeout = FlagCompileTimeout | FlagRunTimeout
-	// FlagMutantKill is the union of all flags that constitute a mutant kill.
-	//
-	// We conservatively don't class timeouts as mutant kills, as they are on the balance of probability more likely to
-	// come from system resource issues.
-	FlagMutantKill = FlagFail | FlagFlagged
 	// FlagBad is the union of all 'bad' flags; it should match the calculation in Status.IsBad.
 	FlagBad = FlagFail | FlagTimeout | FlagFlagged
 
@@ -58,6 +53,16 @@ func (f Flag) MatchesStatus(expected Status) bool {
 		return f == 0
 	}
 	return f.MatchesAll(expected.Flag())
+}
+
+// Status tries to convert this flag into a single status.
+func (f Flag) Status() Status {
+	for s := Ok; s <= Last; s++ {
+		if f.MatchesStatus(s) {
+			return s
+		}
+	}
+	return Unknown
 }
 
 // statusFlags matches statuses to flags.

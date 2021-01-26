@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/c4-project/c4t/internal/subject/status"
+
 	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/subject/compilation"
 )
@@ -28,15 +30,15 @@ func ExampleAnalysis_AddCompilation() {
 
 	ana := Analysis{}
 	fmt.Println("kills after 0 adds:", ana.HasKills())
-	ana.AddCompilation(compilation.Name{SubjectName: "foo", CompilerID: id.FromString("gcc")}, log, false)
+	ana.AddCompilation(compilation.Name{SubjectName: "foo", CompilerID: id.FromString("gcc")}, log, status.Ok)
 	fmt.Println("kills after 1 adds:", ana.HasKills())
-	ana.AddCompilation(compilation.Name{SubjectName: "bar", CompilerID: id.FromString("clang")}, log, true)
+	ana.AddCompilation(compilation.Name{SubjectName: "bar", CompilerID: id.FromString("clang")}, log, status.Flagged)
 	fmt.Println("kills after 2 adds:", ana.HasKills())
 
 	for mutant, hits := range ana {
 		fmt.Printf("%d:", mutant)
 		for _, h := range hits {
-			fmt.Printf(" [%dx, %s, killed: %v]", h.NumHits, h.HitBy, h.Killed)
+			fmt.Printf(" [%dx, %s, killed: %v]", h.NumHits, h.HitBy, h.Killed())
 		}
 		fmt.Println()
 	}

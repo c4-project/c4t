@@ -8,6 +8,8 @@ package mutation
 import (
 	"strings"
 
+	"github.com/c4-project/c4t/internal/subject/status"
+
 	"github.com/c4-project/c4t/internal/subject/compilation"
 )
 
@@ -15,12 +17,12 @@ import (
 type Analysis map[Mutant]MutantAnalysis
 
 // AddCompilation merges any mutant information extracted from log to this analysis.
-// Such analysis is filed under compilation name comp, and killer determines whether hit mutants was killed.
-func (a Analysis) AddCompilation(comp compilation.Name, log string, killer bool) {
+// Such analysis is filed under compilation name comp, and status determines the status of the compilation.
+func (a Analysis) AddCompilation(comp compilation.Name, log string, status status.Status) {
 	for mut, hits := range ScanLines(strings.NewReader(log)) {
-		a[mut] = append(a[mut], HitAnalysis{
+		a[mut] = append(a[mut], SelectionAnalysis{
 			NumHits: hits,
-			Killed:  killer && hits != 0,
+			Status:  status,
 			HitBy:   comp,
 		})
 	}
@@ -30,7 +32,7 @@ func (a Analysis) AddCompilation(comp compilation.Name, log string, killer bool)
 func (a Analysis) HasKills() bool {
 	for _, mut := range a {
 		for _, hit := range mut {
-			if hit.Killed {
+			if hit.Killed() {
 				return true
 			}
 		}
@@ -39,18 +41,22 @@ func (a Analysis) HasKills() bool {
 }
 
 // MutantAnalysis is the type of individual mutant analyses.
-type MutantAnalysis []HitAnalysis
+type MutantAnalysis []SelectionAnalysis
 
-// HitAnalysis is the type of analyses for a one or more hits of a mutant by a compilation.
-type HitAnalysis struct {
+// SelectionAnalysis represents one instance where a compilation selected a particular mutant.
+type SelectionAnalysis struct {
 	// NumHits is the number of times this compilation hit the mutant.
 	// If this is 0, the mutant was selected but never hit.
 	NumHits uint64 `json:"num_hits"`
 
-	// Killed is true provided that this hit resulted in a kill.
-	// If the compilation failed, this will be true unless the mutant was never hit (NumHits == 0).
-	Killed bool `json:"killed"`
+	// Status was the main status of the compilation, which determines whether the selection killed the mutant.
+	Status status.Status `json:"status"`
 
 	// HitBy is the name of the compilation that hit this mutant.
 	HitBy compilation.Name `json:"by"`
+}
+
+// Killed gets whether this selection resulted in a kill (hit at least once and resulted in a flagged status).
+func (h SelectionAnalysis) Killed() bool {
+	return 0 < h.NumHits && h.Status == status.Flagged
 }

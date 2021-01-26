@@ -54,6 +54,7 @@ func (k killObserver) OnInstance(m InstanceMessage) {
 	}
 }
 
+// OnAnalysis fires a kill signal if the analysis a suggests the current mutant was killed.
 func (k killObserver) OnAnalysis(a analysis.Analysis) {
 	if a.Mutation.HasKills() {
 		k <- struct{}{}
