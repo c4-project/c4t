@@ -143,11 +143,12 @@ func (c *Compiler) prepareDirs(p *plan.Plan) error {
 // the corpus proper.
 func (c *Compiler) instance(requests chan<- builder.Request, s subject.Named, p *plan.Plan) *Instance {
 	return &Instance{
-		machineID: p.Machine.ID,
-		subject:   s,
-		compilers: p.Compilers,
-		driver:    c.driver,
-		paths:     c.paths,
-		resCh:     requests,
+		machineID:  p.Machine.ID,
+		subject:    s,
+		compilers:  p.Compilers,
+		driver:     c.driver,
+		paths:      c.paths,
+		resCh:      requests,
+		quantities: c.quantities,
 	}
 }

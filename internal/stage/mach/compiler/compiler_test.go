@@ -8,6 +8,9 @@ package compiler_test
 import (
 	"context"
 	"testing"
+	"time"
+
+	"github.com/c4-project/c4t/internal/quantity"
 
 	mocks2 "github.com/c4-project/c4t/internal/stage/mach/interpreter/mocks"
 
@@ -104,13 +107,21 @@ func TestCompiler_Run(t *testing.T) {
 		}).Once()
 	}
 
-	// not necessarily the same context
-	mc.On("RunCompiler", mock.Anything, mock.MatchedBy(func(j2 mdl.Job) bool {
+	// this test shouldn't take an hour; we're just trying to make sure the timeout propagates.
+	qs := quantity.BatchSet{
+		Timeout: quantity.Timeout(1 * time.Hour),
+	}
+
+	mc.On("RunCompiler", mock.MatchedBy(func(ctx context.Context) bool {
+		dl, ok := ctx.Deadline()
+		// the deadline should be on, or slightly before, now
+		return ok && time.Until(dl) <= time.Duration(qs.Timeout)
+	}), mock.MatchedBy(func(j2 mdl.Job) bool {
 		return j2.SelectedOptName() == cmp.SelectedOpt.Name && j2.SelectedMOptName() == cmp.SelectedMOpt
 	}), mock.Anything).Return(nil)
 	mp.On("Prepare", id.FromString("gcc")).Return(nil)
 
-	stage, serr := compiler.New(&mc, &mp)
+	stage, serr := compiler.New(&mc, &mp, compiler.OverrideQuantities(qs))
 	require.NoError(t, serr, "constructing compile job")
 	p2, err := stage.Run(ctx, &p)
 	require.NoError(t, err, "running compile job")
