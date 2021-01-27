@@ -62,7 +62,8 @@ func ExampleObs_Status() {
 	// e-unsat: Ok
 }
 
-func TestObs_TOML_RoundTrip(t *testing.T) {
+// TestObs_jsonRoundTrip tests that Obs can go round a JSON round-trip.
+func TestObs_jsonRoundTrip(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]obs.Obs{
@@ -71,18 +72,15 @@ func TestObs_TOML_RoundTrip(t *testing.T) {
 		"multiple-flags": {
 			Flags: obs.Sat | obs.Undef,
 			States: []obs.State{
-				{"x": "27", "y": "53"},
-				{"x": "27", "y": "42"},
-			},
-			Witnesses: []obs.State{
-				{"x": "27", "y": "53"},
+				{Occurrences: 42, Values: obs.Valuation{"x": "27", "y": "53"}, Tag: obs.TagWitness},
+				{Occurrences: 90, Values: obs.Valuation{"x": "27", "y": "42"}},
 			},
 		},
 	}
 	for name, want := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			testhelp.TestTomlRoundTrip(t, want, "Obs")
+			testhelp.TestJSONRoundTrip(t, want, "Obs")
 		})
 	}
 }

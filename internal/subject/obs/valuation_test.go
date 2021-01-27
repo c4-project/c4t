@@ -11,15 +11,14 @@ import (
 	"github.com/c4-project/c4t/internal/subject/obs"
 )
 
-// ExampleState_Vars is a runnable example for State.Vars.
-func ExampleState_Vars() {
-	s := obs.State{
+// ExampleValuation_Vars is a runnable example for State.Vars.
+func ExampleValuation_Vars() {
+	for _, v := range (obs.Valuation{
 		"x": "1",
 		"a": "2",
 		"b": "3",
 		"y": "4",
-	}
-	for _, v := range s.Vars() {
+	}).Vars() {
 		fmt.Println(v)
 	}
 

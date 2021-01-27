@@ -18,11 +18,14 @@ const (
 	//
 	// It requires the funcmap to have a function 'obsIndent' from an integer indent level to an indent string.
 	tmplStateset = `
-{{- range $s := . -}}
+{{- range . -}}
 {{- obsIndent 1 -}}
+{{- if .Occurrences -}}[{{ .Occurrences }}x] {{ end -}}
+{{- with $sv := .Values -}}
 {{- range $j, $v := .Vars -}}
-  {{ if ne $j 0 }}, {{ end }}{{ $v }} = {{ index $s $v }}
+  {{ if ne $j 0 }}, {{ end }}{{ $v }} = {{ index $sv $v }}
 {{- else -}}
+{{- end -}}
 {{- end }}{{/* deliberate newline here */}}
 {{ end -}}`
 
@@ -60,10 +63,12 @@ const (
 	tmplDnf = `forall (
 {{- range $i, $s := .States }}
   {{ if eq $i 0 }}  {{ else }}\/{{ end }} (
+{{- with $vs := .Values -}}
 {{- range $j, $v := .Vars -}}
-  {{ if ne $j 0 }} /\ {{ end }}{{ $v }} == {{ index $s $v }}
+  {{ if ne $j 0 }} /\ {{ end }}{{ $v }} == {{ index $vs $v }}
 {{- else -}}
   true
+{{- end -}}
 {{- end -}}
 )
 {{- else }}

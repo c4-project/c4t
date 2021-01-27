@@ -14,29 +14,26 @@ import (
 
 // StateLine is the struct that an implementation of the Herdtools parser must return when parsing a state line.
 type StateLine struct {
-	// NOccurs is the number of times this state has been observed.
-	// If zero, there was no information about occurrences.
-	NOccurs uint64
-	// Tag is the observation tag (witness, counter-example, etc) of this observation.
-	Tag obs.Tag
+	// State is the state parsed, less the valuation.
+	State obs.State
 	// Rest is the remaining fields of the state line, which should be of the form 'x=y;'.
 	Rest []string
 }
 
 // processStateLine performs the herdtools-common processing needed to add sl into an observation.
 func (p *parser) processStateLine(sl *StateLine) error {
-	s, err := parseState(sl.Rest)
-	if err != nil {
+	var err error
+	if sl.State.Values, err = parseValuation(sl.Rest); err != nil {
 		return err
 	}
 	// TODO(@MattWindsor91): number of occurrences?
-	p.o.AddState(sl.Tag, s)
+	p.o.States = append(p.o.States, sl.State)
 	return nil
 }
 
-// parseState parses a state from the mappings in fields.
-func parseState(fields []string) (obs.State, error) {
-	s := make(obs.State, len(fields))
+// parseValuation parses a valuation from the mappings in fields.
+func parseValuation(fields []string) (obs.Valuation, error) {
+	s := make(obs.Valuation, len(fields))
 	for _, f := range fields {
 		k, v, err := parseStateMapping(f)
 		if err != nil {

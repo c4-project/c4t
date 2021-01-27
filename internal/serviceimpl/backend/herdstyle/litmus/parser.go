@@ -81,11 +81,11 @@ func (l *parseLine) parseWithMeta(meta string, rest []string) (*parser.StateLine
 		return l.errorOutf("expected metadata before '>'")
 	}
 
-	if s.NOccurs, err = parseNOccurs(meta[:lfm-1]); err != nil {
+	if s.State.Occurrences, err = parseNOccurs(meta[:lfm-1]); err != nil {
 		return nil, err
 	}
 	s.Rest = rest
-	s.Tag, err = l.parseTagSigil(rune(meta[lfm-1]))
+	s.State.Tag, err = l.parseTagSigil(rune(meta[lfm-1]))
 	return &s, err
 }
 

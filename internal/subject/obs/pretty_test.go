@@ -16,19 +16,11 @@ import (
 func ExamplePretty_dnf() {
 	o := obs.Obs{
 		Flags: obs.Sat,
-		CounterExamples: []obs.State{
-			{"x": "1", "y": "0"},
-			{"x": "0", "y": "0"},
-		},
-		Witnesses: []obs.State{
-			{"x": "0", "y": "1"},
-			{"x": "1", "y": "1"},
-		},
 		States: []obs.State{
-			{"x": "1", "y": "0"},
-			{"x": "0", "y": "0"},
-			{"x": "0", "y": "1"},
-			{"x": "1", "y": "1"},
+			{Values: obs.Valuation{"x": "1", "y": "0"}, Tag: obs.TagCounter},
+			{Values: obs.Valuation{"x": "0", "y": "0"}, Tag: obs.TagCounter},
+			{Values: obs.Valuation{"x": "0", "y": "1"}, Tag: obs.TagWitness},
+			{Values: obs.Valuation{"x": "1", "y": "1"}, Tag: obs.TagWitness},
 		},
 	}
 
@@ -61,19 +53,11 @@ func ExamplePretty_dnf_empty() {
 func ExamplePretty_interesting_exists() {
 	o := obs.Obs{
 		Flags: obs.Sat | obs.Exist,
-		CounterExamples: []obs.State{
-			{"x": "1", "y": "0"},
-			{"x": "0", "y": "0"},
-		},
-		Witnesses: []obs.State{
-			{"x": "0", "y": "1"},
-			{"x": "1", "y": "1"},
-		},
 		States: []obs.State{
-			{"x": "1", "y": "0"},
-			{"x": "0", "y": "0"},
-			{"x": "0", "y": "1"},
-			{"x": "1", "y": "1"},
+			{Values: obs.Valuation{"x": "1", "y": "0"}, Tag: obs.TagCounter},
+			{Values: obs.Valuation{"x": "0", "y": "0"}, Tag: obs.TagCounter},
+			{Values: obs.Valuation{"x": "0", "y": "1"}, Tag: obs.TagWitness},
+			{Values: obs.Valuation{"x": "1", "y": "1"}, Tag: obs.TagWitness},
 		},
 	}
 

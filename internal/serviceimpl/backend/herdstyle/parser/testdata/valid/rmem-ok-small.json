@@ -2,16 +2,14 @@
   "flags": [
     "sat"
   ],
-  "witnesses": [
-    {
-      "t0r0": "1",
-      "x": "1"
-    }
-  ],
   "states": [
     {
-      "t0r0": "1",
-      "x": "1"
+      "occurrences": 2,
+      "tag": "witness",
+      "values": {
+        "t0r0": "1",
+        "x": "1"
+      }
     }
   ]
 }

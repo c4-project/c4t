@@ -6,7 +6,9 @@
 package compilation_test
 
 import (
+	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,33 +17,27 @@ import (
 	"github.com/c4-project/c4t/internal/subject/status"
 
 	"github.com/c4-project/c4t/internal/subject/obs"
-
-	"github.com/BurntSushi/toml"
 )
 
-// TestRun_TomlDecode tests the decoding of a test run from various TOML examples.
-func TestRun_TomlDecode(t *testing.T) {
+// TestRun_JSONDecode tests the decoding of a test run from various JSON examples.
+func TestRun_JSONDecode(t *testing.T) {
 	t.Parallel()
 	cases := map[string]struct {
-		toml string
+		json string
 		want compilation.RunResult
 	}{
-		"empty": {toml: "", want: compilation.RunResult{}},
+		"empty": {json: "{}", want: compilation.RunResult{}},
 		"unsat": {
-			toml: `
-time = 2015-10-21T07:28:00-08:00
-duration = 8675309
-status = "flagged"
-[obs]
-  flags = "unsat"
-
-[[obs.counter_examples]]
-  "0:r0" = "1"
-  x = "1"
-
-[[obs.states]]
-  "0:r0" = "1"
-  x = "1"`,
+			json: `{
+"time": "2015-10-21T07:28:00-08:00",
+"duration": 8675309,
+"status": "flagged",
+"obs": {
+  "flags": ["unsat"],
+  "states": [
+    { "tag": "counter",
+      "values": {"0:r0": "1", "x": "1"} } ] }}
+`,
 			want: compilation.RunResult{
 				Result: compilation.Result{
 					Time:     time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
@@ -50,11 +46,8 @@ status = "flagged"
 				},
 				Obs: &obs.Obs{
 					Flags: obs.Unsat,
-					CounterExamples: []obs.State{
-						{"0:r0": "1", "x": "1"},
-					},
 					States: []obs.State{
-						{"0:r0": "1", "x": "1"},
+						{Values: obs.Valuation{"0:r0": "1", "x": "1"}, Tag: obs.TagCounter},
 					},
 				},
 			},
@@ -66,7 +59,7 @@ status = "flagged"
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			var got compilation.RunResult
-			if _, err := toml.Decode(c.toml, &got); err != nil {
+			if err := json.NewDecoder(strings.NewReader(c.json)).Decode(&got); err != nil {
 				t.Fatal("unexpected decode error:", err)
 			}
 

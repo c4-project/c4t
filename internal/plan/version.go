@@ -11,10 +11,14 @@ type Version uint32
 // CurrentVer is the current plan version.
 // It changes when the interface between various bits of the tester (generally manifested within the plan version)
 // changes.
-const CurrentVer Version = 2021_01_26
+const CurrentVer Version = 2021_01_27
 
 // Version history since 2020_05_29:
 //
+// 2021_01_27: Observation structures completely refactored.  Instead of "counter_examples" and "witnesses" keys, each
+//             state has a "tag" key that contains "counter", "witness", "unknown", or is empty.  New "occurrences" key
+//             in each state tracks number of occurrences where available; key-value maps are now inside a "values" key
+//             inside the state.
 // 2021_01_26: New stages: SetCompiler and Mach, resulting from all plan manipulating tools becoming stages.
 // 2021_01_24: Fixes to keys.
 // 2021_01_22: Changes to 'mutation' key; auto-incrementing config is now in an 'auto' subkey.
