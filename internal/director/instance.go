@@ -102,7 +102,7 @@ func (i *Instance) prepare(ctx context.Context) error {
 		return err
 	}
 	// This must happen after preparing the mutation config, otherwise the kill channel won't be installed.
-	if i.Machine.stages, err = i.makeStageConfig(); err != nil {
+	if i.Machine.stages, err = i.makeStages(); err != nil {
 		return err
 	}
 
@@ -240,7 +240,8 @@ func (i *Instance) plan() *plan.Plan {
 	return &pcopy
 }
 
-func (i *Instance) makeStageConfig() ([]plan.Runner, error) {
+// makeStages constructs a slice of stage runners that will be
+func (i *Instance) makeStages() ([]plan.Runner, error) {
 	var stages []plan.Runner
 
 	for _, f := range []func() (plan.Runner, error){
@@ -282,7 +283,13 @@ func (i *Instance) makePerturber() (plan.Runner, error) {
 	)
 }
 
+// makeFuzzer makes a plan runner for the fuzzer stage.
+// If the fuzzer is disabled, this returns nil.
 func (i *Instance) makeFuzzer() (plan.Runner, error) {
+	if i.FuzzerConfig != nil && i.FuzzerConfig.Disabled {
+		return nil, nil
+	}
+
 	return fuzzer.New(
 		i.Env.Fuzzer,
 		fuzzer.NewPathset(i.Machine.Pathset.Scratch.DirFuzz),
