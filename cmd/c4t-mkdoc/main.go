@@ -13,6 +13,5 @@ import (
 )
 
 func main() {
-	app := mkdoc.App(os.Stdout, os.Stderr)
-	ux.LogTopError(app.Run(os.Args))
+	ux.LogTopError(mkdoc.App(os.Stdout, os.Stderr).Run(os.Args))
 }

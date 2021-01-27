@@ -14,6 +14,5 @@ import (
 )
 
 func main() {
-	app := lift.App(os.Stdout, os.Stderr)
-	ux.LogTopError(app.Run(os.Args))
+	ux.LogTopError(lift.App(os.Stdout, os.Stderr).Run(os.Args))
 }

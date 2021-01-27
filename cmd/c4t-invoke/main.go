@@ -14,6 +14,5 @@ import (
 )
 
 func main() {
-	app := invoke.App(os.Stdout, os.Stderr)
-	ux.LogTopError(app.Run(os.Args))
+	ux.LogTopError(invoke.App(os.Stdout, os.Stderr).Run(os.Args))
 }
