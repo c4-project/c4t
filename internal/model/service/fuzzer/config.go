@@ -5,8 +5,15 @@
 
 package fuzzer
 
-// Configuration lets the tester pass information to the fuzzer.
-type Configuration struct {
+// Config configures the fuzzer.
+type Config struct {
+	// Disabled, if set true, disables the fuzzer stage in the main tester.
+	Disabled bool `toml:"disabled,omitempty"`
+
+	// FuzzesPerSubject specifies the default number of times the fuzzer will be invoked per subject.
+	// If zero, the default number is used.
+	FuzzesPerSubject int `toml:"fuzzes_per_subject,omitempty"`
+
 	// Params contains a low-level key-value map of parameters to pass to the fuzzer.
 	Params map[string]string `toml:"params,omitempty"`
 }

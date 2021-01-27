@@ -27,5 +27,5 @@ type Job struct {
 	Machine *machine.Machine
 
 	// Config is the configuration for the fuzzer, if any.
-	Config *Configuration
+	Config *Config
 }

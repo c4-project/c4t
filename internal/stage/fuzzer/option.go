@@ -44,7 +44,7 @@ func OverrideQuantities(qs quantity.FuzzSet) Option {
 }
 
 // UseConfig populates settings for the fuzzer from the configuration cfg.
-func UseConfig(cfg *fuzzer.Configuration) Option {
+func UseConfig(cfg *fuzzer.Config) Option {
 	// TODO(@MattWindsor91): this should probably install specific settings instead of copying itself.
 	return func(f *Fuzzer) error {
 		f.config = cfg

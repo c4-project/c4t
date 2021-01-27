@@ -43,7 +43,7 @@ type Profile struct {
 	Run *service.RunInfo `toml:"run"`
 
 	// Fuzz specifies a fuzzer configuration to use if this is an known-fuzzer profile.
-	Fuzz *fuzzer2.Configuration `toml:"fuzz"`
+	Fuzz *fuzzer2.Config `toml:"fuzz"`
 
 	// Runner specifies an overridden runner for the profile; this is basically useful only for testing.
 	Runner Runner

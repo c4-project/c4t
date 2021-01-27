@@ -49,7 +49,7 @@ func TestFuzzRunner_Run(t *testing.T) {
 	l.Test(t)
 	s.Test(t)
 
-	conf := fuzzer.Configuration{Params: map[string]string{"fus": "ro dah"}}
+	conf := fuzzer.Config{Params: map[string]string{"fus": "ro dah"}}
 	fr := coverage.FuzzRunner{
 		Fuzzer:     &f,
 		Lifter:     &l,

@@ -49,7 +49,7 @@ type Director struct {
 	// ssh, if present, provides configuration for the director's remote invocation.
 	ssh *remote.Config
 	// fcfg, if present, provides fuzzer configuration.
-	fcfg *fuzzer2.Configuration
+	fcfg *fuzzer2.Config
 	// quantities contains various tunable quantities for the director's stages.
 	quantities quantity.RootSet
 	// files is the input file set.

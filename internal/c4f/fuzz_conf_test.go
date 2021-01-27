@@ -51,7 +51,7 @@ func ExampleWriteFuzzConf_machine() {
 // ExampleWriteFuzzConf_params is a testable example for WriteFuzzConf, showing the effect of adding parameters.
 func ExampleWriteFuzzConf_params() {
 	// These will be output in ascending alphabetical order of keys.
-	f := fuzzer.Job{Config: &fuzzer.Configuration{Params: map[string]string{
+	f := fuzzer.Job{Config: &fuzzer.Config{Params: map[string]string{
 		"int.action.cap.upper":          "1000",
 		"int.this.will.not.parse":       "six",
 		"bool.mem.unsafe-weaken-orders": "true",

@@ -144,7 +144,7 @@ func FiltersFromFile(path string) Option {
 }
 
 // FuzzerConfig sets the fuzzer configuration to cfg.
-func FuzzerConfig(cfg *fuzzer2.Configuration) Option {
+func FuzzerConfig(cfg *fuzzer2.Config) Option {
 	return func(d *Director) error {
 		d.fcfg = cfg
 		return nil

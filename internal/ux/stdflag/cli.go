@@ -111,13 +111,13 @@ func CorpusSizeFromCli(ctx *c.Context) int {
 	return ctx.Int(flagCorpusSize)
 }
 
-// SubjectCyclesCliFlag sets up a 'number of cycles' flag.
-func SubjectCyclesCliFlag() c.Flag {
-	return &c.IntFlag{Name: flagSubjectCycles, Value: fuzzer.DefaultSubjectCycles, Usage: usageSubjectCycles}
+// SubjectFuzzesCliFlag sets up a 'number of cycles' flag.
+func SubjectFuzzesCliFlag() c.Flag {
+	return &c.IntFlag{Name: flagSubjectCycles, Value: fuzzer.DefaultSubjectFuzzes, Usage: usageSubjectFuzzes}
 }
 
-// SubjectCyclesFromCli retrieves a plan file using the file flag set up by SubjectCyclesCliFlag.
-func SubjectCyclesFromCli(ctx *c.Context) int {
+// SubjectFuzzesFromCli retrieves a plan file using the file flag set up by SubjectFuzzesCliFlag.
+func SubjectFuzzesFromCli(ctx *c.Context) int {
 	return ctx.Int(flagSubjectCycles)
 }
 

@@ -31,8 +31,8 @@ import (
 	"github.com/c4-project/c4t/internal/plan"
 )
 
-// DefaultSubjectCycles is the default number of fuzz cycles to run per subject.
-const DefaultSubjectCycles = 10
+// DefaultSubjectFuzzes is the default number of fuzz cycles to run per subject.
+const DefaultSubjectFuzzes = 10
 
 // SubjectPather is the interface of things that serve file-paths for subject outputs during a fuzz batch.
 type SubjectPather interface {
@@ -57,7 +57,7 @@ type Fuzzer struct {
 	// quantities sets the quantities for this batch fuzzer run.
 	quantities quantity.FuzzSet
 	// config sets various options on the fuzzer itself.
-	config *fuzzer.Configuration
+	config *fuzzer.Config
 }
 
 // New constructs a fuzzer with the config c and plan p.
@@ -66,7 +66,7 @@ func New(d Driver, ps SubjectPather, o ...Option) (*Fuzzer, error) {
 		driver: d,
 		paths:  ps,
 		quantities: quantity.FuzzSet{
-			SubjectCycles: DefaultSubjectCycles,
+			SubjectCycles: DefaultSubjectFuzzes,
 		},
 	}
 	if err := Options(o...)(&f); err != nil {

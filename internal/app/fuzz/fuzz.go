@@ -47,7 +47,7 @@ func flags() []c.Flag {
 		stdflag.ConfFileCliFlag(),
 		stdflag.OutDirCliFlag(defaultOutDir),
 		stdflag.CorpusSizeCliFlag(),
-		stdflag.SubjectCyclesCliFlag(),
+		stdflag.SubjectFuzzesCliFlag(),
 	}
 	return append(fs, stdflag.C4fRunnerCliFlags()...)
 }
@@ -81,7 +81,7 @@ func makeFuzzer(ctx *c.Context, cfg *config.Config, drv fuzzer.Driver, l *log.Lo
 func setupQuantityFlags(ctx *c.Context) quantity.FuzzSet {
 	return quantity.FuzzSet{
 		CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
-		SubjectCycles: stdflag.SubjectCyclesFromCli(ctx),
+		SubjectCycles: stdflag.SubjectFuzzesFromCli(ctx),
 		NWorkers:      stdflag.WorkerCountFromCli(ctx),
 	}
 }

@@ -49,7 +49,7 @@ type FuzzRunner struct {
 	// StatDumper is the statistics dumper this fuzz runner uses between fuzzing and lifting.
 	StatDumper litmus.StatDumper
 	// Config is the configuration to pass to the fuzz runner.
-	Config *fuzzer2.Configuration
+	Config *fuzzer2.Config
 
 	// Arch is the architecture that the lifting process should target.
 	Arch id.ID

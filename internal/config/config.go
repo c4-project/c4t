@@ -36,7 +36,7 @@ type Config struct {
 	Quantities quantity.RootSet `toml:"quantities,omitempty"`
 
 	// Fuzz contains fuzzer config overrides.
-	Fuzz *fuzzer.Configuration `toml:"fuzz,omitempty"`
+	Fuzz *fuzzer.Config `toml:"fuzz,omitempty"`
 
 	// SSH contains top-level SSH configuration.
 	SSH *remote.Config `toml:"ssh,omitempty"`
@@ -53,4 +53,28 @@ func (c *Config) FindBackend(cr backend.Criteria) (*backend.NamedSpec, error) {
 // Dump dumps this configuration to the writer w.
 func (c *Config) Dump(w io.Writer) error {
 	return toml.NewEncoder(w).Encode(c)
+}
+
+// OverrideQuantities is shorthand for overriding the quantity set in this config.
+func (c *Config) OverrideQuantities(qs quantity.RootSet) {
+	c.Quantities.Override(qs)
+}
+
+// DisableFuzz is shorthand for setting this config's fuzzer disabled flag to false.
+func (c *Config) DisableFuzz() {
+	if c.Fuzz == nil {
+		c.Fuzz = &fuzzer.Config{}
+	}
+	c.Fuzz.Disabled = true
+}
+
+// OverrideInputs is shorthand for setting this config's inputs to files, if non-empty.
+func (c *Config) OverrideInputs(files []string) error {
+	// TODO(@MattWindsor91): push this into pathset?
+	files, err := c.Paths.FallbackToInputs(files)
+	if err != nil {
+		return err
+	}
+	c.Paths.Inputs = files
+	return nil
 }

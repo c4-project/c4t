@@ -43,7 +43,7 @@ type Instance struct {
 	Machine *machine.Machine
 
 	// Config is the specific configuration, if any, for the fuzzer.
-	Config *fuzzer.Configuration
+	Config *fuzzer.Config
 
 	// Pathset points to the pathset to use to work out where to store fuzz output.
 	Pathset SubjectPather

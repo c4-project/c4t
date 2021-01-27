@@ -59,7 +59,7 @@ type Instance struct {
 	// TODO(@MattWindsor91): this configuration should ideally be per-machine, and then should be moved to Machine.
 
 	// FuzzerConfig contains the fuzzer config for this instance.
-	FuzzerConfig *fuzzer2.Configuration
+	FuzzerConfig *fuzzer2.Config
 
 	// mutantCh stores a channel that will receive mutations, if any.
 	mutantCh <-chan mutation.Mutant

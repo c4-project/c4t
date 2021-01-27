@@ -69,6 +69,10 @@ const (
 	flagNoDash      = "no-dashboard"
 	flagNoDashShort = "D"
 	usageNoDash     = "turns off the dashboard"
+
+	flagNoFuzz      = "no-fuzz"
+	flagNoFuzzShort = "F"
+	usageNoFuzz     = "turns off the fuzzer stage"
 )
 
 // App creates the c4t app.
@@ -93,13 +97,18 @@ func flags() []c.Flag {
 			Aliases: []string{flagNoDashShort},
 			Usage:   usageNoDash,
 		},
+		&c.BoolFlag{
+			Name:    flagNoFuzz,
+			Aliases: []string{flagNoFuzzShort},
+			Usage:   usageNoFuzz,
+		},
 		&c.StringFlag{
 			Name:    flagMFilter,
 			Aliases: []string{stdflag.FlagMachine},
 			Usage:   usageMFilter,
 			Value:   "",
 		},
-		stdflag.SubjectCyclesCliFlag(),
+		stdflag.SubjectFuzzesCliFlag(),
 		stdflag.CorpusSizeCliFlag(),
 		stdflag.CPUProfileCliFlag(),
 	}
@@ -123,20 +132,22 @@ func run(ctx *c.Context, errw io.Writer) error {
 	qs := setupQuantityOverrides(ctx)
 
 	args := args{
-		dash:    !ctx.Bool(flagNoDash),
-		errw:    errw,
-		mfilter: ctx.String(flagMFilter),
-		files:   ctx.Args().Slice(),
+		dash:         !ctx.Bool(flagNoDash),
+		errw:         errw,
+		mfilter:      ctx.String(flagMFilter),
+		files:        ctx.Args().Slice(),
+		fuzzDisabled: ctx.Bool(flagNoFuzz),
 	}
 
 	return runWithArgs(ctx.Context, cfg, qs, a, args)
 }
 
 type args struct {
-	dash    bool
-	errw    io.Writer
-	mfilter string
-	files   []string
+	dash         bool
+	errw         io.Writer
+	mfilter      string
+	files        []string
+	fuzzDisabled bool
 }
 
 func setupPprof(cppath string) (func(), error) {
@@ -155,17 +166,24 @@ func setupPprof(cppath string) (func(), error) {
 }
 
 func runWithArgs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *c4f.Runner, args args) error {
+	if err := overrideConfig(cfg, qs, args); err != nil {
+		return err
+	}
 	o, err := directorobs.NewObs(cfg, args.dash)
 	if err != nil {
 		return err
 	}
-	err = runWithObs(ctx, cfg, qs, a, args, o)
+	err = runWithObs(ctx, cfg, args, a, o)
 	cerr := o.Close()
 	return errhelp.FirstError(err, cerr)
 }
 
-func runWithObs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a *c4f.Runner, args args, o *directorobs.Obs) error {
-	d, err := makeDirector(cfg, qs, a, args, o)
+func runWithObs(ctx context.Context, cfg *config.Config, args args, a *c4f.Runner, o *directorobs.Obs) error {
+	glob, err := makeGlob(args.mfilter)
+	if err != nil {
+		return err
+	}
+	d, err := makeDirector(cfg, glob, a, o)
 	if err != nil {
 		return err
 	}
@@ -184,21 +202,20 @@ func runWithObs(ctx context.Context, cfg *config.Config, qs quantity.RootSet, a 
 	return eg.Wait()
 }
 
-func makeDirector(cfg *config.Config, qs quantity.RootSet, a *c4f.Runner, args args, obs *directorobs.Obs) (*director.Director, error) {
-	glob, err := makeGlob(args.mfilter)
-	if err != nil {
-		return nil, err
-	}
-	files, err := cfg.Paths.FallbackToInputs(args.files)
-	if err != nil {
-		return nil, err
-	}
-	return director.New(makeEnv(a, cfg), cfg.Machines, files,
+func makeDirector(cfg *config.Config, glob id.ID, a *c4f.Runner, obs *directorobs.Obs) (*director.Director, error) {
+	return director.New(makeEnv(a, cfg), cfg.Machines, cfg.Paths.Inputs,
 		director.ConfigFromGlobal(cfg),
-		director.OverrideQuantities(qs),
 		director.FilterMachines(glob),
 		director.ObserveWith(obs.Observers()...),
 	)
+}
+
+func overrideConfig(cfg *config.Config, qs quantity.RootSet, args args) error {
+	cfg.OverrideQuantities(qs)
+	if args.fuzzDisabled {
+		cfg.DisableFuzz()
+	}
+	return cfg.OverrideInputs(args.files)
 }
 
 func makeGlob(mfilter string) (id.ID, error) {
@@ -227,7 +244,7 @@ func setupQuantityOverrides(ctx *c.Context) quantity.RootSet {
 		MachineSet: quantity.MachineSet{
 			Fuzz: quantity.FuzzSet{
 				CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
-				SubjectCycles: stdflag.SubjectCyclesFromCli(ctx),
+				SubjectCycles: stdflag.SubjectFuzzesFromCli(ctx),
 			},
 		},
 	}

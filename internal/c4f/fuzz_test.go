@@ -33,7 +33,7 @@ func TestRunner_Fuzz(t *testing.T) {
 		OutLitmus: "foo.fuzz.litmus",
 		OutTrace:  "foo.trace",
 		Machine:   &machine.Machine{Cores: 16},
-		Config: &fuzzer.Configuration{Params: map[string]string{
+		Config: &fuzzer.Config{Params: map[string]string{
 			"action.var.make":               "10",
 			"bool.mem.unsafe-weaken-orders": "true",
 			"int.action.cap.upper":          "1000",

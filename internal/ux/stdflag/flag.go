@@ -45,6 +45,6 @@ const (
 	usageCorpusSize    = "`number` of corpus files to select for this test plan"
 	usageC4fDuneExec   = "if true, use 'dune exec' to run c4f binaries"
 	usageOutDir        = "`directory` to which outputs will be written"
-	usageSubjectCycles = "number of `cycles` to run for each subject in the corpus"
+	usageSubjectFuzzes = "number of `times` to fuzz each subject in the corpus"
 	usageCPUProfile    = "`file` into which we should dump pprof information"
 )
