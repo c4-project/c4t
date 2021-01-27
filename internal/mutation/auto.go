@@ -33,10 +33,8 @@ type Automator struct {
 	// ticker is the ticker used to handle time-slices.
 	ticker Ticker
 
-	// i is the current index in mutants.
-	i int
-	// mutants is the mutant list.
-	mutants []Mutant
+	// pool contains the current mutant set and handles which one is to be selected next.
+	pool AutoPool
 }
 
 // NewAutomator constructs a new Automator given configuration cfg.
@@ -45,14 +43,14 @@ func NewAutomator(cfg AutoConfig) (*Automator, error) {
 		return nil, ErrNotActive
 	}
 
-	return &Automator{
+	a := &Automator{
 		TickerF: StandardTicker,
 		// killCh is lazily constructed by KillCh.
 		config:   cfg,
 		mutantCh: make(chan Mutant),
-		i:        0,
-		mutants:  cfg.Mutants(),
-	}, nil
+	}
+	a.pool.Init(cfg.Mutants())
+	return a, nil
 }
 
 // MutantCh gets a receive channel for taking mutants from this automator.
@@ -90,12 +88,22 @@ func (a *Automator) loop(ctx context.Context) {
 			a.drainKill()
 			return
 		case <-a.killCh:
-			a.sendMutant(ctx)
-			a.resetTicker()
+			a.handleKill(ctx)
 		case <-a.tickCh:
-			a.sendMutant(ctx)
+			a.handleTimeout(ctx)
 		}
 	}
+}
+
+func (a *Automator) handleKill(ctx context.Context) {
+	a.pool.Kill()
+	a.sendMutant(ctx)
+	a.resetTicker()
+}
+
+func (a *Automator) handleTimeout(ctx context.Context) {
+	a.pool.Advance()
+	a.sendMutant(ctx)
 }
 
 // resetTicker resets the ticker after receiving a kill.
@@ -128,16 +136,8 @@ func (a *Automator) drainKill() {
 func (a *Automator) sendMutant(ctx context.Context) {
 	select {
 	case <-ctx.Done():
-		return
-	case a.mutantCh <- a.mutants[a.i]:
-		a.advanceIndex()
+	case a.mutantCh <- a.pool.Mutant():
 	}
-}
-
-// advanceIndex increments the mutant index, wrapping around at the end of the mutant list.
-func (a *Automator) advanceIndex() {
-	// NewAutomator checks that 0 < len(a.mutants).
-	a.i = (a.i + 1) % len(a.mutants)
 }
 
 // Ticker is a mockable interface for time.Ticker.
@@ -167,3 +167,50 @@ func (nopTicker) Reset(time.Duration) {}
 
 // Stop does nothing.
 func (nopTicker) Stop() {}
+
+// AutoPool manages the next mutant to select in an automated mutation testing campaign.
+//
+// The policy AutoPool implements is:
+// 1) Start by considering every mutant in turn.
+// 2) Whenever a mutant is killed or its timeslot ends, advance to the next mutant.
+// 3) If we are out of mutants, start again with the list of all mutants not killed by the steps above, and repeat.
+// 4) If we kill every mutant, start again with every mutant.  (This behaviour may change eventually.)
+type AutoPool struct {
+	orig, curr, next []Mutant
+	i                int
+}
+
+// Mutant gets the currently selected mutant.
+func (a *AutoPool) Mutant() Mutant {
+	return a.curr[a.i]
+}
+
+// Init initialises this pool with initial mutants muts.
+func (a *AutoPool) Init(muts []Mutant) {
+	a.orig = muts
+	a.endCycle()
+}
+
+// Advance advances to the next mutant without killing it.
+func (a *AutoPool) Advance() {
+	// Advancing is the same as killing, but marking the mutant as needing killing later on.
+	a.next = append(a.next, a.curr[a.i])
+	a.Kill()
+}
+
+// Kill marks the mutant as killed.
+func (a *AutoPool) Kill() {
+	a.i++
+	if len(a.curr) <= a.i {
+		a.endCycle()
+	}
+}
+
+func (a *AutoPool) endCycle() {
+	a.i = 0
+	// Did we kill all of the mutants?  If so, we don't have any special support for this yet, so just reset entirely.
+	if len(a.next) == 0 {
+		a.next = a.orig
+	}
+	a.curr, a.next = a.next, make([]Mutant, 0, len(a.curr))
+}

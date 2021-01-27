@@ -55,7 +55,7 @@ func TestAutomator_Run_killOnly(t *testing.T) {
 	var got mutation.Mutant
 	for i, want := range wants {
 		got = <-mch
-		assert.Equal(t, want, got, "mutant wrong at position", i)
+		assert.Equalf(t, want, got, "mutant wrong at position %d", i)
 		kch <- struct{}{}
 	}
 
@@ -118,4 +118,46 @@ func TestAutomator_Run_timeOnly(t *testing.T) {
 	wg.Wait()
 
 	ticker.AssertExpectations(t)
+}
+
+// TestAutoPool_Mutant checks whether AutoPool.Mutant returns what we expect to be the right mutants.
+func TestAutoPool_Mutant(t *testing.T) {
+	t.Parallel()
+	asrt := assert.New(t)
+
+	orig := []mutation.Mutant{1, 2, 4, 5, 10, 11, 12}
+	var a mutation.AutoPool
+
+	a.Init(orig)
+
+	for i, m := range orig {
+		asrt.Equalf(m, a.Mutant(), "mutant at position %d unexpected", i)
+		if i%2 == 0 {
+			a.Kill()
+		} else {
+			a.Advance()
+		}
+	}
+
+	// This should leave the odd mutants.
+	for i := 1; i < len(orig); i += 2 {
+		asrt.Equalf(orig[i], a.Mutant(), "mutant at position %d unexpected (pass 2)", i)
+		a.Kill()
+	}
+
+	// We should now have killed all the mutants, testing for wraparound now.
+	for i, m := range orig {
+		asrt.Equalf(m, a.Mutant(), "mutant at position %d unexpected (pass 3)", i)
+		if 0 < i {
+			a.Kill()
+		} else {
+			a.Advance()
+		}
+	}
+
+	// We left exactly one mutant live.
+	for i := 0; i < 100; i++ {
+		asrt.Equalf(orig[0], a.Mutant(), "mutant unexpected (pass 4)")
+		a.Advance()
+	}
 }
