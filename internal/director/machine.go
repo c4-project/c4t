@@ -6,7 +6,10 @@
 package director
 
 import (
+	"fmt"
+
 	"github.com/c4-project/c4t/internal/director/pathset"
+	"github.com/c4-project/c4t/internal/helper/iohelp"
 	"github.com/c4-project/c4t/internal/machine"
 	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/plan"
@@ -38,4 +41,11 @@ type Machine struct {
 
 	// stages is the set of stages to run for this machine.
 	stages []plan.Runner
+}
+
+func (m *Machine) check() error {
+	if m.Pathset == nil {
+		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, m.ID.String())
+	}
+	return nil
 }

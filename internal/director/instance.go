@@ -8,7 +8,6 @@ package director
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/c4-project/c4t/internal/mutation"
@@ -139,13 +138,6 @@ func (i *Instance) check() error {
 	return i.Env.Check()
 }
 
-func (m *Machine) check() error {
-	if m.Pathset == nil {
-		return fmt.Errorf("%w: paths for machine %s", iohelp.ErrPathsetNil, m.ID.String())
-	}
-	return nil
-}
-
 // cycleResult is the type of results from cycle goroutines.
 type cycleResult struct {
 	cycle Cycle
@@ -154,7 +146,9 @@ type cycleResult struct {
 
 // mainLoop performs the main testing loop for one machine.
 func (i *Instance) mainLoop(ctx context.Context) error {
+	i.handleFirstMutant(ctx)
 	i.launch(ctx)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -167,6 +161,19 @@ func (i *Instance) mainLoop(ctx context.Context) error {
 		case <-i.timeoutCh:
 			i.launch(ctx)
 		}
+	}
+}
+
+// handleFirstMutant synchronises with any mutant channel to make sure that we retrieve the first mutant before looping.
+// This prevents a race condition where the first mutant may or may not arrive before we launch the first cycle.
+func (i *Instance) handleFirstMutant(ctx context.Context) {
+	if i.mutantCh == nil {
+		return
+	}
+	select {
+	case <-ctx.Done():
+	case m := <-i.mutantCh:
+		i.handleMutantChange(m)
 	}
 }
 
