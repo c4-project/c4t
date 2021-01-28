@@ -11,8 +11,10 @@ c4t
 ```
 [--corpus-size|-n]=[value]
 [--cpuprofile]=[value]
+[--global-timeout]=[value]
 [--machine-filter|-m]=[value]
 [--no-dashboard|-D]
+[--no-fuzz|-F]
 [-C]=[value]
 [-k]=[value]
 [-x]
@@ -30,13 +32,17 @@ c4t [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--cpuprofile**="": `file` into which we should dump pprof information
 
+**--global-timeout**="": `duration` after which experiment will be killed (default: 0s)
+
 **--machine-filter, -m**="": a `glob` to use to filter incoming machines by ID
 
 **--no-dashboard, -D**: turns off the dashboard
 
+**--no-fuzz, -F**: turns off the fuzzer stage
+
 **-C**="": read tester config from this `file`
 
-**-k**="": number of `cycles` to run for each subject in the corpus (default: 10)
+**-k**="": number of `times` to fuzz each subject in the corpus (default: 10)
 
 **-x**: if true, use 'dune exec' to run c4f binaries
 
