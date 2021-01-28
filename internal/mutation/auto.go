@@ -25,7 +25,7 @@ type Automator struct {
 	mutantCh chan Mutant
 
 	// killCh is the channel used to receive kill signals from an observer.
-	killCh chan struct{}
+	killCh chan Mutant
 
 	// tickCh is the channel used to receive signals from the ticker.
 	tickCh <-chan time.Time
@@ -61,9 +61,9 @@ func (a *Automator) MutantCh() <-chan Mutant {
 // KillCh gets a send channel for sending kill signals to this automator.
 // If the automator isn't receiving kill signals, this will be nil.
 // This channel must be closed.
-func (a *Automator) KillCh() chan<- struct{} {
+func (a *Automator) KillCh() chan<- Mutant {
 	if a.killCh == nil && a.config.ChangeKilled {
-		a.killCh = make(chan struct{})
+		a.killCh = make(chan Mutant)
 	}
 	return a.killCh
 }
@@ -87,16 +87,16 @@ func (a *Automator) loop(ctx context.Context) {
 		case <-ctx.Done():
 			a.drainKill()
 			return
-		case <-a.killCh:
-			a.handleKill(ctx)
+		case m := <-a.killCh:
+			a.handleKill(ctx, m)
 		case <-a.tickCh:
 			a.handleTimeout(ctx)
 		}
 	}
 }
 
-func (a *Automator) handleKill(ctx context.Context) {
-	a.pool.Kill()
+func (a *Automator) handleKill(ctx context.Context, m Mutant) {
+	a.pool.Kill(m)
 	a.sendMutant(ctx)
 	a.resetTicker()
 }
@@ -193,13 +193,19 @@ func (a *AutoPool) Init(muts []Mutant) {
 
 // Advance advances to the next mutant without killing it.
 func (a *AutoPool) Advance() {
-	// Advancing is the same as killing, but marking the mutant as needing killing later on.
 	a.next = append(a.next, a.curr[a.i])
-	a.Kill()
+	a.increment()
 }
 
-// Kill marks the mutant as killed.
-func (a *AutoPool) Kill() {
+// Kill marks the mutant m as killed, if it is the current mutant.
+func (a *AutoPool) Kill(m Mutant) {
+	if a.Mutant() != m {
+		return
+	}
+	a.increment()
+}
+
+func (a *AutoPool) increment() {
 	a.i++
 	if len(a.curr) <= a.i {
 		a.endCycle()

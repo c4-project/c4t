@@ -41,7 +41,7 @@ func (i *Instance) handleMutantChange(m mutation.Mutant) {
 }
 
 // killObserver is the kill channel of a mutation automator adapted to observe instances.
-type killObserver chan<- struct{}
+type killObserver chan<- mutation.Mutant
 
 // OnCycle does nothing.
 func (k killObserver) OnCycle(CycleMessage) {
@@ -56,8 +56,8 @@ func (k killObserver) OnInstance(m InstanceMessage) {
 
 // OnAnalysis fires a kill signal if the analysis a suggests the current mutant was killed.
 func (k killObserver) OnAnalysis(a analysis.Analysis) {
-	if a.Mutation.HasKills() {
-		k <- struct{}{}
+	for _, kill := range a.Mutation.Kills() {
+		k <- kill
 	}
 }
 

@@ -29,11 +29,11 @@ func ExampleAnalysis_AddCompilation() {
 	}, "\n")
 
 	ana := Analysis{}
-	fmt.Println("kills after 0 adds:", ana.HasKills())
+	fmt.Println("kills after 0 adds:", ana.Kills())
 	ana.AddCompilation(compilation.Name{SubjectName: "foo", CompilerID: id.FromString("gcc")}, log, status.Ok)
-	fmt.Println("kills after 1 adds:", ana.HasKills())
+	fmt.Println("kills after 1 adds:", ana.Kills())
 	ana.AddCompilation(compilation.Name{SubjectName: "bar", CompilerID: id.FromString("clang")}, log, status.Flagged)
-	fmt.Println("kills after 2 adds:", ana.HasKills())
+	fmt.Println("kills after 2 adds:", ana.Kills())
 
 	for mutant, hits := range ana {
 		fmt.Printf("%d:", mutant)
@@ -44,9 +44,9 @@ func ExampleAnalysis_AddCompilation() {
 	}
 
 	// Unordered output:
-	// kills after 0 adds: false
-	// kills after 1 adds: false
-	// kills after 2 adds: true
+	// kills after 0 adds: []
+	// kills after 1 adds: []
+	// kills after 2 adds: [42]
 	// 42: [2x, foo@gcc, killed: false] [2x, bar@clang, killed: true]
 	// 8: [0x, foo@gcc, killed: false] [0x, bar@clang, killed: false]
 }

@@ -56,7 +56,7 @@ func TestAutomator_Run_killOnly(t *testing.T) {
 	for i, want := range wants {
 		got = <-mch
 		assert.Equalf(t, want, got, "mutant wrong at position %d", i)
-		kch <- struct{}{}
+		kch <- want
 	}
 
 	got = <-mch
@@ -64,7 +64,7 @@ func TestAutomator_Run_killOnly(t *testing.T) {
 
 	cancel()
 	// Test draining of spurious kills.
-	kch <- struct{}{}
+	kch <- 42
 	close(kch)
 	wg.Wait()
 }
@@ -133,7 +133,7 @@ func TestAutoPool_Mutant(t *testing.T) {
 	for i, m := range orig {
 		asrt.Equalf(m, a.Mutant(), "mutant at position %d unexpected", i)
 		if i%2 == 0 {
-			a.Kill()
+			a.Kill(m)
 		} else {
 			a.Advance()
 		}
@@ -142,14 +142,16 @@ func TestAutoPool_Mutant(t *testing.T) {
 	// This should leave the odd mutants.
 	for i := 1; i < len(orig); i += 2 {
 		asrt.Equalf(orig[i], a.Mutant(), "mutant at position %d unexpected (pass 2)", i)
-		a.Kill()
+		a.Kill(orig[i])
 	}
 
 	// We should now have killed all the mutants, testing for wraparound now.
 	for i, m := range orig {
 		asrt.Equalf(m, a.Mutant(), "mutant at position %d unexpected (pass 3)", i)
 		if 0 < i {
-			a.Kill()
+			// Testing the attempted re-killing of expired mutants.
+			a.Kill(m - 1)
+			a.Kill(m)
 		} else {
 			a.Advance()
 		}
