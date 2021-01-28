@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/c4-project/c4t/internal/copier"
 
@@ -28,8 +27,6 @@ import (
 
 	"github.com/mum4k/termdash/linestyle"
 
-	"github.com/mum4k/termdash/widgets/text"
-
 	"github.com/mum4k/termdash/terminal/tcell"
 	"github.com/mum4k/termdash/terminal/terminalapi"
 
@@ -41,7 +38,7 @@ import (
 type Dash struct {
 	container *container.Container
 	term      terminalapi.Terminal
-	startTime *text.Text
+	time      *timeKeeper
 	sysLog    *syslog
 	resultLog *ResultLog
 
@@ -150,10 +147,7 @@ func New() (*Dash, error) {
 		return nil, err
 	}
 
-	if d.startTime, err = text.New(text.DisableScrolling()); err != nil {
-		return nil, err
-	}
-	if err := d.startTime.Write(time.Now().Format(time.Stamp)); err != nil {
+	if d.time, err = newTimeKeeper(); err != nil {
 		return nil, err
 	}
 
@@ -195,13 +189,13 @@ func makeLogPane(d Dash) container.Option {
 		container.Top(
 			container.SplitHorizontal(
 				container.Top(
-					container.Border(linestyle.Double), container.BorderTitle("Experiment Start"),
-					container.PlaceWidget(d.startTime),
+					container.Border(linestyle.Double), container.BorderTitle("Experiment"),
+					d.time.makePane(),
 				),
 				container.Bottom(
 					container.Border(linestyle.Double), container.BorderTitle("System Log"), container.PlaceWidget(d.sysLog.log),
 				),
-				container.SplitFixed(3),
+				container.SplitFixed(4),
 			),
 		),
 		container.Bottom(
@@ -245,7 +239,8 @@ func (d *Dash) Close() error {
 // OnPrepare uses the instance calculation to prepare a machine grid.
 func (d *Dash) OnPrepare(m director.PrepareMessage) {
 	// TODO(@MattWindsor91): broadcast the quantities somewhere
-	d.sysLog.reportPrepare(m)
+	d.time.OnPrepare(m)
+	d.sysLog.OnPrepare(m)
 	if err := d.ensureInstances(m.NumInstances); err != nil {
 		d.logError(err)
 	}

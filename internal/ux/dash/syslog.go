@@ -34,8 +34,8 @@ func newSysLog() (*syslog, error) {
 	return &syslog{log: log, nlines: 0}, nil
 }
 
-// reportPrepare reports a director preparation message.
-func (s *syslog) reportPrepare(m director.PrepareMessage) {
+// OnPrepare reports a director preparation message.
+func (s *syslog) OnPrepare(m director.PrepareMessage) {
 	if m.Kind != director.PrepareInstances {
 		return
 	}

@@ -10,11 +10,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/c4-project/c4t/internal/helper/srvrun"
-	"github.com/c4-project/c4t/internal/stage/fuzzer"
-
 	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	// It's 2020, and tools _still_ can't understand the use of 'v2' unless you do silly hacks like this.
 	c "github.com/urfave/cli/v2"
@@ -93,32 +91,6 @@ func PlanFileFromCli(ctx *c.Context) (string, error) {
 		return "", fmt.Errorf("%w: got %d arguments, expected at most one", ErrBadPlanArguments, narg)
 	}
 	return args.First(), nil
-}
-
-// CorpusSizeCliFlag sets up a 'target corpus size' flag.
-func CorpusSizeCliFlag() c.Flag {
-	return &c.IntFlag{
-		Name:        flagCorpusSize,
-		Aliases:     []string{FlagNum},
-		Value:       0,
-		Usage:       usageCorpusSize,
-		DefaultText: "all",
-	}
-}
-
-// CorpusSizeFromCli retrieves a plan file using the file flag set up by CorpusSizeCliFlag.
-func CorpusSizeFromCli(ctx *c.Context) int {
-	return ctx.Int(flagCorpusSize)
-}
-
-// SubjectFuzzesCliFlag sets up a 'number of cycles' flag.
-func SubjectFuzzesCliFlag() c.Flag {
-	return &c.IntFlag{Name: flagSubjectCycles, Value: fuzzer.DefaultSubjectFuzzes, Usage: usageSubjectFuzzes}
-}
-
-// SubjectFuzzesFromCli retrieves a plan file using the file flag set up by SubjectFuzzesCliFlag.
-func SubjectFuzzesFromCli(ctx *c.Context) int {
-	return ctx.Int(flagSubjectCycles)
 }
 
 // CPUProfileCliFlag sets up a 'cpu profile dumper' flag.

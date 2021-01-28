@@ -51,3 +51,10 @@ func (t *Timeout) UnmarshalText(in []byte) error {
 	*t = Timeout(d)
 	return err
 }
+
+// Override overrides this timeout with new if new is active.
+func (t *Timeout) Override(new Timeout) {
+	if new.IsActive() {
+		*t = new
+	}
+}

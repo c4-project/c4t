@@ -9,6 +9,7 @@ package director
 import (
 	"context"
 	"fmt"
+	"time"
 
 	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 
@@ -159,7 +160,7 @@ func liftInitError(err error) error {
 
 // Direct runs the director d.
 func (d *Director) Direct(ctx context.Context) error {
-	if err := d.prepare(); err != nil {
+	if err := d.prepare(ctx); err != nil {
 		return err
 	}
 
@@ -188,7 +189,14 @@ func (d *Director) makePlanner() (*planner.Planner, error) {
 }
 
 func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) error {
-	eg, ectx := errgroup.WithContext(ctx)
+	// Doing this here so that the perceived experiment length is always at or slightly above the timeout interval.
+	start := time.Now()
+	cctx, cancel := d.quantities.GlobalTimeout.OnContext(ctx)
+	defer cancel()
+
+	d.announceTimes(cctx, start)
+
+	eg, ectx := errgroup.WithContext(cctx)
 	for _, m := range d.instances {
 		m := m
 		m.Machine.InitialPlan = plans[m.Machine.ID.String()]
@@ -197,8 +205,20 @@ func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) err
 	return eg.Wait()
 }
 
-func (d *Director) prepare() error {
+func (d *Director) announceTimes(ctx context.Context, start time.Time) {
 	obs := LowerToPrepare(d.observers)
+	OnPrepare(PrepareStartMessage(start), obs...)
+	if dl, ok := ctx.Deadline(); ok {
+		OnPrepare(PrepareTimeoutMessage(dl), obs...)
+	}
+}
+
+func (d *Director) prepare(ctx context.Context) error {
+	obs := LowerToPrepare(d.observers)
+
+	if dl, ok := ctx.Deadline(); ok {
+		OnPrepare(PrepareTimeoutMessage(dl), obs...)
+	}
 
 	OnPrepare(PrepareQuantitiesMessage(d.quantities), obs...)
 

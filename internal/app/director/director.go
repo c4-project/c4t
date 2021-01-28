@@ -108,28 +108,25 @@ func flags() []c.Flag {
 			Usage:   usageMFilter,
 			Value:   "",
 		},
-		stdflag.SubjectFuzzesCliFlag(),
-		stdflag.CorpusSizeCliFlag(),
 		stdflag.CPUProfileCliFlag(),
 	}
+	nflags = append(nflags, stdflag.RootQuantityCliFlags()...)
 	return append(nflags, stdflag.C4fRunnerCliFlags()...)
 }
 
 func run(ctx *c.Context, errw io.Writer) error {
-	if cppath := stdflag.CPUProfileFromCli(ctx); !ystring.IsBlank(cppath) {
-		stop, err := setupPprof(cppath)
-		if err != nil {
-			return err
-		}
-		defer stop()
+	stopProf, err := setupPprof(stdflag.CPUProfileFromCli(ctx))
+	if err != nil {
+		return err
 	}
+	defer stopProf()
 
 	a := stdflag.C4fRunnerFromCli(ctx, errw)
 	cfg, err := stdflag.ConfFileFromCli(ctx)
 	if err != nil {
 		return err
 	}
-	qs := setupQuantityOverrides(ctx)
+	qs := stdflag.RootQuantitiesFromCli(ctx)
 
 	args := args{
 		dash:         !ctx.Bool(flagNoDash),
@@ -151,6 +148,10 @@ type args struct {
 }
 
 func setupPprof(cppath string) (func(), error) {
+	if ystring.IsBlank(cppath) {
+		return func() {}, nil
+	}
+
 	cpf, err := os.Create(cppath)
 	if err != nil {
 		return nil, fmt.Errorf("opening profile file: %w", err)
@@ -188,6 +189,7 @@ func runWithObs(ctx context.Context, cfg *config.Config, args args, a *c4f.Runne
 		return err
 	}
 
+	// TODO(@MattWindsor91): is this really necessary?
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -234,18 +236,6 @@ func makeEnv(a *c4f.Runner, c *config.Config) director.Env {
 			BProbe:  c,
 			CLister: c.Machines,
 			SProbe:  a,
-		},
-	}
-}
-
-func setupQuantityOverrides(ctx *c.Context) quantity.RootSet {
-	// TODO(@MattWindsor91): disambiguate the corpus size argument
-	return quantity.RootSet{
-		MachineSet: quantity.MachineSet{
-			Fuzz: quantity.FuzzSet{
-				CorpusSize:    stdflag.CorpusSizeFromCli(ctx),
-				SubjectCycles: stdflag.SubjectFuzzesFromCli(ctx),
-			},
 		},
 	}
 }

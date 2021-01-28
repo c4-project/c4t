@@ -50,9 +50,7 @@ func (q *BatchSet) Log(l *log.Logger) {
 
 // Override substitutes any non-zero quantities in new for those in this quantity set, in-place.
 func (q *BatchSet) Override(new BatchSet) {
-	if new.Timeout.IsActive() {
-		q.Timeout = new.Timeout
-	}
+	q.Timeout.Override(new.Timeout)
 	if new.NWorkers != 0 {
 		q.NWorkers = new.NWorkers
 	}

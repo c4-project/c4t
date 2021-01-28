@@ -6,40 +6,35 @@
 package stdflag
 
 const (
+	// Short flags are registered here where possible, to make sure there are
+	// no duplicates.
+
 	// FlagCompiler is a standard flag for compiler selection arguments.
 	FlagCompiler = "c"
-	flagConfFile = "C"
 	// FlagOutDir is a short flag for specifying an output directory.
 	FlagOutDir = "d"
 	// FlagWorkerCount is a standard flag for arguments that set a worker count.
-	FlagWorkerCount = "j"
-	// FlagAltWorkerCount is a flag for arguments that set a secondary worker count.
-	FlagAltWorkerCount = "J"
-	flagSubjectCycles  = "k"
+	FlagWorkerCount   = "j"
+	flagSubjectCycles = "k"
 	// FlagMachine is a standard flag for machine selection arguments.
 	FlagMachine = "m"
 	// FlagNum is a standard flag for 'number of' arguments.
 	FlagNum = "n"
 	// FlagCompilerTimeout is a short flag for compiler timeout.
 	FlagCompilerTimeout = "t"
-	// FlagRunTimeout is a short flag for run timeout.
-	FlagRunTimeout  = "T"
+
 	flagC4fDuneExec = "x"
+
+	flagConfFile = "C"
+	// FlagAltWorkerCount is a flag for arguments that set a secondary worker count.
+	FlagAltWorkerCount = "J"
+	// FlagRunTimeout is a short flag for run timeout.
+	FlagRunTimeout = "T"
 
 	// FlagCPUProfile is a standard flag for specifying a CPU profile output.
 	FlagCPUProfile = "cpuprofile"
 
 	flagCorpusSize = "corpus-size"
-	// FlagCompilerTimeoutLong is a long flag for compiler timeout.
-	FlagCompilerTimeoutLong = "compiler-timeout"
-	// FlagRunTimeoutLong is a long flag for run timeout.
-	FlagRunTimeoutLong = "run-timeout"
-	// FlagWorkerCountLong is a long flag for arguments that set a worker count.
-	FlagWorkerCountLong = "num-workers"
-	// FlagCompilerWorkerCountLong is a long flag for arguments that set a compiler worker count.
-	FlagCompilerWorkerCountLong = "num-compiler-workers"
-	// FlagRunWorkerCountLong is a long flag for arguments that set a runner worker count.
-	FlagRunWorkerCountLong = "num-run-workers"
 
 	usageConfFile      = "read tester config from this `file`"
 	usageCorpusSize    = "`number` of corpus files to select for this test plan"

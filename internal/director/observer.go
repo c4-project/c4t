@@ -7,6 +7,8 @@
 package director
 
 import (
+	"time"
+
 	"github.com/c4-project/c4t/internal/director/pathset"
 	"github.com/c4-project/c4t/internal/mutation"
 	"github.com/c4-project/c4t/internal/quantity"
@@ -63,6 +65,10 @@ const (
 	PrepareQuantities
 	// PreparePaths states that the director is about to make its top-level paths; Paths is set.
 	PreparePaths
+	// PrepareStart states that the director has started experiments; Time is set.
+	PrepareStart
+	// PrepareTimeout states that the director has a global timeout; Time is set.
+	PrepareTimeout
 )
 
 // PrepareMessage is a message from the director stating some aspect of its pre-experiment preparation.
@@ -74,9 +80,11 @@ type PrepareMessage struct {
 	// This can be used by observers to pre-allocate instance sub-observers.
 	NumInstances int `json:"num_instances,omitempty"`
 	// Quantities states, if Kind is PrepareQuantities, the quantities the director is going to make.
-	Quantities quantity.RootSet `json:"quantities,omitempty"`
+	Quantities *quantity.RootSet `json:"quantities,omitempty"`
 	// Paths states, if Kind is PreparePaths, where the director is going to make its top-level paths.
-	Paths pathset.Pathset `json:"paths,omitempty"`
+	Paths *pathset.Pathset `json:"paths,omitempty"`
+	// Time states, if Kind is PrepareStart or PrepareTimeout, what the start/end time of the experiment will be.
+	Time time.Time `json:"deadline,omitempty"`
 }
 
 // PrepareInstancesMessage creates a PrepareMessage with kind PrepareInstances and instance count ninst.
@@ -86,12 +94,22 @@ func PrepareInstancesMessage(ninst int) PrepareMessage {
 
 // PrepareQuantitiesMessage creates a PrepareMessage with kind PrepareQuantities and quantity set qs.
 func PrepareQuantitiesMessage(qs quantity.RootSet) PrepareMessage {
-	return PrepareMessage{Kind: PrepareQuantities, Quantities: qs}
+	return PrepareMessage{Kind: PrepareQuantities, Quantities: &qs}
 }
 
 // PreparePathsMessage creates a PrepareMessage with kind PreparePaths and path set ps.
 func PreparePathsMessage(ps pathset.Pathset) PrepareMessage {
-	return PrepareMessage{Kind: PreparePaths, Paths: ps}
+	return PrepareMessage{Kind: PreparePaths, Paths: &ps}
+}
+
+// PrepareStartMessage creates a PrepareMessage with kind PrepareStart and start time dl.
+func PrepareStartMessage(dl time.Time) PrepareMessage {
+	return PrepareMessage{Kind: PrepareStart, Time: dl}
+}
+
+// PrepareTimeoutMessage creates a PrepareMessage with kind PrepareTimeout and experiment deadline dl.
+func PrepareTimeoutMessage(dl time.Time) PrepareMessage {
+	return PrepareMessage{Kind: PrepareTimeout, Time: dl}
 }
 
 // OnPrepare sends OnPrepare to every observer in obs.
