@@ -3,12 +3,14 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package mutation_test
+package stat_test
 
 import (
 	"encoding/csv"
 	"fmt"
 	"os"
+
+	"github.com/c4-project/c4t/internal/stat"
 
 	"github.com/c4-project/c4t/internal/subject/status"
 
@@ -17,9 +19,9 @@ import (
 	"github.com/c4-project/c4t/internal/subject/compilation"
 )
 
-// ExampleStatset_Reset is a runnable example for Statset.Reset.
-func ExampleStatset_Reset() {
-	var s mutation.Statset
+// ExampleMutation_Reset is a runnable example for Mutation.Reset.
+func ExampleMutation_Reset() {
+	var s stat.Mutation
 	s.Reset()
 
 	fmt.Println("by-mutant nil:", s.ByMutant == nil, "len:", len(s.ByMutant))
@@ -28,9 +30,9 @@ func ExampleStatset_Reset() {
 	// by-mutant nil: false len: 0
 }
 
-// ExampleStatset_AddAnalysis is a runnable example for AddAnalysis.
-func ExampleStatset_AddAnalysis() {
-	var s mutation.Statset
+// ExampleMutation_AddAnalysis is a runnable example for AddAnalysis.
+func ExampleMutation_AddAnalysis() {
+	var s stat.Mutation
 	s.AddAnalysis(mutation.Analysis{
 		27: mutation.MutantAnalysis{
 			{
@@ -66,10 +68,10 @@ func ExampleStatset_AddAnalysis() {
 	// 53 selected: 1 hit: 0 killed: 0
 }
 
-// ExampleStatset_DumpCSV is a runnable example for Statset.DumpCSV.
-func ExampleStatset_DumpCSV() {
-	_ = (&mutation.Statset{
-		ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+// ExampleMutation_DumpCSV is a runnable example for Mutation.DumpCSV.
+func ExampleMutation_DumpCSV() {
+	_ = (&stat.Mutation{
+		ByMutant: map[mutation.Mutant]stat.Mutant{
 			2:  {Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
 			42: {Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
 			53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},

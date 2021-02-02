@@ -22,8 +22,8 @@ func ExampleSet_DumpMutationCSV() {
 		Machines: map[string]stat.Machine{
 			"foo": {
 				Session: stat.MachineSpan{
-					Mutation: mutation.Statset{
-						ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+					Mutation: stat.Mutation{
+						ByMutant: map[mutation.Mutant]stat.Mutant{
 							2:  {Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
 							42: {Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
 							53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
@@ -31,8 +31,8 @@ func ExampleSet_DumpMutationCSV() {
 					},
 				},
 				Total: stat.MachineSpan{
-					Mutation: mutation.Statset{
-						ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+					Mutation: stat.Mutation{
+						ByMutant: map[mutation.Mutant]stat.Mutant{
 							2:  {Selections: 41, Hits: 5000, Kills: 40, Statuses: map[status.Status]uint64{status.Flagged: 40, status.Filtered: 1}},
 							42: {Selections: 100, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 99, status.CompileTimeout: 1}},
 							53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
@@ -42,8 +42,8 @@ func ExampleSet_DumpMutationCSV() {
 			},
 			"bar": {
 				Total: stat.MachineSpan{
-					Mutation: mutation.Statset{
-						ByMutant: map[mutation.Mutant]mutation.MutantStatset{
+					Mutation: stat.Mutation{
+						ByMutant: map[mutation.Mutant]stat.Mutant{
 							1: {Selections: 500, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 500}},
 						},
 					},

@@ -7,7 +7,6 @@ package stat
 
 import (
 	"github.com/c4-project/c4t/internal/director"
-	"github.com/c4-project/c4t/internal/mutation"
 	"github.com/c4-project/c4t/internal/plan/analysis"
 	"github.com/c4-project/c4t/internal/subject/status"
 )
@@ -51,7 +50,7 @@ type MachineSpan struct {
 	// ErroredCycles counts the number of cycles that resulted in an error.
 	ErroredCycles uint64 `json:"errored_cycles"`
 	// Mutation contains totals for mutation testing since this span started.
-	Mutation mutation.Statset `json:"mutation,omitempty"`
+	Mutation Mutation `json:"mutation,omitempty"`
 
 	// SessionStatusTotals contains status totals since this span started.
 	// It may be empty if this machine has not yet been active this span.
