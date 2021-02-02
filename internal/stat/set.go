@@ -8,7 +8,10 @@ package stat
 import (
 	"encoding/json"
 	"io"
+	"os"
 	"time"
+
+	"github.com/c4-project/c4t/internal/helper/errhelp"
 
 	"github.com/c4-project/c4t/internal/copier"
 	"github.com/c4-project/c4t/internal/director"
@@ -102,4 +105,17 @@ func (s *Set) Init() {
 // Load loads stats from r into this Set.
 func (s *Set) Load(r io.Reader) error {
 	return json.NewDecoder(r).Decode(s)
+}
+
+// LoadFile loads stats from filename name into this Set.
+//
+// For persisting into a Set, use OpenStatFile and NewPersister.
+func (s *Set) LoadFile(name string) error {
+	f, err := os.Open(name)
+	if err != nil {
+		return err
+	}
+	rerr := s.Load(f)
+	cerr := f.Close()
+	return errhelp.FirstError(rerr, cerr)
 }

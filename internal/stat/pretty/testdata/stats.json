@@ -1,0 +1,665 @@
+{
+	"start_time": "2021-01-26T18:04:58.710169469Z",
+	"event_count": 19896,
+	"session_start_time": "2021-01-27T18:34:11.032506053Z",
+	"machines": {
+		"bam": {
+			"last_cycle": {
+				"instance": 2,
+				"machine_id": "bam",
+				"iter": 1054,
+				"start_time": "2021-01-28T18:33:29.00976435Z"
+			},
+			"session": {
+				"finished_cycles": 1054,
+				"errored_cycles": 0,
+				"mutation": {
+					"ByMutant": {
+						"108": {
+							"Selections": 180,
+							"Hits": 4169,
+							"Kills": 2,
+							"Statuses": {
+								"CompileFail": 40,
+								"Flagged": 2,
+								"Ok": 138
+							}
+						},
+						"110": {
+							"Selections": 6760,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 6755,
+								"RunTimeout": 5
+							}
+						},
+						"111": {
+							"Selections": 320,
+							"Hits": 9281,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 318,
+								"RunTimeout": 1
+							}
+						},
+						"112": {
+							"Selections": 6620,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 6613,
+								"RunTimeout": 7
+							}
+						},
+						"113": {
+							"Selections": 6680,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 6678,
+								"RunTimeout": 2
+							}
+						},
+						"114": {
+							"Selections": 180,
+							"Hits": 8510,
+							"Kills": 1,
+							"Statuses": {
+								"CompileFail": 55,
+								"Flagged": 1,
+								"Ok": 124
+							}
+						},
+						"123": {
+							"Selections": 80,
+							"Hits": 766,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 79
+							}
+						},
+						"124": {
+							"Selections": 60,
+							"Hits": 447,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 59
+							}
+						},
+						"125": {
+							"Selections": 200,
+							"Hits": 2978,
+							"Kills": 2,
+							"Statuses": {
+								"Flagged": 2,
+								"Ok": 198
+							}
+						}
+					}
+				},
+				"status_totals": {
+					"CompileFail": 95,
+					"CompileTimeout": 0,
+					"Filtered": 0,
+					"Flagged": 8,
+					"Ok": 20962,
+					"RunFail": 0,
+					"RunTimeout": 15
+				}
+			},
+			"total": {
+				"finished_cycles": 2101,
+				"errored_cycles": 1,
+				"mutation": {
+					"ByMutant": {
+						"108": {
+							"Selections": 1700,
+							"Hits": 51511,
+							"Kills": 16,
+							"Statuses": {
+								"CompileFail": 432,
+								"CompileTimeout": 5,
+								"Flagged": 16,
+								"Ok": 1245,
+								"RunTimeout": 2
+							}
+						},
+						"109": {
+							"Selections": 2620,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 2619,
+								"RunTimeout": 1
+							}
+						},
+						"110": {
+							"Selections": 9240,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 9234,
+								"RunTimeout": 6
+							}
+						},
+						"111": {
+							"Selections": 1680,
+							"Hits": 51165,
+							"Kills": 16,
+							"Statuses": {
+								"Flagged": 16,
+								"Ok": 1662,
+								"RunTimeout": 2
+							}
+						},
+						"112": {
+							"Selections": 9060,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 9050,
+								"RunTimeout": 10
+							}
+						},
+						"113": {
+							"Selections": 9100,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 9098,
+								"RunTimeout": 2
+							}
+						},
+						"114": {
+							"Selections": 1900,
+							"Hits": 112100,
+							"Kills": 15,
+							"Statuses": {
+								"CompileFail": 480,
+								"CompileTimeout": 7,
+								"Flagged": 15,
+								"Ok": 1397,
+								"RunTimeout": 1
+							}
+						},
+						"123": {
+							"Selections": 1700,
+							"Hits": 15593,
+							"Kills": 11,
+							"Statuses": {
+								"Flagged": 11,
+								"Ok": 1689
+							}
+						},
+						"124": {
+							"Selections": 1540,
+							"Hits": 10817,
+							"Kills": 13,
+							"Statuses": {
+								"Flagged": 13,
+								"Ok": 1527
+							}
+						},
+						"125": {
+							"Selections": 1820,
+							"Hits": 24242,
+							"Kills": 15,
+							"Statuses": {
+								"Flagged": 15,
+								"Ok": 1802,
+								"RunTimeout": 3
+							}
+						},
+						"126": {
+							"Selections": 1660,
+							"Hits": 15822,
+							"Kills": 8,
+							"Statuses": {
+								"Flagged": 8,
+								"Ok": 1652
+							}
+						}
+					}
+				},
+				"status_totals": {
+					"CompileFail": 912,
+					"CompileTimeout": 12,
+					"Filtered": 0,
+					"Flagged": 94,
+					"Ok": 40975,
+					"RunFail": 0,
+					"RunTimeout": 27
+				}
+			}
+		},
+		"localhost": {
+			"last_cycle": {
+				"instance": 1,
+				"machine_id": "localhost",
+				"iter": 1440,
+				"start_time": "2021-01-28T18:33:20.47767646Z"
+			},
+			"session": {
+				"finished_cycles": 1440,
+				"errored_cycles": 0,
+				"mutation": {
+					"ByMutant": {
+						"103": {
+							"Selections": 5740,
+							"Hits": 563,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 5736,
+								"RunTimeout": 4
+							}
+						},
+						"104": {
+							"Selections": 5580,
+							"Hits": 743,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 5578,
+								"RunTimeout": 2
+							}
+						},
+						"105": {
+							"Selections": 5980,
+							"Hits": 14180,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 5980
+							}
+						},
+						"106": {
+							"Selections": 5800,
+							"Hits": 277,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 5796,
+								"RunTimeout": 4
+							}
+						},
+						"107": {
+							"Selections": 5700,
+							"Hits": 1121,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 5695,
+								"RunTimeout": 5
+							}
+						}
+					}
+				},
+				"status_totals": {
+					"CompileFail": 0,
+					"CompileTimeout": 0,
+					"Filtered": 0,
+					"Flagged": 0,
+					"Ok": 28785,
+					"RunFail": 0,
+					"RunTimeout": 15
+				}
+			},
+			"total": {
+				"finished_cycles": 2823,
+				"errored_cycles": 1,
+				"mutation": {
+					"ByMutant": {
+						"0": {
+							"Selections": 20,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 20
+							}
+						},
+						"103": {
+							"Selections": 11380,
+							"Hits": 1164,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 11372,
+								"RunTimeout": 8
+							}
+						},
+						"104": {
+							"Selections": 11000,
+							"Hits": 1343,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 10995,
+								"RunTimeout": 5
+							}
+						},
+						"105": {
+							"Selections": 11440,
+							"Hits": 27850,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 11438,
+								"RunTimeout": 2
+							}
+						},
+						"106": {
+							"Selections": 11220,
+							"Hits": 409,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 11216,
+								"RunTimeout": 4
+							}
+						},
+						"107": {
+							"Selections": 11400,
+							"Hits": 2354,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 11395,
+								"RunTimeout": 5
+							}
+						}
+					}
+				},
+				"status_totals": {
+					"CompileFail": 0,
+					"CompileTimeout": 0,
+					"Filtered": 0,
+					"Flagged": 0,
+					"Ok": 56436,
+					"RunFail": 0,
+					"RunTimeout": 24
+				}
+			}
+		},
+		"spikemuth": {
+			"last_cycle": {
+				"instance": 0,
+				"machine_id": "spikemuth",
+				"iter": 838,
+				"start_time": "2021-01-28T18:31:55.304296199Z"
+			},
+			"session": {
+				"finished_cycles": 838,
+				"errored_cycles": 0,
+				"mutation": {
+					"ByMutant": {
+						"108": {
+							"Selections": 1040,
+							"Hits": 31646,
+							"Kills": 2,
+							"Statuses": {
+								"Flagged": 2,
+								"Ok": 1037,
+								"RunTimeout": 1
+							}
+						},
+						"109": {
+							"Selections": 5000,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 4998,
+								"RunTimeout": 2
+							}
+						},
+						"110": {
+							"Selections": 120,
+							"Hits": 339,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 119
+							}
+						},
+						"111": {
+							"Selections": 40,
+							"Hits": 596,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 39
+							}
+						},
+						"112": {
+							"Selections": 540,
+							"Hits": 1691,
+							"Kills": 3,
+							"Statuses": {
+								"Flagged": 3,
+								"Ok": 536,
+								"RunTimeout": 1
+							}
+						},
+						"113": {
+							"Selections": 200,
+							"Hits": 604,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 200
+							}
+						},
+						"114": {
+							"Selections": 20,
+							"Hits": 886,
+							"Kills": 3,
+							"Statuses": {
+								"Flagged": 3,
+								"Ok": 17
+							}
+						},
+						"117": {
+							"Selections": 420,
+							"Hits": 1834,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 417,
+								"RunTimeout": 2
+							}
+						},
+						"118": {
+							"Selections": 60,
+							"Hits": 198,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 59
+							}
+						},
+						"119": {
+							"Selections": 4360,
+							"Hits": 10834,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 4357,
+								"RunTimeout": 2
+							}
+						},
+						"120": {
+							"Selections": 80,
+							"Hits": 1260,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 79
+							}
+						},
+						"121": {
+							"Selections": 20,
+							"Hits": 210,
+							"Kills": 2,
+							"Statuses": {
+								"Flagged": 2,
+								"Ok": 18
+							}
+						},
+						"122": {
+							"Selections": 4860,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 4854,
+								"RunTimeout": 6
+							}
+						}
+					}
+				},
+				"status_totals": {
+					"CompileFail": 0,
+					"CompileTimeout": 0,
+					"Filtered": 0,
+					"Flagged": 16,
+					"Ok": 16730,
+					"RunFail": 0,
+					"RunTimeout": 14
+				}
+			},
+			"total": {
+				"finished_cycles": 1703,
+				"errored_cycles": 1,
+				"mutation": {
+					"ByMutant": {
+						"108": {
+							"Selections": 2600,
+							"Hits": 77424,
+							"Kills": 3,
+							"Statuses": {
+								"Flagged": 3,
+								"Ok": 2594,
+								"RunTimeout": 3
+							}
+						},
+						"109": {
+							"Selections": 6600,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 6598,
+								"RunTimeout": 2
+							}
+						},
+						"110": {
+							"Selections": 1700,
+							"Hits": 4661,
+							"Kills": 4,
+							"Statuses": {
+								"Flagged": 4,
+								"Ok": 1692,
+								"RunTimeout": 4
+							}
+						},
+						"111": {
+							"Selections": 1260,
+							"Hits": 34152,
+							"Kills": 9,
+							"Statuses": {
+								"Flagged": 9,
+								"Ok": 1251
+							}
+						},
+						"112": {
+							"Selections": 2040,
+							"Hits": 6372,
+							"Kills": 4,
+							"Statuses": {
+								"Flagged": 4,
+								"Ok": 2035,
+								"RunTimeout": 1
+							}
+						},
+						"113": {
+							"Selections": 1760,
+							"Hits": 5299,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 1758,
+								"RunTimeout": 2
+							}
+						},
+						"114": {
+							"Selections": 1140,
+							"Hits": 72702,
+							"Kills": 15,
+							"Statuses": {
+								"Flagged": 15,
+								"Ok": 1123,
+								"RunTimeout": 2
+							}
+						},
+						"117": {
+							"Selections": 1700,
+							"Hits": 7718,
+							"Kills": 2,
+							"Statuses": {
+								"Flagged": 2,
+								"Ok": 1695,
+								"RunTimeout": 3
+							}
+						},
+						"118": {
+							"Selections": 1220,
+							"Hits": 5543,
+							"Kills": 9,
+							"Statuses": {
+								"Flagged": 9,
+								"Ok": 1211
+							}
+						},
+						"119": {
+							"Selections": 5880,
+							"Hits": 14719,
+							"Kills": 1,
+							"Statuses": {
+								"Flagged": 1,
+								"Ok": 5877,
+								"RunTimeout": 2
+							}
+						},
+						"120": {
+							"Selections": 980,
+							"Hits": 14137,
+							"Kills": 13,
+							"Statuses": {
+								"Flagged": 13,
+								"Ok": 966,
+								"RunTimeout": 1
+							}
+						},
+						"121": {
+							"Selections": 1040,
+							"Hits": 13247,
+							"Kills": 13,
+							"Statuses": {
+								"Flagged": 13,
+								"Ok": 1027
+							}
+						},
+						"122": {
+							"Selections": 6140,
+							"Hits": 0,
+							"Kills": 0,
+							"Statuses": {
+								"Ok": 6133,
+								"RunTimeout": 7
+							}
+						}
+					}
+				},
+				"status_totals": {
+					"CompileFail": 0,
+					"CompileTimeout": 0,
+					"Filtered": 0,
+					"Flagged": 73,
+					"Ok": 33960,
+					"RunFail": 0,
+					"RunTimeout": 27
+				}
+			}
+		}
+	}
+}

@@ -47,12 +47,32 @@ func (m *Mutation) ensure() {
 
 // Mutants returns a sorted list of all mutant IDs seen in this statset.
 func (m *Mutation) Mutants() []mutation.Mutant {
-	muts := make([]mutation.Mutant, len(m.ByMutant))
-	i := 0
-	for k := range m.ByMutant {
-		// Including mutants that were selected 0 times, because that's interesting.
-		muts[i] = k
-		i++
+	return m.MutantsWhere(FilterAllMutants)
+}
+
+// KilledMutants returns a sorted list of all mutant IDs killed in this statset.
+func (m *Mutation) KilledMutants() []mutation.Mutant {
+	return m.MutantsWhere(FilterKilledMutants)
+}
+
+// MutantFilter is the type of mutant filtering predicates.
+type MutantFilter func(m Mutant) bool
+
+var (
+	// FilterAllMutants is a mutant filter that allows all mutants.
+	FilterAllMutants MutantFilter = func(mutant Mutant) bool { return true }
+	// FilterKilledMutants is a mutant filter that allows all mutants.
+	FilterKilledMutants MutantFilter = func(mutant Mutant) bool { return 0 < mutant.Kills }
+)
+
+// MutantsWhere returns a sorted list of mutants satisfying pred.
+// (It is a value receiver method to allow calling through templates.)
+func (m Mutation) MutantsWhere(pred func(m Mutant) bool) []mutation.Mutant {
+	muts := make([]mutation.Mutant, 0, len(m.ByMutant))
+	for k, mstat := range m.ByMutant {
+		if pred(mstat) {
+			muts = append(muts, k)
+		}
 	}
 	sort.Slice(muts, func(i, j int) bool {
 		return muts[i] < muts[j]

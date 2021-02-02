@@ -1,0 +1,34 @@
+# Machine Report
+  ## bam
+    ### Mutants
+      108. 2 kill(s) on 180 selection(s) [4169 hits], Ok=138, Flagged=2, CompileFail=40
+      110. 0 kill(s) on 6760 selection(s) [0 hits], Ok=6755, RunTimeout=5
+      111. 1 kill(s) on 320 selection(s) [9281 hits], Ok=318, Flagged=1, RunTimeout=1
+      112. 0 kill(s) on 6620 selection(s) [0 hits], Ok=6613, RunTimeout=7
+      113. 0 kill(s) on 6680 selection(s) [0 hits], Ok=6678, RunTimeout=2
+      114. 1 kill(s) on 180 selection(s) [8510 hits], Ok=124, Flagged=1, CompileFail=55
+      123. 1 kill(s) on 80 selection(s) [766 hits], Ok=79, Flagged=1
+      124. 1 kill(s) on 60 selection(s) [447 hits], Ok=59, Flagged=1
+      125. 2 kill(s) on 200 selection(s) [2978 hits], Ok=198, Flagged=2
+  ## localhost
+    ### Mutants
+      103. 0 kill(s) on 5740 selection(s) [563 hits], Ok=5736, RunTimeout=4
+      104. 0 kill(s) on 5580 selection(s) [743 hits], Ok=5578, RunTimeout=2
+      105. 0 kill(s) on 5980 selection(s) [14180 hits], Ok=5980
+      106. 0 kill(s) on 5800 selection(s) [277 hits], Ok=5796, RunTimeout=4
+      107. 0 kill(s) on 5700 selection(s) [1121 hits], Ok=5695, RunTimeout=5
+  ## spikemuth
+    ### Mutants
+      108. 2 kill(s) on 1040 selection(s) [31646 hits], Ok=1037, Flagged=2, RunTimeout=1
+      109. 0 kill(s) on 5000 selection(s) [0 hits], Ok=4998, RunTimeout=2
+      110. 1 kill(s) on 120 selection(s) [339 hits], Ok=119, Flagged=1
+      111. 1 kill(s) on 40 selection(s) [596 hits], Ok=39, Flagged=1
+      112. 3 kill(s) on 540 selection(s) [1691 hits], Ok=536, Flagged=3, RunTimeout=1
+      113. 0 kill(s) on 200 selection(s) [604 hits], Ok=200
+      114. 3 kill(s) on 20 selection(s) [886 hits], Ok=17, Flagged=3
+      117. 1 kill(s) on 420 selection(s) [1834 hits], Ok=417, Flagged=1, RunTimeout=2
+      118. 1 kill(s) on 60 selection(s) [198 hits], Ok=59, Flagged=1
+      119. 1 kill(s) on 4360 selection(s) [10834 hits], Ok=4357, Flagged=1, RunTimeout=2
+      120. 1 kill(s) on 80 selection(s) [1260 hits], Ok=79, Flagged=1
+      121. 2 kill(s) on 20 selection(s) [210 hits], Ok=18, Flagged=2
+      122. 0 kill(s) on 4860 selection(s) [0 hits], Ok=4854, RunTimeout=6

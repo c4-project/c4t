@@ -10,7 +10,6 @@ import (
 	"io"
 
 	"github.com/1set/gut/ystring"
-	"github.com/c4-project/c4t/internal/helper/errhelp"
 	"github.com/c4-project/c4t/internal/stat"
 
 	"github.com/c4-project/c4t/internal/ux/stdflag"
@@ -66,17 +65,11 @@ func flags() []c.Flag {
 
 func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 	// TODO(@MattWindsor91): maybe use stat persister?
-	f, err2 := getStatFile(ctx)
-	if err2 != nil {
-		return err2
-	}
-	var set stat.Set
-	if err := set.Load(f); err != nil {
+	set, err := getStats(ctx)
+	if err != nil {
 		return err
 	}
-	err := dump(ctx, &set, outw)
-	cerr := f.Close()
-	return errhelp.FirstError(err, cerr)
+	return dump(ctx, set, outw)
 }
 
 func dump(ctx *c.Context, set *stat.Set, w io.Writer) error {
@@ -100,16 +93,14 @@ func dumpCsvMutations(w io.Writer, set *stat.Set, totals bool) error {
 	return set.DumpMutationCSV(cw, totals)
 }
 
-func getStatFile(ctx *c.Context) (io.ReadCloser, error) {
+func getStats(ctx *c.Context) (*stat.Set, error) {
 	fname, err := getStatPath(ctx)
 	if err != nil {
 		return nil, err
 	}
-	f, err := stat.OpenStatFile(fname)
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
+
+	var set stat.Set
+	return &set, set.LoadFile(fname)
 }
 
 // getStatPath computes the intended path to the stats file.
