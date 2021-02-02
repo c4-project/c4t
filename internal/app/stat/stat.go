@@ -7,7 +7,10 @@ package stat
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
+
+	"github.com/c4-project/c4t/internal/stat/pretty"
 
 	"github.com/1set/gut/ystring"
 	"github.com/c4-project/c4t/internal/stat"
@@ -27,6 +30,8 @@ const (
 
 	flagCsvMutations   = "csv-mutations"
 	usageCsvMutations  = "dump CSV of mutation testing results"
+	flagShowMutations  = "mutations"
+	usageShowMutations = "show mutations matching `filter` ('all' or 'killed')"
 	flagUseTotals      = "use-totals"
 	flagUseTotalsShort = "t"
 	usageUseTotals     = "use multi-session totals rather than per-session totals"
@@ -53,6 +58,7 @@ func flags() []c.Flag {
 	return []c.Flag{
 		stdflag.ConfFileCliFlag(),
 		&c.BoolFlag{Name: flagCsvMutations, Usage: usageCsvMutations},
+		&c.StringFlag{Name: flagShowMutations, Usage: usageShowMutations, DefaultText: "do not show"},
 		&c.BoolFlag{Name: flagUseTotals, Aliases: []string{flagUseTotalsShort}, Usage: usageUseTotals},
 		&c.PathFlag{
 			Name:        flagStatFile,
@@ -82,7 +88,40 @@ func dump(ctx *c.Context, set *stat.Set, w io.Writer) error {
 		}
 	}
 
-	return nil
+	return prettyPrint(ctx, set, w, totals)
+}
+
+func prettyPrint(ctx *c.Context, set *stat.Set, w io.Writer, totals bool) error {
+	pp, err := makePretty(ctx, w, totals)
+	if pp == nil || err != nil {
+		return err
+	}
+	return pp.Write(*set)
+}
+
+func makePretty(ctx *c.Context, w io.Writer, totals bool) (*pretty.Printer, error) {
+	flt, err := makeMutationFilter(ctx)
+	if flt == nil || err != nil {
+		return nil, err
+	}
+	// TODO(@MattWindsor91): add other pretty-printing reports if needs be
+	return pretty.NewPrinter(
+		pretty.UseTotals(totals),
+		pretty.WriteTo(w),
+		pretty.ShowMutants(flt),
+	)
+}
+
+func makeMutationFilter(ctx *c.Context) (stat.MutantFilter, error) {
+	s := ctx.String(flagShowMutations)
+	switch s {
+	case "all":
+		return stat.FilterAllMutants, nil
+	case "killed":
+		return stat.FilterKilledMutants, nil
+	default:
+		return nil, fmt.Errorf("unsupported mutant flag: %s", s)
+	}
 }
 
 func dumpCsvMutations(w io.Writer, set *stat.Set, totals bool) error {
