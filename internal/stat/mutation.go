@@ -61,8 +61,14 @@ type MutantFilter func(m Mutant) bool
 var (
 	// FilterAllMutants is a mutant filter that allows all mutants.
 	FilterAllMutants MutantFilter = func(mutant Mutant) bool { return true }
-	// FilterKilledMutants is a mutant filter that allows all mutants.
+	// FilterHitMutants is a mutant filter that allows hit mutants only.
+	FilterHitMutants MutantFilter = func(mutant Mutant) bool { return 0 < mutant.Hits }
+	// FilterKilledMutants is a mutant filter that allows killed mutants only.
 	FilterKilledMutants MutantFilter = func(mutant Mutant) bool { return 0 < mutant.Kills }
+	// FilterEscapedMutants is a mutant filter that allows only mutants that were hit but not killed.
+	FilterEscapedMutants MutantFilter = func(mutant Mutant) bool {
+		return 0 < mutant.Hits && 0 == mutant.Kills
+	}
 )
 
 // MutantsWhere returns a sorted list of mutants satisfying pred.

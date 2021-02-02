@@ -1,0 +1,14 @@
+# Machine Report
+  ## bam
+    ### Mutants
+      No mutants available matching filter.
+  ## localhost
+    ### Mutants
+      103. 0 kill(s) on 5740 selection(s) [563 hits], Ok=5736, RunTimeout=4
+      104. 0 kill(s) on 5580 selection(s) [743 hits], Ok=5578, RunTimeout=2
+      105. 0 kill(s) on 5980 selection(s) [14180 hits], Ok=5980
+      106. 0 kill(s) on 5800 selection(s) [277 hits], Ok=5796, RunTimeout=4
+      107. 0 kill(s) on 5700 selection(s) [1121 hits], Ok=5695, RunTimeout=5
+  ## spikemuth
+    ### Mutants
+      113. 0 kill(s) on 200 selection(s) [604 hits], Ok=200

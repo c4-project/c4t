@@ -31,7 +31,7 @@ const (
 	flagCsvMutations   = "csv-mutations"
 	usageCsvMutations  = "dump CSV of mutation testing results"
 	flagShowMutations  = "mutations"
-	usageShowMutations = "show mutations matching `filter` ('all' or 'killed')"
+	usageShowMutations = "show mutations matching `filter` ('all', 'hit', 'killed', 'escaped')"
 	flagUseTotals      = "use-totals"
 	flagUseTotalsShort = "t"
 	usageUseTotals     = "use multi-session totals rather than per-session totals"
@@ -117,8 +117,12 @@ func makeMutationFilter(ctx *c.Context) (stat.MutantFilter, error) {
 	switch s {
 	case "all":
 		return stat.FilterAllMutants, nil
+	case "hit":
+		return stat.FilterHitMutants, nil
 	case "killed":
 		return stat.FilterKilledMutants, nil
+	case "escaped":
+		return stat.FilterEscapedMutants, nil
 	default:
 		return nil, fmt.Errorf("unsupported mutant flag: %s", s)
 	}

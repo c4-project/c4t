@@ -31,8 +31,10 @@ func TestPrinter_OnAnalysis_regress(t *testing.T) {
 
 		cases := map[string]pretty.Option{
 			// TODO(@MattWindsor91): totals
-			"mk": pretty.Options(pretty.ShowMutants(stat.FilterKilledMutants), pretty.UseTotals(false)),
 			"ma": pretty.Options(pretty.ShowMutants(stat.FilterAllMutants), pretty.UseTotals(false)),
+			"me": pretty.Options(pretty.ShowMutants(stat.FilterEscapedMutants), pretty.UseTotals(false)),
+			"mh": pretty.Options(pretty.ShowMutants(stat.FilterHitMutants), pretty.UseTotals(false)),
+			"mk": pretty.Options(pretty.ShowMutants(stat.FilterKilledMutants), pretty.UseTotals(false)),
 		}
 
 		var gotw bytes.Buffer
