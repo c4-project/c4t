@@ -8,7 +8,6 @@ package parser_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -87,7 +86,7 @@ func TestParse_valid(t *testing.T) {
 		require.NoError(t, err, "missing input file")
 		defer func() { _ = f.Close() }()
 
-		out, err := ioutil.ReadFile(path)
+		out, err := os.ReadFile(path)
 		require.NoError(t, err, "missing output file")
 
 		o := new(obs.Obs)

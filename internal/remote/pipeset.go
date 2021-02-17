@@ -8,7 +8,6 @@ package remote
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os/exec"
 
 	"golang.org/x/crypto/ssh"
@@ -62,8 +61,8 @@ func OpenSSHPipes(s *ssh.Session) (*Pipeset, error) {
 	}
 	ps := Pipeset{
 		Stdin:  stdin,
-		Stdout: ioutil.NopCloser(stdout),
-		Stderr: ioutil.NopCloser(stderr),
+		Stdout: io.NopCloser(stdout),
+		Stderr: io.NopCloser(stderr),
 	}
 	return &ps, nil
 }

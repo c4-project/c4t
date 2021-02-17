@@ -6,11 +6,12 @@
 package testhelp
 
 import (
+	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/1set/gut/yos"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,14 +19,14 @@ import (
 // The tester function f receives the extensionless basename name and full path path.
 // ext must contain a leading ".".
 func TestFilesOfExt(t *testing.T, dir, ext string, f func(t *testing.T, name, path string)) {
-	ents, err := yos.ListMatch(dir, yos.ListIncludeFile, "*"+ext)
+	dfs := os.DirFS(filepath.ToSlash(dir))
+	files, err := fs.Glob(dfs, "*"+ext)
 	require.NoError(t, err, "couldn't stat test inputs")
 
-	for _, ent := range ents {
-		path := ent.Path
-		name := strings.TrimSuffix(filepath.Base(path), ext)
+	for _, file := range files {
+		name := strings.TrimSuffix(file, ext)
 		t.Run(name, func(t *testing.T) {
-			f(t, name, path)
+			f(t, name, filepath.Join(dir, file))
 		})
 	}
 }

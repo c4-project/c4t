@@ -8,7 +8,7 @@ package copier_test
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 
@@ -79,7 +79,7 @@ func TestSendMapping(t *testing.T) {
 
 	if m.AssertExpectations(t) {
 		for r, l := range mapping {
-			bs, err := ioutil.ReadFile(l)
+			bs, err := os.ReadFile(l)
 			assert.NoError(t, err, "reading local test file", l)
 			assert.Equal(t, bs, buffers[r].Bytes(), "checking copy occurred from", l, "to", r)
 			assert.True(t, buffers[r].closed, "buffer not closed for file", r)

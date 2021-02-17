@@ -7,13 +7,12 @@ package iohelp
 
 import (
 	"io"
-	"io/ioutil"
 )
 
-// EnsureWriter passes through w if non-nil, or supplies ioutil.Discard otherwise.
+// EnsureWriter passes through w if non-nil, or supplies io.Discard otherwise.
 func EnsureWriter(w io.Writer) io.Writer {
 	if w == nil {
-		return ioutil.Discard
+		return io.Discard
 	}
 	return w
 }

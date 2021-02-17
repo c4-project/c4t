@@ -7,7 +7,6 @@ package iohelp
 
 import (
 	"io"
-	"io/ioutil"
 )
 
 // NopWriteCloser is like a NopCloser, but implements WriteCloser rather than ReadCloser.
@@ -20,7 +19,7 @@ func (n NopWriteCloser) Close() error {
 	return nil
 }
 
-// DiscardCloser is like ioutil.Discard, but implements WriteCloser.
+// DiscardCloser is like io.Discard, but implements WriteCloser.
 func DiscardCloser() io.WriteCloser {
-	return NopWriteCloser{ioutil.Discard}
+	return NopWriteCloser{io.Discard}
 }

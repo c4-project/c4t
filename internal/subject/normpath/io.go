@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,7 +24,7 @@ var ErrMissingFile = errors.New("subject file not available")
 
 // ReadSubjectFile is a low-level function for reading a subject file with path path, relative to directory root.
 //
-// If the file is present on disk at root/path, this behaves like ioutil.ReadFile.  Otherwise, if the path starts
+// If the file is present on disk at root/path, this behaves like os.ReadFile.  Otherwise, if the path starts
 // with a directory DIR, it assumes that a file root/DIR.tar.gz exists containing path, and attempts to load the file
 // from there.  (This is the convention used by the saver when saving tarballs of subjects.)
 //
@@ -38,7 +37,7 @@ func ReadSubjectFile(root, path string) ([]byte, error) {
 	if !yos.ExistFile(apath) {
 		return readSubjectFileFromArchive(root, path)
 	}
-	return ioutil.ReadFile(apath)
+	return os.ReadFile(apath)
 }
 
 func readSubjectFileFromArchive(root, path string) ([]byte, error) {
@@ -90,7 +89,7 @@ func readSubjectFileFromTarReader(tr *tar.Reader, tarFile, rpath string) ([]byte
 
 		// TODO(@MattWindsor): case insensitivity?
 		if filepath.Clean(hd.Name) == rpath {
-			return ioutil.ReadAll(tr)
+			return io.ReadAll(tr)
 		}
 	}
 }

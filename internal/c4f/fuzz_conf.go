@@ -8,7 +8,7 @@ package c4f
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"text/template"
 
@@ -63,7 +63,7 @@ func parseBoolParam(key id.ID, val string) string {
 	definites := map[string]bool{"on": true, "yes": true, "true": true, "off": false, "no": false, "false": false}
 	b, ok := definites[val]
 	if ok {
-		return fmt.Sprintf("set flag %s to %s", key, boolToString(b))
+		return fmt.Sprintf("set flag %s to %s", key, strconv.FormatBool(b))
 	}
 	return parseBoolRatioParam(key, val)
 }
@@ -86,14 +86,6 @@ func parseActionWeight(key id.ID, val string) string {
 	return fmt.Sprintf("action %s weight %d", key, vint)
 }
 
-func boolToString(b bool) string {
-	// TODO(@MattWindsor91): is this redundant?
-	if b {
-		return "true"
-	}
-	return "false"
-}
-
 // WriteFuzzConf writes a fuzzer configuration based on j to w.
 func WriteFuzzConf(w io.Writer, j fuzzer.Job) error {
 	fmap := template.FuncMap{"parseParam": parseParam}
@@ -107,7 +99,7 @@ func WriteFuzzConf(w io.Writer, j fuzzer.Job) error {
 // MakeFuzzConfFile creates a temporary file, then outputs WriteFuzzConf of j to it and returns the filepath.
 // It is the caller's responsibility to delete the file.
 func MakeFuzzConfFile(j fuzzer.Job) (string, error) {
-	cf, err := ioutil.TempFile("", "c4f.*.conf")
+	cf, err := os.CreateTemp("", "c4f.*.conf")
 	if err != nil {
 		return "", fmt.Errorf("creating temporary fuzzer config file: %w", err)
 	}

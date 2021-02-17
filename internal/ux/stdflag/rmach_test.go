@@ -7,7 +7,7 @@ package stdflag_test
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -91,7 +91,7 @@ func TestMachConfigFromCli_roundTrip(t *testing.T) {
 func testApp(action func(*c.Context) error) *c.App {
 	a := c.NewApp()
 	a.Flags = stdflag.MachCliFlags()
-	a.Writer = ioutil.Discard
+	a.Writer = io.Discard
 	a.Action = action
 	return a
 }

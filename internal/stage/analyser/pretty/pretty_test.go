@@ -9,7 +9,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -89,7 +89,7 @@ func TestPrinter_OnAnalysis_regress(t *testing.T) {
 			cfile := strings.Join([]string{name, cname, "txt"}, ".")
 
 			t.Run(cfile, func(t *testing.T) {
-				wbytes, err := ioutil.ReadFile(filepath.Join("testdata", cfile))
+				wbytes, err := os.ReadFile(filepath.Join("testdata", cfile))
 				require.NoError(t, err, "couldn't load case file", cfile)
 				want := string(wbytes)
 

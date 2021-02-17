@@ -7,7 +7,8 @@ package obs_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -35,13 +36,13 @@ func TestApp_valid(t *testing.T) {
 				fpath := filepath.Join(dir, name+".txt")
 				require.FileExists(t, fpath, "want-file should exist")
 
-				want, err := ioutil.ReadFile(fpath)
+				want, err := os.ReadFile(fpath)
 				require.NoError(t, err, "want-file should be readable")
 
 				args := []string{obs.Name, "-" + flags, path}
 
 				var buf bytes.Buffer
-				require.NoError(t, obs.App(&buf, ioutil.Discard).Run(args), "obs app should run OK")
+				require.NoError(t, obs.App(&buf, io.Discard).Run(args), "obs app should run OK")
 				require.Equal(t, string(want), buf.String(), "mismatch between output")
 			})
 		}

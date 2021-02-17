@@ -9,7 +9,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -64,7 +63,7 @@ func (l *Instance) patchToTemp(f Fixset, rpath string) (wpath string, err error)
 }
 
 func (l *Instance) patchReaderToTemp(f Fixset, r io.Reader) (string, error) {
-	w, werr := ioutil.TempFile("", "*.c")
+	w, werr := os.CreateTemp("", "*.c")
 	if werr != nil {
 		return "", fmt.Errorf("can't open temp file for reading: %w", werr)
 	}

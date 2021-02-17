@@ -7,7 +7,7 @@ package coverage_test
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 
@@ -67,7 +67,7 @@ func TestFuzzRunner_Run(t *testing.T) {
 	}
 
 	// TODO(@MattWindsor91): it'd be good if we didn't have to do this, but it's needed for the litmus arch scraper.
-	err := ioutil.WriteFile(rc.OutLitmus(), []byte("C foo1\n"), 0644)
+	err := os.WriteFile(rc.OutLitmus(), []byte("C foo1\n"), 0644)
 	require.NoError(t, err, "couldn't write stub litmus output")
 
 	f.On("Fuzz", mock.Anything, mock.MatchedBy(func(f fuzzer.Job) bool {

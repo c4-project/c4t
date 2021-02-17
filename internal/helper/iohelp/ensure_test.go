@@ -7,7 +7,7 @@ package iohelp_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -21,7 +21,7 @@ func TestEnsureWriter(t *testing.T) {
 
 	t.Run("nil", func(t *testing.T) {
 		t.Parallel()
-		require.Equal(t, ioutil.Discard, iohelp.EnsureWriter(nil), "EnsureWriter(nil) didn't return discard")
+		require.Equal(t, io.Discard, iohelp.EnsureWriter(nil), "EnsureWriter(nil) didn't return discard")
 	})
 	t.Run("non-nil", func(t *testing.T) {
 		t.Parallel()

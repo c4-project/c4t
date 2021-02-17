@@ -7,7 +7,6 @@ package analyse
 
 import (
 	"io"
-	"io/ioutil"
 
 	"github.com/c4-project/c4t/internal/plan/analysis"
 
@@ -132,7 +131,7 @@ func run(ctx *c.Context, outw io.Writer, _ io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return ux.RunOnCliPlan(ctx, a, ioutil.Discard)
+	return ux.RunOnCliPlan(ctx, a, io.Discard)
 }
 
 func observers(ctx *c.Context, outw io.Writer) ([]analyser.Observer, error) {

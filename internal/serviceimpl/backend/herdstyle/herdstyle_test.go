@@ -9,10 +9,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/c4-project/c4t/internal/helper/testhelp"
 
 	"github.com/c4-project/c4t/internal/model/service/backend"
 
@@ -20,7 +21,6 @@ import (
 
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/herd"
 
-	"github.com/c4-project/c4t/internal/helper/iohelp"
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle"
 	"github.com/c4-project/c4t/internal/subject/obs"
 	"github.com/stretchr/testify/assert"
@@ -43,37 +43,29 @@ func TestBackend_ParseObs(t *testing.T) {
 			b := herdstyle.Class{Impl: i}.Instantiate(backend.Spec{})
 
 			indir := filepath.Join("testdata", name, "in")
-			fs, err := ioutil.ReadDir(indir)
-			if !assert.NoError(t, err, "reading test data directory", indir) {
-				return
-			}
-			for _, f := range fs {
-				fname := f.Name()
-				ename := iohelp.ExtlessFile(fname)
-				t.Run(ename, func(t *testing.T) {
-					t.Parallel()
+			testhelp.TestFilesOfExt(t, indir, ".txt", func(t *testing.T, fname, path string) {
+				t.Parallel()
 
-					file, err := os.Open(filepath.Join(indir, fname))
-					if !assert.NoError(t, err, "opening test file", fname) {
-						return
-					}
-					var o obs.Obs
-					err = b.ParseObs(context.Background(), file, &o)
-					_ = file.Close()
-					if !assert.NoError(t, err, "parsing test file", fname) {
-						return
-					}
-					inJson, ok := obsToJsonString(t, &o)
-					if !ok {
-						return
-					}
-					outname := filepath.Join("testdata", name, "out", ename+".json")
-					outJson, err := ioutil.ReadFile(outname)
-					if assert.NoError(t, err, "opening expected output file", outname) {
-						assert.JSONEq(t, string(outJson), string(inJson), "JSON for observations didn't match")
-					}
-				})
-			}
+				file, err := os.Open(path)
+				if !assert.NoErrorf(t, err, "opening test file %q", fname) {
+					return
+				}
+				var o obs.Obs
+				err = b.ParseObs(context.Background(), file, &o)
+				_ = file.Close()
+				if !assert.NoErrorf(t, err, "parsing test file %q", fname) {
+					return
+				}
+				inJson, ok := obsToJsonString(t, &o)
+				if !ok {
+					return
+				}
+				outname := filepath.Join("testdata", name, "out", fname+".json")
+				outJson, err := os.ReadFile(outname)
+				if assert.NoErrorf(t, err, "opening expected output file %q", outname) {
+					assert.JSONEq(t, string(outJson), string(inJson), "JSON for observations didn't match")
+				}
+			})
 		})
 	}
 }

@@ -6,7 +6,7 @@
 package mkdoc
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	c "github.com/urfave/cli/v2"
@@ -33,5 +33,5 @@ func (m method) run(outdir string) error {
 		return err
 	}
 	fname := filepath.Join(outdir, m.name)
-	return ioutil.WriteFile(fname, []byte(s), 0744)
+	return os.WriteFile(fname, []byte(s), 0744)
 }

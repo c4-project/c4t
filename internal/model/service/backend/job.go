@@ -9,7 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/c4-project/c4t/internal/model/filekind"
@@ -148,17 +148,17 @@ func (l LiftOutput) Check() error {
 	}
 }
 
-// Files reads s.OutDir as a directory and returns its contents as qualified paths.
+// Files reads s.OutDir as a directory and returns the names of its contents.
 // This is useful for using a recipe job to feed a compiler job.
 func (l LiftOutput) Files() ([]string, error) {
-	fs, err := ioutil.ReadDir(l.Dir)
+	files, err := os.ReadDir(l.Dir)
 	if err != nil {
 		return nil, err
 	}
 
-	ps := make([]string, len(fs))
+	ps := make([]string, len(files))
 	i := 0
-	for _, f := range fs {
+	for _, f := range files {
 		if f.IsDir() {
 			continue
 		}

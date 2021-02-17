@@ -8,7 +8,6 @@ package c4f_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -107,7 +106,7 @@ func TestMakeFuzzConfFile(t *testing.T) {
 			require.FileExists(t, cf, "config file should exist")
 			defer func() { _ = os.Remove(cf) }()
 
-			got, rerr := ioutil.ReadFile(cf)
+			got, rerr := os.ReadFile(cf)
 			require.NoError(t, rerr, "loading config from file shouldn't error")
 
 			require.Equal(t, want, string(got), "config didn't match")

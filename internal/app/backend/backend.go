@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -104,7 +103,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	}
 	crun := stdflag.C4fRunnerFromCli(ctx, errw)
 
-	td, err := ioutil.TempDir("", "c4t-backend")
+	td, err := os.MkdirTemp("", "c4t-backend")
 	if err != nil {
 		return err
 	}
