@@ -105,3 +105,11 @@ func configUCD(path string) (string, error) {
 	}
 	return filepath.Join(cdir, dirConfig, path), nil
 }
+
+// GlobalFile gets the path to the global config file.
+//
+// This usually resides in the user config directory; an error occurs if this
+// directory is not determinable.
+func GlobalFile() (string, error) {
+	return configUCD(fileConfig)
+}
