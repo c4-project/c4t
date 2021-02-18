@@ -157,17 +157,17 @@ func TestPlan_RunStage_error(t *testing.T) {
 // ExamplePlan_SetMutant is a runnable example for Plan.SetMutant.
 func ExamplePlan_SetMutant() {
 	p := plan.Mock()
-	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
-	p.SetMutant(42)
-	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+	fmt.Printf("plan mutant: %s (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+	p.SetMutant(mutation.Mutant{Name: mutation.Name{Operator: "XYZ", Variant: 1}, Index: 42})
+	fmt.Printf("plan mutant: %s (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
 	p.Mutation = &mutation.Config{Enabled: true}
-	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
-	p.SetMutant(42)
-	fmt.Printf("plan mutant: %d (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+	fmt.Printf("plan mutant: %s (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
+	p.SetMutant(mutation.Mutant{Name: mutation.Name{Operator: "XYZ", Variant: 1}, Index: 42})
+	fmt.Printf("plan mutant: %s (is mutation test: %v)\n", p.Mutant(), p.IsMutationTest())
 
 	// Output:
 	// plan mutant: 0 (is mutation test: false)
 	// plan mutant: 0 (is mutation test: false)
 	// plan mutant: 0 (is mutation test: true)
-	// plan mutant: 42 (is mutation test: true)
+	// plan mutant: XYZ1:42 (is mutation test: true)
 }

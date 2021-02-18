@@ -25,7 +25,7 @@ const (
 {{ range $mid, $mach := .Stats.Machines }}  ## {{ $mid }}
 {{ with $muts := ($ctx.Span $mach).Mutation -}}
 {{ if $ctx.MutantFilter }}    ### Mutants
-{{ range $mut := .MutantsWhere $ctx.MutantFilter }}      {{ $mut }}. {{ template "mutant" (index $muts.ByMutant $mut) }}
+{{ range $mut := .MutantsWhere $ctx.MutantFilter }}      {{ $mut }}. {{ template "mutant" (index $muts.ByIndex .Index) }}
 {{ else }}      No mutants available matching filter.
 {{ end -}}
 {{- end -}}

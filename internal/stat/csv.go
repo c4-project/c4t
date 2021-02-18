@@ -18,7 +18,8 @@ import (
 func (s *Set) DumpMutationCSVHeader(w *csv.Writer) error {
 	hdr := []string{
 		"Machine",
-		"Mutant",
+		"Index",
+		"Name",
 		"Selections",
 		"Hits",
 		"Kills",

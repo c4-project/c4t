@@ -182,7 +182,7 @@ func (o *actionObserver) onInstance(m director.InstanceMessage) {
 	case director.KindInstanceClosed:
 		err = o.log.Write("-- INSTANCE CLOSED --\n")
 	case director.KindInstanceMutant:
-		err = o.log.Write(fmt.Sprintf("-- INSTANCE MUTANT NOW %d --\n", m.Mutant))
+		err = o.log.Write(fmt.Sprintf("-- INSTANCE MUTANT NOW %s --\n", m.Mutant))
 	}
 	o.logError(err)
 }

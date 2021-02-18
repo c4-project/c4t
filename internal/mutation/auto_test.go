@@ -64,7 +64,7 @@ func TestAutomator_Run_killOnly(t *testing.T) {
 
 	cancel()
 	// Test draining of spurious kills.
-	kch <- 42
+	kch <- mutation.Mutant{Index: 42}
 	close(kch)
 	wg.Wait()
 }
@@ -125,7 +125,7 @@ func TestAutoPool_Mutant(t *testing.T) {
 	t.Parallel()
 	asrt := assert.New(t)
 
-	orig := []mutation.Mutant{1, 2, 4, 5, 10, 11, 12}
+	orig := []mutation.Mutant{{Index: 1}, {Index: 2}, {Index: 4}, {Index: 5}, {Index: 10}, {Index: 11}, {Index: 12}}
 	var a mutation.AutoPool
 
 	a.Init(orig)
@@ -150,7 +150,7 @@ func TestAutoPool_Mutant(t *testing.T) {
 		asrt.Equalf(m, a.Mutant(), "mutant at position %d unexpected (pass 3)", i)
 		if 0 < i {
 			// Testing the attempted re-killing of expired mutants.
-			a.Kill(m - 1)
+			a.Kill(mutation.Mutant{Index: m.Index - 1})
 			a.Kill(m)
 		} else {
 			a.Advance()

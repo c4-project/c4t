@@ -21,20 +21,21 @@ import (
 func ExampleAutoConfig_Mutants() {
 	cfg := mutation.AutoConfig{
 		Ranges: []mutation.Range{
-			{Start: 1, End: 4},
-			{Start: 10, End: 11},
-			{Start: 27, End: 31},
+			{Start: 1, End: 2},
+			{Operator: "FOO", Start: 2, End: 3},
+			{Start: 10, End: 12},
+			{Operator: "BAR", Start: 27, End: 31},
 		},
 	}
 
 	fmt.Print("mutants:")
 	for _, i := range cfg.Mutants() {
-		fmt.Printf(" %d", i)
+		fmt.Printf(" %s", i)
 	}
 	fmt.Println()
 
 	// Output:
-	// mutants: 1 2 3 10 27 28 29 30
+	// mutants: 1 FOO:2 10 11 BAR1:27 BAR2:28 BAR3:29 BAR4:30
 }
 
 // ExampleAutoConfig_IsActive is a runnable example for Config.IsActive.
@@ -64,14 +65,20 @@ func ExampleAutoConfig_IsActive() {
 
 // ExampleRange_Mutants is a runnable example for Range.
 func ExampleRange_Mutants() {
-	fmt.Print("10..20:")
+	fmt.Print("unnamed:")
 	for _, i := range (mutation.Range{Start: 10, End: 20}).Mutants() {
-		fmt.Printf(" %d", i)
+		fmt.Printf(" %s", i)
+	}
+	fmt.Println()
+	fmt.Print("named:  ")
+	for _, i := range (mutation.Range{Operator: "ABC", Start: 20, End: 23}).Mutants() {
+		fmt.Printf(" %s", i)
 	}
 	fmt.Println()
 
 	// Output:
-	// 10..20: 10 11 12 13 14 15 16 17 18 19
+	// unnamed: 10 11 12 13 14 15 16 17 18 19
+	// named:   ABC1:20 ABC2:21 ABC3:22
 }
 
 // ExampleRange_IsEmpty is a runnable example for IsEmpty.
@@ -102,7 +109,7 @@ func TestRange_Mutants(t *testing.T) {
 		},
 		"singleton": {
 			in:  mutation.Range{Start: 42, End: 43},
-			out: []mutation.Mutant{42},
+			out: []mutation.Mutant{{Index: 42}},
 		},
 		"inverted": {
 			in:  mutation.Range{Start: 53, End: 27},
@@ -110,7 +117,15 @@ func TestRange_Mutants(t *testing.T) {
 		},
 		"ok": {
 			in:  mutation.Range{Start: 10, End: 20},
-			out: []mutation.Mutant{10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
+			out: []mutation.Mutant{{Index: 10}, {Index: 11}, {Index: 12}, {Index: 13}, {Index: 14}, {Index: 15}, {Index: 16}, {Index: 17}, {Index: 18}, {Index: 19}},
+		},
+		"named": {
+			in: mutation.Range{Operator: "ABC", Start: 10, End: 13},
+			out: []mutation.Mutant{
+				mutation.NamedMutant(10, "ABC", 1),
+				mutation.NamedMutant(11, "ABC", 2),
+				mutation.NamedMutant(12, "ABC", 3),
+			},
 		},
 	}
 

@@ -26,6 +26,8 @@ func TestPrinter_OnAnalysis_regress(t *testing.T) {
 	t.Parallel()
 
 	testhelp.TestFilesOfExt(t, "testdata", ".json", func(t *testing.T, name, path string) {
+		t.Helper()
+
 		var s stat.Set
 		require.NoError(t, s.LoadFile(path), "couldn't read stat set")
 

@@ -87,7 +87,7 @@ func (c Instance) stringErr() (string, error) {
 func (c Instance) Interpolations() map[string]string {
 	return map[string]string{
 		varConfigTime: c.unixTimeString(),
-		varMutant:     strconv.FormatUint(c.Mutant, 10),
+		varMutant:     strconv.FormatUint(uint64(c.Mutant.Index), 10),
 	}
 }
 

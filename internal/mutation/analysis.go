@@ -14,36 +14,65 @@ import (
 )
 
 // Analysis is the type of mutation testing analyses.
-type Analysis map[Mutant]MutantAnalysis
+type Analysis map[Index]MutantAnalysis
+
+// RegisterMutant registers the mutant record m in the analysis.
+//
+// This is necessary, at the moment, to put things like the mutant's operator
+// and variant information in the analysis table.
+func (a Analysis) RegisterMutant(m Mutant) {
+	ma, ok := a[m.Index]
+	if ok {
+		return
+	}
+	ma.Mutant = m
+	a[m.Index] = ma
+}
 
 // AddCompilation merges any mutant information extracted from log to this analysis.
 // Such analysis is filed under compilation name comp, and status determines the status of the compilation.
 func (a Analysis) AddCompilation(comp compilation.Name, log string, status status.Status) {
-	for mut, hits := range ScanLines(strings.NewReader(log)) {
-		a[mut] = append(a[mut], SelectionAnalysis{
+	for i, hits := range ScanLines(strings.NewReader(log)) {
+		ma := a[i]
+		// Hopefully, we should've pre-registered this mutant's information with the analysis, but this is a failsafe.
+		if ma.Mutant.Index == 0 {
+			ma.Mutant = AnonMutant(i)
+		}
+		ma.AddSelection(SelectionAnalysis{
 			NumHits: hits,
 			Status:  status,
 			HitBy:   comp,
 		})
+		a[i] = ma
 	}
 }
 
 // Kills determines the mutants that were killed.
 func (a Analysis) Kills() []Mutant {
-	var muts []Mutant
-	for mut, mstat := range a {
-		for _, hit := range mstat {
-			if hit.Killed() {
-				muts = append(muts, mut)
-				break
-			}
+	muts := make([]Mutant, 0, len(a))
+	for _, mstat := range a {
+		if mstat.Killed {
+			muts = append(muts, mstat.Mutant)
 		}
 	}
 	return muts
 }
 
 // MutantAnalysis is the type of individual mutant analyses.
-type MutantAnalysis []SelectionAnalysis
+type MutantAnalysis struct {
+	// Mutant contains the full record for this mutant.
+	Mutant Mutant
+	// Killed records whether this mutant was killed.
+	Killed bool
+	// Selections contains the per-selection analysis for this mutant.
+	Selections []SelectionAnalysis
+}
+
+// AddSelection adds sel to a's selection analyses.
+func (a *MutantAnalysis) AddSelection(sel SelectionAnalysis) {
+	a.Selections = append(a.Selections, sel)
+	a.Killed = a.Killed || sel.Killed()
+}
 
 // SelectionAnalysis represents one instance where a compilation selected a particular mutant.
 type SelectionAnalysis struct {

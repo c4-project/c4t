@@ -36,8 +36,11 @@ import (
 func TestPerturber_Run(t *testing.T) {
 	pm := plan.Mock()
 	pm.Mutation = &mutation.Config{
-		Enabled:   true,
-		Selection: 42,
+		Enabled: true,
+		Selection: mutation.Mutant{
+			Name:  mutation.Name{Operator: "XYZ", Variant: 1},
+			Index: 42,
+		},
 	}
 
 	// This should give us a degree of sampling.

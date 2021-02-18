@@ -208,6 +208,7 @@ func (a *analyser) applyMutants(r subjectAnalysis) {
 		return
 	}
 	// TODO(@MattWindsor91): test this.
+	a.analysis.Mutation.RegisterMutant(a.analysis.Plan.Mutant())
 	for cidstr, clog := range r.clogs {
 		comp := compilation.Name{SubjectName: r.sub.Name, CompilerID: id.FromString(cidstr)}
 		a.analysis.Mutation.AddCompilation(comp, clog, r.cflags[cidstr].Status())

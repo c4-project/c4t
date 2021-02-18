@@ -80,10 +80,13 @@ func (c AutoConfig) Mutants() []Mutant {
 
 // Range defines an inclusive numeric range of mutant numbers to consider.
 type Range struct {
+	// Operator is, if given, the name of the operator in this range.
+	Operator string `json:"operator" toml:"operator"`
+
 	// Start is the first mutant number to consider in this range.
-	Start Mutant `json:"start" toml:"start"`
+	Start Index `json:"start" toml:"start"`
 	// End is one past the last mutant number to consider in this range.
-	End Mutant `json:"end" toml:"end"`
+	End Index `json:"end" toml:"end"`
 }
 
 // IsEmpty gets whether this range defines no mutant numbers.
@@ -91,16 +94,29 @@ func (r Range) IsEmpty() bool {
 	return r.End <= r.Start
 }
 
+// IsSingleton gets whether this range has exactly one item in it.
+func (r Range) IsSingleton() bool {
+	return r.End == r.Start+1
+}
+
 // Mutants expands a range into the slice of mutant numbers falling within it.
 func (r Range) Mutants() []Mutant {
-	if r.IsEmpty() {
+	switch {
+	case r.IsEmpty():
 		return []Mutant{}
+	case r.IsSingleton():
+		// Don't record variant numbers for singleton mutants
+		return []Mutant{NamedMutant(r.Start, r.Operator, 0)}
+	default:
+		return r.enumMutants()
 	}
+}
 
+func (r Range) enumMutants() []Mutant {
 	m := make([]Mutant, r.End-r.Start)
 	for i := r.Start; i < r.End; i++ {
-		m[i-r.Start] = i
+		j := uint64(i - r.Start)
+		m[j] = NamedMutant(i, r.Operator, j+1)
 	}
-
 	return m
 }

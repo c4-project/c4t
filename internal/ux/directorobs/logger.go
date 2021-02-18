@@ -124,7 +124,7 @@ func (j *Logger) OnCycleInstance(c director.Cycle, m director.InstanceMessage) {
 	case director.KindInstanceClosed:
 		j.l.Printf("[instance %d has closed]\n", c.Instance)
 	case director.KindInstanceMutant:
-		j.l.Printf("[instance %d has changed mutant to %d]\n", c.Instance, m.Mutant)
+		j.l.Printf("[instance %d has changed mutant to %s]\n", c.Instance, m.Mutant)
 	}
 }
 

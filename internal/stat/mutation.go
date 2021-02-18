@@ -19,29 +19,29 @@ import (
 
 // Mutation holds statistics for each mutant in a mutation testing campaign.
 type Mutation struct {
-	// ByMutant records statsets for each mutant.
-	ByMutant map[mutation.Mutant]Mutant
+	// ByIndex records statsets for each mutant index.
+	ByIndex map[mutation.Index]Mutant `json:"by_index"`
 }
 
 // Reset resets all of this statset's maps to empty, but non-nil.
 func (m *Mutation) Reset() {
-	m.ByMutant = map[mutation.Mutant]Mutant{}
+	m.ByIndex = map[mutation.Index]Mutant{}
 }
 
 // AddAnalysis adds the information from mutation analysis a to this statset.
 func (m *Mutation) AddAnalysis(a mutation.Analysis) {
 	m.ensure()
 
-	for mut, hits := range a {
-		ms := m.ByMutant[mut]
-		ms.addAnalysis(hits)
-		m.ByMutant[mut] = ms
+	for mut, ma := range a {
+		ms := m.ByIndex[mut]
+		ms.addAnalysis(ma)
+		m.ByIndex[mut] = ms
 	}
 }
 
 func (m *Mutation) ensure() {
-	if m.ByMutant == nil {
-		m.ByMutant = map[mutation.Mutant]Mutant{}
+	if m.ByIndex == nil {
+		m.ByIndex = map[mutation.Index]Mutant{}
 	}
 }
 
@@ -74,14 +74,16 @@ var (
 // MutantsWhere returns a sorted list of mutants satisfying pred.
 // (It is a value receiver method to allow calling through templates.)
 func (m Mutation) MutantsWhere(pred func(m Mutant) bool) []mutation.Mutant {
-	muts := make([]mutation.Mutant, 0, len(m.ByMutant))
-	for k, mstat := range m.ByMutant {
+	muts := make([]mutation.Mutant, 0, len(m.ByIndex))
+	for i, mstat := range m.ByIndex {
 		if pred(mstat) {
-			muts = append(muts, k)
+			info := mstat.Info
+			info.SetIndexIfZero(i)
+			muts = append(muts, info)
 		}
 	}
 	sort.Slice(muts, func(i, j int) bool {
-		return muts[i] < muts[j]
+		return muts[i].Index < muts[j].Index
 	})
 	return muts
 }
@@ -92,7 +94,7 @@ func (m Mutation) MutantsWhere(pred func(m Mutant) bool) []mutation.Mutant {
 func (m *Mutation) DumpCSV(w *csv.Writer, mid string) error {
 	var err error
 	for _, mut := range m.Mutants() {
-		if err = m.dumpMutant(w, mid, mut, m.ByMutant[mut]); err != nil {
+		if err = m.dumpMutant(w, mid, mut, m.ByIndex[mut.Index]); err != nil {
 			break
 		}
 	}
@@ -103,21 +105,24 @@ func (m *Mutation) DumpCSV(w *csv.Writer, mid string) error {
 
 // Mutant gives statistics for a particular mutant.
 type Mutant struct {
+	// Info contains the full mutant metadata set for the mutant.
+	Info mutation.Mutant `json:"info,omitempty"`
 	// Selections records the number of times this mutant has been selected.
-	Selections uint64
+	Selections uint64 `json:"selections,omitempty"`
 	// Hits records the number of times this mutant has been hit (including kills).
-	Hits uint64
+	Hits uint64 `json:"hits,omitempty"`
 	// Kills records the number of selections that resulted in kills.
-	Kills uint64
+	Kills uint64 `json:"kills,omitempty"`
 	// Statuses records, for each status, the number of selections that resulted in that status.
-	Statuses map[status.Status]uint64
+	Statuses map[status.Status]uint64 `json:"statuses,omitempty"`
 }
 
-func (m *Mutant) addAnalysis(hits mutation.MutantAnalysis) {
+func (m *Mutant) addAnalysis(ma mutation.MutantAnalysis) {
 	m.ensure()
+	m.Info = ma.Mutant
+	m.Selections = uint64(len(ma.Selections))
 
-	for _, h := range hits {
-		m.Selections++
+	for _, h := range ma.Selections {
 		m.Hits += h.NumHits
 		if h.Killed() {
 			m.Kills++
@@ -135,7 +140,14 @@ func (m *Mutant) ensure() {
 
 func (m *Mutation) dumpMutant(w *csv.Writer, machname string, mut mutation.Mutant, mstats Mutant) error {
 	mstats.ensure()
-	cells := []string{machname, fint(mut), fint(mstats.Selections), fint(mstats.Hits), fint(mstats.Kills)}
+	cells := []string{
+		machname,
+		fint(uint64(mut.Index)),
+		mut.Name.String(),
+		fint(mstats.Selections),
+		fint(mstats.Hits),
+		fint(mstats.Kills),
+	}
 	for i := status.Ok; i <= status.Last; i++ {
 		cells = append(cells, fint(mstats.Statuses[i]))
 	}

@@ -113,7 +113,7 @@ func (p *Plan) IsMutationTest() bool {
 // This assumes that the plan is being repeatedly refreshed with the appropriate mutant ID.
 func (p *Plan) Mutant() mutation.Mutant {
 	if !p.IsMutationTest() {
-		return 0
+		return mutation.Mutant{}
 	}
 	return p.Mutation.Selection
 }

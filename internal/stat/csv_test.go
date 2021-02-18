@@ -23,19 +23,19 @@ func ExampleSet_DumpMutationCSV() {
 			"foo": {
 				Session: stat.MachineSpan{
 					Mutation: stat.Mutation{
-						ByMutant: map[mutation.Mutant]stat.Mutant{
-							2:  {Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
-							42: {Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
-							53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+						ByIndex: map[mutation.Index]stat.Mutant{
+							2:  {Info: mutation.AnonMutant(2), Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
+							42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
+							53: {Info: mutation.NamedMutant(53, "BAR", 5), Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
 						},
 					},
 				},
 				Total: stat.MachineSpan{
 					Mutation: stat.Mutation{
-						ByMutant: map[mutation.Mutant]stat.Mutant{
-							2:  {Selections: 41, Hits: 5000, Kills: 40, Statuses: map[status.Status]uint64{status.Flagged: 40, status.Filtered: 1}},
-							42: {Selections: 100, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 99, status.CompileTimeout: 1}},
-							53: {Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+						ByIndex: map[mutation.Index]stat.Mutant{
+							2:  {Info: mutation.AnonMutant(2), Selections: 41, Hits: 5000, Kills: 40, Statuses: map[status.Status]uint64{status.Flagged: 40, status.Filtered: 1}},
+							42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: 100, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 99, status.CompileTimeout: 1}},
+							53: {Info: mutation.NamedMutant(53, "BAR", 5), Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
 						},
 					},
 				},
@@ -43,8 +43,8 @@ func ExampleSet_DumpMutationCSV() {
 			"bar": {
 				Total: stat.MachineSpan{
 					Mutation: stat.Mutation{
-						ByMutant: map[mutation.Mutant]stat.Mutant{
-							1: {Selections: 500, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 500}},
+						ByIndex: map[mutation.Index]stat.Mutant{
+							1: {Info: mutation.AnonMutant(1), Selections: 500, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 500}},
 						},
 					},
 				},
@@ -59,13 +59,13 @@ func ExampleSet_DumpMutationCSV() {
 	_ = s.DumpMutationCSV(w, true)
 
 	// Output:
-	// Machine,Mutant,Selections,Hits,Kills,Ok,Filtered,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
-	// foo,2,1,0,0,0,1,0,0,0,0,0
-	// foo,42,10,1,0,9,0,0,0,1,0,0
-	// foo,53,20,400,15,0,0,15,3,0,2,0
+	// Machine,Index,Name,Selections,Hits,Kills,Ok,Filtered,Flagged,CompileFail,CompileTimeout,RunFail,RunTimeout
+	// foo,2,,1,0,0,0,1,0,0,0,0,0
+	// foo,42,FOO,10,1,0,9,0,0,0,1,0,0
+	// foo,53,BAR5,20,400,15,0,0,15,3,0,2,0
 	// --
-	// bar,1,500,0,0,500,0,0,0,0,0,0
-	// foo,2,41,5000,40,0,1,40,0,0,0,0
-	// foo,42,100,1,0,99,0,0,0,1,0,0
-	// foo,53,20,400,15,0,0,15,3,0,2,0
+	// bar,1,,500,0,0,500,0,0,0,0,0,0
+	// foo,2,,41,5000,40,0,1,40,0,0,0,0
+	// foo,42,FOO,100,1,0,99,0,0,0,1,0,0
+	// foo,53,BAR5,20,400,15,0,0,15,3,0,2,0
 }

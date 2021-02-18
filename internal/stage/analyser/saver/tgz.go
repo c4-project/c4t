@@ -15,7 +15,7 @@ import (
 	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
-/// TGZWriter is a wrapper over a gzipped archive writer.
+// TGZWriter is a wrapper over a gzipped archive writer.
 type TGZWriter struct {
 	tw *tar.Writer
 	gw *gzip.Writer

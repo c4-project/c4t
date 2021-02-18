@@ -42,7 +42,7 @@ func TestScanLine(t *testing.T) {
 
 	cases := map[string]struct {
 		line     string
-		hit, sel mutation.Mutant
+		hit, sel mutation.Index
 	}{
 		"empty":       {line: "", hit: 0, sel: 0},
 		"no-match":    {line: "the quick brown fox", hit: 0, sel: 0},
@@ -61,9 +61,9 @@ func TestScanLine(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			var hit, sel uint64
+			var hit, sel mutation.Index
 
-			mutation.ScanLine(c.line, func(u mutation.Mutant) { hit = u }, func(u mutation.Mutant) { sel = u })
+			mutation.ScanLine(c.line, func(u mutation.Index) { hit = u }, func(u mutation.Index) { sel = u })
 
 			assert.Equal(t, c.hit, hit, "hit mutant not updated")
 			assert.Equal(t, c.sel, sel, "selected mutant not updated")
