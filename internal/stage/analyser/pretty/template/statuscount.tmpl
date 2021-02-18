@@ -1,0 +1,3 @@
+{{/* Prints a STATUS: K subject(s) line for each status-count mapping on dot.  Assumes indent of 6 spaces. */}}
+{{- range $status, $count := . }}      - {{ $status }}: {{ $count }} subject(s)
+{{ end -}}

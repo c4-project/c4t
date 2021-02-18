@@ -1,0 +1,22 @@
+{{/* Main template for the subject outcomes part of an analysis.
+     Expects the analysis's ByStatus map wrapped with config on dot.
+     Assumes an indent of 2 spaces, and leaves a trailing space. */}}
+{{- range $status, $corpus := .Data -}}
+    {{- if (and $corpus (or (not $status.IsOk) $.Config.ShowOk)) }}  ## {{ $status }} ({{ len $corpus }})
+{{ range $sname, $subject := $corpus }}    - {{ $sname }}
+{{ range $compiler, $compile := .Compilations -}}
+    {{- with .Run -}}
+        {{- if eq $status .Status }}      - {{ $compiler }}
+{{ end -}}
+
+    {{- with .Obs -}}
+        {{- template "obs.tmpl" . -}}
+    {{- else }}        No state information available.
+{{ end -}}
+
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- else }}  No subject outcomes available.
+{{  end -}}

@@ -1,0 +1,26 @@
+{{/* A human-readable summary of one observation.  Is empty if the observation is uninteresting. */}}
+{{- if .Flags.IsPartial -}}
+    {{ obsIndent 0 }}WARNING: this observation is partial.
+{{ end -}}
+
+{{- if .Flags.IsInteresting -}}
+    {{- if .Flags.IsExistential -}}
+
+        {{ obsIndent 0 }}postcondition witnessed by
+        {{- with .Witnesses -}}:
+{{ template "stateset.tmpl" . }}
+        {{- else }} at least one of these states:
+{{ template "stateset.tmpl" .States }}
+        {{- end -}}
+
+    {{- else -}}
+
+        {{ obsIndent 0 }}postcondition violated by
+        {{- with .CounterExamples }}:
+{{ template "stateset.tmpl" . }}
+        {{- else }} at least one of these states:
+{{ template "stateset.tmpl" .States }}
+        {{- end -}}
+
+    {{- end -}}
+{{- end -}}

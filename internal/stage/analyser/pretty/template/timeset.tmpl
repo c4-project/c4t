@@ -1,0 +1,6 @@
+{{/* Prints, on one line, a min/mean/max timeset given on dot. */}}
+{{- if . -}}
+    Min {{ .Min.Seconds }} Avg {{ .Mean.Seconds }} Max {{ .Max.Seconds }}
+{{- else -}}
+    N/A
+{{- end -}}

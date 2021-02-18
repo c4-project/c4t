@@ -36,5 +36,5 @@ func NewPrinter(o ...Option) (*Printer, error) {
 func (p *Printer) Write(s stat.Set) error {
 	c := p.ctx
 	c.Stats = &s
-	return p.tmpl.ExecuteTemplate(p.w, "root", c)
+	return p.tmpl.ExecuteTemplate(p.w, "root.tmpl", c)
 }

@@ -1,0 +1,16 @@
+{{/* Outputs a Litmus-format postcondition encoding a state set in disjunctive normal form.
+     The newline behaviour here is particularly fragile, be careful when editing!
+     */}}forall (
+{{- range $i, $s := .States }}
+  {{ if eq $i 0 }}  {{ else }}\/{{ end }} (
+    {{- with $vs := .Values -}}
+        {{- range $j, $v := .Vars -}}
+            {{ if ne $j 0 }} /\ {{ end }}{{ $v }} == {{ index $vs $v }}
+        {{- else -}}
+            true
+        {{- end -}}
+    {{- end -}}
+    )
+{{- else }}
+  true{{- end }}
+)

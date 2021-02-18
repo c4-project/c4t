@@ -6,50 +6,22 @@
 package pretty
 
 import (
+	"embed"
+	"io/fs"
 	"text/template"
 
 	"github.com/c4-project/c4t/internal/stat"
-
-	"github.com/c4-project/c4t/internal/helper/iohelp"
 )
 
-// TODO(@MattWindsor91): embed these (and any other templates) when Go 1.16 releases.
-const (
-	tmplMutant = `
-{{- .Kills }} kill(s) on {{ .Selections }} selection(s) [{{ .Hits }} hits]
-{{- range $s, $k := .Statuses -}}, {{ $s }}={{ $k }}{{ end -}}
-`
-
-	tmplMachines = `
-{{- with $ctx := . -}}
-{{ range $mid, $mach := .Stats.Machines }}  ## {{ $mid }}
-{{ with $muts := ($ctx.Span $mach).Mutation -}}
-{{ if $ctx.MutantFilter }}    ### Mutants
-{{ range $mut := .MutantsWhere $ctx.MutantFilter }}      {{ $mut }}. {{ template "mutant" (index $muts.ByIndex .Index) }}
-{{ else }}      No mutants available matching filter.
-{{ end -}}
-{{- end -}}
-{{ else }}    No records available for this machine.
-{{- end -}}
-{{ else }}  No machines available.
-{{ end -}}
-{{- end -}}
-`
-
-	tmplRoot = `# Machine Report
-{{ template "machines" . -}}
-`
-)
+//go:embed template/*.tmpl
+var templates embed.FS
 
 func getTemplate() (*template.Template, error) {
-	t, err := template.New("root").Parse(tmplRoot)
+	dir, err := fs.Sub(templates, "template")
 	if err != nil {
 		return nil, err
 	}
-	return iohelp.ParseTemplateStrings(t, map[string]string{
-		"machines": tmplMachines,
-		"mutant":   tmplMutant,
-	})
+	return template.ParseFS(dir, "*.tmpl")
 }
 
 // context is the root structure visible in the stats pretty-printer.

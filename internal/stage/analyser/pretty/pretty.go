@@ -21,7 +21,7 @@ import (
 type Printer struct {
 	w    io.Writer
 	tmpl *template.Template
-	ctx  WriteContext
+	ctx  Config
 }
 
 // NewPrinter constructs a pretty-printer using options o.
@@ -39,9 +39,7 @@ func NewPrinter(o ...Option) (*Printer, error) {
 
 // Write writes an unsourced analysis a to this writer.
 func (p *Printer) Write(a analysis.Analysis) error {
-	c := p.ctx
-	c.Analysis = &a
-	return p.tmpl.ExecuteTemplate(p.w, "root", c)
+	return p.tmpl.ExecuteTemplate(p.w, "root.tmpl", AddConfig(&a, p.ctx))
 }
 
 // OnAnalysis writes an unsourced analysis a to this printer; if an error occurs, it tries to rescue.

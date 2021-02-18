@@ -1,0 +1,7 @@
+{{/* Template for displaying mutation testing analyses.
+     Assumes an indent of 2 spaces, with the mutation analysis on dot, and leaves a trailing newline. */}}
+{{- range $mut, $analysis := . }}  ## Mutant {{ $mut }}
+{{ range $analysis }}    - {{ .HitBy }}: {{ .NumHits }} hit(s){{ if .Killed }} *KILLED*{{ end }}
+{{ end -}}
+{{- else }}  No mutations were enabled.
+{{- end -}}

@@ -1,0 +1,12 @@
+{{/* Contains the body of a compiler summary (less the compiler name).
+     Expects dot to be a compiler wrapped with config.
+     Assumes an indent of 2 spaces, and doesn't leave a trailing newline. */}}
+{{- template "compilerinfo.tmpl" .Data.Info }}
+    ### Times (sec)
+      - compile: {{ template "timeset.tmpl" .Data.Time }}
+      - run: {{ template "timeset.tmpl" .Data.RunTime }}
+    ### Results
+{{ template "statuscount.tmpl" .Data.Counts -}}
+{{- if .Config.ShowCompilerLogs }}    ### Logs
+{{ template "compilerLog.tmpl" .Data.Logs -}}
+{{- end -}}

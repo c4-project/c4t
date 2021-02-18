@@ -1,0 +1,8 @@
+{{/* Root template for pretty-printing observations. */}}
+{{- if .ShowSummary -}}{{ template "obs.tmpl" .Obs }}{{- end -}}
+{{- if and .ShowSummary .Mode.Dnf }}{{/* TODO(@MattWindsor91): make this unnecessary */}}
+postcondition covering all observed states:
+
+{{ end -}}
+{{- if .Mode.Dnf -}}{{ template "dnf.tmpl" .Obs }}
+{{/* deliberate newline here */}}{{ end -}}

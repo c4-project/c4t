@@ -1,0 +1,11 @@
+{{/* A stateset, printed out in the format [10x] x = 10, y = 100, z = 30.  Starts with indent, ends with newline. */}}
+{{- range . -}}
+    {{- obsIndent 1 -}}
+    {{- if .Occurrences -}}[{{ .Occurrences }}x] {{ end -}}
+    {{- with $sv := .Values -}}
+        {{- range $j, $v := .Vars -}}
+            {{ if ne $j 0 }}, {{ end }}{{ $v }} = {{ index $sv $v }}
+        {{- else -}}
+        {{- end -}}
+    {{- end }}{{/* deliberate newline here */}}
+{{ end -}}

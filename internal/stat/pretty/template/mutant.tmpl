@@ -1,0 +1,2 @@
+{{- .Kills }} kill(s) on {{ .Selections }} selection(s) [{{ .Hits }} hits]
+{{- range $s, $k := .Statuses -}}, {{ $s }}={{ $k }}{{ end -}}

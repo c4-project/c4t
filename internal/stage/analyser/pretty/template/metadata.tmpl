@@ -1,0 +1,8 @@
+{{/* Template for displaying plan metadata.
+     Assumes dot is on the metadata, and an indent of 2 spaces.
+     Leaves a trailing newline.
+   */}}  - created at: {{ .Creation }}
+  - seed: {{ .Seed }}
+  - version: {{ .Version }}
+  ## Stages
+{{ template "stages.tmpl" .Stages }}

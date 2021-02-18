@@ -1,0 +1,13 @@
+{{- with $ctx := . -}}
+{{ range $mid, $mach := .Stats.Machines }}  ## {{ $mid }}
+{{ with $muts := ($ctx.Span $mach).Mutation -}}
+{{ if $ctx.MutantFilter }}    ### Mutants
+{{ range $mut := .MutantsWhere $ctx.MutantFilter }}      {{ $mut }}. {{ template "mutant.tmpl" (index $muts.ByIndex .Index) }}
+{{ else }}      No mutants available matching filter.
+{{ end -}}
+{{- end -}}
+{{ else }}    No records available for this machine.
+{{- end -}}
+{{ else }}  No machines available.
+{{ end -}}
+{{- end -}}

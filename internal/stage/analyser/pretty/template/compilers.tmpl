@@ -1,0 +1,7 @@
+{{/* Lists all of the compilers.
+     Compilers should be a ID-compiler map wrapped with config on dot.
+     Expects an indent of 2 spaces, and leaves a trailing newline. */}}
+{{- range $cname, $compiler := .Data }}  ## {{ $cname }}
+{{ template "compiler.tmpl" (withConfig $compiler $.Config) }}
+{{- else }}  No compilers available.
+{{- end -}}

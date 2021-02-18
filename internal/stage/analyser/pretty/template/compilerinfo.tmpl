@@ -1,0 +1,18 @@
+{{/* Displays metadata about a compiler.
+     Assumes an indent of 4 spaces, and does not leave a trailing newline.
+   */}}    - style: {{ .Style }}
+    - arch: {{ .Arch }}
+    - opt: {{ with .SelectedOpt -}}
+    {{- with .Name -}}
+        {{ . }}
+    {{- else -}}
+        none
+    {{- end -}}
+{{- else -}}
+    none
+{{- end }}
+    - mopt: {{ with .SelectedMOpt -}}
+    {{ . }}
+{{- else -}}
+    none
+{{- end -}}

@@ -6,21 +6,19 @@
 package pretty
 
 import (
+	"embed"
+	"io/fs"
 	"strings"
 	"text/template"
 
 	"github.com/c4-project/c4t/internal/subject/obs"
-
-	"github.com/c4-project/c4t/internal/helper/iohelp"
-
-	"github.com/c4-project/c4t/internal/plan/analysis"
 )
 
-// WriteContext is the type of roots sent to the template engine.
-type WriteContext struct {
-	// The analysis to write.
-	Analysis *analysis.Analysis
+//go:embed template
+var templates embed.FS
 
+// Config is the type of pretty-printer configuration.
+type Config struct {
 	// ShowCompilers is true if compiler breakdowns should be shown.
 	ShowCompilers bool
 
@@ -40,120 +38,33 @@ type WriteContext struct {
 	ShowMutation bool
 }
 
-const (
-	tmplStages = `  ## Stages
-{{- range . }}
-    - {{ .Stage }}: completed {{ .CompletedOn }}, took {{ .Duration.Seconds }} sec(s)
-{{- end -}}
-`
+// WithConfig is the type of things wrapped with pretty-printer config.
+type WithConfig struct {
+	// Data is the wrapped data.
+	Data interface{}
+	// Config is the configuration.
+	Config Config
+}
 
-	tmplPlanInfo = `  - created at: {{ .Analysis.Plan.Metadata.Creation }}
-  - seed: {{ .Analysis.Plan.Metadata.Seed }}
-  - version: {{ .Analysis.Plan.Metadata.Version }}
-{{ template "stages" .Analysis.Plan.Metadata.Stages -}}
-`
-
-	tmplCompilerCounts = `{{ range $status, $count := . }}      - {{ $status }}: {{ $count }} subject(s)
-{{ end -}}`
-
-	tmplTime = `{{ if . }}Min {{ .Min.Seconds }} Avg {{ .Mean.Seconds }} Max {{ .Max.Seconds }}{{ else }}N/A{{ end }}`
-
-	tmplCompilerInfo = `    - style: {{ .Style }}
-    - arch: {{ .Arch }}
-    - opt: {{ if .SelectedOpt -}}{{ if .SelectedOpt.Name }}{{ .SelectedOpt.Name }}{{ else }}none{{ end -}}{{ else }}none{{- end }}
-    - mopt: {{ if .SelectedMOpt }}{{ .SelectedMOpt }}{{ else }}none{{ end }}`
-
-	tmplCompilerLogs = `
-{{- range $sname, $log := . }}{{ if $log }}      #### {{ $sname }}
-` + "```" + `
-{{ $log }}
-` + "```" + `
-{{ end -}}
-{{ end }}
-`
-
-	tmplCompilers = `
-{{- range $cname, $compiler := .Analysis.Compilers }}  ## {{ $cname }}
-{{ template "compilerInfo" .Info }}
-    ### Times (sec)
-      - compile: {{ template "timeset" .Time }}
-      - run: {{ template "timeset" .RunTime }}
-    ### Results
-{{ template "compilerCounts" .Counts }}
-{{- if $.ShowCompilerLogs }}    ### Logs
-{{ template "compilerLogs" .Logs }}
-{{ end -}}
-{{ end -}}
-`
-
-	tmplByStatus = `
-{{- range $status, $corpus := .Analysis.ByStatus -}}
-{{- if (and $corpus (or (not $status.IsOk) $.ShowOk)) }}  ## {{ $status }} ({{ len $corpus }})
-{{ range $sname, $subject := $corpus }}    - {{ $sname }}
-{{ range $compiler, $compile := .Compilations -}}
-{{- with .Run -}}
-{{- if eq $status .Status }}      - {{ $compiler }}
-{{ end -}}
-
-{{- with .Obs -}}{{- template "interesting" . -}}{{- end -}}
-
-{{- end -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-{{- else }}  No subject outcomes available.
-{{- end -}}
-`
-
-	tmplMutations = `
-{{- range $mut, $analysis := .Analysis.Mutation }}  ## Mutant {{ $mut }}
-{{ range $analysis }}    - {{ .HitBy }}: {{ .NumHits }} hit(s){{ if .Killed }} *KILLED*{{ end }}
-{{ end -}}
-{{- else }}  No mutations were enabled.
-{{- end -}}
-`
-
-	tmplRoot = `
-{{- if .ShowPlanInfo -}}
-# Plan
-{{ template "planInfo" . }}
-{{ end -}}
-{{- if .ShowCompilers -}}
-# Compilers
-{{ template "compilers" . -}}
-{{/* 'compilers' adds its own newline */}}{{- end -}}
-{{- if .ShowSubjects -}}
-# Subject Outcomes
-{{ template "byStatus" . -}}
-{{/* 'byStatus' adds its own newline */}}{{- end -}}
-{{- if .ShowMutation -}}
-# Mutation Testing
-{{ template "mutations" . -}}
-{{/* 'mutations' adds its own newline */}}{{- end -}}
-`
-)
+// AddConfig wraps the item x with the config c.
+func AddConfig(x interface{}, c Config) WithConfig {
+	return WithConfig{Data: x, Config: c}
+}
 
 func indent(n int) string {
 	return "        " + strings.Repeat("  ", n+1)
 }
 
 func getTemplate() (*template.Template, error) {
-	t, err := template.New("root").Parse(tmplRoot)
+	t := template.New("root.tmpl")
+	efs, err := fs.Sub(templates, "template")
 	if err != nil {
 		return nil, err
 	}
-	if t, err = obs.AddObsTemplates(t, indent); err != nil {
+	if t, err = obs.AddCommonTemplates(t, indent); err != nil {
 		return nil, err
 	}
-	return iohelp.ParseTemplateStrings(t, map[string]string{
-		"timeset":        tmplTime,
-		"byStatus":       tmplByStatus,
-		"compilers":      tmplCompilers,
-		"compilerCounts": tmplCompilerCounts,
-		"compilerInfo":   tmplCompilerInfo,
-		"compilerLogs":   tmplCompilerLogs,
-		"mutations":      tmplMutations,
-		"planInfo":       tmplPlanInfo,
-		"stages":         tmplStages,
-	})
+	return t.Funcs(template.FuncMap{
+		"withConfig": AddConfig,
+	}).ParseFS(efs, "*.tmpl")
 }

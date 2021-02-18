@@ -1,0 +1,24 @@
+{{/* Root template for analyses.
+
+     Each sub-template here expects to be indented, and leaves a trailing newline.
+*/}}
+
+{{- if .Config.ShowPlanInfo -}}
+# Plan
+{{ template "metadata.tmpl" .Data.Plan.Metadata -}}
+{{ end -}}
+
+{{- if .Config.ShowCompilers -}}
+# Compilers
+{{ template "compilers.tmpl" (withConfig .Data.Compilers .Config) -}}
+{{- end -}}
+
+{{- if .Config.ShowSubjects -}}
+# Subject Outcomes
+{{ template "outcomes.tmpl" (withConfig .Data.ByStatus .Config) -}}
+{{- end -}}
+
+{{- if .Config.ShowMutation -}}
+# Mutation Testing
+{{ template "mutation.tmpl" .Data.Mutation -}}
+{{- end -}}

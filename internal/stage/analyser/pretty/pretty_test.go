@@ -69,6 +69,8 @@ func TestPrinter_OnAnalysis_regress(t *testing.T) {
 	t.Parallel()
 
 	testhelp.TestFilesOfExt(t, "testdata", ".json", func(t *testing.T, name, path string) {
+		t.Helper()
+
 		var p plan.Plan
 		require.NoError(t, plan.ReadFile(path, &p), "couldn't read plan")
 
@@ -90,12 +92,12 @@ func TestPrinter_OnAnalysis_regress(t *testing.T) {
 
 			t.Run(cfile, func(t *testing.T) {
 				wbytes, err := os.ReadFile(filepath.Join("testdata", cfile))
-				require.NoError(t, err, "couldn't load case file", cfile)
+				require.NoErrorf(t, err, "couldn't load case file %q", cfile)
 				want := string(wbytes)
 
 				pp, err := pretty.NewPrinter(popt, pretty.WriteTo(&gotw))
-				require.NoError(t, err, "couldn't set up pretty printer for profile", cname)
-				require.NoError(t, pp.Write(*an), "couldn't write analysis for profile", cname)
+				require.NoErrorf(t, err, "couldn't set up pretty printer for profile %q", cname)
+				require.NoErrorf(t, pp.Write(*an), "couldn't write analysis for profile %q", cname)
 				require.Equal(t, want, gotw.String())
 			})
 		}
