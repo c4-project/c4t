@@ -126,10 +126,9 @@ func (a *Automator) tickerDuration() time.Duration {
 
 // drainKill spins on any kill channel until it closes.
 func (a *Automator) drainKill() {
-	if a.killCh == nil {
-		return
-	}
-	for range a.killCh {
+	if a.killCh != nil {
+		for range a.killCh {
+		}
 	}
 }
 
@@ -193,16 +192,15 @@ func (a *AutoPool) Init(muts []Mutant) {
 
 // Advance advances to the next mutant without killing it.
 func (a *AutoPool) Advance() {
-	a.next = append(a.next, a.curr[a.i])
+	a.next = append(a.next, a.Mutant())
 	a.increment()
 }
 
 // Kill marks the mutant m as killed, if it is the current mutant.
 func (a *AutoPool) Kill(m Mutant) {
-	if a.Mutant() != m {
-		return
+	if a.Mutant().Index == m.Index {
+		a.increment()
 	}
-	a.increment()
 }
 
 func (a *AutoPool) increment() {

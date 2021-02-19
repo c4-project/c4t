@@ -21,10 +21,7 @@ type Analysis map[Index]MutantAnalysis
 // This is necessary, at the moment, to put things like the mutant's operator
 // and variant information in the analysis table.
 func (a Analysis) RegisterMutant(m Mutant) {
-	ma, ok := a[m.Index]
-	if ok {
-		return
-	}
+	ma := a[m.Index]
 	ma.Mutant = m
 	a[m.Index] = ma
 }
@@ -35,9 +32,7 @@ func (a Analysis) AddCompilation(comp compilation.Name, log string, status statu
 	for i, hits := range ScanLines(strings.NewReader(log)) {
 		ma := a[i]
 		// Hopefully, we should've pre-registered this mutant's information with the analysis, but this is a failsafe.
-		if ma.Mutant.Index == 0 {
-			ma.Mutant = AnonMutant(i)
-		}
+		ma.Mutant.SetIndexIfZero(i)
 		ma.AddSelection(SelectionAnalysis{
 			NumHits: hits,
 			Status:  status,
