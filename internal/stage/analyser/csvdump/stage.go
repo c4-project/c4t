@@ -35,7 +35,8 @@ func (s *StageWriter) OnAnalysis(a analysis.Analysis) {
 
 var columnHeaders = [...]string{
 	"Stage",
-	"CompletedAt",
+	"Start",
+	"End",
 	"Duration",
 }
 
@@ -46,8 +47,9 @@ func (s *StageWriter) writeHeader() {
 func (s *StageWriter) writeStage(rec stage.Record) {
 	s.write([]string{
 		rec.Stage.String(),
-		rec.CompletedOn.Format(time.RFC3339),
-		fmt.Sprint(rec.Duration.Seconds()),
+		rec.Timespan.Start.Format(time.RFC3339),
+		rec.Timespan.End.Format(time.RFC3339),
+		fmt.Sprint(rec.Timespan.Duration().Seconds()),
 	})
 }
 

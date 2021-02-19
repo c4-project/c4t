@@ -8,6 +8,8 @@ package mutation
 import (
 	"strings"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/subject/status"
 
 	"github.com/c4-project/c4t/internal/subject/compilation"
@@ -71,6 +73,9 @@ func (a *MutantAnalysis) AddSelection(sel SelectionAnalysis) {
 
 // SelectionAnalysis represents one instance where a compilation selected a particular mutant.
 type SelectionAnalysis struct {
+	// Timespan represents the timespan at which the compilation finished.
+	Timespan timing.Span `json:"time_span"`
+
 	// NumHits is the number of times this compilation hit the mutant.
 	// If this is 0, the mutant was selected but never hit.
 	NumHits uint64 `json:"num_hits"`
@@ -82,7 +87,12 @@ type SelectionAnalysis struct {
 	HitBy compilation.Name `json:"by"`
 }
 
+// Hit gets whether this selection resulted in at least one hit.
+func (h SelectionAnalysis) Hit() bool {
+	return 0 < h.NumHits
+}
+
 // Killed gets whether this selection resulted in a kill (hit at least once and resulted in a flagged status).
 func (h SelectionAnalysis) Killed() bool {
-	return 0 < h.NumHits && h.Status == status.Flagged
+	return h.Hit() && h.Status == status.Flagged
 }

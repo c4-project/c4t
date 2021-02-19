@@ -55,7 +55,7 @@ func makeMockPlanFile(t *testing.T) string {
 
 	// TODO(@MattWindsor91): share this with different tests as we add them.
 	// TODO(@MattWindsor91): exercise gzip too?
-	tpath := filepath.Join(t.TempDir(), "plan.json")
+	tpath := filepath.Join(t.TempDir(), "small-ok.json")
 	p := plan.Mock()
 	err := p.WriteFile(tpath, plan.WriteNone)
 	require.NoError(t, err, "couldn't write mock plan to temp file")

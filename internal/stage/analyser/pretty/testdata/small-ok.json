@@ -1,0 +1,2645 @@
+{
+	"metadata": {
+		"created": "2021-02-19T15:01:06.858569Z",
+		"seed": 1613746866858569000,
+		"version": 20210219,
+		"stages": [
+			{
+				"stage": "Plan",
+				"timespan": {
+					"start": "2021-02-19T15:00:52.019914Z",
+					"end": "2021-02-19T15:01:06.753064Z"
+				}
+			},
+			{
+				"stage": "Perturb",
+				"timespan": {
+					"start": "2021-02-19T15:01:06.858569Z",
+					"end": "2021-02-19T15:01:06.858666Z"
+				}
+			},
+			{
+				"stage": "Lift",
+				"timespan": {
+					"start": "2021-02-19T15:01:06.918546Z",
+					"end": "2021-02-19T15:01:06.979834Z"
+				}
+			},
+			{
+				"stage": "Compile",
+				"timespan": {
+					"start": "2021-02-19T15:01:07.098151Z",
+					"end": "2021-02-19T15:01:08.40785Z"
+				}
+			},
+			{
+				"stage": "Run",
+				"timespan": {
+					"start": "2021-02-19T15:01:08.407851Z",
+					"end": "2021-02-19T15:01:33.853046Z"
+				}
+			},
+			{
+				"stage": "Mach",
+				"timespan": {
+					"start": "2021-02-19T15:01:07.098151Z",
+					"end": "2021-02-19T15:01:33.853048Z"
+				}
+			},
+			{
+				"stage": "Invoke",
+				"timespan": {
+					"start": "2021-02-19T15:01:07.043167Z",
+					"end": "2021-02-19T15:01:33.855436Z"
+				}
+			}
+		]
+	},
+	"machine": {
+		"id": "esthar",
+		"cores": 8
+	},
+	"backend": {
+		"ID": "litmus",
+		"style": "herdtools.litmus"
+	},
+	"compilers": {
+		"clang": {
+			"selected_opt": {
+				"name": "fast",
+				"optimises": true,
+				"bias": "speed",
+				"breaks_standards": true
+			},
+			"config_time": "2021-02-19T15:01:06.858603Z",
+			"mutant": {
+				"Name": {
+					"Operator": "",
+					"Variant": 0
+				},
+				"Index": 0
+			},
+			"style": "gcc",
+			"arch": "aarch64.8.1",
+			"run": {
+				"cmd": "clang"
+			}
+		}
+	},
+	"corpus": {
+		"test_1": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_1.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 2,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 2,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.098993Z",
+							"end": "2021-02-19T15:01:08.241288Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_1",
+							"log": "out/compile/logs/clang/test_1"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:12.679447Z",
+							"end": "2021-02-19T15:01:13.907334Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "1",
+										"1:r0": "0",
+										"x": "2",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "0",
+										"x": "1",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_1",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_1.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_112": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_112.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 1,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 2,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.098511Z",
+							"end": "2021-02-19T15:01:08.329208Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_112",
+							"log": "out/compile/logs/clang/test_112"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:15.126521Z",
+							"end": "2021-02-19T15:01:16.244604Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 1431,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "0",
+										"x": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 498564,
+									"values": {
+										"0:r0": "1",
+										"1:r0": "0",
+										"x": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500005,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "2",
+										"x": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_112",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_112.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_115": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_115.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 2,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 1,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.10019Z",
+							"end": "2021-02-19T15:01:08.303037Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_115",
+							"log": "out/compile/logs/clang/test_115"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:22.403584Z",
+							"end": "2021-02-19T15:01:23.591502Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"x": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "2",
+										"x": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_115",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_115.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_116": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_116.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 1,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 2,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.0996Z",
+							"end": "2021-02-19T15:01:08.346594Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_116",
+							"log": "out/compile/logs/clang/test_116"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:17.481886Z",
+							"end": "2021-02-19T15:01:18.778583Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"x": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 499997,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "2",
+										"x": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 3,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "1",
+										"x": "3"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_116",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_116.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_119": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_119.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 1,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 2,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 4,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.10021Z",
+							"end": "2021-02-19T15:01:08.327171Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_119",
+							"log": "out/compile/logs/clang/test_119"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:16.244642Z",
+							"end": "2021-02-19T15:01:17.481846Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 499997,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "0",
+										"1:r1": "0",
+										"x": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500003,
+									"values": {
+										"0:r0": "1",
+										"1:r0": "0",
+										"1:r1": "0",
+										"x": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_119",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_119.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_128": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_128.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 1,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 2,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 3,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.09953Z",
+							"end": "2021-02-19T15:01:08.289658Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_128",
+							"log": "out/compile/logs/clang/test_128"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:18.778599Z",
+							"end": "2021-02-19T15:01:20.059871Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 499999,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"1:r0": "0",
+										"x": "1",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 1486,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "1",
+										"1:r0": "0",
+										"x": "1",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 498515,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "1",
+										"1:r0": "0",
+										"x": "1",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_128",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_128.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_135": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_135.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 1,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.099007Z",
+							"end": "2021-02-19T15:01:08.207313Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_135",
+							"log": "out/compile/logs/clang/test_135"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:10.384283Z",
+							"end": "2021-02-19T15:01:11.422438Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 1000000,
+									"values": {
+										"0:r0": "0",
+										"x": "1"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_135",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_135.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_136": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_136.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 1,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 3,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.100172Z",
+							"end": "2021-02-19T15:01:08.226241Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_136",
+							"log": "out/compile/logs/clang/test_136"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:20.059887Z",
+							"end": "2021-02-19T15:01:21.23958Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 420716,
+									"values": {
+										"0:r0": "2",
+										"x": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 579284,
+									"values": {
+										"0:r0": "0",
+										"x": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_136",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_136.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_143": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_143.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 2,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 2,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.099844Z",
+							"end": "2021-02-19T15:01:08.39637Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_143",
+							"log": "out/compile/logs/clang/test_143"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:23.591528Z",
+							"end": "2021-02-19T15:01:24.718554Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 1000000,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "0",
+										"x": "0"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_143",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_143.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_17": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_17.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.099587Z",
+							"end": "2021-02-19T15:01:08.36993Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_17",
+							"log": "out/compile/logs/clang/test_17"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:25.857579Z",
+							"end": "2021-02-19T15:01:27.104867Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 500177,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "0",
+										"x": "0",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 499823,
+									"values": {
+										"0:r0": "1",
+										"1:r0": "0",
+										"x": "1",
+										"y": "1"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_17",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_17.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_21": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_21.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 1
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 3
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 3
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.100266Z",
+							"end": "2021-02-19T15:01:08.303622Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_21",
+							"log": "out/compile/logs/clang/test_21"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:28.349944Z",
+							"end": "2021-02-19T15:01:29.562588Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 499999,
+									"values": {
+										"0:r0": "0",
+										"x": "1",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 559,
+									"values": {
+										"0:r0": "1",
+										"x": "1",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 499442,
+									"values": {
+										"0:r0": "1",
+										"x": "1",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_21",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_21.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_22": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_22.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 1,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 3
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 1,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 4
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.100331Z",
+							"end": "2021-02-19T15:01:08.377059Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_22",
+							"log": "out/compile/logs/clang/test_22"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:13.907377Z",
+							"end": "2021-02-19T15:01:15.126498Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 499994,
+									"values": {
+										"0:r0": "0",
+										"x": "2",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 2357,
+									"values": {
+										"0:r0": "2",
+										"x": "2",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 497649,
+									"values": {
+										"0:r0": "2",
+										"x": "2",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_22",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_22.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_25": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_25.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 2,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 2,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.098471Z",
+							"end": "2021-02-19T15:01:08.280382Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_25",
+							"log": "out/compile/logs/clang/test_25"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:11.422454Z",
+							"end": "2021-02-19T15:01:12.679436Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 500002,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"1:r0": "0",
+										"x": "1",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 499998,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "1",
+										"1:r0": "0",
+										"x": "1",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_25",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_25.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_26": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_26.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 2,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 3,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.100097Z",
+							"end": "2021-02-19T15:01:08.312762Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_26",
+							"log": "out/compile/logs/clang/test_26"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:32.622703Z",
+							"end": "2021-02-19T15:01:33.852952Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 473824,
+									"values": {
+										"0:r0": "1",
+										"1:r0": "0",
+										"x": "3"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 26176,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "0",
+										"x": "4"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "4",
+										"x": "4"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_26",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_26.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_50": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_50.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.098974Z",
+							"end": "2021-02-19T15:01:08.231061Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_50",
+							"log": "out/compile/logs/clang/test_50"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:08.40789Z",
+							"end": "2021-02-19T15:01:10.384255Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "0",
+										"x": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "1",
+										"x": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_50",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_50.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_52": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_52.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 1,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 2,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.1001Z",
+							"end": "2021-02-19T15:01:08.33264Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_52",
+							"log": "out/compile/logs/clang/test_52"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:24.718597Z",
+							"end": "2021-02-19T15:01:25.857541Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 368609,
+									"values": {
+										"0:r0": "1",
+										"1:r0": "0",
+										"x": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 131388,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "0",
+										"x": "3"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500003,
+									"values": {
+										"0:r0": "0",
+										"1:r0": "3",
+										"x": "3"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_52",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_52.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_59": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_59.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 2,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 3,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.098444Z",
+							"end": "2021-02-19T15:01:08.403583Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_59",
+							"log": "out/compile/logs/clang/test_59"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:29.562627Z",
+							"end": "2021-02-19T15:01:30.787511Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 502516,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"1:r0": "0",
+										"x": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 14289,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "1",
+										"1:r0": "0",
+										"x": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 483195,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "1",
+										"1:r0": "0",
+										"x": "3"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_59",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_59.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_82": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_82.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 1,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 3,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 4,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.098504Z",
+							"end": "2021-02-19T15:01:08.377512Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_82",
+							"log": "out/compile/logs/clang/test_82"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:27.104897Z",
+							"end": "2021-02-19T15:01:28.349909Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 8142,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"1:r0": "0",
+										"1:r1": "0",
+										"x": "1",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 491858,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"1:r0": "0",
+										"1:r1": "1",
+										"x": "1",
+										"y": "1"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 500000,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "0",
+										"1:r0": "0",
+										"1:r1": "0",
+										"x": "1",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_82",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_82.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_89": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_89.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 3,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 1
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 5,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.098578Z",
+							"end": "2021-02-19T15:01:08.373958Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_89",
+							"log": "out/compile/logs/clang/test_89"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:21.239595Z",
+							"end": "2021-02-19T15:01:22.403572Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 496977,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"1:r0": "0",
+										"x": "1",
+										"y": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 3024,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "2",
+										"1:r0": "0",
+										"x": "1",
+										"y": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 499999,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "2",
+										"1:r0": "0",
+										"x": "2",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_89",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_89.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		},
+		"test_96": {
+			"source": {
+				"path": "/Users/mattbw/Documents/git/c4-corpora/partialSC/small/test_96.litmus",
+				"arch": "c",
+				"stats": {
+					"threads": 2,
+					"atomic_expressions": {
+						"types": {
+							"cmpxchg": 0,
+							"fence": 0,
+							"fetch": 0,
+							"load": 1,
+							"store": 0
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 1,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 0,
+							"memory_order_release": 0,
+							"memory_order_seq_cst": 0
+						}
+					},
+					"atomic_statements": {
+						"types": {
+							"cmpxchg": 1,
+							"fence": 0,
+							"fetch": 0,
+							"load": 0,
+							"store": 2
+						},
+						"mem_orders": {
+							"memory_order_acq_rel": 0,
+							"memory_order_acquire": 0,
+							"memory_order_consume": 0,
+							"memory_order_relaxed": 3,
+							"memory_order_release": 1,
+							"memory_order_seq_cst": 0
+						}
+					}
+				}
+			},
+			"compilations": {
+				"clang": {
+					"compile": {
+						"time_span": {
+							"start": "2021-02-19T15:01:07.099488Z",
+							"end": "2021-02-19T15:01:08.407812Z"
+						},
+						"status": "Ok",
+						"recipe_id": "aarch64.8.1",
+						"files": {
+							"bin": "out/compile/bins/clang/test_96",
+							"log": "out/compile/logs/clang/test_96"
+						}
+					},
+					"run": {
+						"time_span": {
+							"start": "2021-02-19T15:01:30.787531Z",
+							"end": "2021-02-19T15:01:32.622685Z"
+						},
+						"status": "Ok",
+						"obs": {
+							"flags": [
+								"sat"
+							],
+							"states": [
+								{
+									"tag": "witness",
+									"occurrences": 499999,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "0",
+										"x": "1",
+										"y": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 5,
+									"values": {
+										"0:r0": "0",
+										"0:r1": "2",
+										"x": "1",
+										"y": "2"
+									}
+								},
+								{
+									"tag": "witness",
+									"occurrences": 499996,
+									"values": {
+										"0:r0": "1",
+										"0:r1": "2",
+										"x": "1",
+										"y": "2"
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"recipes": {
+				"aarch64.8.1": {
+					"dir": "out/lift/aarch64/8/1/test_96",
+					"files": [
+						"Makefile",
+						"README.txt",
+						"comp.sh",
+						"litmus_rand.c",
+						"litmus_rand.h",
+						"outs.c",
+						"outs.h",
+						"run.sh",
+						"show.awk",
+						"test_96.c",
+						"utils.c",
+						"utils.h"
+					],
+					"instructions": [
+						{
+							"op": "PushInputs",
+							"file_kind": [
+								"c/src"
+							]
+						},
+						{
+							"op": "CompileExe"
+						}
+					],
+					"out_type": 2
+				}
+			}
+		}
+	},
+	"mutation": null
+}

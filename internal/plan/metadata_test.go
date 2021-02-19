@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/plan"
 	"github.com/c4-project/c4t/internal/plan/stage"
 )
@@ -17,7 +19,7 @@ import (
 func ExampleMetadata_RequireStage() {
 	m := plan.NewMetadata(plan.UseDateSeed)
 	fmt.Println("starts with plan stage?:", m.RequireStage(stage.Plan) == nil)
-	m.ConfirmStage(stage.Plan, time.Now(), 0)
+	m.ConfirmStage(stage.Plan, timing.SpanFromInstant(time.Now()))
 	fmt.Println("ends with plan stage?:", m.RequireStage(stage.Plan) == nil)
 
 	// Output:
@@ -29,7 +31,7 @@ func ExampleMetadata_RequireStage() {
 func ExampleMetadata_ForbidStage() {
 	m := plan.NewMetadata(plan.UseDateSeed)
 	fmt.Println("starts without plan stage?:", m.ForbidStage(stage.Plan) == nil)
-	m.ConfirmStage(stage.Plan, time.Now(), 0)
+	m.ConfirmStage(stage.Plan, timing.SpanFromInstant(time.Now()))
 	fmt.Println("ends without plan stage?:", m.ForbidStage(stage.Plan) == nil)
 
 	// Output:

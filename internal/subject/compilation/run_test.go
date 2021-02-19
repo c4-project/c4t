@@ -7,10 +7,12 @@ package compilation_test
 
 import (
 	"encoding/json"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/c4-project/c4t/internal/timing"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/c4-project/c4t/internal/subject/compilation"
 
@@ -29,8 +31,10 @@ func TestRun_JSONDecode(t *testing.T) {
 		"empty": {json: "{}", want: compilation.RunResult{}},
 		"unsat": {
 			json: `{
-"time": "2015-10-21T07:28:00-08:00",
-"duration": 8675309,
+"time_span": {
+  "start": "2015-10-21T07:28:00-08:00",
+  "end": "2015-10-21T08:28:00-08:00"
+},
 "status": "flagged",
 "obs": {
   "flags": ["unsat"],
@@ -40,9 +44,11 @@ func TestRun_JSONDecode(t *testing.T) {
 `,
 			want: compilation.RunResult{
 				Result: compilation.Result{
-					Time:     time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
-					Duration: 8675309,
-					Status:   status.Flagged,
+					Timespan: timing.Span{
+						Start: time.Date(2015, time.October, 21, 7, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
+						End:   time.Date(2015, time.October, 21, 8, 28, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
+					},
+					Status: status.Flagged,
 				},
 				Obs: &obs.Obs{
 					Flags: obs.Unsat,
@@ -63,18 +69,10 @@ func TestRun_JSONDecode(t *testing.T) {
 				t.Fatal("unexpected decode error:", err)
 			}
 
-			if !got.Time.Equal(c.want.Time) {
-				t.Errorf("badly parsed time: got=%v, want=%v", got.Time, c.want.Time)
-			}
-			if got.Duration != c.want.Duration {
-				t.Errorf("badly parsed duration: got=%v, want=%v", got.Duration, c.want.Duration)
-			}
-			if got.Status != c.want.Status {
-				t.Errorf("badly parsed status: got=%q, want=%q", got.Status.String(), c.want.Status.String())
-			}
-			if !reflect.DeepEqual(got.Obs, c.want.Obs) {
-				t.Errorf("badly parsed obs: got=%v, want=%v", got.Obs, c.want.Obs)
-			}
+			assert.True(t, c.want.Timespan.Start.Equal(got.Timespan.Start))
+			assert.True(t, c.want.Timespan.End.Equal(got.Timespan.End))
+			assert.Equal(t, c.want.Status, got.Status)
+			assert.Equal(t, c.want.Obs, got.Obs)
 		})
 	}
 }

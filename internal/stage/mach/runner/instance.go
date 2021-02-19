@@ -11,6 +11,8 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/model/service/backend"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
@@ -90,8 +92,7 @@ func (n *Instance) runCompileInner(ctx context.Context, name compilation.Name, c
 func (n *Instance) makeResult(start time.Time, s status.Status, o *obs.Obs) compilation.RunResult {
 	return compilation.RunResult{
 		Result: compilation.Result{
-			Time:     start,
-			Duration: time.Since(start),
+			Timespan: timing.SpanSince(start),
 			Status:   s,
 		},
 		Obs: o,

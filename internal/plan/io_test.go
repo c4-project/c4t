@@ -58,7 +58,7 @@ func TestPlan_WriteFile_roundTrip(t *testing.T) {
 	dir := t.TempDir()
 	defer func() { _ = os.RemoveAll(dir) }()
 
-	tmpfn := filepath.Join(dir, "plan.json")
+	tmpfn := filepath.Join(dir, "small-ok.json")
 
 	cases := map[string]plan.WriteFlag{
 		"mach":     plan.WriteNone,

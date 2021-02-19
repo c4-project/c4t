@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
 	"github.com/c4-project/c4t/internal/subject/compilation"
@@ -20,12 +22,13 @@ import (
 
 // subjectAnalysis holds the result of performing a single analysis on one subject.
 type subjectAnalysis struct {
-	flags  status.Flag
-	sub    subject.Named
-	cflags map[string]status.Flag
-	ctimes map[string][]time.Duration
-	clogs  map[string]string
-	rtimes map[string][]time.Duration
+	flags        status.Flag
+	sub          subject.Named
+	cflags       map[string]status.Flag
+	ctimes       map[string][]time.Duration
+	clogs        map[string]string
+	rtimes       map[string][]time.Duration
+	cspan, rspan timing.Span
 }
 
 func newSubjectAnalysis(s subject.Named) subjectAnalysis {
@@ -68,8 +71,9 @@ func (c *subjectAnalysis) classifyCompiler(cidstr string, cm *compilation.Compil
 	}
 	c.logCompileStatus(st, cidstr)
 
-	if cm.Duration != 0 && st.CountsForTiming() {
-		c.ctimes[cidstr] = append(c.ctimes[cidstr], cm.Duration)
+	c.cspan.Union(cm.Timespan)
+	if d := cm.Timespan.Duration(); d != 0 && st.CountsForTiming() {
+		c.ctimes[cidstr] = append(c.ctimes[cidstr], d)
 	}
 }
 
@@ -86,8 +90,10 @@ func (c *subjectAnalysis) classifyRun(cidstr string, r *compilation.RunResult) {
 	if !(c.cflags[cidstr].MatchesStatus(status.Filtered)) {
 		c.logCompileStatus(r.Status, cidstr)
 	}
-	if r.Duration != 0 && r.Status.CountsForTiming() {
-		c.rtimes[cidstr] = append(c.rtimes[cidstr], r.Duration)
+
+	c.rspan.Union(r.Timespan)
+	if d := r.Timespan.Duration(); d != 0 && r.Status.CountsForTiming() {
+		c.rtimes[cidstr] = append(c.rtimes[cidstr], d)
 	}
 }
 

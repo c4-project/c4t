@@ -10,6 +10,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/c4-project/c4t/internal/model/id"
@@ -104,7 +106,7 @@ func (p *Planner) makeMachinePlan(ctx context.Context, start time.Time, mid id.I
 	}
 
 	pn.Metadata = *plan.NewMetadata(0)
-	pn.Metadata.ConfirmStage(stage.Plan, start, time.Since(start))
+	pn.Metadata.ConfirmStage(stage.Plan, timing.SpanSince(start))
 	return pn, nil
 }
 

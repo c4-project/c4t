@@ -93,7 +93,7 @@ func (o *actionObserver) onRun(sname string, b *builder.Run) {
 
 func (o *actionObserver) onMachOp(sname, opname string, cid id.ID, r compilation.Result) {
 	descStub := idQualSubjectDesc(sname, cid)
-	desc := fmt.Sprintf("%s%s %s", descStub, suffixOfStatus(r.Status), r.Duration)
+	desc := fmt.Sprintf("%s%s %s", descStub, suffixOfStatus(r.Status), r.Timespan.Duration())
 	o.logAndStepGauge(opname, desc, statusColours[r.Status])
 }
 

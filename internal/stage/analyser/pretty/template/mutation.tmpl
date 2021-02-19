@@ -4,4 +4,4 @@
 {{ range $analysis }}    - {{ .HitBy }}: {{ .NumHits }} hit(s){{ if .Killed }} *KILLED*{{ end }}
 {{ end -}}
 {{- else }}  No mutations were enabled.
-{{- end -}}
+{{ end -}}

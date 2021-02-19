@@ -16,9 +16,9 @@
 				"mutation": {
 					"by_index": {
 						"108": {
-							"selections": 180,
-							"hits": 4169,
-							"kills": 2,
+							"selections": {"count": 180},
+							"hits": {"count": 4169},
+							"kills": {"count": 2},
 							"statuses": {
 								"CompileFail": 40,
 								"Flagged": 2,
@@ -26,18 +26,18 @@
 							}
 						},
 						"110": {
-							"selections": 6760,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 6760},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 6755,
 								"RunTimeout": 5
 							}
 						},
 						"111": {
-							"selections": 320,
-							"hits": 9281,
-							"kills": 1,
+							"selections": {"count": 320},
+							"hits": {"count": 9281},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 318,
@@ -45,27 +45,27 @@
 							}
 						},
 						"112": {
-							"selections": 6620,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 6620},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 6613,
 								"RunTimeout": 7
 							}
 						},
 						"113": {
-							"selections": 6680,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 6680},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 6678,
 								"RunTimeout": 2
 							}
 						},
 						"114": {
-							"selections": 180,
-							"hits": 8510,
-							"kills": 1,
+							"selections": {"count": 180},
+							"hits": {"count": 8510},
+							"kills": {"count": 1},
 							"statuses": {
 								"CompileFail": 55,
 								"Flagged": 1,
@@ -73,27 +73,27 @@
 							}
 						},
 						"123": {
-							"selections": 80,
-							"hits": 766,
-							"kills": 1,
+							"selections": {"count": 80},
+							"hits": {"count": 766},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 79
 							}
 						},
 						"124": {
-							"selections": 60,
-							"hits": 447,
-							"kills": 1,
+							"selections": {"count": 60},
+							"hits": {"count": 447},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 59
 							}
 						},
 						"125": {
-							"selections": 200,
-							"hits": 2978,
-							"kills": 2,
+							"selections": {"count": 200},
+							"hits": {"count": 2978},
+							"kills": {"count": 2},
 							"statuses": {
 								"Flagged": 2,
 								"Ok": 198
@@ -117,9 +117,9 @@
 				"mutation": {
 					"by_index": {
 						"108": {
-							"selections": 1700,
-							"hits": 51511,
-							"kills": 16,
+							"selections": {"count": 1700},
+							"hits": {"count": 51511},
+							"kills": {"count": 16},
 							"statuses": {
 								"CompileFail": 432,
 								"CompileTimeout": 5,
@@ -129,27 +129,27 @@
 							}
 						},
 						"109": {
-							"selections": 2620,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 2620},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 2619,
 								"RunTimeout": 1
 							}
 						},
 						"110": {
-							"selections": 9240,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 9240},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 9234,
 								"RunTimeout": 6
 							}
 						},
 						"111": {
-							"selections": 1680,
-							"hits": 51165,
-							"kills": 16,
+							"selections": {"count": 1680},
+							"hits": {"count": 51165},
+							"kills": {"count": 16},
 							"statuses": {
 								"Flagged": 16,
 								"Ok": 1662,
@@ -157,27 +157,27 @@
 							}
 						},
 						"112": {
-							"selections": 9060,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 9060},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 9050,
 								"RunTimeout": 10
 							}
 						},
 						"113": {
-							"selections": 9100,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 9100},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 9098,
 								"RunTimeout": 2
 							}
 						},
 						"114": {
-							"selections": 1900,
-							"hits": 112100,
-							"kills": 15,
+							"selections": {"count": 1900},
+							"hits": {"count": 112100},
+							"kills": {"count": 15},
 							"statuses": {
 								"CompileFail": 480,
 								"CompileTimeout": 7,
@@ -187,27 +187,27 @@
 							}
 						},
 						"123": {
-							"selections": 1700,
-							"hits": 15593,
-							"kills": 11,
+							"selections": {"count": 1700},
+							"hits": {"count": 15593},
+							"kills": {"count": 11},
 							"statuses": {
 								"Flagged": 11,
 								"Ok": 1689
 							}
 						},
 						"124": {
-							"selections": 1540,
-							"hits": 10817,
-							"kills": 13,
+							"selections": {"count": 1540},
+							"hits": {"count": 10817},
+							"kills": {"count": 13},
 							"statuses": {
 								"Flagged": 13,
 								"Ok": 1527
 							}
 						},
 						"125": {
-							"selections": 1820,
-							"hits": 24242,
-							"kills": 15,
+							"selections": {"count": 1820},
+							"hits": {"count": 24242},
+							"kills": {"count": 15},
 							"statuses": {
 								"Flagged": 15,
 								"Ok": 1802,
@@ -215,9 +215,9 @@
 							}
 						},
 						"126": {
-							"selections": 1660,
-							"hits": 15822,
-							"kills": 8,
+							"selections": {"count": 1660},
+							"hits": {"count": 15822},
+							"kills": {"count": 8},
 							"statuses": {
 								"Flagged": 8,
 								"Ok": 1652
@@ -249,44 +249,44 @@
 				"mutation": {
 					"by_index": {
 						"103": {
-							"selections": 5740,
-							"hits": 563,
-							"kills": 0,
+							"selections": {"count": 5740},
+							"hits": {"count": 563},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 5736,
 								"RunTimeout": 4
 							}
 						},
 						"104": {
-							"selections": 5580,
-							"hits": 743,
-							"kills": 0,
+							"selections": {"count": 5580},
+							"hits": {"count": 743},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 5578,
 								"RunTimeout": 2
 							}
 						},
 						"105": {
-							"selections": 5980,
-							"hits": 14180,
-							"kills": 0,
+							"selections": {"count": 5980},
+							"hits": {"count": 14180},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 5980
 							}
 						},
 						"106": {
-							"selections": 5800,
-							"hits": 277,
-							"kills": 0,
+							"selections": {"count": 5800},
+							"hits": {"count": 277},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 5796,
 								"RunTimeout": 4
 							}
 						},
 						"107": {
-							"selections": 5700,
-							"hits": 1121,
-							"kills": 0,
+							"selections": {"count": 5700},
+							"hits": {"count": 1121},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 5695,
 								"RunTimeout": 5
@@ -310,53 +310,53 @@
 				"mutation": {
 					"by_index": {
 						"0": {
-							"selections": 20,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 20},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 20
 							}
 						},
 						"103": {
-							"selections": 11380,
-							"hits": 1164,
-							"kills": 0,
+							"selections": {"count": 11380},
+							"hits": {"count": 1164},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 11372,
 								"RunTimeout": 8
 							}
 						},
 						"104": {
-							"selections": 11000,
-							"hits": 1343,
-							"kills": 0,
+							"selections": {"count": 11000},
+							"hits": {"count": 1343},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 10995,
 								"RunTimeout": 5
 							}
 						},
 						"105": {
-							"selections": 11440,
-							"hits": 27850,
-							"kills": 0,
+							"selections": {"count": 11440},
+							"hits": {"count": 27850},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 11438,
 								"RunTimeout": 2
 							}
 						},
 						"106": {
-							"selections": 11220,
-							"hits": 409,
-							"kills": 0,
+							"selections": {"count": 11220},
+							"hits": {"count": 409},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 11216,
 								"RunTimeout": 4
 							}
 						},
 						"107": {
-							"selections": 11400,
-							"hits": 2354,
-							"kills": 0,
+							"selections": {"count": 11400},
+							"hits": {"count": 2354},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 11395,
 								"RunTimeout": 5
@@ -388,9 +388,9 @@
 				"mutation": {
 					"by_index": {
 						"108": {
-							"selections": 1040,
-							"hits": 31646,
-							"kills": 2,
+							"selections": {"count": 1040},
+							"hits": {"count": 31646},
+							"kills": {"count": 2},
 							"statuses": {
 								"Flagged": 2,
 								"Ok": 1037,
@@ -398,36 +398,36 @@
 							}
 						},
 						"109": {
-							"selections": 5000,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 5000},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 4998,
 								"RunTimeout": 2
 							}
 						},
 						"110": {
-							"selections": 120,
-							"hits": 339,
-							"kills": 1,
+							"selections": {"count": 120},
+							"hits": {"count": 339},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 119
 							}
 						},
 						"111": {
-							"selections": 40,
-							"hits": 596,
-							"kills": 1,
+							"selections": {"count": 40},
+							"hits": {"count": 596},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 39
 							}
 						},
 						"112": {
-							"selections": 540,
-							"hits": 1691,
-							"kills": 3,
+							"selections": {"count": 540},
+							"hits": {"count": 1691},
+							"kills": {"count": 3},
 							"statuses": {
 								"Flagged": 3,
 								"Ok": 536,
@@ -435,26 +435,26 @@
 							}
 						},
 						"113": {
-							"selections": 200,
-							"hits": 604,
-							"kills": 0,
+							"selections": {"count": 200},
+							"hits": {"count": 604},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 200
 							}
 						},
 						"114": {
-							"selections": 20,
-							"hits": 886,
-							"kills": 3,
+							"selections": {"count": 20},
+							"hits": {"count": 886},
+							"kills": {"count": 3},
 							"statuses": {
 								"Flagged": 3,
 								"Ok": 17
 							}
 						},
 						"117": {
-							"selections": 420,
-							"hits": 1834,
-							"kills": 1,
+							"selections": {"count": 420},
+							"hits": {"count": 1834},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 417,
@@ -462,18 +462,18 @@
 							}
 						},
 						"118": {
-							"selections": 60,
-							"hits": 198,
-							"kills": 1,
+							"selections": {"count": 60},
+							"hits": {"count": 198},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 59
 							}
 						},
 						"119": {
-							"selections": 4360,
-							"hits": 10834,
-							"kills": 1,
+							"selections": {"count": 4360},
+							"hits": {"count": 10834},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 4357,
@@ -481,27 +481,27 @@
 							}
 						},
 						"120": {
-							"selections": 80,
-							"hits": 1260,
-							"kills": 1,
+							"selections": {"count": 80},
+							"hits": {"count": 1260},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 79
 							}
 						},
 						"121": {
-							"selections": 20,
-							"hits": 210,
-							"kills": 2,
+							"selections": {"count": 20},
+							"hits": {"count": 210},
+							"kills": {"count": 2},
 							"statuses": {
 								"Flagged": 2,
 								"Ok": 18
 							}
 						},
 						"122": {
-							"selections": 4860,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 4860},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 4854,
 								"RunTimeout": 6
@@ -525,9 +525,9 @@
 				"mutation": {
 					"by_index": {
 						"108": {
-							"selections": 2600,
-							"hits": 77424,
-							"kills": 3,
+							"selections": {"count": 2600},
+							"hits": {"count": 77424},
+							"kills": {"count": 3},
 							"statuses": {
 								"Flagged": 3,
 								"Ok": 2594,
@@ -535,18 +535,18 @@
 							}
 						},
 						"109": {
-							"selections": 6600,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 6600},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 6598,
 								"RunTimeout": 2
 							}
 						},
 						"110": {
-							"selections": 1700,
-							"hits": 4661,
-							"kills": 4,
+							"selections": {"count": 1700},
+							"hits": {"count": 4661},
+							"kills": {"count": 4},
 							"statuses": {
 								"Flagged": 4,
 								"Ok": 1692,
@@ -554,18 +554,18 @@
 							}
 						},
 						"111": {
-							"selections": 1260,
-							"hits": 34152,
-							"kills": 9,
+							"selections": {"count": 1260},
+							"hits": {"count": 34152},
+							"kills": {"count": 9},
 							"statuses": {
 								"Flagged": 9,
 								"Ok": 1251
 							}
 						},
 						"112": {
-							"selections": 2040,
-							"hits": 6372,
-							"kills": 4,
+							"selections": {"count": 2040},
+							"hits": {"count": 6372},
+							"kills": {"count": 4},
 							"statuses": {
 								"Flagged": 4,
 								"Ok": 2035,
@@ -573,18 +573,18 @@
 							}
 						},
 						"113": {
-							"selections": 1760,
-							"hits": 5299,
-							"kills": 0,
+							"selections": {"count": 1760},
+							"hits": {"count": 5299},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 1758,
 								"RunTimeout": 2
 							}
 						},
 						"114": {
-							"selections": 1140,
-							"hits": 72702,
-							"kills": 15,
+							"selections": {"count": 1140},
+							"hits": {"count": 72702},
+							"kills": {"count": 15},
 							"statuses": {
 								"Flagged": 15,
 								"Ok": 1123,
@@ -592,9 +592,9 @@
 							}
 						},
 						"117": {
-							"selections": 1700,
-							"hits": 7718,
-							"kills": 2,
+							"selections": {"count": 1700},
+							"hits": {"count": 7718},
+							"kills": {"count": 2},
 							"statuses": {
 								"Flagged": 2,
 								"Ok": 1695,
@@ -602,18 +602,18 @@
 							}
 						},
 						"118": {
-							"selections": 1220,
-							"hits": 5543,
-							"kills": 9,
+							"selections": {"count": 1220},
+							"hits": {"count": 5543},
+							"kills": {"count": 9},
 							"statuses": {
 								"Flagged": 9,
 								"Ok": 1211
 							}
 						},
 						"119": {
-							"selections": 5880,
-							"hits": 14719,
-							"kills": 1,
+							"selections": {"count": 5880},
+							"hits": {"count": 14719},
+							"kills": {"count": 1},
 							"statuses": {
 								"Flagged": 1,
 								"Ok": 5877,
@@ -621,9 +621,9 @@
 							}
 						},
 						"120": {
-							"selections": 980,
-							"hits": 14137,
-							"kills": 13,
+							"selections": {"count": 980},
+							"hits": {"count": 14137},
+							"kills": {"count": 13},
 							"statuses": {
 								"Flagged": 13,
 								"Ok": 966,
@@ -631,18 +631,18 @@
 							}
 						},
 						"121": {
-							"selections": 1040,
-							"hits": 13247,
-							"kills": 13,
+							"selections": {"count": 1040},
+							"hits": {"count": 13247},
+							"kills": {"count": 13},
 							"statuses": {
 								"Flagged": 13,
 								"Ok": 1027
 							}
 						},
 						"122": {
-							"selections": 6140,
-							"hits": 0,
-							"kills": 0,
+							"selections": {"count": 6140},
+							"hits": {"count": 0},
+							"kills": {"count": 0},
 							"statuses": {
 								"Ok": 6133,
 								"RunTimeout": 7

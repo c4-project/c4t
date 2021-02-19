@@ -1,0 +1,23 @@
+# Plan
+  - created at: 2021-02-19 15:01:06.858569 +0000 UTC
+  - seed: 1613746866858569000
+  - version: 20210219
+  ## Stages
+    - Plan: 14.73315 sec(s), from Feb 19 15:00:52.019 to Feb 19 15:01:06.753
+    - Perturb: 9.7e-05 sec(s), from Feb 19 15:01:06.858 to Feb 19 15:01:06.858
+    - Lift: 0.061288 sec(s), from Feb 19 15:01:06.918 to Feb 19 15:01:06.979
+    - Compile: 1.309699 sec(s), from Feb 19 15:01:07.098 to Feb 19 15:01:08.407
+    - Run: 25.445195 sec(s), from Feb 19 15:01:08.407 to Feb 19 15:01:33.853
+    - Mach: 26.754897 sec(s), from Feb 19 15:01:07.098 to Feb 19 15:01:33.853
+    - Invoke: 26.812269 sec(s), from Feb 19 15:01:07.043 to Feb 19 15:01:33.855
+# Compilers
+  ## clang
+    - style: gcc
+    - arch: aarch64.8.1
+    - opt: fast
+    - mopt: none
+    ### Times (sec)
+      - compile: Min 1.108306 Avg 1.2224152 Max 1.308324
+      - run: Min 1.038155 Avg 1.2722277499999999 Max 1.976365
+    ### Results
+      - Ok: 20 subject(s)

@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/c4-project/c4t/internal/plan/stage"
@@ -175,7 +177,7 @@ func TestFuzzer_Run_error(t *testing.T) {
 			require.NoError(t, err, "there shouldn't be an error yet!")
 
 			p := makePlan()
-			p.Metadata.ConfirmStage(stage.Plan, time.Now(), 0)
+			p.Metadata.ConfirmStage(stage.Plan, timing.SpanFromInstant(time.Now()))
 			if f := c.pdelta; f != nil {
 				p = f(p)
 			}
@@ -206,7 +208,7 @@ func TestFuzzer_Run_nop(t *testing.T) {
 	md.On("DumpStats", mock.Anything, mock.Anything, "fuzz.litmus").Return(nil)
 
 	p := makePlan()
-	p.Metadata.ConfirmStage(stage.Plan, time.Now(), 0)
+	p.Metadata.ConfirmStage(stage.Plan, timing.SpanFromInstant(time.Now()))
 
 	p2, err := f.Run(context.Background(), p)
 	require.NoError(t, err, "unexpected error in Run")

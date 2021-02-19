@@ -8,5 +8,5 @@
     ### Results
 {{ template "statuscount.tmpl" .Data.Counts -}}
 {{- if .Config.ShowCompilerLogs }}    ### Logs
-{{ template "compilerLog.tmpl" .Data.Logs -}}
+{{ template "compilerlog.tmpl" .Data.Logs -}}
 {{- end -}}

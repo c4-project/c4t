@@ -28,5 +28,5 @@ func ExampleStageWriter_OnAnalysis() {
 	sw.OnAnalysis(*an)
 
 	// Output:
-	// Stage,CompletedAt,Duration
+	// Stage,Start,End,Duration
 }

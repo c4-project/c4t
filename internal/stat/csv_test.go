@@ -24,18 +24,18 @@ func ExampleSet_DumpMutationCSV() {
 				Session: stat.MachineSpan{
 					Mutation: stat.Mutation{
 						ByIndex: map[mutation.Index]stat.Mutant{
-							2:  {Info: mutation.AnonMutant(2), Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
-							42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
-							53: {Info: mutation.NamedMutant(53, "BAR", 5), Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+							2:  {Info: mutation.AnonMutant(2), Selections: stat.Hitset{Count: 1}, Hits: stat.Hitset{Count: 0}, Kills: stat.Hitset{Count: 0}, Statuses: map[status.Status]uint64{status.Filtered: 1}},
+							42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: stat.Hitset{Count: 10}, Hits: stat.Hitset{Count: 1}, Kills: stat.Hitset{Count: 0}, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
+							53: {Info: mutation.NamedMutant(53, "BAR", 5), Selections: stat.Hitset{Count: 20}, Hits: stat.Hitset{Count: 400}, Kills: stat.Hitset{Count: 15}, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
 						},
 					},
 				},
 				Total: stat.MachineSpan{
 					Mutation: stat.Mutation{
 						ByIndex: map[mutation.Index]stat.Mutant{
-							2:  {Info: mutation.AnonMutant(2), Selections: 41, Hits: 5000, Kills: 40, Statuses: map[status.Status]uint64{status.Flagged: 40, status.Filtered: 1}},
-							42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: 100, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 99, status.CompileTimeout: 1}},
-							53: {Info: mutation.NamedMutant(53, "BAR", 5), Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+							2:  {Info: mutation.AnonMutant(2), Selections: stat.Hitset{Count: 41}, Hits: stat.Hitset{Count: 5000}, Kills: stat.Hitset{Count: 40}, Statuses: map[status.Status]uint64{status.Flagged: 40, status.Filtered: 1}},
+							42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: stat.Hitset{Count: 100}, Hits: stat.Hitset{Count: 1}, Kills: stat.Hitset{Count: 0}, Statuses: map[status.Status]uint64{status.Ok: 99, status.CompileTimeout: 1}},
+							53: {Info: mutation.NamedMutant(53, "BAR", 5), Selections: stat.Hitset{Count: 20}, Hits: stat.Hitset{Count: 400}, Kills: stat.Hitset{Count: 15}, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
 						},
 					},
 				},
@@ -44,7 +44,7 @@ func ExampleSet_DumpMutationCSV() {
 				Total: stat.MachineSpan{
 					Mutation: stat.Mutation{
 						ByIndex: map[mutation.Index]stat.Mutant{
-							1: {Info: mutation.AnonMutant(1), Selections: 500, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 500}},
+							1: {Info: mutation.AnonMutant(1), Selections: stat.Hitset{Count: 500}, Hits: stat.Hitset{Count: 0}, Kills: stat.Hitset{Count: 0}, Statuses: map[status.Status]uint64{status.Ok: 500}},
 						},
 					},
 				},

@@ -66,8 +66,8 @@ func ExampleMutation_AddAnalysis() {
 		},
 	})
 
-	fmt.Println(s.ByIndex[27].Info, "selected:", s.ByIndex[27].Selections, "hit:", s.ByIndex[27].Hits, "killed:", s.ByIndex[27].Kills)
-	fmt.Println(s.ByIndex[53].Info, "selected:", s.ByIndex[53].Selections, "hit:", s.ByIndex[53].Hits, "killed:", s.ByIndex[53].Kills)
+	fmt.Println(s.ByIndex[27].Info, "selected:", s.ByIndex[27].Selections.Count, "hit:", s.ByIndex[27].Hits.Count, "killed:", s.ByIndex[27].Kills.Count)
+	fmt.Println(s.ByIndex[53].Info, "selected:", s.ByIndex[53].Selections.Count, "hit:", s.ByIndex[53].Hits.Count, "killed:", s.ByIndex[53].Kills.Count)
 
 	// Output:
 	// ABC1:27 selected: 3 hit: 6 killed: 1
@@ -78,9 +78,9 @@ func ExampleMutation_AddAnalysis() {
 func ExampleMutation_DumpCSV() {
 	_ = (&stat.Mutation{
 		ByIndex: map[mutation.Index]stat.Mutant{
-			2:  {Info: mutation.AnonMutant(2), Selections: 1, Hits: 0, Kills: 0, Statuses: map[status.Status]uint64{status.Filtered: 1}},
-			42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: 10, Hits: 1, Kills: 0, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
-			53: {Info: mutation.NamedMutant(53, "BAR", 10), Selections: 20, Hits: 400, Kills: 15, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
+			2:  {Info: mutation.AnonMutant(2), Selections: stat.Hitset{Count: 1}, Hits: stat.Hitset{Count: 0}, Kills: stat.Hitset{Count: 0}, Statuses: map[status.Status]uint64{status.Filtered: 1}},
+			42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: stat.Hitset{Count: 10}, Hits: stat.Hitset{Count: 1}, Kills: stat.Hitset{Count: 0}, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
+			53: {Info: mutation.NamedMutant(53, "BAR", 10), Selections: stat.Hitset{Count: 20}, Hits: stat.Hitset{Count: 400}, Kills: stat.Hitset{Count: 15}, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
 		},
 	}).DumpCSV(csv.NewWriter(os.Stdout), "localhost")
 

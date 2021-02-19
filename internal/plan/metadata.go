@@ -11,6 +11,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/plan/stage"
 )
 
@@ -62,9 +64,9 @@ func (m *Metadata) CheckVersion() error {
 	return nil
 }
 
-// ConfirmStage adds a stage confirmation for s, which started at start and lasted for dur, to this metadata.
-func (m *Metadata) ConfirmStage(s stage.Stage, start time.Time, dur time.Duration) {
-	m.Stages = append(m.Stages, stage.NewRecord(s, start, dur))
+// ConfirmStage adds a stage confirmation for s, spanning timespan ts, to this metadata.
+func (m *Metadata) ConfirmStage(s stage.Stage, ts timing.Span) {
+	m.Stages = append(m.Stages, stage.Record{Stage: s, Timespan: ts})
 }
 
 // RequireStage checks to see if this metadata has had each given stage marked completed at least once.

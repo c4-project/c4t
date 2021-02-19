@@ -1,0 +1,12 @@
+# Compilers
+  ## clang
+    - style: gcc
+    - arch: aarch64.8.1
+    - opt: fast
+    - mopt: none
+    ### Times (sec)
+      - compile: Min 1.108306 Avg 1.2224152 Max 1.308324
+      - run: Min 1.038155 Avg 1.2722277499999999 Max 1.976365
+    ### Results
+      - Ok: 20 subject(s)
+# Subject Outcomes

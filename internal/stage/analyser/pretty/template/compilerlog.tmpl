@@ -1,5 +1,5 @@
 {{/* Formats a map of compiler logs (one per subject).
-     Assumes an indent of 6 spaces, and does not leave a trailing newline. */}}
+     Assumes an indent of 6 spaces, and leaves a trailing newline. */}}
 {{- range $sname, $log := . -}}      #### {{ $sname }}
     {{- with $log }}
 ```
@@ -7,5 +7,5 @@
 ```
     {{- else }}
         No log available.
-    {{- end -}}
-{{- end -}}
+    {{- end }}
+{{ end -}}

@@ -12,6 +12,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
@@ -114,13 +116,13 @@ func (j *Instance) runCompiler(ctx context.Context, nc *compiler.Named, res *com
 	tctx, cancel := j.quantities.Timeout.OnContext(ctx)
 	defer cancel()
 
-	res.Time = time.Now()
+	start := time.Now()
 
 	// Some compiler errors are recoverable, so we don't immediately bail on them.
 	rerr := j.runCompilerJob(tctx, nc, res.Files, h, logf)
 	lerr := logf.Close()
 
-	res.Duration = time.Since(res.Time)
+	res.Timespan = timing.SpanSince(start)
 	res.Status, err = status.FromCompileError(errhelp.TimeoutOrFirstError(tctx, rerr, lerr))
 	return err
 }

@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/mutation"
 
 	"github.com/c4-project/c4t/internal/subject/status"
@@ -62,12 +64,12 @@ var (
 	// FilterAllMutants is a mutant filter that allows all mutants.
 	FilterAllMutants MutantFilter = func(mutant Mutant) bool { return true }
 	// FilterHitMutants is a mutant filter that allows hit mutants only.
-	FilterHitMutants MutantFilter = func(mutant Mutant) bool { return 0 < mutant.Hits }
+	FilterHitMutants MutantFilter = func(mutant Mutant) bool { return mutant.Hits.AtLeastOnce() }
 	// FilterKilledMutants is a mutant filter that allows killed mutants only.
-	FilterKilledMutants MutantFilter = func(mutant Mutant) bool { return 0 < mutant.Kills }
+	FilterKilledMutants MutantFilter = func(mutant Mutant) bool { return mutant.Kills.AtLeastOnce() }
 	// FilterEscapedMutants is a mutant filter that allows only mutants that were hit but not killed.
 	FilterEscapedMutants MutantFilter = func(mutant Mutant) bool {
-		return 0 < mutant.Hits && 0 == mutant.Kills
+		return mutant.Hits.AtLeastOnce() && !mutant.Kills.AtLeastOnce()
 	}
 )
 
@@ -108,24 +110,49 @@ type Mutant struct {
 	// Info contains the full mutant metadata set for the mutant.
 	Info mutation.Mutant `json:"info,omitempty"`
 	// Selections records the number of times this mutant has been selected.
-	Selections uint64 `json:"selections,omitempty"`
+	Selections Hitset `json:"selections,omitempty"`
 	// Hits records the number of times this mutant has been hit (including kills).
-	Hits uint64 `json:"hits,omitempty"`
+	Hits Hitset `json:"hits,omitempty"`
 	// Kills records the number of selections that resulted in kills.
-	Kills uint64 `json:"kills,omitempty"`
+	Kills Hitset `json:"kills,omitempty"`
 	// Statuses records, for each status, the number of selections that resulted in that status.
 	Statuses map[status.Status]uint64 `json:"statuses,omitempty"`
+}
+
+// Hitset is a set of statistics relating to the way in which a mutant has been 'hit'.
+type Hitset struct {
+	// Timespan records the first and most recent times this mutant was hit in this way.
+	Timespan timing.Span `json:"time_span,omitempty"`
+	// Count is the number of times this mutant was hit in this way.
+	Count uint64 `json:"count,omitempty"`
+}
+
+// AtLeastOnce gets whether the mutant was hit in a particular way at least once.
+func (h *Hitset) AtLeastOnce() bool {
+	return 0 < h.Count
+}
+
+// At records ntimes hits over timespan ts.
+func (h *Hitset) Add(ntimes uint64, ts timing.Span) {
+	if ntimes == 0 {
+		return
+	}
+	h.Timespan.Union(ts)
+	h.Count += ntimes
 }
 
 func (m *Mutant) addAnalysis(ma mutation.MutantAnalysis) {
 	m.ensure()
 	m.Info = ma.Mutant
-	m.Selections = uint64(len(ma.Selections))
 
 	for _, h := range ma.Selections {
-		m.Hits += h.NumHits
+		ts := h.Timespan
+
+		m.Selections.Add(1, ts)
+
+		m.Hits.Add(h.NumHits, ts)
 		if h.Killed() {
-			m.Kills++
+			m.Kills.Add(1, ts)
 		}
 
 		m.Statuses[h.Status]++
@@ -144,9 +171,9 @@ func (m *Mutation) dumpMutant(w *csv.Writer, machname string, mut mutation.Mutan
 		machname,
 		fint(uint64(mut.Index)),
 		mut.Name.String(),
-		fint(mstats.Selections),
-		fint(mstats.Hits),
-		fint(mstats.Kills),
+		fint(mstats.Selections.Count),
+		fint(mstats.Hits.Count),
+		fint(mstats.Kills.Count),
 	}
 	for i := status.Ok; i <= status.Last; i++ {
 		cells = append(cells, fint(mstats.Statuses[i]))

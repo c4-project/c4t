@@ -9,6 +9,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/subject/compilation"
 
 	"github.com/c4-project/c4t/internal/model/litmus"
@@ -87,7 +89,7 @@ func MockTimeoutRun(name string) *subject.Subject {
 func MockSuccessfulCompile(cstr string, sname string) compilation.CompileResult {
 	return compilation.CompileResult{
 		Result: compilation.Result{
-			Duration: 200 * time.Second,
+			Timespan: timing.SpanFromDuration(timing.MockDate, 200*time.Second),
 			Status:   status.Ok,
 		},
 		Files: compilation.CompileFileset{

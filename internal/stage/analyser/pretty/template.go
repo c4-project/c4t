@@ -10,6 +10,7 @@ import (
 	"io/fs"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/c4-project/c4t/internal/subject/obs"
 )
@@ -66,5 +67,6 @@ func getTemplate() (*template.Template, error) {
 	}
 	return t.Funcs(template.FuncMap{
 		"withConfig": AddConfig,
+		"time":       func(t time.Time) string { return t.Format(time.StampMilli) },
 	}).ParseFS(efs, "*.tmpl")
 }

@@ -11,6 +11,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/c4-project/c4t/internal/timing"
+
 	"github.com/c4-project/c4t/internal/mutation"
 
 	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
@@ -73,7 +75,7 @@ func (p *Plan) RunStage(ctx context.Context, r Runner) (*Plan, error) {
 	if err != nil {
 		return nil, err
 	}
-	np.Metadata.ConfirmStage(r.Stage(), start, time.Since(start))
+	np.Metadata.ConfirmStage(r.Stage(), timing.SpanSince(start))
 	return np, nil
 }
 

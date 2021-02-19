@@ -1,6 +1,6 @@
 {{/* Sub-template for printing out stage information for a plan.
      Assumes dot is on the stage list, and an indent of 4 spaces.
      Leaves a trailing newline. */}}
-{{- range . }}    - {{ .Stage }}: completed {{ .CompletedOn }}, took {{ .Duration.Seconds }} sec(s)
+{{- range . }}    - {{ .Stage }}: {{ .Timespan.Duration.Seconds }} sec(s), from {{ time .Timespan.Start }} to {{ time .Timespan.End }}
 {{ else }}    No stages recorded.
 {{ end -}}

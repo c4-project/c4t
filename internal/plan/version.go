@@ -11,10 +11,13 @@ type Version uint32
 // CurrentVer is the current plan version.
 // It changes when the interface between various bits of the tester (generally manifested within the plan version)
 // changes.
-const CurrentVer Version = 2021_01_27
+const CurrentVer Version = 2021_02_19
 
 // Version history since 2020_05_29:
 //
+// 2021_02_19: Everything tracking time plus duration has been standardised to take a "time_span" key; this contains a
+//             "start" time and an "end" time.  Currently, both can be in different timezones.
+//             Mutation analysis has changed to associate selections, hits, and kills with such timespans.
 // 2021_01_27: Observation structures completely refactored.  Instead of "counter_examples" and "witnesses" keys, each
 //             state has a "tag" key that contains "counter", "witness", "unknown", or is empty.  New "occurrences" key
 //             in each state tracks number of occurrences where available; key-value maps are now inside a "values" key
