@@ -151,7 +151,7 @@ func getStatPath(ctx *c.Context) (string, error) {
 	if f := ctx.Path(flagStatFile); ystring.IsNotBlank(f) {
 		return f, nil
 	}
-	cfg, err := stdflag.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfigFromCli(ctx)
 	if err != nil {
 		return "", err
 	}

@@ -53,7 +53,7 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
-	cfg, err := stdflag.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfigFromCli(ctx)
 	if err != nil {
 		return err
 	}

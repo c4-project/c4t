@@ -21,8 +21,6 @@ import (
 
 	"github.com/1set/gut/yos"
 
-	"github.com/c4-project/c4t/internal/c4f"
-
 	"github.com/c4-project/c4t/internal/config"
 	"github.com/c4-project/c4t/internal/plan"
 	"github.com/c4-project/c4t/internal/stage/planner"
@@ -75,7 +73,7 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw, errw io.Writer) error {
-	cfg, err := stdflag.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfigFromCli(ctx)
 	if err != nil {
 		return err
 	}
@@ -172,7 +170,7 @@ func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.P
 	)
 }
 
-func source(a *c4f.Runner, cfg *config.Config) planner.Source {
+func source(a planner.SubjectProber, cfg *config.Config) planner.Source {
 	return planner.Source{
 		BProbe:  cfg,
 		CLister: cfg.Machines,

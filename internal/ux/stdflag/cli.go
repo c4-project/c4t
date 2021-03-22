@@ -68,10 +68,9 @@ func ConfFileCliFlag() c.Flag {
 	}
 }
 
-// ConfFileFromCli sets up a Config using the file flag set up by ConfFileCliFlag.
-func ConfFileFromCli(ctx *c.Context) (*config.Config, error) {
-	cfile := ctx.Path(flagConfFile)
-	return config.Load(cfile)
+// ConfigFromCli sets up a Config using the file flag set up by ConfFileCliFlag.
+func ConfigFromCli(ctx *c.Context) (*config.Config, error) {
+	return config.Load(ctx.Path(flagConfFile))
 }
 
 // OutDirFromCli gets the output directory set up by OutDirCliFlag.

@@ -122,7 +122,7 @@ func run(ctx *c.Context, errw io.Writer) error {
 	defer stopProf()
 
 	a := stdflag.C4fRunnerFromCli(ctx, errw)
-	cfg, err := stdflag.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfigFromCli(ctx)
 	if err != nil {
 		return err
 	}

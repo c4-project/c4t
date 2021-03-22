@@ -73,7 +73,7 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 }
 
 func makePerturber(ctx *c.Context, errw io.Writer) (*perturber.Perturber, error) {
-	cfg, err := stdflag.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfigFromCli(ctx)
 	if err != nil {
 		return nil, err
 	}

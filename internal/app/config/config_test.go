@@ -28,5 +28,6 @@ func TestApp_printGlobalPath(t *testing.T) {
 	gp, err := config.GlobalFile()
 	require.NoError(t, err, "error while getting global config file")
 
+	// We can't actually assert that the global file path _is_ something in particular, as it'll depend on OS
 	require.Equal(t, gp, strings.TrimSpace(buf.String()), "should have printed global file to stdout")
 }

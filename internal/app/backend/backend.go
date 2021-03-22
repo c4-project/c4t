@@ -14,7 +14,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/c4-project/c4t/internal/c4f"
+	"github.com/c4-project/c4t/internal/model/litmus"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
@@ -25,7 +25,6 @@ import (
 	"github.com/c4-project/c4t/internal/helper/srvrun"
 	"github.com/c4-project/c4t/internal/subject/obs"
 
-	"github.com/c4-project/c4t/internal/config"
 	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/model/service/backend"
 	backend2 "github.com/c4-project/c4t/internal/serviceimpl/backend"
@@ -97,7 +96,7 @@ func flags() []c.Flag {
 }
 
 func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
-	cfg, err := stdflag.ConfFileFromCli(ctx)
+	cfg, err := stdflag.ConfigFromCli(ctx)
 	if err != nil {
 		return fmt.Errorf("while getting config: %w", err)
 	}
@@ -127,7 +126,7 @@ func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {
 	return errhelp.FirstError(perr, derr)
 }
 
-func jobFromCli(ctx *c.Context, fn string, c4f *c4f.Runner, td string) (backend.LiftJob, error) {
+func jobFromCli(ctx *c.Context, fn string, c4f litmus.StatDumper, td string) (backend.LiftJob, error) {
 	in, err := backend.InputFromFile(ctx.Context, fn, c4f)
 	if err != nil {
 		return backend.LiftJob{}, err
@@ -183,7 +182,7 @@ func runAndParse(ctx context.Context, to time.Duration, b backend.Backend, j bac
 	return nil
 }
 
-func liftWithTimeout(ctx context.Context, to time.Duration, b backend.Backend, j backend.LiftJob, xr service.Runner) (recipe.Recipe, error) {
+func liftWithTimeout(ctx context.Context, to time.Duration, b backend.SingleLifter, j backend.LiftJob, xr service.Runner) (recipe.Recipe, error) {
 	cf := func() {}
 	if to != 0 {
 		ctx, cf = context.WithTimeout(ctx, to)
@@ -194,7 +193,7 @@ func liftWithTimeout(ctx context.Context, to time.Duration, b backend.Backend, j
 	return b.Lift(ctx, j, xr)
 }
 
-func parseFile(ctx context.Context, b backend.Backend, o *obs.Obs, fname string) error {
+func parseFile(ctx context.Context, b backend.ObsParser, o *obs.Obs, fname string) error {
 	f, err := os.Open(fname)
 	if err != nil {
 		return fmt.Errorf("can't open output file %s: %w", fname, err)
@@ -211,7 +210,7 @@ func inputNameFromCli(ctx *c.Context) (string, error) {
 	return ctx.Args().First(), nil
 }
 
-func getBackend(cfg *config.Config, c backend.Criteria) (backend.Backend, error) {
+func getBackend(cfg backend.Finder, c backend.Criteria) (backend.Backend, error) {
 	spec, err := cfg.FindBackend(c)
 	if err != nil {
 		return nil, fmt.Errorf("while finding backend: %w", err)
