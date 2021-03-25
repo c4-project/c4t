@@ -8,8 +8,16 @@ package config_test
 import (
 	"bytes"
 	"io"
+	"os"
+	"path"
+	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/c4-project/c4t/internal/ux/stdflag"
+
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/c4-project/c4t/internal/config"
 
@@ -30,4 +38,34 @@ func TestApp_printGlobalPath(t *testing.T) {
 
 	// We can't actually assert that the global file path _is_ something in particular, as it'll depend on OS
 	require.Equal(t, gp, strings.TrimSpace(buf.String()), "should have printed global file to stdout")
+}
+
+// TestApp_compilerTables tests the output of 'c4t-config -print-compilers' given various input files.
+func TestApp_compilerTables(t *testing.T) {
+	t.Parallel()
+
+	testhelp.TestFilesOfExt(t, path.Join("testdata", "compilers"), ".toml", func(t *testing.T, name, path string) {
+		t.Helper()
+		t.Parallel()
+		a := assert.New(t)
+
+		var buf bytes.Buffer
+
+		if err := app.App(&buf, io.Discard).Run([]string{
+			app.Name,
+			"-" + app.FlagPrintCompilers,
+			"-" + stdflag.FlagConfigFile,
+			path,
+		}); !a.NoError(err) {
+			return
+		}
+
+		got := buf.String()
+		wbytes, err := os.ReadFile(filepath.Join("testdata", "compilers", name+".txt"))
+		if !a.NoError(err) {
+			return
+		}
+
+		a.Equalf(string(wbytes), got, "compiler output not equal for %q", name)
+	})
 }

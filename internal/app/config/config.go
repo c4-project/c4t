@@ -46,7 +46,7 @@ You can use this to open the global config in a text editor, or save the config 
 	usagePrintPath           = "print path to global config file, rather than generating a new one"
 
 	FlagPrintCompilers      = "print-compilers"
-	flagPrintCompilersShort = "C"
+	flagPrintCompilersShort = "c"
 	usagePrintCompilers     = "print information about configured compilers"
 )
 
@@ -65,7 +65,7 @@ func App(outw, errw io.Writer) *c.App {
 }
 
 func flags() []c.Flag {
-	ownFlags := []c.Flag{
+	flags := []c.Flag{
 		&c.BoolFlag{
 			Name:    FlagPrintGlobalPath,
 			Aliases: []string{flagPrintGlobalPathShort},
@@ -77,7 +77,9 @@ func flags() []c.Flag {
 			Usage:   usagePrintCompilers,
 		},
 	}
-	return append(ownFlags, stdflag.TabulatorCliFlags()...)
+	flags = append(flags, stdflag.TabulatorCliFlags()...)
+	flags = append(flags, stdflag.ConfFileCliFlag())
+	return flags
 }
 
 func run(ctx *c.Context, outw io.Writer, errw io.Writer) error {

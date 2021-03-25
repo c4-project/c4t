@@ -1,0 +1,5 @@
+Machine  ID     Style  Arch            Status
+local    clang  gcc    aarch64.8.1     on
+local    gcc    gcc    aarch64.8.1     on
+x86      clang  gcc    x86.64.skylake  on
+x86      gcc    gcc    x86.64          on

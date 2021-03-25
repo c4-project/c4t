@@ -62,7 +62,7 @@ func C4fRunnerFromCli(ctx *c.Context, errw io.Writer) *c4f.Runner {
 // ConfFileCliFlag creates a cli flag for the config file.
 func ConfFileCliFlag() c.Flag {
 	return &c.PathFlag{
-		Name:      flagConfFile,
+		Name:      FlagConfigFile,
 		Usage:     usageConfFile,
 		TakesFile: true,
 	}
@@ -70,7 +70,7 @@ func ConfFileCliFlag() c.Flag {
 
 // ConfigFromCli sets up a Config using the file flag set up by ConfFileCliFlag.
 func ConfigFromCli(ctx *c.Context) (*config.Config, error) {
-	return config.Load(ctx.Path(flagConfFile))
+	return config.Load(ctx.Path(FlagConfigFile))
 }
 
 // OutDirFromCli gets the output directory set up by OutDirCliFlag.

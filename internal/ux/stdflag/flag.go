@@ -25,7 +25,8 @@ const (
 
 	flagC4fDuneExec = "x"
 
-	flagConfFile = "C"
+	// FlagConfigFile is a standard flag for overriding the config file.
+	FlagConfigFile = "C"
 	// FlagAltWorkerCount is a flag for arguments that set a secondary worker count.
 	FlagAltWorkerCount = "J"
 	// FlagRunTimeout is a short flag for run timeout.

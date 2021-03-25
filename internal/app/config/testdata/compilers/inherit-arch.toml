@@ -1,0 +1,27 @@
+# Tests whether an architecture specified in a machine is inherited by its compilers.
+
+[machines.local]
+    arch = "aarch64.8.1"
+
+    [machines.local.compilers.gcc]
+        style = "gcc"
+        run.cmd = "gcc"
+        # no arch specified: should be "aarch64.8.1"
+
+    [machines.local.compilers.clang]
+        style = "gcc"
+        run.cmd = "clang"
+        # no arch specified: should be "aarch64.8.1"
+
+[machines.x86]
+    arch = "x86.64"
+
+    [machines.x86.compilers.gcc]
+        style = "gcc"
+        run.cmd = "gcc"
+        # no arch specified: should be "x86.64"
+
+    [machines.x86.compilers.clang]
+        style = "gcc"
+        run.cmd = "clang"
+        arch = "x86.64.skylake"
