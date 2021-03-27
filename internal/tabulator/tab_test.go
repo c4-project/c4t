@@ -6,8 +6,13 @@
 package tabulator_test
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"testing"
+
+	"github.com/c4-project/c4t/internal/helper/iohelp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/c4-project/c4t/internal/tabulator"
 )
@@ -26,4 +31,14 @@ func ExampleNewTab() {
 	// Country  Code
 	// USA      1
 	// UK       44
+}
+
+// TestNewTab_error tests that tabbing tabulators handle errors correctly.
+func TestNewTab_error(t *testing.T) {
+	t.Parallel()
+	err := errors.New("no u")
+	w := tabulator.NewTab(iohelp.ErrWriter{Err: err})
+	w.Cell("USA").Cell(1).EndRow()
+	w.Cell("UK").Cell(int64(44)).EndRow()
+	assert.ErrorIs(t, w.Flush(), err)
 }

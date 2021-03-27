@@ -24,25 +24,40 @@ func TabulateCompilers(t tabulator.Tabulator, c *config.Config) error {
 		return err
 	}
 	for _, mid := range ids {
-		TabulateCompilersForMachine(t, mid, c.Machines[mid.String()])
+		if err := TabulateCompilersForMachine(t, mid, c.Machines[mid.String()]); err != nil {
+			return err
+		}
 	}
 	return t.Flush()
 }
 
 // TabulateCompilersForMachine writes a human-readable compiler table for machine mid/mc to w.
 // It does not flush the table.
-func TabulateCompilersForMachine(t tabulator.Tabulator, mid id.ID, mc machine.Config) {
+func TabulateCompilersForMachine(t tabulator.Tabulator, mid id.ID, mc machine.Config) error {
 	// In case we're calling into this individually:
 	setCompilerTableHeader(t)
 
-	// TODO(@MattWindsor91): deterministic order here?
-	for cid, c := range mc.Compilers {
-		addCompilerRow(t, mid, &c, cid)
+	cs, err := mc.Compilers()
+	if err != nil {
+		return err
 	}
+
+	// Trying to force a deterministic order here.
+	cids, err := id.MapKeys(cs)
+	if err != nil {
+		return err
+	}
+
+	// TODO(@MattWindsor91): deterministic order here?
+	for _, cid := range cids {
+		addCompilerRow(t, mid, cs[cid.String()], cid)
+	}
+
+	return err
 }
 
-func addCompilerRow(t tabulator.Tabulator, mid id.ID, c *compiler.Compiler, cid string) {
-	t.Cell(mid).Cell(cid).Cell(c.Style).Cell(c.Arch).Cell(status(c)).EndRow()
+func addCompilerRow(t tabulator.Tabulator, mid id.ID, c compiler.Compiler, cid id.ID) {
+	t.Cell(mid).Cell(cid).Cell(c.Style).Cell(c.Arch).Cell(status(&c)).EndRow()
 }
 
 func status(c *compiler.Compiler) string {

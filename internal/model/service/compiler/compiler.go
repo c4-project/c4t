@@ -12,7 +12,11 @@ import (
 	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 )
 
-// Compiler collects the part of a compiler's specification that comes from the c4t configuration.
+// Compiler represents fully prepared baseline configuration for a compiler.
+//
+// The distinction between Compiler and Config is that the latter represents a raw form of a Compiler coming from a
+// config file; the distinction between Compiler and Instance is that the latter is the former plus a set of decisions
+// on the specific invocation the compiler will have for a test run (eg, optimisation levels, mutant indices, etc).
 type Compiler struct {
 	// Disabled specifies whether this compiler has been disabled.
 	Disabled bool `toml:"disabled,omitempty" json:"disabled,omitempty"`
@@ -32,3 +36,6 @@ type Compiler struct {
 	// Opt contains information on the optimisation levels to select for the compiler.
 	Opt *optlevel.Selection `toml:"opt,omitempty" json:"opt,omitempty"`
 }
+
+// Config denotes raw configuration for a Compiler.
+type Config Compiler

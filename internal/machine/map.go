@@ -42,7 +42,7 @@ func (m ConfigMap) ListCompilers(_ context.Context, mid id.ID) (map[string]compi
 	if !ok {
 		return nil, fmt.Errorf("%w: %s", ErrNoMachine, mstr)
 	}
-	return mach.Compilers, nil
+	return mach.Compilers()
 }
 
 // ObserveOn sends this map to obs as a series of machine observations.
