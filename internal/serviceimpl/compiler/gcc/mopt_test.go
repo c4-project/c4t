@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // TestDefaultMOpts tests the mopt calculation for various platforms.

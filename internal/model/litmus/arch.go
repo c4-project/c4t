@@ -14,7 +14,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // archMap maps C4 architecture family/variant pairs to Litmus7 arch names.

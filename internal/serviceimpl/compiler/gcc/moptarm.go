@@ -8,7 +8,7 @@ package gcc
 import (
 	"fmt"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 func armMOpts(variant string, _ id.ID) (*mOptSet, error) {

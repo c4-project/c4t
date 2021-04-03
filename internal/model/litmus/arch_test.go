@@ -17,7 +17,7 @@ import (
 	"github.com/c4-project/c4t/internal/model/litmus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // ExampleArchToLitmus gives a few testable examples of ArchToLitmus.

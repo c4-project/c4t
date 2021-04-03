@@ -7,7 +7,7 @@ import (
 
 	compiler "github.com/c4-project/c4t/internal/model/service/compiler"
 
-	id "github.com/c4-project/c4t/internal/model/id"
+	id "github.com/c4-project/c4t/internal/id"
 
 	mock "github.com/stretchr/testify/mock"
 )

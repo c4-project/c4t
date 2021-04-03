@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // CompileResult is a record about an attempt to compile a subject.

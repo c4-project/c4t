@@ -13,7 +13,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/helper/testhelp"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // ExampleSort is a runnable example for Sort.
@@ -149,6 +149,8 @@ func TestMapGlob_errors(t *testing.T) {
 	for name, c := range cases {
 		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			_, err := id.MapGlob(c.in, c.glob)
 			testhelp.ExpectErrorIs(t, err, c.out, "testing MapGlob")
 		})
@@ -186,6 +188,8 @@ func TestMapKeys_errors(t *testing.T) {
 	for name, c := range cases {
 		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			_, err := id.MapKeys(c.in)
 			testhelp.ExpectErrorIs(t, err, c.out, "testing MapKeys")
 		})

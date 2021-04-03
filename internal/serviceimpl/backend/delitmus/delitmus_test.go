@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/c4-project/c4t/internal/model/service"
 	"github.com/c4-project/c4t/internal/model/service/mocks"

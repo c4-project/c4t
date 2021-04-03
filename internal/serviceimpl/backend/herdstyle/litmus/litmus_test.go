@@ -15,7 +15,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/serviceimpl/backend/herdstyle/litmus"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	mdl "github.com/c4-project/c4t/internal/model/litmus"
 	"github.com/c4-project/c4t/internal/model/service"
 )

@@ -21,7 +21,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // compilerPerturber contains the state necessary to perturb the compiler part of a test plan.

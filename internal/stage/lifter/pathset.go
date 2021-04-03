@@ -10,7 +10,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // Pathset contains the paths for a lifter.

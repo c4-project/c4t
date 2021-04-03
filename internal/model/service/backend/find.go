@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // ErrNoMatch occurs when we can't find a backend that matches the given criteria.

@@ -27,7 +27,7 @@ import (
 	"github.com/c4-project/c4t/internal/c4f"
 	"github.com/c4-project/c4t/internal/config"
 	"github.com/c4-project/c4t/internal/director"
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/serviceimpl/compiler"
 	"github.com/c4-project/c4t/internal/stage/planner"
 

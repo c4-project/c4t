@@ -8,7 +8,7 @@ package litmus
 import (
 	"context"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // Option is the type of options to the litmus-test record constructor.

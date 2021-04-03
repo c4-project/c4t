@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/c4-project/c4t/internal/director"
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/plan/analysis"
 	"github.com/c4-project/c4t/internal/subject/corpus"
 	"github.com/c4-project/c4t/internal/subject/status"

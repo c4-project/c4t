@@ -8,7 +8,7 @@ package compiler
 import (
 	"strings"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // Named wraps an Instance with its ID.

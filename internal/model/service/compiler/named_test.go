@@ -13,7 +13,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/helper/testhelp"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 )
 

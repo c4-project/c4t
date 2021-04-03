@@ -10,12 +10,14 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/1set/gut/ystring"
 )
 
 const (
 	// SepTag is the identifier tag separator.
 	// It is exported for testing and sanitisation purposes.
-	SepTag = '.'
+	SepTag = "."
 )
 
 var (
@@ -28,7 +30,8 @@ var (
 
 // ID represents a C4 ID.
 type ID struct {
-	tags []string
+	// Invariant: repr is case-folded with no whitespace.
+	repr string
 }
 
 // New tries to construct a C4 ID from tags.
@@ -41,10 +44,10 @@ func New(tags ...string) (ID, error) {
 
 	vtags, err := validateTags(tags)
 	if err != nil {
-		return ID{nil}, fmt.Errorf("tag validation failed for %v: %w", tags, err)
+		return ID{}, fmt.Errorf("tag validation failed for %v: %w", tags, err)
 	}
 
-	return ID{tags: vtags}, nil
+	return unsafeJoin(vtags...), nil
 }
 
 func validateTags(tags []string) ([]string, error) {
@@ -65,7 +68,7 @@ func validateTag(t string) error {
 	if t == "" {
 		return ErrTagEmpty
 	}
-	if strings.ContainsRune(t, SepTag) {
+	if strings.Contains(t, SepTag) {
 		return ErrTagHasSep
 	}
 	return nil
@@ -74,10 +77,10 @@ func validateTag(t string) error {
 // TryFromString tries to convert a string to a C4 ID.
 // It returns any validation error arising.
 func TryFromString(s string) (ID, error) {
-	return New(strings.Split(s, string(SepTag))...)
+	return New(strings.Split(s, SepTag)...)
 }
 
-//FromString converts a string to a C4 ID.
+// FromString converts a string to a C4 ID.
 // It returns the empty ID if there is an error.
 func FromString(s string) ID {
 	id, err := TryFromString(s)
@@ -89,17 +92,17 @@ func FromString(s string) ID {
 
 // IsEmpty gets whether this ID is empty.
 func (i ID) IsEmpty() bool {
-	return len(i.tags) == 0
+	return ystring.IsEmpty(i.repr)
 }
 
 // Tags extracts the tags comprising an ID as a slice.
 func (i ID) Tags() []string {
-	return i.tags
+	return strings.Split(i.repr, SepTag)
 }
 
 // String converts a C4 ID to a string.
 func (i ID) String() string {
-	return strings.Join(i.tags, string(SepTag))
+	return i.repr
 }
 
 // Join appends r to this ID, creating a new ID.
@@ -110,7 +113,11 @@ func (i ID) Join(r ID) ID {
 	if r.IsEmpty() {
 		return i
 	}
-	return ID{append(i.tags, r.tags...)}
+	return unsafeJoin(i.repr, r.repr)
+}
+
+func unsafeJoin(tags ...string) ID {
+	return ID{repr: strings.Join(tags, string(SepTag))}
 }
 
 // Uncons splits an ID into a head tag and tail of zero or more further tags.
@@ -119,9 +126,17 @@ func (i ID) Uncons() (hd string, tl ID, ok bool) {
 	if i.IsEmpty() {
 		return hd, tl, false
 	}
-	hd = i.tags[0]
-	tl = ID{tags: i.tags[1:]}
-	return hd, tl, true
+	hd, tls := i.unconsInner()
+	return hd, ID{repr: tls}, true
+}
+
+func (i ID) unconsInner() (hd, tl string) {
+	splits := strings.SplitN(i.repr, SepTag, 2)
+	hd = splits[0]
+	if len(splits) == 2 {
+		tl = splits[1]
+	}
+	return hd, tl
 }
 
 // Unsnoc splits an ID into a tail tag and head of zero or more preceding tags.
@@ -130,10 +145,8 @@ func (i ID) Unsnoc() (hd ID, tl string, ok bool) {
 	if i.IsEmpty() {
 		return hd, tl, false
 	}
-	end := len(i.tags) - 1
-	hd = ID{tags: i.tags[:end]}
-	tl = i.tags[end]
-	return hd, tl, true
+	splitIx := strings.LastIndex(i.repr, SepTag)
+	return ID{repr: i.repr[:splitIx]}, i.repr[splitIx+1:], true
 }
 
 // Triple splits this ID into three parts: a family tag, a variant tag, and a subvariant identifier.

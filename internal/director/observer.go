@@ -27,7 +27,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/stage/planner"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 )
 

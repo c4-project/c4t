@@ -11,7 +11,7 @@ import (
 
 	mocks2 "github.com/c4-project/c4t/internal/model/service/mocks"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/serviceimpl/compiler"
 	"github.com/c4-project/c4t/internal/serviceimpl/compiler/mocks"
 	"github.com/stretchr/testify/require"

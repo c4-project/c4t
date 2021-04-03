@@ -57,44 +57,44 @@ const (
 var (
 	// ArchC is the architecture ID for C.
 	// (C isn't an architecture, but certain parts of the backend system are easier if we treat it as one.)
-	ArchC = ID{[]string{ArchFamilyC}}
+	ArchC = ID{repr: ArchFamilyC}
 
 	// ArchX86 is the architecture ID for x86 (generic, assumed 32-bit).
-	ArchX86 = ID{[]string{ArchFamilyX86}}
+	ArchX86 = ID{repr: ArchFamilyX86}
 	// ArchX8664 is the architecture ID for x86-64.
-	ArchX8664 = ID{[]string{ArchFamilyX86, ArchVariantX8664}}
+	ArchX8664 = ID{repr: ArchFamilyX86 + SepTag + ArchVariantX8664}
 	// ArchX86Broadwell is the architecture ID for x86-64 Broadwell.
-	ArchX86Broadwell = ID{[]string{ArchFamilyX86, ArchVariantX8664, ArchSubVariantX86Broadwell}}
+	ArchX86Broadwell = ID{repr: ArchFamilyX86 + SepTag + ArchVariantX8664 + SepTag + ArchSubVariantX86Broadwell}
 	// ArchX86Skylake is the architecture ID for x86-64 Skylake.
-	ArchX86Skylake = ID{[]string{ArchFamilyX86, ArchVariantX8664, ArchSubVariantX86Skylake}}
+	ArchX86Skylake = ID{repr: ArchFamilyX86 + SepTag + ArchVariantX8664 + SepTag + ArchSubVariantX86Skylake}
 
 	// ArchArm is the architecture ID for ARM (generic, 32-bit).
-	ArchArm = ID{[]string{ArchFamilyArm}}
+	ArchArm = ID{repr: ArchFamilyArm}
 	// ArchArm7 is the architecture ID for arm7(-a).
-	ArchArm7 = ID{[]string{ArchFamilyArm, ArchVariantArm7}}
+	ArchArm7 = ID{repr: ArchFamilyArm + SepTag + ArchVariantArm7}
 	// ArchArm8 is the architecture ID for arm8(-a).
-	ArchArm8 = ID{[]string{ArchFamilyArm, ArchVariantArm8}}
+	ArchArm8 = ID{repr: ArchFamilyArm + SepTag + ArchVariantArm8}
 	// ArchArmCortexA72 is the architecture ID for arm Cortex-A72.
-	ArchArmCortexA72 = ID{[]string{ArchFamilyArm, ArchVariantArmCortexA72}}
+	ArchArmCortexA72 = ID{repr: ArchFamilyArm + SepTag + ArchVariantArmCortexA72}
 
 	// ArchAArch64 is the architecture ID for ARM (generic, 64-bit).
-	ArchAArch64 = ID{[]string{ArchFamilyAArch64}}
+	ArchAArch64 = ID{repr: ArchFamilyAArch64}
 	// ArchAArch648 is the architecture ID for ARM 64-bit version 8.x.
-	ArchAArch648 = ID{[]string{ArchFamilyAArch64, ArchVariantAArch648}}
+	ArchAArch648 = ID{repr: ArchFamilyAArch64 + SepTag + ArchVariantAArch648}
 	// ArchAArch648 is the architecture ID for ARM 64-bit version 8.1.
-	ArchAArch6481 = ID{[]string{ArchFamilyAArch64, ArchVariantAArch648, ArchSubVariantAArch6481}}
+	ArchAArch6481 = ID{repr: ArchFamilyAArch64 + SepTag + ArchVariantAArch648 + SepTag + ArchSubVariantAArch6481}
 
 	// ArchPPC is the architecture ID for PowerPC.
-	ArchPPC = ID{[]string{ArchFamilyPPC}}
+	ArchPPC = ID{repr: ArchFamilyPPC}
 	// ArchPPC64LE is the architecture ID for PowerPC64LE.
-	ArchPPC64LE = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE}}
+	ArchPPC64LE = ID{repr: ArchFamilyPPC + SepTag + ArchVariantPPC64LE}
 	// ArchPPCPOWER7 is the architecture ID for POWER7.
-	ArchPPCPOWER7 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER7}}
+	ArchPPCPOWER7 = ID{repr: ArchPPC64LE.repr + SepTag + ArchSubVariantPPCPOWER7}
 	// ArchPPCPOWER8 is the architecture ID for POWER8.
-	ArchPPCPOWER8 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER8}}
+	ArchPPCPOWER8 = ID{repr: ArchPPC64LE.repr + SepTag + ArchSubVariantPPCPOWER8}
 	// ArchPPCPOWER9 is the architecture ID for POWER9.
-	ArchPPCPOWER9 = ID{[]string{ArchFamilyPPC, ArchVariantPPC64LE, ArchSubVariantPPCPOWER9}}
+	ArchPPCPOWER9 = ID{repr: ArchPPC64LE.repr + SepTag + ArchSubVariantPPCPOWER9}
 
 	// CStyleGCC is the compiler style ID for GCC.
-	CStyleGCC = ID{[]string{"gcc"}}
+	CStyleGCC = ID{repr: "gcc"}
 )

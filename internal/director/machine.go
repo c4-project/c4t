@@ -10,8 +10,8 @@ import (
 
 	"github.com/c4-project/c4t/internal/director/pathset"
 	"github.com/c4-project/c4t/internal/helper/iohelp"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/machine"
-	"github.com/c4-project/c4t/internal/model/id"
 	"github.com/c4-project/c4t/internal/plan"
 	"github.com/c4-project/c4t/internal/quantity"
 )

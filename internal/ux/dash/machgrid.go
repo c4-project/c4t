@@ -6,7 +6,7 @@
 package dash
 
 import (
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/mum4k/termdash/container"
 	"github.com/mum4k/termdash/container/grid"
 )

@@ -26,7 +26,7 @@ import (
 	"github.com/c4-project/c4t/internal/director/pathset"
 	"github.com/c4-project/c4t/internal/remote"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/c4-project/c4t/internal/subject/corpus"
 

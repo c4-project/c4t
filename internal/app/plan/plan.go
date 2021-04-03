@@ -14,7 +14,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/quantity"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/1set/gut/ystring"
 	"github.com/c4-project/c4t/internal/machine"

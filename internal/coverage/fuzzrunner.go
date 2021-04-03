@@ -16,7 +16,7 @@ import (
 
 	"github.com/1set/gut/yos"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/model/litmus"
 
 	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"

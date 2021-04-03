@@ -11,7 +11,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/helper/testhelp"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // ExampleFromString is a runnable example for FromString.

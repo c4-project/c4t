@@ -24,7 +24,7 @@ import (
 	"github.com/c4-project/c4t/internal/stage/analyser/saver"
 
 	"github.com/c4-project/c4t/internal/helper/iohelp"
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // ExampleLogger_OnPrepare is a runnable example indirectly exercising Logger.OnPrepare.

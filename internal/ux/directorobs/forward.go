@@ -9,8 +9,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/machine"
-	"github.com/c4-project/c4t/internal/model/id"
 
 	"github.com/c4-project/c4t/internal/copier"
 	"github.com/c4-project/c4t/internal/stage/mach/observer"

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // ExampleID_Less is a runnable example for Less.

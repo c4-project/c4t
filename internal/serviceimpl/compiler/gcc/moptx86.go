@@ -8,7 +8,7 @@ package gcc
 import (
 	"fmt"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // x86MOpts calculates the m-optimisation set for the triple (x86, variant, subvar).

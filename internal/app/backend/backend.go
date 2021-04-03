@@ -25,7 +25,7 @@ import (
 	"github.com/c4-project/c4t/internal/helper/srvrun"
 	"github.com/c4-project/c4t/internal/subject/obs"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/model/service/backend"
 	backend2 "github.com/c4-project/c4t/internal/serviceimpl/backend"
 	"github.com/c4-project/c4t/internal/ux/stdflag"

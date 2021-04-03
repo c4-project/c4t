@@ -16,7 +16,7 @@ import (
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 	"gopkg.in/yaml.v3"
 )
 

@@ -5,7 +5,7 @@ package mocks
 import (
 	compilation "github.com/c4-project/c4t/internal/subject/compilation"
 
-	id "github.com/c4-project/c4t/internal/model/id"
+	id "github.com/c4-project/c4t/internal/id"
 
 	mock "github.com/stretchr/testify/mock"
 )

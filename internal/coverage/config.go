@@ -14,7 +14,7 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 
 	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
 

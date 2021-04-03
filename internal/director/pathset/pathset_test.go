@@ -15,7 +15,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/director/pathset"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // ExampleNew is a runnable example for New.

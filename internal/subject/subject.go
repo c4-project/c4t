@@ -18,7 +18,7 @@ import (
 
 	"github.com/c4-project/c4t/internal/model/recipe"
 
-	"github.com/c4-project/c4t/internal/model/id"
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // Normalise represents a single test subject in a corpus.

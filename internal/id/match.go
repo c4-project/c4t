@@ -8,6 +8,7 @@ package id
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // TagGlob is the tag used in a glob expression to indicate that everything before it should be a prefix,
@@ -19,29 +20,33 @@ var ErrBadGlob = errors.New("malformed glob expression")
 
 // HasPrefix tests whether prefix is a prefix of this ID.
 func (i ID) HasPrefix(prefix ID) bool {
-	li := len(i.tags)
-	lp := len(prefix.tags)
 	switch {
-	case li < lp:
+	// Easiest cases can be done by direct string analysis.
+	case prefix.IsEmpty():
+		return true
+	case len(i.repr) < len(prefix.repr):
 		return false
-	case li == lp:
+	case len(i.repr) == len(prefix.repr):
 		return i.Equal(prefix)
 	default:
-		return i.slice(0, len(prefix.tags)).Equal(prefix)
+		// We can use string prefixing, with a caveat: we must ensure the last tag of prefix is contained verbatim in i.
+		// Because i is larger, we assume it has more tags, so we can do this by adding SepTag.
+		return strings.HasPrefix(i.repr, prefix.repr+SepTag)
 	}
 }
 
 // HasPrefix tests whether suffix is a suffix of this ID.
 func (i ID) HasSuffix(suffix ID) bool {
-	li := len(i.tags)
-	ls := len(suffix.tags)
+	// As HasPrefix, but with the final case flipped around for suffixing.
 	switch {
-	case li < ls:
+	case suffix.IsEmpty():
+		return true
+	case len(i.repr) < len(suffix.repr):
 		return false
-	case li == ls:
+	case len(i.repr) == len(suffix.repr):
 		return i.Equal(suffix)
 	default:
-		return i.slice(len(i.tags)-len(suffix.tags), len(i.tags)).Equal(suffix)
+		return strings.HasSuffix(i.repr, SepTag+suffix.repr)
 	}
 }
 
@@ -58,15 +63,14 @@ func (i ID) Matches(glob ID) (bool, error) {
 	return i.HasPrefix(prefix) && i.HasSuffix(suffix), nil
 }
 
-func (i ID) slice(from int, to int) ID {
-	return ID{tags: i.tags[from:to]}
-}
-
 // splitGlob splits a glob ID into a prefix, suffix, and error.
 // If there is no glob character, we return a flag that specifies that the match should be exact.
 func splitGlob(glob ID) (prefix ID, suffix ID, exact bool, err error) {
+	// TODO(@MattWindsor91): use a string based algorithm here?
+
 	globIndex := -1
-	for i, tag := range glob.tags {
+	gtags := glob.Tags()
+	for i, tag := range gtags {
 		if tag == TagGlob {
 			if globIndex != -1 {
 				return prefix, suffix, exact, fmt.Errorf("%w: more than one '*' character", ErrBadGlob)
@@ -78,7 +82,7 @@ func splitGlob(glob ID) (prefix ID, suffix ID, exact bool, err error) {
 		return prefix, suffix, true, nil
 	}
 
-	prefix.tags = glob.tags[:globIndex]
-	suffix.tags = glob.tags[globIndex+1:]
-	return prefix, suffix, false, err
+	prefix = unsafeJoin(gtags[:globIndex]...)
+	suffix = unsafeJoin(gtags[globIndex+1:]...)
+	return prefix, suffix, false, nil
 }
