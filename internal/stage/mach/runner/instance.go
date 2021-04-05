@@ -23,8 +23,6 @@ import (
 
 	"github.com/c4-project/c4t/internal/subject/status"
 
-	"github.com/c4-project/c4t/internal/id"
-
 	"github.com/c4-project/c4t/internal/subject/corpus/builder"
 
 	"github.com/c4-project/c4t/internal/subject/obs"
@@ -49,8 +47,7 @@ type Instance struct {
 
 // Run runs the instance with context ctx.
 func (n *Instance) Run(ctx context.Context) error {
-	for cidstr, cc := range n.subject.Compilations {
-		cid := id.FromString(cidstr)
+	for cid, cc := range n.subject.Compilations {
 		name := compilation.Name{CompilerID: cid, SubjectName: n.subject.Name}
 		if err := n.runCompile(ctx, name, cc.Compile); err != nil {
 			return err

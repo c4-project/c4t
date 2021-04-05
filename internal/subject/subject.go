@@ -29,15 +29,13 @@ type Subject struct {
 	// Source refers to the original litmus test for this subject.
 	Source litmus.Litmus `toml:"source,omitempty" json:"source,omitempty"`
 
-	// Compilations contains information about this subject's compilations.
-	// It maps from the string form of each compiler's ID.
+	// Compilations contains information about this subject's compilations, organised by compiler ID.
 	// If nil, this subject hasn't had any compilations.
-	Compilations map[string]compilation.Compilation `toml:"compilations,omitempty" json:"compilations,omitempty"`
+	Compilations compilation.Map `toml:"compilations,omitempty" json:"compilations,omitempty"`
 
 	// Recipes contains information about this subject's lifted test recipes.
-	// It maps the string form of each recipe's target architecture's ID.
-	// If nil, this subject hasn't had a recipe generated.
-	Recipes map[string]recipe.Recipe `toml:"recipes,omitempty" json:"recipes,omitempty"`
+	// If nil, this subject hasn't had any recipes generated.
+	Recipes recipe.Map `toml:"recipes,omitempty" json:"recipes,omitempty"`
 }
 
 // BestLitmus tries to get the 'best' litmus test for further development.
@@ -63,7 +61,8 @@ func (s *Subject) HasFuzzFile() bool {
 
 // Compilation gets the compilation information for the compiler ID cid.
 func (s *Subject) Compilation(cid id.ID) (compilation.Compilation, error) {
-	c, ok := s.Compilations[cid.String()]
+	// TODO(@MattWindsor91): obsolete?
+	c, ok := s.Compilations[cid]
 	if !ok {
 		return compilation.Compilation{}, fmt.Errorf("%w: compiler=%q", ErrMissingCompilation, cid)
 	}
@@ -120,20 +119,19 @@ func (s *Subject) AddRun(cid id.ID, r compilation.RunResult) error {
 
 func (s *Subject) mapCompilation(cid id.ID, f func(cc *compilation.Compilation) error) error {
 	s.ensureCompilationMap()
-	key := cid.String()
 	// Deliberately taking the zero value if the compilation hasn't been seen yet.
-	cc := s.Compilations[key]
+	cc := s.Compilations[cid]
 	if err := f(&cc); err != nil {
 		return err
 	}
-	s.Compilations[key] = cc
+	s.Compilations[cid] = cc
 	return nil
 }
 
 // ensureCompilationMap makes sure this subject has a compile result map.
 func (s *Subject) ensureCompilationMap() {
 	if s.Compilations == nil {
-		s.Compilations = make(map[string]compilation.Compilation)
+		s.Compilations = make(compilation.Map)
 	}
 }
 
@@ -141,10 +139,9 @@ func (s *Subject) ensureCompilationMap() {
 // It returns the ID of the recipe as well as the recipe contents.
 func (s *Subject) Recipe(arch id.ID) (id.ID, recipe.Recipe, error) {
 	// TODO(@MattWindsor91): do scoping here
-	key := arch.String()
-	r, ok := s.Recipes[key]
+	r, ok := s.Recipes[arch]
 	if !ok {
-		return id.ID{}, recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingRecipe, key)
+		return id.ID{}, recipe.Recipe{}, fmt.Errorf("%w: arch=%q", ErrMissingRecipe, arch)
 	}
 	return arch, r, nil
 }
@@ -153,17 +150,16 @@ func (s *Subject) Recipe(arch id.ID) (id.ID, recipe.Recipe, error) {
 // It fails if there already _is_ a recipe for arch.
 func (s *Subject) AddRecipe(arch id.ID, r recipe.Recipe) error {
 	s.ensureRecipeMap()
-	key := arch.String()
-	if _, ok := s.Recipes[key]; ok {
-		return fmt.Errorf("%w: arch=%q", ErrDuplicateRecipe, key)
+	if _, ok := s.Recipes[arch]; ok {
+		return fmt.Errorf("%w: arch=%q", ErrDuplicateRecipe, arch)
 	}
-	s.Recipes[key] = r
+	s.Recipes[arch] = r
 	return nil
 }
 
 // ensureRecipeMap makes sure this subject has a recipe map.
 func (s *Subject) ensureRecipeMap() {
 	if s.Recipes == nil {
-		s.Recipes = make(map[string]recipe.Recipe)
+		s.Recipes = make(recipe.Map)
 	}
 }

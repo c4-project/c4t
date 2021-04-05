@@ -41,10 +41,10 @@ type analyser struct {
 	analysis *Analysis
 
 	// compilerTimes contains raw durations from each compiler's compilations.
-	compilerTimes map[string][]time.Duration
+	compilerTimes map[id.ID][]time.Duration
 
 	// runTimes contains raw durations from each compiler's runs.
-	runTimes map[string][]time.Duration
+	runTimes map[id.ID][]time.Duration
 
 	// corpus is the incoming corpus.
 	corpus corpus.Corpus
@@ -106,8 +106,8 @@ func newAnalyser(p *plan.Plan, opts ...Option) (*analyser, error) {
 	a := analyser{
 		analysis:      newAnalysis(p),
 		corpus:        p.Corpus,
-		compilerTimes: make(map[string][]time.Duration, lc),
-		runTimes:      make(map[string][]time.Duration, lc),
+		compilerTimes: make(map[id.ID][]time.Duration, lc),
+		runTimes:      make(map[id.ID][]time.Duration, lc),
 	}
 	if err := Options(opts...)(&a); err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Check()
 }
 
-func (a *analyser) initCompilers(cs map[string]compiler.Instance) error {
+func (a *analyser) initCompilers(cs compiler.InstanceMap) error {
 	for cn, c := range cs {
 		a.analysis.Compilers[cn] = Compiler{Counts: map[status.Status]int{}, Logs: map[string]string{}, Info: c}
 		a.compilerTimes[cn] = []time.Duration{}
@@ -163,15 +163,15 @@ func (a *analyser) apply(r subjectAnalysis) {
 }
 
 func (a *analyser) applyCompilers(r subjectAnalysis) {
-	for cstr, cflag := range r.cflags {
-		if _, ok := a.analysis.Compilers[cstr]; !ok {
+	for cid, cflag := range r.cflags {
+		if _, ok := a.analysis.Compilers[cid]; !ok {
 			// Somehow the analysis is mentioning a compiler whose existence we haven't foreseen.
 			continue
 		}
-		a.analysis.Compilers[cstr].Logs[r.sub.Name] = r.clogs[cstr]
+		a.analysis.Compilers[cid].Logs[r.sub.Name] = r.clogs[cid]
 
 		for i := status.Ok; i <= status.Last; i++ {
-			a.applyCompilerStatusCount(i, cflag, cstr)
+			a.applyCompilerStatusCount(i, cflag, cid)
 		}
 	}
 }
@@ -186,11 +186,11 @@ func (a *analyser) applyByStatus(s status.Status, r subjectAnalysis) {
 	a.analysis.ByStatus[s][r.sub.Name] = r.sub.Subject
 }
 
-func (a *analyser) applyCompilerStatusCount(s status.Status, cf status.Flag, cstr string) {
+func (a *analyser) applyCompilerStatusCount(s status.Status, cf status.Flag, cid id.ID) {
 	if !cf.MatchesStatus(s) {
 		return
 	}
-	a.analysis.Compilers[cstr].Counts[s]++
+	a.analysis.Compilers[cid].Counts[s]++
 }
 
 func (a *analyser) applyTimes(r subjectAnalysis) {
@@ -210,8 +210,8 @@ func (a *analyser) applyMutants(r subjectAnalysis) {
 	// TODO(@MattWindsor91): test this.
 	a.analysis.Mutation.RegisterMutant(a.analysis.Plan.Mutant())
 
-	for cidstr, clog := range r.clogs {
-		comp := compilation.Name{SubjectName: r.sub.Name, CompilerID: id.FromString(cidstr)}
-		a.analysis.Mutation.AddCompilation(comp, clog, r.cflags[cidstr].Status())
+	for cid, clog := range r.clogs {
+		comp := compilation.Name{SubjectName: r.sub.Name, CompilerID: cid}
+		a.analysis.Mutation.AddCompilation(comp, clog, r.cflags[cid].Status())
 	}
 }

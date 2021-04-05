@@ -35,10 +35,10 @@ func MockX86Gcc() Instance {
 }
 
 // MockSet produces a mock compiler set.
-func MockSet() map[string]Instance {
+func MockSet() map[id.ID]Instance {
 	// These names line up with those in the example corpus.
-	return map[string]Instance{
-		"gcc":   MockPower9GCCOpt(),
-		"clang": MockX86Gcc(),
+	return map[id.ID]Instance{
+		id.FromString("gcc"):   MockPower9GCCOpt(),
+		id.FromString("clang"): MockX86Gcc(),
 	}
 }

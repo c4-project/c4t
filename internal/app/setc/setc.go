@@ -10,7 +10,6 @@ package setc
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -130,19 +129,11 @@ func (*CompilerSetter) Close() error {
 	return nil
 }
 
-// ErrCompilerMissing occurs when we can't find the compiler with a given name.
-var ErrCompilerMissing = errors.New("compiler not found")
-
 func (c *CompilerSetter) Run(_ context.Context, p *plan.Plan) (*plan.Plan, error) {
-	cmp, err := getCompiler(p.Compilers, c.cid)
-	if err != nil {
-		return nil, err
-	}
-	if err := c.set(&cmp); err != nil {
-		return nil, err
-	}
-	setCompiler(p.Compilers, c.cid, cmp)
-	return p, nil
+	err := p.Compilers.Map(c.cid, func(inst *compiler.Instance) error {
+		return c.set(inst)
+	})
+	return p, err
 }
 
 func (c *CompilerSetter) set(cnf *compiler.Instance) error {
@@ -192,18 +183,4 @@ func (c *CompilerSetter) setMOpt(cnf *compiler.Instance) error {
 	}
 	cnf.SelectedMOpt = c.mopt
 	return nil
-}
-
-// TODO(@MattWindsor91): move all of these onto a 'config map' type.
-
-func getCompiler(m map[string]compiler.Instance, id id.ID) (compiler.Instance, error) {
-	cmp, ok := m[id.String()]
-	if !ok {
-		return compiler.Instance{}, fmt.Errorf("%w: %s", ErrCompilerMissing, id)
-	}
-	return cmp, nil
-}
-
-func setCompiler(m map[string]compiler.Instance, id id.ID, c compiler.Instance) {
-	m[id.String()] = c
 }

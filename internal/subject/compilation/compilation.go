@@ -5,6 +5,8 @@
 
 package compilation
 
+import "github.com/c4-project/c4t/internal/id"
+
 // Compilation holds information about one testcase-compiler pairing.
 type Compilation struct {
 	// Compile contains any information about the compile phase of this compilation.
@@ -12,3 +14,6 @@ type Compilation struct {
 	// Run contains any information about the run phase of this compilation.
 	Run *RunResult `json:"run,omitempty"`
 }
+
+// Map is shorthand for a map from compiler IDs to compilations.
+type Map map[id.ID]Compilation

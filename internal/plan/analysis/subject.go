@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/timing"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
@@ -24,20 +26,20 @@ import (
 type subjectAnalysis struct {
 	flags        status.Flag
 	sub          subject.Named
-	cflags       map[string]status.Flag
-	ctimes       map[string][]time.Duration
-	clogs        map[string]string
-	rtimes       map[string][]time.Duration
+	cflags       map[id.ID]status.Flag
+	ctimes       map[id.ID][]time.Duration
+	clogs        map[id.ID]string
+	rtimes       map[id.ID][]time.Duration
 	cspan, rspan timing.Span
 }
 
 func newSubjectAnalysis(s subject.Named) subjectAnalysis {
 	return subjectAnalysis{
 		flags:  0,
-		cflags: map[string]status.Flag{},
-		clogs:  map[string]string{},
-		ctimes: map[string][]time.Duration{},
-		rtimes: map[string][]time.Duration{},
+		cflags: map[id.ID]status.Flag{},
+		clogs:  map[id.ID]string{},
+		ctimes: map[id.ID][]time.Duration{},
+		rtimes: map[id.ID][]time.Duration{},
 		sub:    s,
 	}
 }
@@ -49,31 +51,31 @@ func (a *analyser) analyseSubject(s subject.Named) subjectAnalysis {
 	return c
 }
 
-func (c *subjectAnalysis) classifyCompilations(crs map[string]compilation.Compilation, ccs map[string]compiler.Instance, fs FilterSet) {
-	for n, cm := range crs {
-		conf := ccs[n]
+func (c *subjectAnalysis) classifyCompilations(crs compilation.Map, ccs compiler.InstanceMap, fs FilterSet) {
+	for cid, cm := range crs {
+		conf := ccs[cid]
 
 		if cm.Compile != nil {
-			c.classifyCompiler(n, cm.Compile, conf, fs)
+			c.classifyCompiler(cid, cm.Compile, conf, fs)
 		}
 		if cm.Run != nil {
-			c.classifyRun(n, cm.Run)
+			c.classifyRun(cid, cm.Run)
 		}
 	}
 }
 
-func (c *subjectAnalysis) classifyCompiler(cidstr string, cm *compilation.CompileResult, conf compiler.Instance, fs FilterSet) {
-	c.clogs[cidstr] = c.compileLog(cm)
-	st, err := fs.FilteredStatus(cm.Status, conf, c.clogs[cidstr])
+func (c *subjectAnalysis) classifyCompiler(cid id.ID, cm *compilation.CompileResult, conf compiler.Instance, fs FilterSet) {
+	c.clogs[cid] = c.compileLog(cm)
+	st, err := fs.FilteredStatus(cm.Status, conf, c.clogs[cid])
 	if err != nil {
 		// TODO(@MattWindsor91): do something about this!!
 		return
 	}
-	c.logCompileStatus(st, cidstr)
+	c.logCompileStatus(cid, st)
 
 	c.cspan.Union(cm.Timespan)
 	if d := cm.Timespan.Duration(); d != 0 && st.CountsForTiming() {
-		c.ctimes[cidstr] = append(c.ctimes[cidstr], d)
+		c.ctimes[cid] = append(c.ctimes[cid], d)
 	}
 }
 
@@ -85,20 +87,20 @@ func (c *subjectAnalysis) compileLog(cm *compilation.CompileResult) string {
 	return string(log)
 }
 
-func (c *subjectAnalysis) classifyRun(cidstr string, r *compilation.RunResult) {
+func (c *subjectAnalysis) classifyRun(cid id.ID, r *compilation.RunResult) {
 	// If we've already filtered this run out, don't unfilter it.
-	if !(c.cflags[cidstr].MatchesStatus(status.Filtered)) {
-		c.logCompileStatus(r.Status, cidstr)
+	if !(c.cflags[cid].MatchesStatus(status.Filtered)) {
+		c.logCompileStatus(cid, r.Status)
 	}
 
 	c.rspan.Union(r.Timespan)
 	if d := r.Timespan.Duration(); d != 0 && r.Status.CountsForTiming() {
-		c.rtimes[cidstr] = append(c.rtimes[cidstr], d)
+		c.rtimes[cid] = append(c.rtimes[cid], d)
 	}
 }
 
-func (c *subjectAnalysis) logCompileStatus(s status.Status, cidstr string) {
+func (c *subjectAnalysis) logCompileStatus(cid id.ID, s status.Status) {
 	sf := s.Flag()
 	c.flags |= sf
-	c.cflags[cidstr] |= sf
+	c.cflags[cid] |= sf
 }

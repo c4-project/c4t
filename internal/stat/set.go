@@ -11,6 +11,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
 	"github.com/c4-project/c4t/internal/copier"
@@ -37,7 +39,7 @@ type Set struct {
 	SessionStartTime time.Time `json:"session_start_time,omitempty"`
 
 	// Machines is a map from machine IDs to statistics about those machines.
-	Machines map[string]Machine `json:"machines,omitempty"`
+	Machines map[id.ID]Machine `json:"machines,omitempty"`
 }
 
 // OnCycle incorporates cycle information from c into the statistics set.
@@ -80,12 +82,11 @@ func (s *Set) OnPrepare(director.PrepareMessage) {}
 // liftCycle lifts an operation on a cycle c, handling making sure the machine exists, translating the ID, etc.
 func (s *Set) liftCycle(c director.Cycle, f func(m *Machine)) {
 	if s.Machines == nil {
-		s.Machines = make(map[string]Machine)
+		s.Machines = make(map[id.ID]Machine)
 	}
-	mid := c.MachineID.String()
-	mach := s.Machines[mid]
+	mach := s.Machines[c.MachineID]
 	f(&mach)
-	s.Machines[mid] = mach
+	s.Machines[c.MachineID] = mach
 }
 
 // ResetForSession resets statistics in s that are session-specific.

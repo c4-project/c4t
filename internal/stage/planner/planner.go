@@ -49,8 +49,9 @@ func New(src Source, opts ...Option) (*Planner, error) {
 	return p, err
 }
 
-// Plan runs the test planner p.
-func (p *Planner) Plan(ctx context.Context, ms machine.ConfigMap, fs ...string) (map[string]plan.Plan, error) {
+// Plan runs the test planner on the given fileset fs and config ms.
+// It returns, on success, a map from machine IDs to their test plans.
+func (p *Planner) Plan(ctx context.Context, ms machine.ConfigMap, fs ...string) (plan.Map, error) {
 	// Early out to prevent us from doing any planning if we received no files.
 	if len(fs) == 0 {
 		return nil, corpus.ErrNone
@@ -65,25 +66,21 @@ func (p *Planner) Plan(ctx context.Context, ms machine.ConfigMap, fs ...string) 
 		return nil, err
 	}
 
-	return p.planWithCorpus(ctx, ms, start, corp)
+	return p.planWithCorpus(ms, start, corp)
 }
 
-func (p *Planner) planWithCorpus(ctx context.Context, ms machine.ConfigMap, start time.Time, corp corpus.Corpus) (map[string]plan.Plan, error) {
-	ps := make(map[string]plan.Plan, len(ms))
+func (p *Planner) planWithCorpus(ms machine.ConfigMap, start time.Time, corp corpus.Corpus) (plan.Map, error) {
+	ps := make(plan.Map, len(ms))
+	var err error
 	for n, m := range ms {
-		nid, err := id.TryFromString(n)
-		if err != nil {
-			return nil, err
-		}
-		ps[n], err = p.makeMachinePlan(ctx, start, nid, m, corp)
-		if err != nil {
+		if ps[n], err = p.makeMachinePlan(start, n, m, corp); err != nil {
 			return nil, err
 		}
 	}
 	return ps, nil
 }
 
-func (p *Planner) makeMachinePlan(ctx context.Context, start time.Time, mid id.ID, m machine.Config, corp corpus.Corpus) (plan.Plan, error) {
+func (p *Planner) makeMachinePlan(start time.Time, mid id.ID, m machine.Config, corp corpus.Corpus) (plan.Plan, error) {
 	var (
 		pn  plan.Plan
 		err error
@@ -100,7 +97,7 @@ func (p *Planner) makeMachinePlan(ctx context.Context, start time.Time, mid id.I
 	}
 
 	p.announce(Message{Kind: KindPlanningCompilers, MachineID: mid})
-	pn.Compilers, err = p.planCompilers(ctx, mid)
+	pn.Compilers, err = p.planCompilers(m)
 	if err != nil {
 		return pn, err
 	}

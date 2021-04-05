@@ -6,18 +6,19 @@
 package planner
 
 import (
-	"context"
 	"fmt"
+
+	"github.com/c4-project/c4t/internal/machine"
 
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 
 	"github.com/c4-project/c4t/internal/id"
 )
 
-// CompilerLister is the interface of things that can query compiler information.
+// CompilerLister is the interface of things that can query compiler information for a particular machine.
 type CompilerLister interface {
-	// ListCompilers asks the compiler inspector to list all available compilers on machine ID mid.
-	ListCompilers(ctx context.Context, mid id.ID) (map[string]compiler.Compiler, error)
+	// Compilers asks the compiler inspector to list all available compilers.
+	Compilers() (map[id.ID]compiler.Compiler, error)
 }
 
 //go:generate mockery --name=CompilerLister
@@ -30,23 +31,20 @@ type CompilerPlanner struct {
 	Filter id.ID
 	// Observers contains observers for the CompilerPlanner.
 	Observers []compiler.Observer
-	// MachineID is the identifier of the machine for which we are making a plan.
-	MachineID id.ID
 }
 
-func (p *Planner) planCompilers(ctx context.Context, nid id.ID) (map[string]compiler.Instance, error) {
+func (p *Planner) planCompilers(m machine.Config) (compiler.InstanceMap, error) {
 	c := CompilerPlanner{
 		Filter:    id.FromString(p.filter),
-		Lister:    p.source.CLister,
 		Observers: lowerToCompiler(p.observers),
-		MachineID: nid,
+		Lister:    &m,
 	}
-	return c.Plan(ctx)
+	return c.Plan()
 }
 
 // Plan constructs the compiler set for a plan.
-func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Instance, error) {
-	cfgs, err := c.Lister.ListCompilers(ctx, c.MachineID)
+func (c *CompilerPlanner) Plan() (compiler.InstanceMap, error) {
+	cfgs, err := c.Lister.Compilers()
 	if err != nil {
 		return nil, fmt.Errorf("listing compilers: %w", err)
 	}
@@ -58,13 +56,10 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Instanc
 	nenabled := resolveDisabled(cfgs)
 	compiler.OnCompilerConfigStart(nenabled, c.Observers...)
 
-	cmps := make(map[string]compiler.Instance, len(cfgs))
+	cmps := make(compiler.InstanceMap, len(cfgs))
 	i := 0
 	for n, cfg := range cfgs {
-		nc, err := c.maybePlanCompiler(cmps, n, cfg)
-		if err != nil {
-			return nil, err
-		}
+		nc := c.maybePlanCompiler(cmps, n, cfg)
 		if nc != nil {
 			compiler.OnCompilerConfigStep(i, *nc, c.Observers...)
 		}
@@ -76,7 +71,7 @@ func (c *CompilerPlanner) Plan(ctx context.Context) (map[string]compiler.Instanc
 	return cmps, nil
 }
 
-func (c *CompilerPlanner) filterCompilers(in map[string]compiler.Compiler) (map[string]compiler.Compiler, error) {
+func (c *CompilerPlanner) filterCompilers(in map[id.ID]compiler.Compiler) (map[id.ID]compiler.Compiler, error) {
 	if c.Filter.IsEmpty() {
 		return in, nil
 	}
@@ -84,10 +79,10 @@ func (c *CompilerPlanner) filterCompilers(in map[string]compiler.Compiler) (map[
 	if err != nil {
 		return nil, err
 	}
-	return out.(map[string]compiler.Compiler), nil
+	return out.(map[id.ID]compiler.Compiler), nil
 }
 
-func resolveDisabled(cfgs map[string]compiler.Compiler) (nenabled int) {
+func resolveDisabled(cfgs map[id.ID]compiler.Compiler) (nenabled int) {
 	// TODO(@MattWindsor91): automatic disabling
 	for _, cfg := range cfgs {
 		if !cfg.Disabled {
@@ -97,17 +92,11 @@ func resolveDisabled(cfgs map[string]compiler.Compiler) (nenabled int) {
 	return nenabled
 }
 
-func (c *CompilerPlanner) maybePlanCompiler(into map[string]compiler.Instance, n string, cfg compiler.Compiler) (*compiler.Named, error) {
+func (c *CompilerPlanner) maybePlanCompiler(into compiler.InstanceMap, nid id.ID, cfg compiler.Compiler) *compiler.Named {
 	if cfg.Disabled {
-		return nil, nil
+		return nil
 	}
-
-	nid, err := id.TryFromString(n)
-	if err != nil {
-		return nil, fmt.Errorf("%s not a valid ID: %w", n, err)
-	}
-
 	// Everything that used to be here is now in the perturber.
-	into[n] = compiler.Instance{Compiler: cfg}
-	return into[n].AddName(nid), nil
+	into[nid] = compiler.Instance{Compiler: cfg}
+	return into[nid].AddName(nid)
 }

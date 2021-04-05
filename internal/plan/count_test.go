@@ -8,6 +8,8 @@ package plan_test
 import (
 	"fmt"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 	"github.com/c4-project/c4t/internal/plan"
 	"github.com/c4-project/c4t/internal/subject/corpus"
@@ -16,10 +18,10 @@ import (
 // ExamplePlan_MaxNumRecipes is a testable example for MaxNumRecipes.
 func ExamplePlan_MaxNumRecipes() {
 	p := plan.Plan{
-		Compilers: map[string]compiler.Instance{
-			"gcc1": compiler.MockX86Gcc(),
-			"gcc2": compiler.MockX86Gcc(), // same architecture
-			"gcc3": compiler.MockPower9GCCOpt(),
+		Compilers: compiler.InstanceMap{
+			id.FromString("gcc1"): compiler.MockX86Gcc(),
+			id.FromString("gcc2"): compiler.MockX86Gcc(), // same architecture
+			id.FromString("gcc3"): compiler.MockPower9GCCOpt(),
 		},
 		Corpus: corpus.New("foo", "bar", "baz"),
 	}
@@ -32,10 +34,10 @@ func ExamplePlan_MaxNumRecipes() {
 // ExamplePlan_NumExpCompilations is a testable example for NumExpCompilations.
 func ExamplePlan_NumExpCompilations() {
 	p := plan.Plan{
-		Compilers: map[string]compiler.Instance{
-			"gcc1": compiler.MockX86Gcc(),
-			"gcc2": compiler.MockX86Gcc(),
-			"gcc3": compiler.MockPower9GCCOpt(),
+		Compilers: compiler.InstanceMap{
+			id.FromString("gcc1"): compiler.MockX86Gcc(),
+			id.FromString("gcc2"): compiler.MockX86Gcc(),
+			id.FromString("gcc3"): compiler.MockPower9GCCOpt(),
 		},
 		Corpus: corpus.New("foo", "bar", "baz"),
 	}

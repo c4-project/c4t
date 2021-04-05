@@ -7,8 +7,9 @@ package perturber_test
 
 import (
 	"context"
-	"sort"
 	"testing"
+
+	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/c4-project/c4t/internal/mutation"
 
@@ -123,9 +124,7 @@ func TestPerturber_Run(t *testing.T) {
 		return n == clen
 	}).Return().Once()
 	mockOnCompilerConfig(&mo, observing.BatchStep, func(_ int, nc *compiler.Named) bool {
-		i := sort.Search(clen, func(i int) bool {
-			return !cids[i].Less(nc.ID)
-		})
+		i := id.SearchSlice(cids, nc.ID)
 		return i < clen && cids[i].Equal(nc.ID)
 	}).Return().Times(clen)
 	mockOnCompilerConfig(&mo, observing.BatchEnd, func(int, *compiler.Named) bool {

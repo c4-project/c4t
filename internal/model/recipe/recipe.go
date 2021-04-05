@@ -8,6 +8,8 @@ package recipe
 
 import (
 	"path"
+
+	"github.com/c4-project/c4t/internal/id"
 )
 
 // Recipe represents information about a lifted test recipe.
@@ -47,3 +49,6 @@ func (r *Recipe) Paths() []string {
 func (r *Recipe) NeedsCompile() bool {
 	return r.Output != OutNothing
 }
+
+// Map is shorthand from a map from architecture IDs to recipes.
+type Map map[id.ID]Recipe

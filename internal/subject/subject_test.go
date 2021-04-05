@@ -49,12 +49,12 @@ func ExampleSubject_BestLitmus() {
 
 // ExampleSubject_CompileResult is a testable example for CompileResult.
 func ExampleSubject_CompileResult() {
-	s := subject.Subject{Compilations: map[string]compilation.Compilation{
-		"gcc": {
+	s := subject.Subject{Compilations: compilation.Map{
+		id.FromString("gcc"): {
 			Compile: &compilation.CompileResult{
 				Result: compilation.Result{Status: status.Ok}, Files: compilation.CompileFileset{Bin: "a.out", Log: "gcc.log"},
 			}},
-		"clang": {
+		id.FromString("clang"): {
 			Compile: &compilation.CompileResult{
 				Result: compilation.Result{Status: status.CompileFail}, Files: compilation.CompileFileset{Bin: "a.out", Log: "clang.log"},
 			}},
@@ -72,9 +72,9 @@ func ExampleSubject_CompileResult() {
 
 // ExampleSubject_Recipe is a testable example for Recipe.
 func ExampleSubject_Recipe() {
-	s := subject.Subject{Recipes: map[string]recipe.Recipe{
-		"x86.64": {Dir: "foo", Files: []string{"bar", "baz"}},
-		"arm":    {Dir: "foobar", Files: []string{"barbaz"}},
+	s := subject.Subject{Recipes: recipe.Map{
+		id.ArchX8664: {Dir: "foo", Files: []string{"bar", "baz"}},
+		id.ArchArm:   {Dir: "foobar", Files: []string{"barbaz"}},
 	}}
 	xsn, xs, _ := s.Recipe(id.ArchX8664)
 	asn, as, _ := s.Recipe(id.ArchArm)
@@ -98,12 +98,12 @@ func ExampleSubject_Recipe() {
 
 // ExampleSubject_RunResult is a testable example for Subject.RunResult.
 func ExampleSubject_RunResult() {
-	s := subject.Subject{Compilations: map[string]compilation.Compilation{
-		"gcc": {
+	s := subject.Subject{Compilations: compilation.Map{
+		id.FromString("gcc"): {
 			Run: &compilation.RunResult{
 				Result: compilation.Result{Status: status.Ok},
 			}},
-		"clang": {
+		id.FromString("clang"): {
 			Run: &compilation.RunResult{
 				Result: compilation.Result{Status: status.RunTimeout},
 			}},
@@ -128,7 +128,7 @@ func TestSubject_CompileResult_Missing(t *testing.T) {
 	_, err := s.CompileResult(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompilation, "missing compilations")
 
-	s.Compilations = map[string]compilation.Compilation{"gcc": {}}
+	s.Compilations = compilation.Map{id.FromString("gcc"): {}}
 	_, err = s.CompileResult(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompile, "missing compile result path")
 }
@@ -209,7 +209,7 @@ func TestSubject_RunOf_Missing(t *testing.T) {
 	_, err := s.RunResult(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingCompilation, "missing compilation")
 
-	s.Compilations = map[string]compilation.Compilation{"gcc": {}}
+	s.Compilations = compilation.Map{id.FromString("gcc"): {}}
 	_, err = s.RunResult(id.FromString("gcc"))
 	testhelp.ExpectErrorIs(t, err, subject.ErrMissingRun, "missing run result")
 }

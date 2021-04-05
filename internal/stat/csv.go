@@ -7,11 +7,10 @@ package stat
 
 import (
 	"encoding/csv"
-	"sort"
+
+	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/c4-project/c4t/internal/subject/status"
-
-	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // DumpMutationCSVHeader dumps into w a CSV header for mutation analysis.
@@ -34,11 +33,10 @@ func (s *Set) DumpMutationCSVHeader(w *csv.Writer) error {
 // Each machine record has its lines prefixed by its machine ID, is flushed separately, and appears in ID order.
 // If total is true, the multi-session totals will be dumped; otherwise, this session's totals will be dumped.
 func (s *Set) DumpMutationCSV(w *csv.Writer, total bool) error {
-	mids, err := stringhelp.MapKeys(s.Machines)
+	mids, err := id.MapKeys(s.Machines)
 	if err != nil {
 		return err
 	}
-	sort.Strings(mids)
 
 	for _, mid := range mids {
 		sm := s.Machines[mid]
@@ -53,16 +51,16 @@ func (s *Set) DumpMutationCSV(w *csv.Writer, total bool) error {
 // Each line in the record has mid as a prefix.
 // If total is true, the multi-session totals will be dumped; otherwise, this session's totals will be dumped.
 // The writer is flushed at the end of this dump.
-func (m *Machine) DumpMutationCSV(w *csv.Writer, mid string, total bool) error {
+func (m *Machine) DumpMutationCSV(w *csv.Writer, machine id.ID, total bool) error {
 	if total {
-		return m.Total.DumpMutationCSV(w, mid)
+		return m.Total.DumpMutationCSV(w, machine)
 	}
-	return m.Session.DumpMutationCSV(w, mid)
+	return m.Session.DumpMutationCSV(w, machine)
 }
 
 // DumpMutationCSV dumps into w a CSV representation of the mutation statistics in this machine span.
 // Each line in the record has mid as a prefix.
 // The writer is flushed at the end of this dump.
-func (m *MachineSpan) DumpMutationCSV(w *csv.Writer, mid string) error {
-	return m.Mutation.DumpCSV(w, mid)
+func (m *MachineSpan) DumpMutationCSV(w *csv.Writer, machine id.ID) error {
+	return m.Mutation.DumpCSV(w, machine)
 }

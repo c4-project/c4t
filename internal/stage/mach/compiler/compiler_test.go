@@ -89,8 +89,8 @@ func TestCompiler_Run(t *testing.T) {
 				Cores: 4,
 			},
 		},
-		Compilers: map[string]mdl.Instance{
-			"gcc": cmp,
+		Compilers: map[id.ID]mdl.Instance{
+			id.FromString("gcc"): cmp,
 		},
 		Corpus: c,
 	}

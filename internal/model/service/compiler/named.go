@@ -24,15 +24,6 @@ func (c Instance) AddName(name id.ID) *Named {
 	return &Named{ID: name, Instance: c}
 }
 
-// AddNameString tries to resolve name into an ID then name this Instance with it.
-func (c Instance) AddNameString(name string) (*Named, error) {
-	nid, err := id.TryFromString(name)
-	if err != nil {
-		return nil, err
-	}
-	return c.AddName(nid), err
-}
-
 // FullID gets a fully qualified identifier for this configuration, consisting of the compiler name, followed by
 // 'oOpt' where 'Opt' is its selected optimisation name, and 'mMopt' where 'Mopt' is its selected machine profile.
 //

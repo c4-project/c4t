@@ -6,10 +6,13 @@
 package compiler
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/c4-project/c4t/internal/mutation"
 
@@ -23,6 +26,9 @@ const (
 	// varMutant is the interpolation variable for mutant IDs.
 	varMutant = "mutant"
 )
+
+// ErrCompilerMissing occurs when we can't find the compiler with a given name.
+var ErrCompilerMissing = errors.New("compiler not found")
 
 // Instance represents a fully configured instance of a compiler.
 type Instance struct {
@@ -93,4 +99,29 @@ func (c Instance) Interpolations() map[string]string {
 
 func (c Instance) unixTimeString() string {
 	return strconv.FormatInt(c.ConfigTime.Unix(), 10)
+}
+
+// InstanceMap is shorthand for a map from compiler IDs to instantiated compilers.
+type InstanceMap map[id.ID]Instance
+
+// Map maps f over the compiler at ID cid.  It errors if cid doesn't exist, or if f fails.
+func (m InstanceMap) Map(cid id.ID, f func(*Instance) error) error {
+	inst, err := m.Get(cid)
+	if err != nil {
+		return err
+	}
+	if err := f(&inst); err != nil {
+		return err
+	}
+	m[cid] = inst
+	return nil
+}
+
+// Get is a wrapper around map getting that returns ErrCompilerMissing if cid doesn't exist.
+func (m InstanceMap) Get(cid id.ID) (Instance, error) {
+	inst, ok := m[cid]
+	if !ok {
+		return inst, fmt.Errorf("%w: %s", ErrCompilerMissing, cid)
+	}
+	return inst, nil
 }

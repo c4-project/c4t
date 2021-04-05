@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/mutation"
 
 	"github.com/c4-project/c4t/internal/plan"
@@ -29,7 +31,7 @@ type Analysis struct {
 	ByStatus map[status.Status]corpus.Corpus
 
 	// Compilers maps each compiler ID (or full-ID, depending on configuration) to an analysis of that compiler.
-	Compilers map[string]Compiler
+	Compilers map[id.ID]Compiler
 
 	// Flags aggregates all flags found during the analysis.
 	Flags status.Flag
@@ -62,7 +64,7 @@ func newAnalysis(p *plan.Plan) *Analysis {
 	return &Analysis{
 		Plan:      p,
 		ByStatus:  make(map[status.Status]corpus.Corpus, status.Last),
-		Compilers: make(map[string]Compiler, len(p.Compilers)),
+		Compilers: make(map[id.ID]Compiler, len(p.Compilers)),
 		Mutation:  make(mutation.Analysis),
 	}
 }

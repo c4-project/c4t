@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/subject/status"
 
 	"github.com/c4-project/c4t/internal/mutation"
@@ -19,8 +21,8 @@ import (
 // ExampleSet_DumpMutationCSV is a runnable example for Set.DumpMutationCSV.
 func ExampleSet_DumpMutationCSV() {
 	s := stat.Set{
-		Machines: map[string]stat.Machine{
-			"foo": {
+		Machines: map[id.ID]stat.Machine{
+			id.FromString("foo"): {
 				Session: stat.MachineSpan{
 					Mutation: stat.Mutation{
 						ByIndex: map[mutation.Index]stat.Mutant{
@@ -40,7 +42,7 @@ func ExampleSet_DumpMutationCSV() {
 					},
 				},
 			},
-			"bar": {
+			id.FromString("bar"): {
 				Total: stat.MachineSpan{
 					Mutation: stat.Mutation{
 						ByIndex: map[mutation.Index]stat.Mutant{

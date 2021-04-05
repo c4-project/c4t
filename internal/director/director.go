@@ -97,8 +97,8 @@ func (d *Director) initInstances() error {
 	// This is a bit weird, but necessary at the moment to solve a race involving instance observers.
 	OnPrepare(PrepareInstancesMessage(len(d.instances)), LowerToPrepare(d.observers)...)
 
-	for midstr, c := range d.machines {
-		if err := d.initInstance(i, midstr, c); err != nil {
+	for mid, mc := range d.machines {
+		if err := d.initInstance(i, mid, mc); err != nil {
 			return err
 		}
 		i++
@@ -106,20 +106,16 @@ func (d *Director) initInstances() error {
 	return nil
 }
 
-func (d *Director) initInstance(i int, midstr string, c machine.Config) error {
-	mid, err := id.TryFromString(midstr)
-	if err != nil {
-		return err
-	}
+func (d *Director) initInstance(i int, mid id.ID, mc machine.Config) error {
 	obs, err := d.instanceObservers(mid)
 	if err != nil {
 		return err
 	}
 	m := Machine{
 		ID:         mid,
-		Config:     c,
+		Config:     mc,
 		Pathset:    d.paths.Instance(mid),
-		Quantities: d.machineQuantities(&c),
+		Quantities: d.machineQuantities(&mc),
 	}
 	d.instances[i] = Instance{
 		Index:        i,
@@ -172,7 +168,7 @@ func (d *Director) Direct(ctx context.Context) error {
 	return d.runLoops(ctx, pn)
 }
 
-func (d *Director) plan(ctx context.Context) (map[string]plan.Plan, error) {
+func (d *Director) plan(ctx context.Context) (plan.Map, error) {
 	p, err := d.makePlanner()
 	if err != nil {
 		return nil, fmt.Errorf("when making planner: %w", err)
@@ -188,7 +184,7 @@ func (d *Director) makePlanner() (*planner.Planner, error) {
 	)
 }
 
-func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) error {
+func (d *Director) runLoops(ctx context.Context, plans plan.Map) error {
 	// Doing this here so that the perceived experiment length is always at or slightly above the timeout interval.
 	start := time.Now()
 	cctx, cancel := d.quantities.GlobalTimeout.OnContext(ctx)
@@ -199,7 +195,7 @@ func (d *Director) runLoops(ctx context.Context, plans map[string]plan.Plan) err
 	eg, ectx := errgroup.WithContext(cctx)
 	for _, m := range d.instances {
 		m := m
-		m.Machine.InitialPlan = plans[m.Machine.ID.String()]
+		m.Machine.InitialPlan = plans[m.Machine.ID]
 		eg.Go(func() error { return m.Run(ectx) })
 	}
 	return eg.Wait()

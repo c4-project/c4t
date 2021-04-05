@@ -9,6 +9,8 @@ package config
 import (
 	"io"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/model/service/backend"
 	"github.com/pelletier/go-toml"
 
@@ -29,8 +31,8 @@ type Config struct {
 	// backends by trying each backend specification in order.
 	Backends []backend.NamedSpec `toml:"backends,omitempty"`
 
-	// Machines enumerates the machines available for testing.
-	Machines machine.ConfigMap `toml:"machines,omitempty"`
+	// RawMachines contains raw config for the machines available for testing.
+	RawMachines map[string]machine.Config `toml:"machines,omitempty"`
 
 	// Quantities gives the default quantities for the director.
 	Quantities quantity.RootSet `toml:"quantities,omitempty"`
@@ -43,6 +45,21 @@ type Config struct {
 
 	// Paths contains path configuration for the config file.
 	Paths Pathset `toml:"paths,omitempty"`
+}
+
+// Machines gets the checked, fully processed machine config map.
+//
+// So far, this just makes sure IDs are ok.
+func (c *Config) Machines() (machine.ConfigMap, error) {
+	ms := make(machine.ConfigMap, len(c.RawMachines))
+	for k, v := range c.RawMachines {
+		mid, err := id.TryFromString(k)
+		if err != nil {
+			return nil, err
+		}
+		ms[mid] = v
+	}
+	return ms, nil
 }
 
 // FindBackend uses the configuration to find a backend matching criteria cr.

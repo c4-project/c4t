@@ -42,8 +42,7 @@ type Plan struct {
 	Backend *backend2.NamedSpec `json:"backend,omitempty"`
 
 	// Compilers represents the compilers to be targeted by this plan.
-	// Each compiler's key is a stringified form of its machine CompilerID.
-	Compilers map[string]compiler.Instance `json:"compilers"`
+	Compilers compiler.InstanceMap `json:"compilers"`
 
 	// Corpus contains each test corpus entry chosen for this plan.
 	Corpus corpus.Corpus `json:"corpus"`
@@ -89,10 +88,10 @@ func (p *Plan) Arches() []id.ID {
 	return ids
 }
 
-func (p *Plan) archSet() map[string]struct{} {
-	amap := make(map[string]struct{})
+func (p *Plan) archSet() map[id.ID]struct{} {
+	amap := make(map[id.ID]struct{})
 	for _, c := range p.Compilers {
-		amap[c.Arch.String()] = struct{}{}
+		amap[c.Arch] = struct{}{}
 	}
 	return amap
 }
@@ -126,3 +125,6 @@ func (p *Plan) SetMutant(m mutation.Mutant) {
 		p.Mutation.Selection = m
 	}
 }
+
+// Map is shorthand for a map from machine IDs to plans.
+type Map map[id.ID]Plan

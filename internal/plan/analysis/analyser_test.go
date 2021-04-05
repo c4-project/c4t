@@ -11,6 +11,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/plan/analysis"
 
 	"github.com/stretchr/testify/assert"
@@ -100,9 +102,9 @@ func TestAnalyse_filtered(t *testing.T) {
 	t.Parallel()
 
 	m := plan.Mock()
-	cgcc := m.Corpus["bar"].Compilations["gcc"]
+	cgcc := m.Corpus["bar"].Compilations[id.FromString("gcc")]
 	cgcc.Compile.Files.Log = filepath.Join("testdata", "filter_trip.log")
-	m.Corpus["bar"].Compilations["gcc"] = cgcc
+	m.Corpus["bar"].Compilations[id.FromString("gcc")] = cgcc
 
 	crp, err := analysis.Analyse(context.Background(), m, analysis.WithFiltersFromFile(filepath.Join("testdata", "filters.yaml")))
 	require.NoError(t, err, "unexpected error analysing")
@@ -110,7 +112,7 @@ func TestAnalyse_filtered(t *testing.T) {
 	// We need to trim space because the log may have a trailing newline, which comes across as \n on Unix and \r\n on
 	// Windows.
 	// TODO(@MattWindsor91): consider normalising newlines on compiler logs
-	lg := strings.TrimSpace(crp.Compilers["gcc"].Logs["bar"])
+	lg := strings.TrimSpace(crp.Compilers[id.FromString("gcc")].Logs["bar"])
 
 	assert.Equal(t, "error: invalid memory model for ‘__atomic_exchange’", lg, "log not as expected")
 	assert.Contains(t, crp.ByStatus[status.Filtered], "bar", "bar should have been filtered")

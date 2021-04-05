@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/timing"
 
 	"github.com/c4-project/c4t/internal/mutation"
@@ -91,12 +93,12 @@ func (m Mutation) MutantsWhere(pred func(m Mutant) bool) []mutation.Mutant {
 }
 
 // DumpMutationCSV dumps into w a CSV representation of this mutation statistics set.
-// Each line in the record has mid as a prefix.
+// Each line in the record has machine as a prefix.
 // The writer is flushed at the end of this dump.
-func (m *Mutation) DumpCSV(w *csv.Writer, mid string) error {
+func (m *Mutation) DumpCSV(w *csv.Writer, machine id.ID) error {
 	var err error
 	for _, mut := range m.Mutants() {
-		if err = m.dumpMutant(w, mid, mut, m.ByIndex[mut.Index]); err != nil {
+		if err = m.dumpMutant(w, machine, mut, m.ByIndex[mut.Index]); err != nil {
 			break
 		}
 	}
@@ -165,10 +167,10 @@ func (m *Mutant) ensure() {
 	}
 }
 
-func (m *Mutation) dumpMutant(w *csv.Writer, machname string, mut mutation.Mutant, mstats Mutant) error {
+func (m *Mutation) dumpMutant(w *csv.Writer, machine id.ID, mut mutation.Mutant, mstats Mutant) error {
 	mstats.ensure()
 	cells := []string{
-		machname,
+		machine.String(),
 		fint(uint64(mut.Index)),
 		mut.Name.String(),
 		fint(mstats.Selections.Count),

@@ -101,11 +101,16 @@ func run(ctx *c.Context, outw, errw io.Writer) error {
 }
 
 func machines(ctx *c.Context, cfg *config.Config) (machine.ConfigMap, error) {
+	// TODO(@MattWindsor91): maybe merge Filter into Machines.
+	ms, err := cfg.Machines()
+	if err != nil {
+		return nil, err
+	}
 	midstr := ctx.String(flagMachineFilter)
 	if ystring.IsBlank(midstr) {
-		return cfg.Machines, nil
+		return ms, nil
 	}
-	return globbedMachines(midstr, cfg.Machines)
+	return globbedMachines(midstr, ms)
 }
 
 func globbedMachines(midstr string, configMap machine.ConfigMap) (machine.ConfigMap, error) {
@@ -116,7 +121,7 @@ func globbedMachines(midstr string, configMap machine.ConfigMap) (machine.Config
 	return configMap.Filter(mid)
 }
 
-func outDir(ctx *c.Context, ms map[string]machine.Config) (string, error) {
+func outDir(ctx *c.Context, ms machine.ConfigMap) (string, error) {
 	dir := stdflag.OutDirFromCli(ctx)
 	if ystring.IsBlank(dir) && len(ms) != 1 {
 		return "", fmt.Errorf("must specify directory if planning multiple machines (have %d)", len(ms))
@@ -124,7 +129,7 @@ func outDir(ctx *c.Context, ms map[string]machine.Config) (string, error) {
 	return dir, nil
 }
 
-func writePlans(outw io.Writer, outdir string, ps map[string]plan.Plan) error {
+func writePlans(outw io.Writer, outdir string, ps plan.Map) error {
 	// Assuming that outDir above has dealt with the case whereby there is no output directory but multiple plans.
 	if ystring.IsBlank(outdir) {
 		return writePlansToWriter(outw, ps)
@@ -132,7 +137,7 @@ func writePlans(outw io.Writer, outdir string, ps map[string]plan.Plan) error {
 	return writePlansToDir(outdir, ps)
 }
 
-func writePlansToWriter(w io.Writer, ps map[string]plan.Plan) error {
+func writePlansToWriter(w io.Writer, ps plan.Map) error {
 	for _, p := range ps {
 		if err := p.Write(w, plan.WriteHuman); err != nil {
 			return err
@@ -141,7 +146,7 @@ func writePlansToWriter(w io.Writer, ps map[string]plan.Plan) error {
 	return nil
 }
 
-func writePlansToDir(outdir string, ps map[string]plan.Plan) error {
+func writePlansToDir(outdir string, ps plan.Map) error {
 	if err := yos.MakeDir(outdir); err != nil {
 		return err
 	}
@@ -172,9 +177,8 @@ func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.P
 
 func source(a planner.SubjectProber, cfg *config.Config) planner.Source {
 	return planner.Source{
-		BProbe:  cfg,
-		CLister: cfg.Machines,
-		SProbe:  a,
+		BProbe: cfg,
+		SProbe: a,
 	}
 }
 

@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/subject/normpath"
 
 	"github.com/c4-project/c4t/internal/subject/compilation"
@@ -70,48 +72,48 @@ func (n *Normaliser) fuzz(of *subject.Fuzz) *subject.Fuzz {
 	return &f
 }
 
-func (n *Normaliser) recipes(rs map[string]recipe.Recipe) map[string]recipe.Recipe {
+func (n *Normaliser) recipes(rs recipe.Map) recipe.Map {
 	if rs == nil {
 		return nil
 	}
 
-	nrs := make(map[string]recipe.Recipe, len(rs))
-	for archstr, r := range rs {
-		nrs[archstr] = n.recipe(archstr, r)
+	nrs := make(recipe.Map, len(rs))
+	for arch, r := range rs {
+		nrs[arch] = n.recipe(arch, r)
 	}
 	return nrs
 }
 
-func (n *Normaliser) recipe(archstr string, h recipe.Recipe) recipe.Recipe {
+func (n *Normaliser) recipe(arch id.ID, h recipe.Recipe) recipe.Recipe {
 	oldPaths := h.Paths()
-	h.Dir = normpath.RecipeDir(n.root, archstr)
+	h.Dir = normpath.RecipeDir(n.root, arch.String())
 	for i, np := range h.Paths() {
 		n.add(oldPaths[i], np, filekind.GuessFromFile(np), filekind.InRecipe)
 	}
 	return h
 }
 
-func (n *Normaliser) compilations(cs map[string]compilation.Compilation) map[string]compilation.Compilation {
+func (n *Normaliser) compilations(cs compilation.Map) compilation.Map {
 	if cs == nil {
 		return nil
 	}
-	ncs := make(map[string]compilation.Compilation, len(cs))
-	for cidstr, c := range cs {
-		ncs[cidstr] = n.compilation(cidstr, c)
+	ncs := make(compilation.Map, len(cs))
+	for cid, c := range cs {
+		ncs[cid] = n.compilation(cid, c)
 	}
 	return ncs
 }
 
-func (n *Normaliser) compilation(cidstr string, c compilation.Compilation) compilation.Compilation {
+func (n *Normaliser) compilation(compiler id.ID, c compilation.Compilation) compilation.Compilation {
 	if c.Compile != nil {
-		c.Compile = n.compile(cidstr, *c.Compile)
+		c.Compile = n.compile(compiler, *c.Compile)
 	}
 	return c
 }
 
-func (n *Normaliser) compile(cidstr string, c compilation.CompileResult) *compilation.CompileResult {
-	c.Files.Bin = n.replaceAndAdd(c.Files.Bin, filekind.Bin, filekind.InCompile, normpath.DirCompiles, cidstr, normpath.FileBin)
-	c.Files.Log = n.replaceAndAdd(c.Files.Log, filekind.Log, filekind.InCompile, normpath.DirCompiles, cidstr, normpath.FileCompileLog)
+func (n *Normaliser) compile(compiler id.ID, c compilation.CompileResult) *compilation.CompileResult {
+	c.Files.Bin = n.replaceAndAdd(c.Files.Bin, filekind.Bin, filekind.InCompile, normpath.DirCompiles, compiler.String(), normpath.FileBin)
+	c.Files.Log = n.replaceAndAdd(c.Files.Log, filekind.Log, filekind.InCompile, normpath.DirCompiles, compiler.String(), normpath.FileCompileLog)
 	return &c
 }
 

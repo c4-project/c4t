@@ -14,6 +14,8 @@ import (
 	"runtime/pprof"
 	"strings"
 
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
+
 	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
@@ -205,7 +207,11 @@ func runWithObs(ctx context.Context, cfg *config.Config, args args, a *c4f.Runne
 }
 
 func makeDirector(cfg *config.Config, glob id.ID, a *c4f.Runner, obs *directorobs.Obs) (*director.Director, error) {
-	return director.New(makeEnv(a, cfg), cfg.Machines, cfg.Paths.Inputs,
+	ms, err := cfg.Machines()
+	if err != nil {
+		return nil, err
+	}
+	return director.New(makeEnv(a, cfg), ms, cfg.Paths.Inputs,
 		director.ConfigFromGlobal(cfg),
 		director.FilterMachines(glob),
 		director.ObserveWith(obs.Observers()...),
@@ -227,15 +233,14 @@ func makeGlob(mfilter string) (id.ID, error) {
 	return id.TryFromString(mfilter)
 }
 
-func makeEnv(a *c4f.Runner, c *config.Config) director.Env {
+func makeEnv(a *c4f.Runner, c backend2.Finder) director.Env {
 	return director.Env{
 		Fuzzer:     a,
 		BResolver:  &backend.Resolve,
 		CInspector: &compiler.CResolve,
 		Planner: planner.Source{
-			BProbe:  c,
-			CLister: c.Machines,
-			SProbe:  a,
+			BProbe: c,
+			SProbe: a,
 		},
 	}
 }

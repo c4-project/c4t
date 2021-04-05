@@ -93,7 +93,7 @@ func (c Corpus) Names() []string {
 // EraseCompilations deletes the compilation entries for each subject in c.
 func (c Corpus) EraseCompilations() {
 	for n, s := range c {
-		s.Compilations = map[string]compilation.Compilation{}
+		s.Compilations = compilation.Map{}
 		c[n] = s
 	}
 }

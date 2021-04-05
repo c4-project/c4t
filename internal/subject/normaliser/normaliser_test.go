@@ -9,6 +9,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/subject/normpath"
 
 	"github.com/c4-project/c4t/internal/subject/compilation"
@@ -77,24 +79,24 @@ var testSubjects = map[string]func(root string) testCase{
 		h := func(arch, file string) string { return path.Join(root, normpath.DirRecipes, arch, file) }
 		return testCase{
 			in: subject.Subject{
-				Recipes: map[string]recipe.Recipe{
-					"arm": {
+				Recipes: recipe.Map{
+					id.ArchArm: {
 						Dir:   path.Join("burble", "armv8"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
-					"x86": {
+					id.ArchX86: {
 						Dir:   path.Join("burble", "i386"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
 				},
 			},
 			out: subject.Subject{
-				Recipes: map[string]recipe.Recipe{
-					"arm": {
+				Recipes: recipe.Map{
+					id.ArchArm: {
 						Dir:   normpath.RecipeDir(root, "arm"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
-					"x86": {
+					id.ArchX86: {
 						Dir:   normpath.RecipeDir(root, "x86"),
 						Files: []string{"inky.c", "pinky.c"},
 					},
@@ -112,8 +114,8 @@ var testSubjects = map[string]func(root string) testCase{
 		c := func(comp, file string) string { return path.Join(root, normpath.DirCompiles, comp, file) }
 		return testCase{
 			in: subject.Subject{
-				Compilations: map[string]compilation.Compilation{
-					"clang": {
+				Compilations: compilation.Map{
+					id.FromString("clang"): {
 						Compile: &compilation.CompileResult{
 							Result: compilation.Result{Status: status.Ok},
 							Files: compilation.CompileFileset{
@@ -122,7 +124,7 @@ var testSubjects = map[string]func(root string) testCase{
 							},
 						},
 					},
-					"gcc": {
+					id.FromString("gcc"): {
 						Compile: &compilation.CompileResult{
 							Result: compilation.Result{Status: status.Ok},
 							Files: compilation.CompileFileset{
@@ -134,8 +136,8 @@ var testSubjects = map[string]func(root string) testCase{
 				},
 			},
 			out: subject.Subject{
-				Compilations: map[string]compilation.Compilation{
-					"clang": {
+				Compilations: compilation.Map{
+					id.FromString("clang"): {
 						Compile: &compilation.CompileResult{
 							Result: compilation.Result{Status: status.Ok},
 							Files: compilation.CompileFileset{
@@ -144,7 +146,7 @@ var testSubjects = map[string]func(root string) testCase{
 							},
 						},
 					},
-					"gcc": {
+					id.FromString("gcc"): {
 						Compile: &compilation.CompileResult{
 							Result: compilation.Result{Status: status.Ok},
 							Files: compilation.CompileFileset{

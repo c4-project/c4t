@@ -6,11 +6,13 @@
 package id
 
 import (
+	"errors"
 	"reflect"
 	"sort"
-
-	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
+
+// ErrNotMap occurs when we try to use an ID map function on something that isn't an ID map.
+var ErrNotMap = errors.New("not a map with ID keys")
 
 // Sort sorts ids.
 func Sort(ids []ID) {
@@ -22,45 +24,62 @@ func Sort(ids []ID) {
 // MapKeys tries to get the keys of an ID-as-string map m as a sorted list.
 // It fails if m is not an ID-as-string map.
 func MapKeys(m interface{}) ([]ID, error) {
-	keys, err := stringhelp.SafeMapKeys(m)
+	ids, err := unsortedMapKeys(m)
 	if err != nil {
 		return nil, err
-	}
-
-	ids := make([]ID, len(keys))
-	for i := range keys {
-		var err error
-		if ids[i], err = tryFromValue(keys[i]); err != nil {
-			return nil, err
-		}
 	}
 
 	Sort(ids)
 	return ids, nil
 }
 
-// MapGlob filters a string map m to those keys that match glob when interpreted as IDs.
-func MapGlob(m interface{}, glob ID) (interface{}, error) {
-	mv, mt, err := stringhelp.CheckMap(m)
+func unsortedMapKeys(m interface{}) ([]ID, error) {
+	mv, _, err := checkMap(m)
 	if err != nil {
 		return nil, err
 	}
 
+	return unreflectIdSlice(mv.MapKeys()), nil
+}
+
+func unreflectIdSlice(kvs []reflect.Value) []ID {
+	// Assuming we have already checked the type.
+	ids := make([]ID, len(kvs))
+	for i, kv := range kvs {
+		ids[i] = kv.Interface().(ID)
+	}
+	return ids
+}
+
+// MapGlob filters a string map m to those keys that match glob when interpreted as IDs.
+func MapGlob(m interface{}, glob ID) (interface{}, error) {
+	mv, mt, err := checkMap(m)
+	if err != nil {
+		return nil, err
+	}
 	nm := reflect.MakeMap(mt)
-	for _, kstr := range mv.MapKeys() {
-		k, err := tryFromValue(kstr)
-		if err != nil {
-			return nil, err
-		}
-		match, err := k.Matches(glob)
+	for _, kv := range mv.MapKeys() {
+		match, err := kv.Interface().(ID).Matches(glob)
 		if err != nil {
 			return nil, err
 		}
 		if match {
-			nm.SetMapIndex(kstr, mv.MapIndex(kstr))
+			nm.SetMapIndex(kv, mv.MapIndex(kv))
 		}
 	}
 	return nm.Interface(), nil
+}
+
+func checkMap(m interface{}) (reflect.Value, reflect.Type, error) {
+	mv := reflect.ValueOf(m)
+	if mv.Kind() != reflect.Map {
+		return reflect.Value{}, nil, ErrNotMap
+	}
+	mt := mv.Type()
+	if mt.Key() != reflect.TypeOf(ID{}) {
+		return reflect.Value{}, nil, ErrNotMap
+	}
+	return mv, mt, nil
 }
 
 // LookupPrefix looks up id in map m by starting from the id itself, and progressively taking a smaller and smaller
@@ -68,14 +87,14 @@ func MapGlob(m interface{}, glob ID) (interface{}, error) {
 // If a lookup succeeded, LookupPrefix returns the matched key as key, the value as val, and true as ok;
 // else, it returns false, and the other two values are undefined.
 func LookupPrefix(m interface{}, id ID) (key ID, val interface{}, ok bool) {
-	mv, _, err := stringhelp.CheckMap(m)
+	mv, _, err := checkMap(m)
 	if err != nil {
 		return ID{}, nil, false
 	}
 
 	key = id
 	for ok = true; ok; key, _, ok = key.Unsnoc() {
-		vv := mv.MapIndex(reflect.ValueOf(key.String()))
+		vv := mv.MapIndex(reflect.ValueOf(key))
 		if vv.Kind() != reflect.Invalid {
 			return key, vv.Interface(), true
 		}
@@ -83,6 +102,10 @@ func LookupPrefix(m interface{}, id ID) (key ID, val interface{}, ok bool) {
 	return ID{}, nil, ok
 }
 
-func tryFromValue(v reflect.Value) (ID, error) {
-	return TryFromString(v.String())
+// SearchSlice finds the smallest index in haystack for which the ID at that index is greater than or equal to needle.
+// If there is no such index, it returns len(haystack).
+func SearchSlice(haystack []ID, needle ID) int {
+	return sort.Search(len(haystack), func(i int) bool {
+		return !haystack[i].Less(needle)
+	})
 }

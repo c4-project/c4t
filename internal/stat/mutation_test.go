@@ -82,7 +82,7 @@ func ExampleMutation_DumpCSV() {
 			42: {Info: mutation.NamedMutant(42, "FOO", 0), Selections: stat.Hitset{Count: 10}, Hits: stat.Hitset{Count: 1}, Kills: stat.Hitset{Count: 0}, Statuses: map[status.Status]uint64{status.Ok: 9, status.CompileTimeout: 1}},
 			53: {Info: mutation.NamedMutant(53, "BAR", 10), Selections: stat.Hitset{Count: 20}, Hits: stat.Hitset{Count: 400}, Kills: stat.Hitset{Count: 15}, Statuses: map[status.Status]uint64{status.Flagged: 15, status.CompileFail: 3, status.RunFail: 2}},
 		},
-	}).DumpCSV(csv.NewWriter(os.Stdout), "localhost")
+	}).DumpCSV(csv.NewWriter(os.Stdout), id.FromString("localhost"))
 
 	// Output:
 	// localhost,2,,1,0,0,0,1,0,0,0,0,0

@@ -19,12 +19,16 @@ import (
 func TabulateCompilers(t tabulator.Tabulator, c *config.Config) error {
 	setCompilerTableHeader(t)
 
-	ids, err := c.Machines.IDs()
+	ms, err := c.Machines()
 	if err != nil {
 		return err
 	}
-	for _, mid := range ids {
-		if err := TabulateCompilersForMachine(t, mid, c.Machines[mid.String()]); err != nil {
+	mids, err := ms.IDs()
+	if err != nil {
+		return err
+	}
+	for _, mid := range mids {
+		if err := TabulateCompilersForMachine(t, mid, ms[mid]); err != nil {
 			return err
 		}
 	}
@@ -50,7 +54,7 @@ func TabulateCompilersForMachine(t tabulator.Tabulator, mid id.ID, mc machine.Co
 
 	// TODO(@MattWindsor91): deterministic order here?
 	for _, cid := range cids {
-		addCompilerRow(t, mid, cs[cid.String()], cid)
+		addCompilerRow(t, mid, cs[cid], cid)
 	}
 
 	return err

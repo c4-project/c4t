@@ -24,14 +24,14 @@ func (c *Config) Probe(ctx context.Context, sr service.Runner, m machine.Prober)
 }
 
 func (c *Config) probeMachines(m machine.Prober) error {
-	if c.Machines == nil {
-		c.Machines = make(machine.ConfigMap)
+	if c.RawMachines == nil {
+		c.RawMachines = make(map[string]machine.Config)
 	}
 
 	hname := hostnameOrDefault(m)
 	var err error
-	if _, ok := c.Machines[hname]; !ok {
-		c.Machines[hname], err = probeConfig(m)
+	if _, ok := c.RawMachines[hname]; !ok {
+		c.RawMachines[hname], err = probeConfig(m)
 	}
 
 	return err

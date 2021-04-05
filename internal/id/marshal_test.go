@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/helper/testhelp"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -43,24 +45,11 @@ func TestID_MarshalText(t *testing.T) {
 }
 
 // TestID_MarshalText_roundTrip tests whether text marshalling for IDs works by means of round-trip encoding/decoding.
-func TestID_MarshalText_roundTrip(t *testing.T) {
+func TestID_MarshalTOML_roundTrip(t *testing.T) {
 	t.Parallel()
 
 	for name, ids := range cases {
-		ids := ids
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			i := id.FromString(ids)
-
-			var got wrappedID
-
-			str, err := encodeToString(t, wrappedID{i})
-			require.NoErrorf(t, err, "error marshalling %q", i)
-			_, err = toml.Decode(str, &got)
-			require.NoErrorf(t, err, "error unmarshalling %q", i)
-			assert.Truef(t, i.Equal(got.ID), "marshal roundtrip %q came back as %q", i, got.ID)
-		})
+		testhelp.TestTomlRoundTrip(t, wrappedID{ID: id.FromString(ids)}, name)
 	}
 }
 

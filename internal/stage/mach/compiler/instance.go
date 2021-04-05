@@ -50,7 +50,7 @@ type Instance struct {
 	subject subject.Named
 
 	// compilers points to the compilers to run.
-	compilers map[string]compiler.Instance
+	compilers compiler.InstanceMap
 
 	// driver tells the instance how to run the compiler.
 	driver interpreter.Driver
@@ -70,12 +70,8 @@ func (j *Instance) Compile(ctx context.Context) error {
 		return fmt.Errorf("in job: %w", iohelp.ErrPathsetNil)
 	}
 
-	for n, c := range j.compilers {
-		nc, err := c.AddNameString(n)
-		if err != nil {
-			return err
-		}
-		if err := j.compileOnCompiler(ctx, nc); err != nil {
+	for cid, c := range j.compilers {
+		if err := j.compileOnCompiler(ctx, c.AddName(cid)); err != nil {
 			return err
 		}
 	}

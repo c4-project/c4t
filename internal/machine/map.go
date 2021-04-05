@@ -17,8 +17,8 @@ import (
 // ErrNoMachine occurs when we try to look up the compilers of a missing machine.
 var ErrNoMachine = errors.New("no such machine")
 
-// ConfigMap is a map from stringified IDs to machine configuration.
-type ConfigMap map[string]Config
+// ConfigMap is a map from IDs to machine configuration.
+type ConfigMap map[id.ID]Config
 
 // Filter filters this Config's machines according to glob.
 func (m ConfigMap) Filter(glob id.ID) (ConfigMap, error) {
@@ -36,11 +36,10 @@ func (m ConfigMap) IDs() ([]id.ID, error) {
 }
 
 // ListCompilers implements the compiler listing operation using a config.
-func (m ConfigMap) ListCompilers(_ context.Context, mid id.ID) (map[string]compiler.Compiler, error) {
-	mstr := mid.String()
-	mach, ok := m[mstr]
+func (m ConfigMap) ListCompilers(_ context.Context, machine id.ID) (map[id.ID]compiler.Compiler, error) {
+	mach, ok := m[machine]
 	if !ok {
-		return nil, fmt.Errorf("%w: %s", ErrNoMachine, mstr)
+		return nil, fmt.Errorf("%w: %s", ErrNoMachine, machine)
 	}
 	return mach.Compilers()
 }
@@ -56,7 +55,7 @@ func (m ConfigMap) ObserveOn(obs ...Observer) error {
 	for i, n := range ids {
 		OnMachinesRecord(i, Named{
 			ID:      n,
-			Machine: m[n.String()].Machine,
+			Machine: m[n].Machine,
 		}, obs...)
 	}
 	OnMachinesFinish(obs...)

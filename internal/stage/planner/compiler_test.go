@@ -6,8 +6,6 @@
 package planner_test
 
 import (
-	"context"
-	"sort"
 	"testing"
 
 	"github.com/c4-project/c4t/internal/stage/planner/mocks"
@@ -41,20 +39,17 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	ml.Test(t)
 	mo.Test(t)
 
-	ctx := context.Background()
-	mid := id.FromString("localhost")
-
-	cfgs := map[string]compiler.Compiler{
-		"gcc": {
+	cfgs := map[id.ID]compiler.Compiler{
+		id.FromString("gcc"): {
 			Style: id.CStyleGCC,
 			Arch:  id.ArchArmCortexA72,
 		},
-		"gccnt": {
+		id.FromString("gccnt"): {
 			Disabled: true,
 			Style:    id.CStyleGCC,
 			Arch:     id.ArchArmCortexA72,
 		},
-		"clang": {
+		id.FromString("clang"): {
 			Style: id.CStyleGCC,
 			Arch:  id.ArchArm8,
 			Run: &service.RunInfo{
@@ -75,17 +70,16 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	dls := stringhelp.NewSet("0", "2", "fast")
 	dms := stringhelp.NewSet("march=armv7-a")
 
-	ml.On("ListCompilers", ctx, mid).Return(cfgs, nil).Once()
+	ml.On("Compilers").Return(cfgs, nil).Once()
 
-	keys, _ := stringhelp.MapKeys(cfgs)
-	sort.Strings(keys)
+	keys, _ := id.MapKeys(cfgs)
 
 	mockOnCompilerConfig(&mo, observing.BatchStart, func(n int, _ *compiler.Named) bool {
 		return n == ncfgs-1
 	}).Return().Once()
 	mockOnCompilerConfig(&mo, observing.BatchStep, func(_ int, nc *compiler.Named) bool {
-		cs := nc.ID.String()
-		i := sort.SearchStrings(keys, cs)
+		cs := nc.ID
+		i := id.SearchSlice(keys, cs)
 		return i < ncfgs && keys[i] == cs && !nc.Disabled
 	}).Return().Times(ncfgs - 1)
 	mockOnCompilerConfig(&mo, observing.BatchEnd, func(int, *compiler.Named) bool {
@@ -95,10 +89,9 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 	cp := planner.CompilerPlanner{
 		Lister:    &ml,
 		Observers: []compiler.Observer{&mo},
-		MachineID: mid,
 	}
 
-	cs, err := cp.Plan(ctx)
+	cs, err := cp.Plan()
 	require.NoError(t, err)
 
 	ml.AssertExpectations(t)
@@ -108,10 +101,10 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 		assert.Equalf(t, cfgs[n], c.Compiler, "config not passed through correctly for %s", n)
 
 		if !ystring.IsBlank(c.SelectedMOpt) {
-			checkSelection(t, "MOpt", n, c.SelectedMOpt, dms.Slice(), c.MOpt)
+			checkSelection(t, "MOpt", n.String(), c.SelectedMOpt, dms.Slice(), c.MOpt)
 		}
 		if c.SelectedOpt != nil {
-			checkSelection(t, "Opt", n, c.SelectedOpt.Name, dls.Slice(), c.Opt)
+			checkSelection(t, "Opt", n.String(), c.SelectedOpt.Name, dls.Slice(), c.Opt)
 		}
 		assert.Falsef(t, c.Disabled, "picked up disabled compiler %s", n)
 	}

@@ -52,10 +52,10 @@ func (p *Perturber) perturbCompilers(rng *rand.Rand, pn *plan.Plan) error {
 }
 
 // Perturb perturbs the compiler set for a plan.
-func (c *compilerPerturber) Perturb(cfgs map[string]compiler.Instance) (map[string]compiler.Instance, error) {
+func (c *compilerPerturber) Perturb(cfgs compiler.InstanceMap) (compiler.InstanceMap, error) {
 	compiler.OnCompilerConfigStart(len(cfgs), c.observers...)
 
-	ncfgs := make(map[string]compiler.Instance, len(cfgs))
+	ncfgs := make(compiler.InstanceMap, len(cfgs))
 	i := 0
 	for n, cfg := range cfgs {
 		nc, err := c.perturbCompiler(n, cfg.Compiler)
@@ -66,7 +66,7 @@ func (c *compilerPerturber) Perturb(cfgs map[string]compiler.Instance) (map[stri
 		if err != nil {
 			return nil, err
 		}
-		ncfgs[nid.String()] = nc.Instance
+		ncfgs[nid] = nc.Instance
 		compiler.OnCompilerConfigStep(i, *nc, c.observers...)
 		i++
 	}
@@ -88,12 +88,12 @@ func (c *compilerPerturber) fullCompilerName(nc *compiler.Named) (id.ID, error) 
 	return fid, nil
 }
 
-func (c *compilerPerturber) perturbCompiler(name string, cmp compiler.Compiler) (*compiler.Named, error) {
+func (c *compilerPerturber) perturbCompiler(name id.ID, cmp compiler.Compiler) (*compiler.Named, error) {
 	inst, err := c.makeCompilerInstance(cmp)
 	if err != nil {
 		return nil, err
 	}
-	return inst.AddNameString(name)
+	return inst.AddName(name), nil
 }
 
 func (c *compilerPerturber) makeCompilerInstance(cmp compiler.Compiler) (compiler.Instance, error) {

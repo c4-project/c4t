@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/model/service/compiler"
 	"github.com/c4-project/c4t/internal/plan/analysis"
 	"github.com/c4-project/c4t/internal/subject/status"
@@ -28,8 +30,8 @@ func NewCompilerWriter(w io.Writer) *CompilerWriter {
 // OnAnalysis observes an analysis by emitting a CSV with compiler information.
 func (c *CompilerWriter) OnAnalysis(a analysis.Analysis) {
 	c.writeHeader()
-	for cname, can := range a.Compilers {
-		c.writeCompiler(cname, can)
+	for cid, can := range a.Compilers {
+		c.writeCompiler(cid, can)
 	}
 	(*csv.Writer)(c).Flush()
 }
@@ -56,8 +58,8 @@ func timesetHeader(name string) []string {
 	return []string{"Min" + name, "Avg" + name, "Max" + name}
 }
 
-func (c *CompilerWriter) writeCompiler(cname string, can analysis.Compiler) {
-	scs := c.staticColumnsForCompiler(cname, can)
+func (c *CompilerWriter) writeCompiler(cid id.ID, can analysis.Compiler) {
+	scs := c.staticColumnsForCompiler(cid, can)
 	rec := scs[:]
 	rec = append(rec, timeset(can.Time)...)
 	rec = append(rec, timeset(can.RunTime)...)
@@ -69,9 +71,9 @@ func (c *CompilerWriter) write(record []string) {
 	_ = (*csv.Writer)(c).Write(record)
 }
 
-func (c *CompilerWriter) staticColumnsForCompiler(cname string, can analysis.Compiler) [len(staticColumnHeaders)]string {
+func (c *CompilerWriter) staticColumnsForCompiler(cid id.ID, can analysis.Compiler) [len(staticColumnHeaders)]string {
 	return [...]string{
-		cname,
+		cid.String(),
 		can.Info.Style.String(),
 		can.Info.Arch.String(),
 		optName(can.Info),

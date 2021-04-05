@@ -22,9 +22,9 @@ import (
 // ExampleConfigMap_IDs is a runnable example for IDs.
 func ExampleConfigMap_IDs() {
 	cm := machine.ConfigMap{
-		"localhost": machine.Config{Machine: machine.Machine{Cores: 3}},
-		"bar":       machine.Config{Machine: machine.Machine{Cores: 1}},
-		"foo.bar":   machine.Config{Machine: machine.Machine{Cores: 2}},
+		id.FromString("localhost"): machine.Config{Machine: machine.Machine{Cores: 3}},
+		id.FromString("bar"):       machine.Config{Machine: machine.Machine{Cores: 1}},
+		id.FromString("foo.bar"):   machine.Config{Machine: machine.Machine{Cores: 2}},
 	}
 	ids, _ := cm.IDs()
 	for _, n := range ids {
@@ -40,10 +40,10 @@ func ExampleConfigMap_IDs() {
 // ExampleConfigMap_Filter is a runnable example for Filter.
 func ExampleConfigMap_Filter() {
 	cm := machine.ConfigMap{
-		"bar":         machine.Config{Machine: machine.Machine{Cores: 1}},
-		"foo.bar":     machine.Config{Machine: machine.Machine{Cores: 2}},
-		"foo.bar.baz": machine.Config{Machine: machine.Machine{Cores: 3}},
-		"foo.baz":     machine.Config{Machine: machine.Machine{Cores: 4}},
+		id.FromString("bar"):         machine.Config{Machine: machine.Machine{Cores: 1}},
+		id.FromString("foo.bar"):     machine.Config{Machine: machine.Machine{Cores: 2}},
+		id.FromString("foo.bar.baz"): machine.Config{Machine: machine.Machine{Cores: 3}},
+		id.FromString("foo.baz"):     machine.Config{Machine: machine.Machine{Cores: 4}},
 	}
 	cm, _ = cm.Filter(id.FromString("foo.*.baz"))
 	ids, _ := cm.IDs()
@@ -60,10 +60,10 @@ func TestConfigMap_ObserveOn(t *testing.T) {
 	t.Parallel()
 
 	cm := machine.ConfigMap{
-		"bar":         machine.Config{Machine: machine.Machine{Cores: 1}},
-		"foo.bar":     machine.Config{Machine: machine.Machine{Cores: 2}},
-		"foo.bar.baz": machine.Config{Machine: machine.Machine{Cores: 3}},
-		"foo.baz":     machine.Config{Machine: machine.Machine{Cores: 4}},
+		id.FromString("bar"):         machine.Config{Machine: machine.Machine{Cores: 1}},
+		id.FromString("foo.bar"):     machine.Config{Machine: machine.Machine{Cores: 2}},
+		id.FromString("foo.bar.baz"): machine.Config{Machine: machine.Machine{Cores: 3}},
+		id.FromString("foo.baz"):     machine.Config{Machine: machine.Machine{Cores: 4}},
 	}
 
 	var mk mocks.Observer
@@ -74,7 +74,7 @@ func TestConfigMap_ObserveOn(t *testing.T) {
 	for n := range cm {
 		n := n
 		mk.On("OnMachines", mock.MatchedBy(func(m machine.Message) bool {
-			return m.Kind == machine.MessageRecord && m.Machine.ID.String() == n
+			return m.Kind == machine.MessageRecord && m.Machine.ID == n
 		})).Return().Once()
 	}
 	mk.On("OnMachines", mock.MatchedBy(func(m machine.Message) bool {

@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/c4-project/c4t/internal/helper/stringhelp"
-
 	"github.com/c4-project/c4t/internal/helper/testhelp"
 
 	"github.com/c4-project/c4t/internal/id"
@@ -50,11 +48,11 @@ func ExampleSort() {
 
 // ExampleMapKeys is a runnable example for MapKeys.
 func ExampleMapKeys() {
-	c := map[string]int{
-		"foo.bar":       1,
-		"BAR":           2,
-		"foobar.baz":    3,
-		"barbaz.Foobaz": 4,
+	c := map[id.ID]int{
+		id.FromString("foo.bar"):       1,
+		id.FromString("BAR"):           2,
+		id.FromString("foobar.baz"):    3,
+		id.FromString("barbaz.Foobaz"): 4,
 	}
 	ids, _ := id.MapKeys(c)
 	for _, x := range ids {
@@ -70,14 +68,14 @@ func ExampleMapKeys() {
 
 // ExampleMapGlob is a runnable example for MapGlob.
 func ExampleMapGlob() {
-	c := map[string]int{
-		"foo.baz":     1,
-		"foo.bar.baz": 2,
-		"foo.bar":     3,
-		"bar.baz":     4,
+	c := map[id.ID]int{
+		id.FromString("foo.baz"):     1,
+		id.FromString("foo.bar.baz"): 2,
+		id.FromString("foo.bar"):     3,
+		id.FromString("bar.baz"):     4,
 	}
 	c2, _ := id.MapGlob(c, id.FromString("foo.*.baz"))
-	for k, v := range c2.(map[string]int) {
+	for k, v := range c2.(map[id.ID]int) {
 		fmt.Println(k, v)
 	}
 
@@ -86,11 +84,12 @@ func ExampleMapGlob() {
 	// foo.bar.baz 2
 }
 
+// ExampleLookupPrefix is a runnable example for LookupPrefix.
 func ExampleLookupPrefix() {
-	c := map[string]int{
-		"foo":     1,
-		"bar":     2,
-		"bar.baz": 3,
+	c := map[id.ID]int{
+		id.FromString("foo"):     1,
+		id.FromString("bar"):     2,
+		id.FromString("bar.baz"): 3,
 	}
 
 	k1, v1, _ := id.LookupPrefix(c, id.FromString("bar.baz"))
@@ -107,6 +106,26 @@ func ExampleLookupPrefix() {
 	// matched foo.bar.baz to foo (1)
 }
 
+// ExampleSearchSlice is a runnable example for SearchSlice.
+func ExampleSearchSlice() {
+	haystack := []id.ID{
+		id.FromString("fus"),
+		id.FromString("fus.ro"),
+		id.FromString("fus.ro.dah"),
+	}
+
+	fmt.Println(id.SearchSlice(haystack, id.ID{}))
+	fmt.Println(id.SearchSlice(haystack, id.FromString("fus.dah")))
+	fmt.Println(id.SearchSlice(haystack, id.FromString("fus.ro.dah")))
+	fmt.Println(id.SearchSlice(haystack, id.FromString("fus.ro.dah.dah.dah")))
+
+	// Output:
+	// 0
+	// 1
+	// 2
+	// 3
+}
+
 // TestMapGlob_errors tests MapKeys's error handling.
 func TestMapGlob_errors(t *testing.T) {
 	t.Parallel()
@@ -117,10 +136,10 @@ func TestMapGlob_errors(t *testing.T) {
 		out  error
 	}{
 		"normal": {
-			in: map[string]string{
-				"a": "A",
-				"b": "B",
-				"c": "C",
+			in: map[id.ID]string{
+				id.FromString("a"): "A",
+				id.FromString("b"): "B",
+				id.FromString("c"): "C",
 			},
 			glob: id.FromString("a.*"),
 			out:  nil,
@@ -128,18 +147,18 @@ func TestMapGlob_errors(t *testing.T) {
 		"not-a-map": {
 			in:   5,
 			glob: id.FromString("a.*"),
-			out:  stringhelp.ErrNotMap,
+			out:  id.ErrNotMap,
 		},
-		"key-not-an-id": {
+		"not-an-id-map": {
 			in: map[string]int{
 				"fus..ro": 6,
 			},
 			glob: id.FromString("a.*"),
-			out:  id.ErrTagEmpty,
+			out:  id.ErrNotMap,
 		},
 		"glob-not-a-glob": {
-			in: map[string]int{
-				"a.b.c": 6,
+			in: map[id.ID]int{
+				id.FromString("a.b.c"): 6,
 			},
 			glob: id.FromString("a.*.b.*"),
 			out:  id.ErrBadGlob,
@@ -166,22 +185,22 @@ func TestMapKeys_errors(t *testing.T) {
 		out error
 	}{
 		"normal": {
-			in: map[string]string{
-				"a": "A",
-				"b": "B",
-				"c": "C",
+			in: map[id.ID]string{
+				id.FromString("a"): "A",
+				id.FromString("b"): "B",
+				id.FromString("c"): "C",
 			},
 			out: nil,
 		},
 		"not-a-map": {
 			in:  5,
-			out: stringhelp.ErrNotMap,
+			out: id.ErrNotMap,
 		},
-		"not-an-id": {
+		"not-an-id-map": {
 			in: map[string]int{
 				"fus..ro": 6,
 			},
-			out: id.ErrTagEmpty,
+			out: id.ErrNotMap,
 		},
 	}
 
