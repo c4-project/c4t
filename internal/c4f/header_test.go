@@ -3,17 +3,19 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package c4f
+package c4f_test
 
 import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/c4-project/c4t/internal/c4f"
 )
 
 var headerDecodeCases = map[string]struct {
 	json string
-	want Header
+	want c4f.Header
 }{
 	// TODO(@MattWindsor91): add more test cases
 	"sbrlx": {
@@ -22,7 +24,7 @@ var headerDecodeCases = map[string]struct {
 		"locations": null,
 		"init": { "x": 0, "y": 0 },
 		"postcondition": "exists (0:a == 0 /\\ 1:a == 0)"
-	 }`, Header{
+	 }`, c4f.Header{
 			Name:      "SBRlx",
 			Locations: nil,
 			Init: map[string]int{
@@ -39,7 +41,7 @@ func TestReadHeader(t *testing.T) {
 	for name, c := range headerDecodeCases {
 		t.Run(name, func(t *testing.T) {
 			rd := strings.NewReader(c.json)
-			var got Header
+			var got c4f.Header
 			if err := got.Read(rd); err != nil {
 				t.Errorf("decode failed with error (%s): %q", err, c.json)
 			} else if !reflect.DeepEqual(got, c.want) {

@@ -150,15 +150,18 @@ func TestSubject_AddCompileResult(t *testing.T) {
 	mcomp := id.FromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
+		t.Parallel()
 		assert.NoError(t, s.AddCompileResult(mcomp, c), "err when adding compile to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
+		t.Parallel()
 		c2, err := s.CompileResult(mcomp)
 		if assert.NoError(t, err, "err when getting added compile") {
 			assert.Equalf(t, c, *c2, "added compile (%v) came back wrong (%v)", c2, c)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
+		t.Parallel()
 		err := s.AddCompileResult(mcomp, compilation.CompileResult{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateCompile, "adding compile twice")
 	})
@@ -185,9 +188,11 @@ func TestSubject_AddRecipe(t *testing.T) {
 	march := id.ArchX8664
 
 	t.Run("initial-add", func(t *testing.T) {
+		t.Parallel()
 		assert.NoError(t, s.AddRecipe(march, h), "err when adding recipe to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
+		t.Parallel()
 		m2, h2, err := s.Recipe(march)
 		if assert.NoError(t, err, "err when getting added recipe") {
 			assert.Equal(t, march, m2, "wrong recipe ID")
@@ -195,6 +200,7 @@ func TestSubject_AddRecipe(t *testing.T) {
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
+		t.Parallel()
 		err := s.AddRecipe(march, recipe.Recipe{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRecipe, "adding recipe twice")
 	})
@@ -224,15 +230,18 @@ func TestSubject_AddRun(t *testing.T) {
 	mcomp := id.FromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
+		t.Parallel()
 		assert.NoError(t, s.AddRun(mcomp, c), "err when adding run to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
+		t.Parallel()
 		c2, err := s.RunResult(mcomp)
 		if assert.NoError(t, err, "err when getting added run") {
 			assert.Equalf(t, c, *c2, "added run (%v) came back wrong (%v)", c2, c)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
+		t.Parallel()
 		err := s.AddRun(mcomp, compilation.RunResult{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRun, "adding compile twice")
 	})

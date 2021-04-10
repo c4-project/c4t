@@ -49,7 +49,10 @@ func TestID_MarshalTOML_roundTrip(t *testing.T) {
 	t.Parallel()
 
 	for name, ids := range cases {
-		testhelp.TestTomlRoundTrip(t, wrappedID{ID: id.FromString(ids)}, name)
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			testhelp.TestTomlRoundTrip(t, wrappedID{ID: id.FromString(ids)}, name)
+		})
 	}
 }
 

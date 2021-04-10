@@ -101,16 +101,15 @@ func TestCorpus_Sample_actuallySample(t *testing.T) {
 }
 
 func checkCorpusIsSample(t *testing.T, corpus, smp corpus.Corpus) {
+	t.Helper()
+
 	// Each item in the sample should be in the corpus.
 	for k, got := range smp {
 		want, ok := corpus[k]
 		if !ok {
-			t.Helper()
 			t.Fatalf("sample of %v (%v) contains unexpected key: %q", corpus, smp, k)
-
 		}
 		if !reflect.DeepEqual(got, want) {
-			t.Helper()
 			t.Fatalf("sample of %v (%v) maps %q to %v; want %v", corpus, smp, k, got, want)
 		}
 	}

@@ -22,6 +22,8 @@ func TestStatus_MarshalJSON_roundTrip(t *testing.T) {
 	for i := status.Ok; i <= status.Last; i++ {
 		i := i
 		t.Run(i.String(), func(t *testing.T) {
+			t.Parallel()
+
 			var b bytes.Buffer
 
 			err := json.NewEncoder(&b).Encode(i)

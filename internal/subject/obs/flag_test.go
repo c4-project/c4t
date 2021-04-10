@@ -115,6 +115,7 @@ func TestFlag_MarshalJSON_roundTrip(t *testing.T) {
 	for name, c := range cases {
 		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			testhelp.TestJSONRoundTrip(t, c, "Flag JSON marshalling")
 		})
 	}

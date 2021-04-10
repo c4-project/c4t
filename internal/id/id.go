@@ -117,7 +117,7 @@ func (i ID) Join(r ID) ID {
 }
 
 func unsafeJoin(tags ...string) ID {
-	return ID{repr: strings.Join(tags, string(SepTag))}
+	return ID{repr: strings.Join(tags, SepTag)}
 }
 
 // Uncons splits an ID into a head tag and tail of zero or more further tags.

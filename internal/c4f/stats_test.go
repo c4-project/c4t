@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/model/litmus"
 
 	"github.com/c4-project/c4t/internal/c4f"
@@ -51,39 +53,39 @@ mem-orders.statement.memory_order_seq_cst 0`)
 		Returns:      0,
 		LiteralBools: 14,
 		AtomicExpressions: litmus.AtomicStatset{
-			Types: map[string]int{
-				"cmpxchg": 0,
-				"fence":   0,
-				"fetch":   30,
-				"load":    19,
-				"store":   0,
-				"xchg":    0,
+			Types: map[id.ID]int{
+				id.FromString("cmpxchg"): 0,
+				id.FromString("fence"):   0,
+				id.FromString("fetch"):   30,
+				id.FromString("load"):    19,
+				id.FromString("store"):   0,
+				id.FromString("xchg"):    0,
 			},
-			MemOrders: map[string]int{
-				"memory_order_relaxed": 15,
-				"memory_order_consume": 4,
-				"memory_order_acquire": 11,
-				"memory_order_release": 10,
-				"memory_order_acq_rel": 3,
-				"memory_order_seq_cst": 6,
+			MemOrders: map[id.ID]int{
+				id.FromString("memory_order_relaxed"): 15,
+				id.FromString("memory_order_consume"): 4,
+				id.FromString("memory_order_acquire"): 11,
+				id.FromString("memory_order_release"): 10,
+				id.FromString("memory_order_acq_rel"): 3,
+				id.FromString("memory_order_seq_cst"): 6,
 			},
 		},
 		AtomicStatements: litmus.AtomicStatset{
-			Types: map[string]int{
-				"cmpxchg": 0,
-				"fence":   1,
-				"fetch":   2,
-				"load":    0,
-				"store":   0,
-				"xchg":    3,
+			Types: map[id.ID]int{
+				id.FromString("cmpxchg"): 0,
+				id.FromString("fence"):   1,
+				id.FromString("fetch"):   2,
+				id.FromString("load"):    0,
+				id.FromString("store"):   0,
+				id.FromString("xchg"):    3,
 			},
-			MemOrders: map[string]int{
-				"memory_order_relaxed": 8,
-				"memory_order_consume": 0,
-				"memory_order_acquire": 0,
-				"memory_order_release": 7,
-				"memory_order_acq_rel": 0,
-				"memory_order_seq_cst": 0,
+			MemOrders: map[id.ID]int{
+				id.FromString("memory_order_relaxed"): 8,
+				id.FromString("memory_order_consume"): 0,
+				id.FromString("memory_order_acquire"): 0,
+				id.FromString("memory_order_release"): 7,
+				id.FromString("memory_order_acq_rel"): 0,
+				id.FromString("memory_order_seq_cst"): 0,
 			},
 		},
 	}

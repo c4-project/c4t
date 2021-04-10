@@ -44,6 +44,7 @@ func TestBackend_ParseObs(t *testing.T) {
 
 			indir := filepath.Join("testdata", name, "in")
 			testhelp.TestFilesOfExt(t, indir, ".txt", func(t *testing.T, fname, path string) {
+				t.Helper()
 				t.Parallel()
 
 				file, err := os.Open(path)

@@ -80,7 +80,7 @@ func TestCorpusPlanner_Plan_ProbeError(t *testing.T) {
 }
 
 // makeCorpusPlanner builds a test CorpusPlanner using tp as the prober.
-func makeCorpusPlanner(tp *TestProber) *planner.CorpusPlanner {
+func makeCorpusPlanner(tp planner.SubjectProber) *planner.CorpusPlanner {
 	in := []string{"foo.litmus", "bar.litmus", "baz.litmus", "foobar.litmus", "foobaz.litmus", "barbaz.litmus"}
 	sort.Strings(in)
 	return &planner.CorpusPlanner{

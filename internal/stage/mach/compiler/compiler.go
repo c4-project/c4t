@@ -136,7 +136,7 @@ func (c *Compiler) builderConfig(p *plan.Plan) builder.Config {
 
 func (c *Compiler) prepareDirs(p *plan.Plan) error {
 	// TODO(@MattWindsor91): port this to observers
-	//c.l.Println("preparing directories")
+	// c.l.Println("preparing directories")
 	cids, err := p.CompilerIDs()
 	if err != nil {
 		return err

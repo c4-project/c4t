@@ -39,8 +39,7 @@ type Logger log.Logger
 
 // OnBuild logs build messages.
 func (l *Logger) OnBuild(b builder.Message) {
-	switch b.Kind {
-	case observing.BatchStep:
+	if b.Kind == observing.BatchStep {
 		l.onBuildRequest(b.Request)
 	}
 }
@@ -83,8 +82,7 @@ func (l *Logger) onCompilerPlan(nc compiler.Named) {
 
 // OnCopy logs build messages.
 func (l *Logger) OnCopy(c copier.Message) {
-	switch c.Kind {
-	case observing.BatchStart:
+	if c.Kind == observing.BatchStart {
 		l.onCopyStart(c.Num)
 	}
 }

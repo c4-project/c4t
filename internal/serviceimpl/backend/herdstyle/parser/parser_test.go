@@ -65,6 +65,7 @@ func TestParse_valid(t *testing.T) {
 
 	dir := filepath.Join("testdata", "valid")
 	testhelp.TestFilesOfExt(t, dir, ".json", func(t *testing.T, name, path string) {
+		t.Helper()
 		t.Parallel()
 
 		pfields := strings.SplitN(name, "-", 2)

@@ -54,11 +54,12 @@ func (f *FanIn) Run(ctx context.Context) error {
 		}
 
 		chosen, recv, recvOK := reflect.Select(f.chans)
-		if chosen == doneCh {
+		switch {
+		case chosen == doneCh:
 			f.ctxDone(ctx)
-		} else if !recvOK {
+		case !recvOK:
 			f.remove(chosen)
-		} else if f.err == nil {
+		case f.err == nil:
 			f.err = f.f(chosen-nReservedCh, recv.Interface())
 		}
 	}

@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package compiler
+package compiler_test
 
 import (
 	"fmt"
@@ -12,6 +12,8 @@ import (
 	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/c4-project/c4t/internal/stage/mach/compiler"
 
 	"github.com/stretchr/testify/require"
 
@@ -24,7 +26,7 @@ import (
 
 // ExamplePathset_Dirs is a testable example for Dirs.
 func ExamplePathset_Dirs() {
-	ps := Pathset{DirBins: "bins", DirLogs: "logs"}
+	ps := compiler.Pathset{DirBins: "bins", DirLogs: "logs"}
 	for _, p := range ps.Dirs(id.FromString("foo"), id.FromString("bar.baz")) {
 		fmt.Println(p)
 	}
@@ -40,7 +42,7 @@ func ExamplePathset_Dirs() {
 // Test_Pathset_Dirs_NoCompilers makes sure each of the expected paths appears in the pathset
 // when no compilers are involved.
 func TestPathset_Dirs_NoCompilers(t *testing.T) {
-	ps := NewPathset("foo")
+	ps := compiler.NewPathset("foo")
 	dirs := ps.Dirs()
 	sort.Strings(dirs)
 
@@ -60,7 +62,7 @@ func TestPathset_Dirs_NoCompilers(t *testing.T) {
 
 // TestPathset_SubjectPaths tests that SubjectPaths produces sensible paths.
 func TestPathset_SubjectPaths(t *testing.T) {
-	ps := Pathset{
+	ps := compiler.Pathset{
 		DirBins: "bins",
 		DirLogs: "logs",
 	}
@@ -81,7 +83,7 @@ func TestPathset_SubjectPaths(t *testing.T) {
 
 func TestPathset_Prepare(t *testing.T) {
 	td := t.TempDir()
-	ps := NewPathset(td)
+	ps := compiler.NewPathset(td)
 
 	compilers := []id.ID{id.FromString("gcc.4"), id.FromString("gcc.9"), id.FromString("icc")}
 

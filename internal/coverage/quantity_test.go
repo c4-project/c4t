@@ -91,6 +91,8 @@ func TestQuantitySet_Override(t *testing.T) {
 	for name, c := range cases {
 		c := c
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			got := base
 			got.Override(c.override)
 			assert.Equal(t, c.want, got, "unexpected override result")

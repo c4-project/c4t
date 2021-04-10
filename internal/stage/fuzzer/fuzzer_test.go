@@ -221,7 +221,7 @@ func TestFuzzer_Run_nop(t *testing.T) {
 		require.Truef(t, ok, "subject %s in fuzzer output has no corresponding input", name)
 
 		// This isn't exhaustive, but should be enough to catch out issues.
-		//assert.Equal(t, sf.Stats, s.Stats, "stats mismatch")
+		// assert.Equal(t, sf.Stats, s.Stats, "stats mismatch")
 		assert.Equal(t, sf.Source, s.Source, "litmus file mismatch")
 	}
 

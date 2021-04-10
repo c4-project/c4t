@@ -26,20 +26,22 @@ func ExamplePluralQuantity() {
 
 // BenchmarkPluralQuantity_zero benchmarks PluralQuantity with a quantity of 0.
 func BenchmarkPluralQuantity_zero(b *testing.B) {
-	benchmarkPluralQuantity(0, b)
+	benchmarkPluralQuantity(b, 0)
 }
 
 // BenchmarkPluralQuantity_one benchmarks PluralQuantity with a quantity of 1.
 func BenchmarkPluralQuantity_one(b *testing.B) {
-	benchmarkPluralQuantity(1, b)
+	benchmarkPluralQuantity(b, 1)
 }
 
 // BenchmarkPluralQuantity_more benchmarks PluralQuantity with a quantity of more than 1.
 func BenchmarkPluralQuantity_more(b *testing.B) {
-	benchmarkPluralQuantity(2, b)
+	benchmarkPluralQuantity(b, 2)
 }
 
-func benchmarkPluralQuantity(n int, b *testing.B) {
+func benchmarkPluralQuantity(b *testing.B, n int) {
+	b.Helper()
+
 	var result string
 
 	for i := 0; i < b.N; i++ {

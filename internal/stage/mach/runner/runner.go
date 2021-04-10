@@ -116,7 +116,7 @@ func checkPlan(p *plan.Plan) error {
 	return p.Metadata.RequireStage(stage.Compile)
 }
 
-func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, backend backend.Backend) *Instance {
+func (r *Runner) instance(requests chan<- builder.Request, named subject.Named, backend backend.ObsParser) *Instance {
 
 	return &Instance{
 		backend:    backend,

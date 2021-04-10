@@ -25,6 +25,7 @@ func TestApp_valid(t *testing.T) {
 
 	dir := filepath.Join("testdata", "valid")
 	testhelp.TestFilesOfExt(t, dir, ".json", func(t *testing.T, name, path string) {
+		t.Helper()
 		t.Parallel()
 
 		for _, flags := range []string{"i", "p", "ip"} {

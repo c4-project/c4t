@@ -73,6 +73,7 @@ func TestStage_MarshalJSON_roundTrip(t *testing.T) {
 	for i := stage.Unknown; i <= stage.Last; i++ {
 		i := i
 		t.Run(i.String(), func(t *testing.T) {
+			t.Parallel()
 			testhelp.TestJSONRoundTrip(t, i, "round-trip Stage")
 		})
 	}

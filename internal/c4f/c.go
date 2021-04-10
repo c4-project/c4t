@@ -103,7 +103,7 @@ func (a *Runner) Delitmus(ctx context.Context, d DelitmusJob) error {
 	return a.Run(ctx, CmdSpec{Cmd: BinC4fC, Subcmd: "delitmus", Args: d.Args()})
 }
 
-/// CVersion gets the version of the c4f-c tool.
+// CVersion gets the version of the c4f-c tool.
 func (a *Runner) CVersion(ctx context.Context) (string, error) {
 	var obuf bytes.Buffer
 	// For some reason, just passing 'c4f-c version' gives the build info too.

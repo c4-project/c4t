@@ -3,13 +3,15 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-package gccnt
+package gccnt_test
 
 import (
 	"bytes"
 	"context"
 	"strings"
 	"testing"
+
+	"github.com/c4-project/c4t/internal/tool/gccnt"
 
 	"github.com/1set/gut/ystring"
 
@@ -22,37 +24,37 @@ func TestGccnt_DryRun(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		in  Gccnt
+		in  gccnt.Gccnt
 		out string
 	}{
 		"passthrough": {
-			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out"},
+			in:  gccnt.Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out"},
 			out: "invocation: gcc -o a.out -O hello.c",
 		},
 		"passthrough-pthread": {
-			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", Pthread: true},
+			in:  gccnt.Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", Pthread: true},
 			out: "invocation: gcc -o a.out -O -pthread hello.c",
 		},
 		"passthrough-oflag": {
-			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", OptLevel: "3"},
+			in:  gccnt.Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", OptLevel: "3"},
 			out: "invocation: gcc -o a.out -O3 hello.c",
 		},
 		"passthrough-march": {
-			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", March: "nehalem"},
+			in:  gccnt.Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", March: "nehalem"},
 			out: "invocation: gcc -o a.out -O -march=nehalem hello.c",
 		},
 		"passthrough-mcpu": {
-			in:  Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", Mcpu: "power9"},
+			in:  gccnt.Gccnt{Bin: "gcc", In: []string{"hello.c"}, Out: "a.out", Mcpu: "power9"},
 			out: "invocation: gcc -o a.out -O -mcpu=power9 hello.c",
 		},
 		"passthrough-addopts": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin: "gcc",
 				In:  []string{"hello.c"},
 				Out: "a.out",
-				Conds: ConditionSet{
-					Diverge: Condition{Opts: []string{"2", "3"}},
-					Error:   Condition{Opts: []string{"1"}},
+				Conds: gccnt.ConditionSet{
+					Diverge: gccnt.Condition{Opts: []string{"2", "3"}},
+					Error:   gccnt.Condition{Opts: []string{"1"}},
 				},
 			},
 			out: `The following optimisation levels will trigger divergence: 2 3
@@ -60,7 +62,7 @@ func TestGccnt_DryRun(t *testing.T) {
 			invocation: gcc -o a.out -O hello.c`,
 		},
 		"passthrough-mutant-miss-noperiods": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin:    "gcc",
 				In:     []string{"hello.c"},
 				Out:    "a.out",
@@ -70,15 +72,15 @@ func TestGccnt_DryRun(t *testing.T) {
 			invocation: gcc -o a.out -O hello.c`,
 		},
 		"passthrough-mutant-miss": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin:    "gcc",
 				In:     []string{"hello.c"},
 				Out:    "a.out",
 				Mutant: 2,
-				Conds: ConditionSet{
+				Conds: gccnt.ConditionSet{
 					MutHitPeriod: 4,
-					Diverge:      Condition{MutPeriod: 3},
-					Error:        Condition{MutPeriod: 5},
+					Diverge:      gccnt.Condition{MutPeriod: 3},
+					Error:        gccnt.Condition{MutPeriod: 5},
 				},
 			},
 			out: `MUTATION SELECTED: 2
@@ -87,15 +89,15 @@ func TestGccnt_DryRun(t *testing.T) {
 			invocation: gcc -o a.out -O hello.c`,
 		},
 		"passthrough-mutant-hit": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin:    "gcc",
 				In:     []string{"hello.c"},
 				Out:    "a.out",
 				Mutant: 4,
-				Conds: ConditionSet{
+				Conds: gccnt.ConditionSet{
 					MutHitPeriod: 4,
-					Diverge:      Condition{MutPeriod: 3},
-					Error:        Condition{MutPeriod: 5},
+					Diverge:      gccnt.Condition{MutPeriod: 3},
+					Error:        gccnt.Condition{MutPeriod: 5},
 				},
 			},
 			out: `MUTATION SELECTED: 4
@@ -105,14 +107,14 @@ func TestGccnt_DryRun(t *testing.T) {
 			invocation: gcc -o a.out -O hello.c`,
 		},
 		"diverge": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin:      "gcc",
 				In:       []string{"hello.c"},
 				Out:      "a.out",
 				OptLevel: "3",
-				Conds: ConditionSet{
-					Diverge: Condition{Opts: []string{"2", "3"}},
-					Error:   Condition{Opts: []string{"1"}},
+				Conds: gccnt.ConditionSet{
+					Diverge: gccnt.Condition{Opts: []string{"2", "3"}},
+					Error:   gccnt.Condition{Opts: []string{"1"}},
 				},
 			},
 			out: `The following optimisation levels will trigger divergence: 2 3
@@ -120,15 +122,15 @@ func TestGccnt_DryRun(t *testing.T) {
             gccn't would diverge here`,
 		},
 		"diverge-mutant": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin:    "gcc",
 				In:     []string{"hello.c"},
 				Out:    "a.out",
 				Mutant: 3,
-				Conds: ConditionSet{
+				Conds: gccnt.ConditionSet{
 					MutHitPeriod: 4,
-					Diverge:      Condition{MutPeriod: 3},
-					Error:        Condition{MutPeriod: 5},
+					Diverge:      gccnt.Condition{MutPeriod: 3},
+					Error:        gccnt.Condition{MutPeriod: 5},
 				},
 			},
 			out: `MUTATION SELECTED: 3
@@ -138,14 +140,14 @@ func TestGccnt_DryRun(t *testing.T) {
 			gccn't would diverge here`,
 		},
 		"error": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin:      "gcc",
 				In:       []string{"hello.c"},
 				Out:      "a.out",
 				OptLevel: "1",
-				Conds: ConditionSet{
-					Diverge: Condition{Opts: []string{"2", "3"}},
-					Error:   Condition{Opts: []string{"1"}},
+				Conds: gccnt.ConditionSet{
+					Diverge: gccnt.Condition{Opts: []string{"2", "3"}},
+					Error:   gccnt.Condition{Opts: []string{"1"}},
 				},
 			},
 			out: `The following optimisation levels will trigger divergence: 2 3
@@ -153,15 +155,15 @@ func TestGccnt_DryRun(t *testing.T) {
             gccn't would error here`,
 		},
 		"error-mutant": {
-			in: Gccnt{
+			in: gccnt.Gccnt{
 				Bin:    "gcc",
 				In:     []string{"hello.c"},
 				Out:    "a.out",
 				Mutant: 5,
-				Conds: ConditionSet{
+				Conds: gccnt.ConditionSet{
 					MutHitPeriod: 4,
-					Diverge:      Condition{MutPeriod: 3},
-					Error:        Condition{MutPeriod: 5},
+					Diverge:      gccnt.Condition{MutPeriod: 3},
+					Error:        gccnt.Condition{MutPeriod: 5},
 				},
 			},
 			out: `MUTATION SELECTED: 5

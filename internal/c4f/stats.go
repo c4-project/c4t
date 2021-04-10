@@ -101,8 +101,7 @@ func setLiteral(s *litmus.Statset, lid id.ID, val int) error {
 	if !ok {
 		return errEmptyId(catLiterals)
 	}
-	switch lcat {
-	case catLiteralsBool:
+	if lcat == catLiteralsBool {
 		if !lrest.IsEmpty() {
 			return fmt.Errorf("%w: unexpected subcategory for '%s.%s': %s", ErrStatsetParse, catLiterals, catLiteralsBool, lrest)
 		}

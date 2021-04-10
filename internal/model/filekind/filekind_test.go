@@ -106,6 +106,7 @@ func TestKind_MarshalJSON_roundTrip(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run(c.String(), func(t *testing.T) {
+			t.Parallel()
 			testhelp.TestJSONRoundTrip(t, c, "filekind")
 		})
 	}

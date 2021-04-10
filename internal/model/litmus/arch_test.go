@@ -114,6 +114,8 @@ func TestArchOfFile_errors(t *testing.T) {
 	} {
 		name, want := name, want
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			_, err := litmus.ArchOfFile(filepath.Join("testdata", name+".litmus"))
 			testhelp.ExpectErrorIs(t, err, want, "running ArchOfFile")
 		})

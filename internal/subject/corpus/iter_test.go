@@ -69,7 +69,7 @@ func TestCorpus_Map(t *testing.T) {
 func TestCorpus_Map_rename(t *testing.T) {
 	c := corpus.New("foo", "bar", "baz", "barbaz")
 	err := c.Map(func(s *subject.Named) error {
-		s.Name = s.Name + "2"
+		s.Name += "2"
 		return nil
 	})
 	testhelp.ExpectErrorIs(t, err, corpus.ErrMapRename, "renaming in a Map")

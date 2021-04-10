@@ -180,6 +180,8 @@ func onMachNode(m *mocks.Observer, k observer.MessageKind, f func(set *quantity.
 }
 
 func roundTrip(t *testing.T, ctx context.Context, input func(*forward.Observer), obsf func(*mocks.Observer)) (*mocks.Observer, error) {
+	t.Helper()
+
 	pw, obs, tobs, rep := roundTripPipe(t)
 	obsf(tobs)
 	eg, ectx := errgroup.WithContext(ctx)
@@ -194,6 +196,8 @@ func roundTrip(t *testing.T, ctx context.Context, input func(*forward.Observer),
 }
 
 func roundTripPipe(t *testing.T) (io.Closer, *forward.Observer, *mocks.Observer, forward.Replayer) {
+	t.Helper()
+
 	pr, pw := io.Pipe()
 	obs := forward.NewObserver(pw)
 	tobs := mocks.Observer{}

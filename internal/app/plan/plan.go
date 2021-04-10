@@ -12,6 +12,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/c4-project/c4t/internal/model/service/backend"
+
 	"github.com/c4-project/c4t/internal/quantity"
 
 	"github.com/c4-project/c4t/internal/id"
@@ -159,11 +161,11 @@ func writePlansToDir(outdir string, ps plan.Map) error {
 	return nil
 }
 
-func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.Planner, error) {
+func makePlanner(ctx *c.Context, bf backend.Finder, errw io.Writer) (*planner.Planner, error) {
 	a := stdflag.C4fRunnerFromCli(ctx, errw)
 
 	qs := quantities(ctx)
-	src := source(a, cfg)
+	src := source(a, bf)
 
 	l := log.New(errw, "[planner] ", log.LstdFlags)
 
@@ -175,9 +177,9 @@ func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.P
 	)
 }
 
-func source(a planner.SubjectProber, cfg *config.Config) planner.Source {
+func source(a planner.SubjectProber, bf backend.Finder) planner.Source {
 	return planner.Source{
-		BProbe: cfg,
+		BProbe: bf,
 		SProbe: a,
 	}
 }

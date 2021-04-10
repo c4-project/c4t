@@ -112,13 +112,13 @@ func onBuild(m *mocks.Observer, k observing.BatchKind, f func(int, string, *buil
 }
 
 func checkAddCorpus(t *testing.T, adds []subject.Named, got corpus.Corpus) {
+	t.Helper()
+
 	for _, s := range adds {
 		sa, ok := got[s.Name]
 		if !ok {
-			t.Helper()
 			t.Error("misplaced add", s.Name)
 		} else if !reflect.DeepEqual(sa, s.Subject) {
-			t.Helper()
 			t.Errorf("add of %s: got subject %v; want %v", s.Name, sa, s.Subject)
 		}
 	}
@@ -143,6 +143,8 @@ func TestBuilderReq_SendTo(t *testing.T) {
 }
 
 func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch chan builder.Request) error {
+	t.Helper()
+
 	want := builder.AddRequest(
 		subject.NewOrPanic(litmus.NewOrPanic("blah", litmus.WithThreads(5))).AddName("foo"))
 
@@ -150,7 +152,6 @@ func exerciseSendTo(t *testing.T, eg *errgroup.Group, ectx context.Context, ch c
 		select {
 		case got := <-ch:
 			if !reflect.DeepEqual(got, want) {
-				t.Helper()
 				t.Errorf("received request malformed: got=%v, want=%v", got, want)
 			}
 			return nil

@@ -11,11 +11,11 @@ import (
 	"context"
 	"fmt"
 
+	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
+
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
 	"github.com/c4-project/c4t/internal/plan/stage"
-
-	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
@@ -44,7 +44,7 @@ type Mach struct {
 	fwd *forward.Observer
 }
 
-func New(cdriver interpreter.Driver, bresolve *backend.Resolver, opts ...Option) (*Mach, error) {
+func New(cdriver interpreter.Driver, bresolve backend2.Resolver, opts ...Option) (*Mach, error) {
 	// The respective constructors will check that cdriver and rdriver are ok.
 
 	m := &Mach{}
@@ -72,7 +72,7 @@ func (m *Mach) Close() error {
 	return errhelp.FirstError(cerr, rerr)
 }
 
-func (m *Mach) makeCompilerAndRunner(cdriver interpreter.Driver, bresolve *backend.Resolver) error {
+func (m *Mach) makeCompilerAndRunner(cdriver interpreter.Driver, bresolve backend2.Resolver) error {
 	if err := m.makeCompiler(cdriver); err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func (m *Mach) makeCompiler(driver interpreter.Driver) error {
 	return err
 }
 
-func (m *Mach) makeRunner(r *backend.Resolver) error {
+func (m *Mach) makeRunner(r backend2.Resolver) error {
 	var err error
 	ps := runner.NewPathset(m.path)
 	m.runner, err = runner.New(r, ps, m.roptions...)
