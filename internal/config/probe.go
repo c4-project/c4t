@@ -45,12 +45,9 @@ func (c *Config) probeBackends(ctx context.Context, sr service.Runner) error {
 }
 
 func probeConfig(m machine.Prober) (machine.Config, error) {
-	var (
-		c   machine.Config
-		err error
-	)
+	var c machine.Config
 
-	err = machine.Probe(&(c.Machine), m)
+	err := c.Probe(m)
 
 	return c, err
 }

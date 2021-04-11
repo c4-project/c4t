@@ -8,6 +8,8 @@ package machine_test
 import (
 	"testing"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/machine"
 	"github.com/c4-project/c4t/internal/machine/mocks"
 	"github.com/stretchr/testify/assert"
@@ -22,12 +24,17 @@ func TestProbe(t *testing.T) {
 	m.Test(t)
 
 	ncores := 4
+	arch := id.ArchAArch64
 
 	m.On("NCores").Return(ncores, nil).Once()
+	m.On("Arch").Return(arch, nil).Once()
 	// TODO(@MattWindsor91): add other probing
 
-	var got machine.Machine
-	require.NoError(t, machine.Probe(&got, &m), "probe shouldn't error")
+	var got machine.Config
+	require.NoError(t, got.Probe(&m), "probe shouldn't error")
 
 	assert.Equal(t, ncores, got.Cores, "probed cores not set correctly")
+	assert.Equal(t, arch, got.Arch, "probed arch not set correctly")
+
+	m.AssertExpectations(t)
 }

@@ -147,7 +147,7 @@ func printGlobalPath(outw io.Writer) error {
 
 func probeAndDump(ctx context.Context, outw io.Writer, errw io.Writer) error {
 	cfg := config.Config{}
-	if err := cfg.Probe(ctx, srvrun.NewExecRunner(srvrun.StderrTo(errw)), machine.LocalProber{}); err != nil {
+	if err := cfg.Probe(ctx, srvrun.NewExecRunner(srvrun.StderrTo(errw)), machine.LocalProber()); err != nil {
 		return err
 	}
 	return cfg.Dump(outw)
