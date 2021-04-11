@@ -13,7 +13,7 @@ import (
 
 // Observer is the interface of anything that observes machine node behaviour.
 type Observer interface {
-	// This allows observing the corpus builds for both compilation and running.
+	// Observer allows observing the corpus builds for both compilation and running.
 	builder.Observer
 
 	// OnMachineNodeAction observes a machine node action, usually forwarded from a remote node.
@@ -34,10 +34,10 @@ type Message struct {
 type MessageKind uint8
 
 const (
-	// The machine node is starting its compile phase.
+	// KindCompileStart means that the machine node is starting its compile phase.
 	// Quantities.Compile contains the compiler quantities.
 	KindCompileStart MessageKind = iota
-	// The machine node is starting its run phase.
+	// KindRunStart means that the machine node is starting its run phase.
 	// Quantities.Run contains the runner quantities.
 	KindRunStart
 )

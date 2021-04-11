@@ -92,7 +92,7 @@ func (m Mutation) MutantsWhere(pred func(m Mutant) bool) []mutation.Mutant {
 	return muts
 }
 
-// DumpMutationCSV dumps into w a CSV representation of this mutation statistics set.
+// DumpCSV dumps into w a CSV representation of this mutation statistics set.
 // Each line in the record has machine as a prefix.
 // The writer is flushed at the end of this dump.
 func (m *Mutation) DumpCSV(w *csv.Writer, machine id.ID) error {
@@ -134,7 +134,7 @@ func (h *Hitset) AtLeastOnce() bool {
 	return 0 < h.Count
 }
 
-// At records ntimes hits over timespan ts.
+// Add records ntimes hits over timespan ts.
 func (h *Hitset) Add(ntimes uint64, ts timing.Span) {
 	if ntimes == 0 {
 		return

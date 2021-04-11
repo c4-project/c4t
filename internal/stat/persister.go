@@ -60,13 +60,13 @@ func (s *Persister) Close() error {
 	return errhelp.FirstError(perr, cerr)
 }
 
-// OnMachine feeds the information from m into the stats set.
+// OnMachines feeds the information from m into the stats set.
 func (s *Persister) OnMachines(m machine.Message) {
 	s.set.OnMachines(m)
 	s.flush()
 }
 
-// OnMachine feeds the information from m into the stats set.
+// OnPrepare feeds the information from m into the stats set.
 func (s *Persister) OnPrepare(m director.PrepareMessage) {
 	s.set.OnPrepare(m)
 	s.flush()

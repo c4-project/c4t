@@ -27,11 +27,12 @@ func (p *Perturber) sampleCorpus(rng *rand.Rand, pn *plan.Plan) error {
 }
 
 func (p *Perturber) announceCorpus(c corpus.Corpus) {
+	// TODO(@MattWindsor91): the fact that we're reusing the builder observations here is sus.
 	obs := lowerToBuilder(p.observers)
-	builder.OnBuildStart(builder.Manifest{Name: "sampled", NReqs: len(c)}, obs...)
+	builder.OnBuild(builder.StartMessage(builder.Manifest{Name: "sampled", NReqs: len(c)}), obs...)
 	for i, n := range c.Names() {
 		s := c[n]
-		builder.OnBuildRequest(i, builder.AddRequest(s.AddName(n)), obs...)
+		builder.OnBuild(builder.StepMessage(i, builder.AddRequest(s.AddName(n))), obs...)
 	}
-	builder.OnBuildFinish(obs...)
+	builder.OnBuild(builder.EndMessage(), obs...)
 }

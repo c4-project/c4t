@@ -52,7 +52,7 @@ func ObserveWith(obs ...Observer) Option {
 	}
 }
 
-// ObserveWith adds each observer in obs to the observer set for saving.
+// ObserveSaveWith adds each observer in obs to the observer set for saving.
 func ObserveSaveWith(obs ...saver.Observer) Option {
 	return func(a *Analyser) error {
 		for _, o := range obs {

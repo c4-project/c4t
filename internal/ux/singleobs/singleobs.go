@@ -63,7 +63,7 @@ func Copier(l *log.Logger, verbose bool) []copier.Observer {
 	return director.LowerToCopy(DirectorInstance(l, verbose))
 }
 
-// Mach builds a list of observers suitable for observing machine node actions in single-shot binaries.
+// MachNode builds a list of observers suitable for observing machine node actions in single-shot binaries.
 func MachNode(l *log.Logger, verbose bool) []observer.Observer {
 	return director.LowerToMach(DirectorInstance(l, verbose))
 }

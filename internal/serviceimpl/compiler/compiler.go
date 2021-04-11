@@ -81,7 +81,7 @@ func (r *Resolver) OptLevels(c *mdl.Compiler) (map[string]optlevel.Level, error)
 	return cp.OptLevels(c)
 }
 
-// OptLevels gets the default machine-specific optimisation profiles for the compiler described by c.
+// DefaultMOpts gets the default machine-specific optimisation profiles for the compiler described by c.
 func (r *Resolver) DefaultMOpts(c *mdl.Compiler) (stringhelp.Set, error) {
 	cp, err := r.Get(c)
 	if err != nil {

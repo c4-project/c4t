@@ -50,7 +50,7 @@ func (s *Set) OnCycle(c director.CycleMessage) {
 	s.EventCount++
 }
 
-// OnAnalysis incorporates cycle analysis from a into the statistics set.
+// OnCycleAnalysis incorporates cycle analysis from a into the statistics set.
 func (s *Set) OnCycleAnalysis(a director.CycleAnalysis) {
 	s.liftCycle(a.Cycle, func(m *Machine) {
 		m.AddAnalysis(a.Analysis)

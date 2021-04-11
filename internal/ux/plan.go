@@ -19,7 +19,7 @@ import (
 // StdinFile is the special file path that the plan loader treats as a request to load from stdin instead.
 const StdinFile = "-"
 
-// Load loads a plan pointed to by f.
+// LoadPlan loads a plan pointed to by f.
 // If f is empty or StdinFile, Load loads from standard input instead.
 func LoadPlan(f string) (*plan.Plan, error) {
 	var (

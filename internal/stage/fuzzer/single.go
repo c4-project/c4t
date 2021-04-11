@@ -22,7 +22,7 @@ type SingleFuzzer interface {
 // NopFuzzer is a single-fuzzer that does nothing.
 type NopFuzzer struct{}
 
-// FuzzSingle does nothing, but pretends to fuzz a file.
+// Fuzz does nothing, but pretends to fuzz a file.
 func (n NopFuzzer) Fuzz(context.Context, fuzzer.Job) error {
 	return nil
 }

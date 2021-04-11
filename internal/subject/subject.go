@@ -21,7 +21,7 @@ import (
 	"github.com/c4-project/c4t/internal/id"
 )
 
-// Normalise represents a single test subject in a corpus.
+// Subject represents a single test subject in a corpus.
 type Subject struct {
 	// Fuzz is the fuzzer output for this subject, if it has been fuzzed.
 	Fuzz *Fuzz `toml:"fuzz,omitempty" json:"fuzz,omitempty"`

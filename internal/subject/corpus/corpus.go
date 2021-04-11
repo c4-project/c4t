@@ -69,7 +69,7 @@ func (c Corpus) Add(s subject.Named) error {
 	return nil
 }
 
-// copyCorpus makes a deep copy of this corpus.
+// Copy makes a deep copy of this corpus.
 func (c Corpus) Copy() Corpus {
 	cc := make(Corpus, len(c))
 	for n, s := range c {

@@ -81,7 +81,7 @@ var (
 	ArchAArch64 = ID{repr: ArchFamilyAArch64}
 	// ArchAArch648 is the architecture ID for ARM 64-bit version 8.x.
 	ArchAArch648 = ID{repr: ArchFamilyAArch64 + SepTag + ArchVariantAArch648}
-	// ArchAArch648 is the architecture ID for ARM 64-bit version 8.1.
+	// ArchAArch6481 is the architecture ID for ARM 64-bit version 8.1.
 	ArchAArch6481 = ID{repr: ArchFamilyAArch64 + SepTag + ArchVariantAArch648 + SepTag + ArchSubVariantAArch6481}
 
 	// ArchPPC is the architecture ID for PowerPC.

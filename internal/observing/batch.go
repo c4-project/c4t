@@ -19,11 +19,11 @@ type Batch struct {
 type BatchKind uint8
 
 const (
-	// A message that represents the start of a batch run.
+	// BatchStart represents a message that represents the start of a batch run.
 	BatchStart BatchKind = iota
-	// A message that represents a single step in a batch run.
+	// BatchStep represents a message that represents a single step in a batch run.
 	BatchStep
-	// A message that represents the end of a batch run.
+	// BatchEnd represents a message that represents the end of a batch run.
 	BatchEnd
 )
 

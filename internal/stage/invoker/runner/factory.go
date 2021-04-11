@@ -22,7 +22,7 @@ type Factory interface {
 	// It takes the plan p in case the factory is waiting to get machine configuration from it.
 	MakeRunner(ldir string, p *plan.Plan, obs ...copier.Observer) (Runner, error)
 
-	// Runner spawners can be closed once no more runners are needed.
+	// Closer captures that Runner spawners can be closed once no more runners are needed.
 	// For SSH runner spawners, this will close the SSH connection.
 	io.Closer
 }

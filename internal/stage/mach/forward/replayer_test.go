@@ -79,12 +79,12 @@ func TestReplayer_Run_roundTripBuilder(t *testing.T) {
 		})
 
 	tobs, err := roundTrip(t, context.Background(), func(obs *forward.Observer) {
-		builder.OnBuildStart(m, obs)
-		builder.OnBuildRequest(0, add, obs)
-		builder.OnBuildRequest(1, rec, obs)
-		builder.OnBuildRequest(2, com, obs)
-		builder.OnBuildRequest(3, run, obs)
-		builder.OnBuildFinish(obs)
+		builder.OnBuild(builder.StartMessage(m), obs)
+		builder.OnBuild(builder.StepMessage(0, add), obs)
+		builder.OnBuild(builder.StepMessage(1, rec), obs)
+		builder.OnBuild(builder.StepMessage(2, com), obs)
+		builder.OnBuild(builder.StepMessage(3, run), obs)
+		builder.OnBuild(builder.EndMessage(), obs)
 	}, func(obs *mocks.Observer) {
 		onBuild(obs, observing.BatchStart, func(i int, name string, _ *builder.Request) bool {
 			return i == m.NReqs && name == m.Name

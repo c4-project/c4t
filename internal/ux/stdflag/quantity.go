@@ -28,7 +28,7 @@ const (
 	usageGlobalTimeout = "`duration` after which experiment will be killed"
 )
 
-// RootQuantityFlags sets up the root quantity override flags read by RootQuantitiesFromCli.
+// RootQuantityCliFlags sets up the root quantity override flags read by RootQuantitiesFromCli.
 func RootQuantityCliFlags() []c.Flag {
 	return []c.Flag{
 		SubjectFuzzesCliFlag(),

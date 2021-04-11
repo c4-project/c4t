@@ -22,7 +22,7 @@ type Runner interface {
 	// It returns an updated plan (which may or may not be p edited in-place), or an error.
 	Run(ctx context.Context, p *Plan) (*Plan, error)
 
-	// Some stages have resources that need to be freed after use.
+	// Closer captures that some stages have resources that need to be freed after use.
 	io.Closer
 
 	// TODO(@MattWindsor91): implement Close() calls for parents of Runners other than the director.

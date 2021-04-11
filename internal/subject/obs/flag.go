@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-// ObsFlag is the type of observation flags.
+// Flag is the type of observation flags.
 type Flag int
 
 const (
@@ -133,7 +133,7 @@ func (o Flag) MarshalJSON() ([]byte, error) {
 	return json.Marshal(o.Strings())
 }
 
-// MarshalJSON unmarshals an observation flag list from bs by interpreting it as a string list.
+// UnmarshalJSON unmarshals an observation flag list from bs by interpreting it as a string list.
 func (o *Flag) UnmarshalJSON(bs []byte) error {
 	var strs []string
 	if err := json.Unmarshal(bs, &strs); err != nil {

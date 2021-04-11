@@ -24,7 +24,7 @@ func (i Status) MarshalJSON() ([]byte, error) {
 	return json.Marshal(i.String())
 }
 
-// UnarshalJSON unmarshals a Status from JSON via its string representation.
+// UnmarshalJSON unmarshals a Status from JSON via its string representation.
 func (i *Status) UnmarshalJSON(bytes []byte) error {
 	var (
 		sstr string

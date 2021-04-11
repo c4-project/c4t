@@ -35,7 +35,7 @@ func (i ID) HasPrefix(prefix ID) bool {
 	}
 }
 
-// HasPrefix tests whether suffix is a suffix of this ID.
+// HasSuffix tests whether suffix is a suffix of this ID.
 func (i ID) HasSuffix(suffix ID) bool {
 	// As HasPrefix, but with the final case flipped around for suffixing.
 	switch {

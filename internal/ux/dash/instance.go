@@ -135,7 +135,7 @@ func (o *Instance) currentRunColumn() grid.Element {
 	)
 }
 
-// OnIteration logs that a new iteration has begun.
+// OnCycle logs that a new iteration has begun.
 func (o *Instance) OnCycle(r director.CycleMessage) {
 	if r.Kind == director.CycleStart {
 		o.onCycleStart(r.Cycle)

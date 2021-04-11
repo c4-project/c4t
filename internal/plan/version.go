@@ -5,7 +5,7 @@
 
 package plan
 
-// Type of plan version numbers.
+// Version is the type of plan version numbers.
 type Version uint32
 
 // CurrentVer is the current plan version.

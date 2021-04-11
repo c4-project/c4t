@@ -26,15 +26,15 @@ type Observer interface {
 type Kind uint8
 
 const (
-	// The planner is starting.
+	// KindStart means that the planner is starting.
 	// Quantities points to the planner's quantity set.
 	KindStart Kind = iota
-	// The planner is now getting information about the backend to use.
+	// KindPlanningBackend means that the planner is now getting information about the backend to use.
 	KindPlanningBackend
-	// The planner is now getting information about the corpus.
+	// KindPlanningCorpus means that the planner is now getting information about the corpus.
 	// The corpus will be announced as a series of OnBuild messages.
 	KindPlanningCorpus
-	// The planner is now getting information about the compilers for a given machine.
+	// KindPlanningCompilers means that the planner is now getting information about the compilers for a given machine.
 	// MachineID points to the name of the machine.
 	// The selected compilers will be announced as a series of OnCompilerConfig messages.
 	KindPlanningCompilers

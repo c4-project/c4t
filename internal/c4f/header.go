@@ -10,7 +10,7 @@ import (
 	"io"
 )
 
-// Metadata represents a Litmus test header in the form that c4f-c accepts and dumps.
+// Header represents a Litmus test header in the form that c4f-c accepts and dumps.
 type Header struct {
 	// Name is the name of the Litmus test.
 	Name string `json:"name"`

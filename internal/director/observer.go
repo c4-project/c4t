@@ -3,7 +3,6 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package observer defines interfaces and basic implementations of the director's 'observer' pattern.
 package director
 
 import (
@@ -33,13 +32,13 @@ import (
 
 // Observer is an interface for types that implement multi-machine test progress observation.
 type Observer interface {
-	// Observers can observe machine configuration.
+	// Observer captures that observers can observe machine configuration.
 	machine.Observer
 
-	// Observers can observe planner operations.
+	// Observer captures that observers can observe planner operations.
 	planner.Observer
 
-	// Observers can observe director preparations.
+	// PrepareObserver captures that observers can observe director preparations.
 	PrepareObserver
 
 	// Instance gets a sub-observer for the machine with ID id.
@@ -129,25 +128,25 @@ type CycleObserver interface {
 
 // InstanceObserver is an interface for types that observe a director instance.
 type InstanceObserver interface {
-	// InstanceObserver observers can observe cycles.
+	// CycleObserver captures that InstanceObserver observers can observe cycles.
 	CycleObserver
 
 	// OnInstance observes something about that the instance this observer is observing.
 	OnInstance(m InstanceMessage)
 
-	// InstanceObserver observers can observe plan analyses.
+	// Observer captures that InstanceObserver observers can observe plan analyses.
 	analyser.Observer
 
-	// InstanceObserver observers can observe plan saves.
+	// Observer captures that InstanceObserver observers can observe plan saves.
 	saver.Observer
 
-	// InstanceObserver observers can observe perturber operations.
+	// Observer captures that InstanceObserver observers can observe perturber operations.
 	perturber.Observer
 
-	// InstanceObserver observers can observe file copies.
+	// Observer captures that InstanceObserver observers can observe file copies.
 	copier.Observer
 
-	// InstanceObserver observers can observe machine node actions.
+	// Observer captures that InstanceObserver observers can observe machine node actions.
 	mach.Observer
 }
 
@@ -161,10 +160,10 @@ type InstanceMessage struct {
 type InstanceMessageKind uint8
 
 const (
-	// The instance has closed.
+	// KindInstanceClosed means that the instance has closed.
 	// Observers should free any resources specific to this instance.
 	KindInstanceClosed InstanceMessageKind = iota
-	// The instance has changed to a new mutant (in Mutant).
+	// KindInstanceMutant means that the instance has changed to a new mutant (in Mutant).
 	KindInstanceMutant
 )
 
@@ -276,7 +275,7 @@ func LowerToPerturber(obs []InstanceObserver) []perturber.Observer {
 	return cos
 }
 
-// LowerToSave lowers a slice of instance observers to a slice of saver observers.
+// LowerToSaver lowers a slice of instance observers to a slice of saver observers.
 func LowerToSaver(obs []InstanceObserver) []saver.Observer {
 	cos := make([]saver.Observer, len(obs))
 	for i, o := range obs {

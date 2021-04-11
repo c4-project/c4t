@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package copy provides a mockable interface for network-transparent(ish) file copying, and implementations thereof.
+// Package copier provides a mockable interface for network-transparent(ish) file copying, and implementations thereof.
 package copier
 
 import (

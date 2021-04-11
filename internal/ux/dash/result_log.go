@@ -93,13 +93,13 @@ func (r *ResultLog) overflow() error {
 	return r.log.Write(txt, text.WriteReplace(), text.WriteCellOpts(cell.FgColor(cell.ColorMagenta)))
 }
 
-// LogHeader logs the header of a collation bucket with status st.
+// LogBucketHeader logs the header of a collation bucket with status st.
 func (r *ResultLog) LogBucketHeader(st status.Status) error {
 	header := fmt.Sprintf("  [%s]\n", st)
 	return r.log.Write(header, text.WriteCellOpts(cell.FgColor(statusColours[st])))
 }
 
-// LogHeader logs an entry for a subject with name sname.
+// LogBucketEntry logs an entry for a subject with name sname.
 func (r *ResultLog) LogBucketEntry(sname string) error {
 	return r.log.Write(fmt.Sprintf("  - %s\n", sname))
 }

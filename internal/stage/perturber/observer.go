@@ -27,16 +27,16 @@ type Observer interface {
 type Kind uint8
 
 const (
-	// The perturber is starting.
+	// KindStart means that the perturber is starting.
 	// Quantities points to the perturber's quantity set.
 	KindStart Kind = iota
-	// The perturber has now changed the seed.
+	// KindSeedChanged means that the perturber has now changed the seed.
 	// Seed points to the new seed.
 	KindSeedChanged
-	// The perturber is now sampling the corpus.
+	// KindSamplingCorpus means that the perturber is now sampling the corpus.
 	// The selected corpus will be announced as a series of OnBuild messages.
 	KindSamplingCorpus
-	// The perturber is now randomising the compiler optimisations.
+	// KindRandomisingOpts means that the perturber is now randomising the compiler optimisations.
 	// The selected compilers will be announced as a series of OnCompilerConfig messages.
 	KindRandomisingOpts
 )

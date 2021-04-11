@@ -15,7 +15,7 @@ type Selection struct {
 	Disabled []string `toml:"disabled,omitempty"`
 }
 
-// Select inserts enables from this selection into defaults, then removes disables.
+// Override inserts enables from this selection into defaults, then removes disables.
 // Disables take priority over enables.
 // The resulting map is a copy; this function doesn't mutate defaults.
 func (s Selection) Override(defaults stringhelp.Set) stringhelp.Set {

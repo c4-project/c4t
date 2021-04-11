@@ -35,7 +35,7 @@ func (f *Fixset) Args() []string {
 	return args
 }
 
-// PopulateFromStats switches various fixes on as appropriate for the Litmus file l.
+// PopulateFromLitmus switches various fixes on as appropriate for the Litmus file l.
 func (f *Fixset) PopulateFromLitmus(l *litmus.Litmus) {
 	if l != nil && l.IsC() {
 		f.PopulateFromStats(l.Stats)
@@ -60,7 +60,7 @@ func (f *Fixset) PopulateFromStats(s *litmus.Statset) {
 	}
 }
 
-// Write dumps a human-readable description of the fixset to the given writer.
+// Dump dumps a human-readable description of the fixset to the given writer.
 func (f *Fixset) Dump(w io.Writer) error {
 	for _, c := range []struct {
 		field string

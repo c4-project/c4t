@@ -3,5 +3,5 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Module pretty contains pretty-printers for configuration.
+// Package pretty contains pretty-printers for configuration.
 package pretty

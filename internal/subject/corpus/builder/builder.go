@@ -80,8 +80,8 @@ func initCorpus(init corpus.Corpus, nreqs int) corpus.Corpus {
 // Run runs the builder in context ctx.
 // Run is not thread-safe.
 func (b *Builder) Run(ctx context.Context) (corpus.Corpus, error) {
-	OnBuildStart(b.m, b.obs...)
-	defer func() { OnBuildFinish(b.obs...) }()
+	OnBuild(StartMessage(b.m), b.obs...)
+	defer func() { OnBuild(EndMessage(), b.obs...) }()
 
 	for i := 0; i < b.m.NReqs; i++ {
 		if err := b.runSingle(i, ctx); err != nil {
@@ -102,7 +102,7 @@ func (b *Builder) runSingle(i int, ctx context.Context) error {
 }
 
 func (b *Builder) runRequest(i int, r Request) error {
-	OnBuildRequest(i, r, b.obs...)
+	OnBuild(StepMessage(i, r), b.obs...)
 	switch {
 	case r.Add != nil:
 		return b.add(r.Name, subject.Subject(*r.Add))

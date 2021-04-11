@@ -139,16 +139,16 @@ func (r *ForwardReceiver) Run(ctx context.Context) error {
 //
 // These inject behaviour into a ForwardObserver.
 type ForwardHandler interface {
-	// ForwardHandler instances can observe cycles in the same way that the forwarding observer can.
+	// CycleObserver captures that ForwardHandler can observe cycles in the same way that the forwarding observer can.
 	director.CycleObserver
 
 	// These exist to let ForwardHandlers also implement bits of normal Observers, and can safely be zeroed.
 	// TODO(@MattWindsor91): simplify this away.
 
-	// ForwardHandler instances can observe machines.
+	// Observer captures that ForwardHandler instances can observe machines.
 	machine.Observer
 
-	// ForwardHandler instances can observe preparations.
+	// PrepareObserver captures that ForwardHandler instances can observe preparations.
 	director.PrepareObserver
 
 	// OnCycleInstance handles a message for the instance of a particular cycle.
@@ -287,7 +287,7 @@ func (l *ForwardingInstanceObserver) OnCompilerConfig(m compiler.Message) {
 	l.forward(ForwardCompilerMessage(l.cycle, m))
 }
 
-// OnIteration notes that the instance's iteration has changed.
+// OnCycle notes that the instance's iteration has changed.
 func (l *ForwardingInstanceObserver) OnCycle(r director.CycleMessage) {
 	if r.Kind == director.CycleStart {
 		l.cycle = r.Cycle

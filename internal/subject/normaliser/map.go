@@ -14,7 +14,7 @@ import (
 // Map is the type of normalisation mappings.
 type Map map[string]Entry
 
-// Matching filters this map to only the files matching kind k and location l.
+// RenamesMatching filters this map to only the files matching kind k and location l.
 func (m Map) RenamesMatching(k filekind.Kind, l filekind.Loc) map[string]string {
 	fs := make(map[string]string)
 	for n, v := range m {

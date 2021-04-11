@@ -54,7 +54,7 @@ func (r *MachineRunner) Close() error {
 	return r.cli.Close()
 }
 
-// Runner gets a SSH runner for this machine, given the configuration in c.
+// MachineRunner gets a SSH runner for this machine, given the configuration in c.
 func (m *MachineConfig) MachineRunner(c *Config) (*MachineRunner, error) {
 	s, err := m.clientConfig(c)
 	if err != nil {

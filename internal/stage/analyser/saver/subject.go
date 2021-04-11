@@ -19,7 +19,7 @@ type Archiver interface {
 	// ArchiveFile archives the file at rpath, storing it in the archive as wpath and with permissions mode.
 	ArchiveFile(rpath, wpath string, mode int64) error
 
-	// An Archiver can be closed; this should free all resources attached to the archiver.
+	// Closer captures that an Archiver can be closed; this should free all resources attached to the archiver.
 	io.Closer
 }
 

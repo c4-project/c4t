@@ -21,14 +21,14 @@ import (
 
 // Backend contains the various interfaces that a backend can implement.
 type Backend interface {
-	// Some backends can lift test-cases into recipes (capability CanLift).
+	// SingleLifter captures that some backends can lift test-cases into recipes (capability CanLiftLitmus).
 	SingleLifter
 
-	// Backends that can be run standalone or produce executables (capability CanRunStandalone | CanProduceExe)
-	// must give an observation parser for interpreting their stdout as observations.
+	// ObsParser captures that any backends that can be run standalone or produce executables
+	// (capability CanRunStandalone | CanProduceExe) must give an parser for interpreting their stdout as observations.
 	ObsParser
 
-	// Class gets the archetype of this backend.
+	// Class gets the class of this backend.
 	Class() Class
 }
 

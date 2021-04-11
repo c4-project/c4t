@@ -35,17 +35,17 @@ func OnBuild(m Message, obs ...Observer) {
 	}
 }
 
-// OnBuildStart sends an OnBuildStart message to each observer in obs.
-func OnBuildStart(m Manifest, obs ...Observer) {
-	OnBuild(Message{Batch: observing.NewBatchStart(m.NReqs), Name: m.Name}, obs...)
+// StartMessage creates an build-start message using manifest m.
+func StartMessage(m Manifest) Message {
+	return Message{Batch: observing.NewBatchStart(m.NReqs), Name: m.Name}
 }
 
-// OnBuildRequest sends an OnBuildRequest message to each observer in obs.
-func OnBuildRequest(i int, r Request, obs ...Observer) {
-	OnBuild(Message{Batch: observing.NewBatchStep(i), Request: &r}, obs...)
+// StepMessage creates a build-step message for step i and request r.
+func StepMessage(i int, r Request) Message {
+	return Message{Batch: observing.NewBatchStep(i), Request: &r}
 }
 
-// OnBuildStart sends an OnBuildFinish message to each observer in obs.
-func OnBuildFinish(obs ...Observer) {
-	OnBuild(Message{Batch: observing.NewBatchEnd()}, obs...)
+// EndMessage creates a build-end message.
+func EndMessage() Message {
+	return Message{Batch: observing.NewBatchEnd()}
 }

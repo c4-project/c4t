@@ -10,7 +10,7 @@ import (
 	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
 )
 
-// MockPower9GCCOpt produces a GCC-compatible power entry with Power9 architecture and optimisation configuration.
+// MockPower9GCCOpt produces a GCC-compatible instance with Power9 architecture and optimisation configuration.
 func MockPower9GCCOpt() Instance {
 	return Instance{
 		Compiler: Compiler{
@@ -24,7 +24,7 @@ func MockPower9GCCOpt() Instance {
 	}
 }
 
-// MockPower9GCCOpt produces a GCC-compatible power entry with X86 architecture.
+// MockX86Gcc produces a GCC-compatible instance with X86 architecture.
 func MockX86Gcc() Instance {
 	return Instance{
 		Compiler: Compiler{

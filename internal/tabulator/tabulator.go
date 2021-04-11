@@ -3,7 +3,7 @@
 // This file is part of c4t.
 // Licenced under the MIT licence; see `LICENSE`.
 
-// Package tabulate provides a generic interface for tabulating data (to CSV, to tabwriter, etc).
+// Package tabulator provides a generic interface for tabulating data (to CSV, to tabwriter, etc).
 package tabulator
 
 import (

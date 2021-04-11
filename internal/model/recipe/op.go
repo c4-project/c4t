@@ -24,7 +24,7 @@ const (
 	PushInput
 	// CompileObj pops inputs off the stack, compile them to an object, and push the name of the object onto the stack.
 	CompileObj
-	// CompileObj pops inputs off the stack, compile them, and output the results to the output binary.
+	// CompileExe pops inputs off the stack, compile them, and output the results to the output binary.
 	CompileExe
 
 	// Last is the last operation defined.

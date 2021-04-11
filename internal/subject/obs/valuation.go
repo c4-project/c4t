@@ -7,7 +7,7 @@ package obs
 
 import "sort"
 
-// An observed assignment of variable names to values.
+// Valuation is an observed assignment of variable names to values.
 type Valuation map[string]string
 
 // Vars gets a sorted list of variables bound by a state.
