@@ -25,7 +25,7 @@ import (
 
 // ExampleGCC_RunCompiler is a runnable example for GCC.RunCompiler.
 func ExampleGCC_RunCompiler() {
-	g := gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc"}}
+	g := gcc.GCC{DefaultRunInfo: service.RunInfo{Cmd: "gcc"}}
 	j := compiler.Job{
 		Compiler: &compiler.Instance{
 			SelectedMOpt: "arch=skylake",

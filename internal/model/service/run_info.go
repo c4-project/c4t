@@ -44,12 +44,10 @@ func (r *RunInfo) NewIfDifferent(cmd string) *RunInfo {
 	if cmd == r.Cmd {
 		return nil
 	}
-	newr := *r
-	newr.Cmd = cmd
-	return &newr
+	return &RunInfo{Cmd: cmd}
 }
 
-// SystematicID produces an ID based any non-default elements of this RunInfo.
+// SystematicID produces an ID based any present elements of this RunInfo.
 // If the RunInfo is the zero value, the ID will be empty.
 // It is not formally guaranteed to be unique, but should be close enough.
 func (r *RunInfo) SystematicID() (id.ID, error) {

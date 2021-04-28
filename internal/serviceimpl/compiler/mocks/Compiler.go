@@ -7,6 +7,8 @@ import (
 
 	compiler "github.com/c4-project/c4t/internal/model/service/compiler"
 
+	id "github.com/c4-project/c4t/internal/id"
+
 	mock "github.com/stretchr/testify/mock"
 
 	optlevel "github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
@@ -88,6 +90,20 @@ func (_m *Compiler) OptLevels(c *compiler.Compiler) (map[string]optlevel.Level, 
 	}
 
 	return r0, r1
+}
+
+// Probe provides a mock function with given fields: ctx, sr, classId, target
+func (_m *Compiler) Probe(ctx context.Context, sr service.Runner, classId id.ID, target compiler.ConfigMap) error {
+	ret := _m.Called(ctx, sr, classId, target)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, service.Runner, id.ID, compiler.ConfigMap) error); ok {
+		r0 = rf(ctx, sr, classId, target)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // RunCompiler provides a mock function with given fields: ctx, j, sr

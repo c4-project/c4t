@@ -9,45 +9,76 @@ import (
 	"context"
 	"strings"
 
+	"github.com/c4-project/c4t/internal/model/service/backend"
+
+	"github.com/c4-project/c4t/internal/model/service/compiler"
+
+	bimpl "github.com/c4-project/c4t/internal/serviceimpl/backend"
+	cimpl "github.com/c4-project/c4t/internal/serviceimpl/compiler"
+
 	"github.com/c4-project/c4t/internal/model/service"
-	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/machine"
 )
 
-// Probe populates this configuration with information found by scrutinising the current machine.
-func (c *Config) Probe(ctx context.Context, sr service.Runner, m machine.Prober) error {
-	if err := c.probeMachines(m); err != nil {
-		return err
-	}
-	return c.probeBackends(ctx, sr)
+// ProberSet contains the various probers used by configuration probing.
+type ProberSet struct {
+	// Machine is a machine prober.
+	Machine machine.Prober
+	// Backend is a backend resolver used for probing.
+	Backend backend.Prober
+	// Compiler is a compiler prober used for probing.
+	Compiler compiler.Prober
 }
 
-func (c *Config) probeMachines(m machine.Prober) error {
+// LocalProberSet provides a prober set suitable for most local probing.
+func LocalProberSet() ProberSet {
+	return ProberSet{
+		Machine:  machine.LocalProber(),
+		Backend:  &bimpl.Resolve,
+		Compiler: &cimpl.CResolve,
+	}
+}
+
+// Probe populates c with information found by scrutinising the current machine.
+func (p ProberSet) Probe(ctx context.Context, sr service.Runner, c *Config) error {
+	if err := p.probeMachines(ctx, sr, c); err != nil {
+		return err
+	}
+	return p.probeBackends(ctx, sr, c)
+}
+
+func (p ProberSet) probeMachines(ctx context.Context, sr service.Runner, c *Config) error {
 	if c.RawMachines == nil {
 		c.RawMachines = make(map[string]machine.Config)
 	}
 
-	hname := hostnameOrDefault(m)
+	hname := hostnameOrDefault(p.Machine)
 	var err error
 	if _, ok := c.RawMachines[hname]; !ok {
-		c.RawMachines[hname], err = probeConfig(m)
+		c.RawMachines[hname], err = p.probeMachine(ctx, sr)
 	}
 
 	return err
 }
 
-func (c *Config) probeBackends(ctx context.Context, sr service.Runner) error {
+func (p ProberSet) probeBackends(ctx context.Context, sr service.Runner, c *Config) error {
 	var err error
-	// TODO(@MattWindsor91): should this be hardcoded?
-	c.Backends, err = backend.Resolve.Probe(ctx, sr)
+	c.Backends, err = p.Backend.Probe(ctx, sr)
 	return err
 }
 
-func probeConfig(m machine.Prober) (machine.Config, error) {
-	var c machine.Config
-
-	err := c.Probe(m)
+func (p ProberSet) probeMachine(ctx context.Context, sr service.Runner) (machine.Config, error) {
+	var (
+		c   machine.Config
+		err error
+	)
+	if err = c.Probe(p.Machine); err != nil {
+		return c, err
+	}
+	if c.RawCompilers == nil {
+		c.RawCompilers, err = p.Compiler.Probe(ctx, sr)
+	}
 
 	return c, err
 }

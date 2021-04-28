@@ -6,6 +6,8 @@
 package backend
 
 import (
+	"context"
+
 	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/model/service"
 )
@@ -25,4 +27,10 @@ type NamedSpec struct {
 	ID id.ID `toml:"id"`
 
 	Spec
+}
+
+// Prober is the interface of types that support backend probing.
+type Prober interface {
+	// Probe uses sr to probe for backends.
+	Probe(ctx context.Context, sr service.Runner) ([]NamedSpec, error)
 }

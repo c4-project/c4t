@@ -7,6 +7,8 @@
 package compiler
 
 import (
+	"context"
+
 	"github.com/c4-project/c4t/internal/id"
 	"github.com/c4-project/c4t/internal/model/service"
 	"github.com/c4-project/c4t/internal/model/service/compiler/optlevel"
@@ -25,7 +27,7 @@ type Compiler struct {
 	Style id.ID `toml:"style" json:"style"`
 
 	// Arch is the architecture (or 'emits') ID for the compiler.
-	Arch id.ID `toml:"arch" json:"arch"`
+	Arch id.ID `toml:"arch,omitempty" json:"arch,omitempty"`
 
 	// Run contains information on how to run the compiler.
 	Run *service.RunInfo `toml:"run,omitempty" json:"run,omitempty"`
@@ -39,3 +41,13 @@ type Compiler struct {
 
 // Config denotes raw configuration for a Compiler.
 type Config Compiler
+
+// ConfigMap is a map of raw compiler configuration.
+type ConfigMap map[string]Config
+
+// Prober is the interface of types that support compiler probing.
+type Prober interface {
+	// Probe uses sr to probe for compilers.
+	// It returns them as a map of the right type to slot into RawCompilers in a machine config, hence the string keys.
+	Probe(ctx context.Context, sr service.Runner) (ConfigMap, error)
+}

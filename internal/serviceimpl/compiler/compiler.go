@@ -34,12 +34,21 @@ var (
 
 	// CResolve is a pre-populated compiler resolver.
 	CResolve = Resolver{Compilers: map[id.ID]Compiler{
-		id.CStyleGCC: gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}}},
+		id.CStyleGCC: gcc.GCC{
+			DefaultRunInfo: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}},
+			AltCommands: []string{
+				// non-exhaustive, add more as we need them
+				"clang",
+			},
+		},
 	}}
 )
 
 // Compiler contains the various interfaces that a compiler can implement.
 type Compiler interface {
+	// Probe uses sr to probe for copies of a particular compiler class with id classId, adding them to target.
+	Probe(ctx context.Context, sr service.Runner, classId id.ID, target mdl.ConfigMap) error
+
 	mdl.Inspector
 	interpreter.Driver
 }
@@ -98,4 +107,15 @@ func (r *Resolver) RunCompiler(ctx context.Context, j mdl.Job, sr service.Runner
 		return err
 	}
 	return cp.RunCompiler(ctx, j, sr)
+}
+
+func (r *Resolver) Probe(ctx context.Context, sr service.Runner) (mdl.ConfigMap, error) {
+	// As an educated guess, assume every class has one spec.
+	target := make(mdl.ConfigMap, len(r.Compilers))
+	for cid, class := range r.Compilers {
+		if err := class.Probe(ctx, sr, cid, target); err != nil {
+			return nil, err
+		}
+	}
+	return target, nil
 }

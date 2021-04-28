@@ -18,7 +18,6 @@ import (
 	"github.com/c4-project/c4t/internal/helper/srvrun"
 
 	"github.com/c4-project/c4t/internal/config"
-	"github.com/c4-project/c4t/internal/machine"
 	"github.com/c4-project/c4t/internal/ux/stdflag"
 	c "github.com/urfave/cli/v2"
 )
@@ -147,7 +146,7 @@ func printGlobalPath(outw io.Writer) error {
 
 func probeAndDump(ctx context.Context, outw io.Writer, errw io.Writer) error {
 	cfg := config.Config{}
-	if err := cfg.Probe(ctx, srvrun.NewExecRunner(srvrun.StderrTo(errw)), machine.LocalProber()); err != nil {
+	if err := config.LocalProberSet().Probe(ctx, srvrun.NewExecRunner(srvrun.StderrTo(errw)), &cfg); err != nil {
 		return err
 	}
 	return cfg.Dump(outw)

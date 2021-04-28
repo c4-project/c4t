@@ -30,7 +30,7 @@ type Config struct {
 	// We don't store them as IDs here, to avoid issues with TOML serialisation.
 	//
 	// This doesn't contain machine-level defaults; use Compilers() to get a fully resolved version.
-	RawCompilers map[string]compiler.Config `toml:"compilers,omitempty"`
+	RawCompilers compiler.ConfigMap `toml:"compilers,omitempty"`
 
 	// Mutation contains information about how to mutation-test on this machine.
 	Mutation *mutation.Config `toml:"mutation,omitempty"`

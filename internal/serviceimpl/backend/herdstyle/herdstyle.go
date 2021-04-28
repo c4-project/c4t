@@ -84,7 +84,7 @@ func (c Class) Probe(ctx context.Context, sr service.Runner, classId id.ID) ([]b
 	specs := make([]backend2.NamedSpec, 0, len(candidates))
 	for k := range candidates {
 		// TODO(@MattWindsor91): check version
-		ns, err := expandProbedCommand(classId, c.DefaultRunInfo.NewIfDifferent(k))
+		ns, err := c.expandProbedCommand(classId, k)
 		if err != nil {
 			return nil, err
 		}
@@ -94,16 +94,20 @@ func (c Class) Probe(ctx context.Context, sr service.Runner, classId id.ID) ([]b
 	return specs, nil
 }
 
-func expandProbedCommand(classId id.ID, run *service.RunInfo) (backend2.NamedSpec, error) {
-	ns := backend2.NamedSpec{ID: classId, Spec: backend2.Spec{Style: classId, Run: run}}
-	if ns.Run != nil {
-		sid, err := ns.Run.SystematicID()
-		if err != nil {
-			return backend2.NamedSpec{}, err
-		}
-		ns.ID = ns.ID.Join(sid)
+func (c Class) expandProbedCommand(classId id.ID, cmd string) (backend2.NamedSpec, error) {
+	run := c.DefaultRunInfo.NewIfDifferent(cmd)
+	bid, err := c.makeID(run)
+	if err != nil {
+		return backend2.NamedSpec{}, err
 	}
-	return ns, nil
+	return backend2.NamedSpec{ID: bid, Spec: backend2.Spec{Style: classId, Run: run}}, nil
+}
+
+func (c Class) makeID(run *service.RunInfo) (id.ID, error) {
+	if run == nil {
+		return id.TryFromString(c.DefaultRunInfo.Cmd)
+	}
+	return run.SystematicID()
 }
 
 // Backend represents instantiated herd-style backends.
