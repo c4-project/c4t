@@ -6,33 +6,17 @@
 package service
 
 import (
-	"context"
 	"fmt"
-	"io"
 	"sort"
 	"strings"
-	"time"
+
+	"github.com/1set/gut/ystring"
+
+	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/buildkite/interpolate"
 	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
-
-// Runner is the interface of things that can run, or pretend to run, services.
-type Runner interface {
-	// WithStdout should return a new runner with the standard output overridden to w.
-	WithStdout(w io.Writer) Runner
-
-	// WithStderr should return a new runner with the standard error overridden to w.
-	WithStderr(w io.Writer) Runner
-
-	// WithGrace should return a new runner with the timeout grace period set to d.
-	WithGrace(d time.Duration) Runner
-
-	// Run runs r using context ctx.
-	Run(ctx context.Context, r RunInfo) error
-}
-
-//go:generate mockery --name=Runner
 
 // RunInfo gives hints as to how to run a service.
 type RunInfo struct {
@@ -49,6 +33,36 @@ type RunInfo struct {
 // NewRunInfo programmatically creates a RunInfo using command cmd and arguments args.
 func NewRunInfo(cmd string, args ...string) *RunInfo {
 	return &RunInfo{Cmd: cmd, Args: args}
+}
+
+// NewIfDifferent returns a new RunInfo overriding this RunInfo's Cmd with cmd if it is different, and nil otherwise.
+// This is useful for generating service configuration, if we only want to supply a specific non-default RunInfo when
+// there is a real difference from the current default.
+//
+// This function may eventually also take arguments; if so, they will be supplied variadically.
+func (r *RunInfo) NewIfDifferent(cmd string) *RunInfo {
+	if cmd == r.Cmd {
+		return nil
+	}
+	newr := *r
+	newr.Cmd = cmd
+	return &newr
+}
+
+// SystematicID produces an ID based any non-default elements of this RunInfo.
+// If the RunInfo is the zero value, the ID will be empty.
+// It is not formally guaranteed to be unique, but should be close enough.
+func (r *RunInfo) SystematicID() (id.ID, error) {
+	// TODO(@MattWindsor91): strip - and ., perhaps
+
+	tags := make([]string, 0, 1+len(r.Args)+len(r.Env))
+	if ystring.IsNotEmpty(r.Cmd) {
+		tags = append(tags, r.Cmd)
+	}
+	tags = append(tags, r.Args...)
+	tags = append(tags, r.EnvStrings()...)
+
+	return id.New(tags...)
 }
 
 // Invocation is Cmd appended to Args.

@@ -26,7 +26,7 @@ func TestResolver_RunCompiler(t *testing.T) {
 	mc.Test(t)
 	mr.Test(t)
 
-	r := compiler.Resolver{Compilers: map[string]compiler.Compiler{"gcc": mc}}
+	r := compiler.Resolver{Compilers: map[id.ID]compiler.Compiler{id.CStyleGCC: mc}}
 
 	ctx := context.Background()
 	j := *mdl.NewJob(

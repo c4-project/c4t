@@ -34,25 +34,33 @@ var (
 	rmemArches = []id.ID{id.ArchAArch64}
 
 	// Resolve is a pre-populated backend resolver.
-	Resolve = Resolver{Backends: map[string]backend2.Class{
-		"delitmus": delitmus.Delitmus{},
-		"herdtools.herd": herdstyle.Class{
+	Resolve = Resolver{Backends: map[id.ID]backend2.Class{
+		id.FromString("delitmus"): delitmus.Delitmus{},
+		id.FromString("herdtools.herd"): herdstyle.Class{
 			OptCapabilities: 0,
 			Arches:          herdArches,
-			DefaultRunInfo:  service.RunInfo{Cmd: "herd7"},
 			Impl:            herd.Herd{},
+			ExtClass: service.ExtClass{
+				DefaultRunInfo: service.RunInfo{Cmd: "herd7"},
+				AltCommands:    []string{"herd"},
+			},
 		},
-		"herdtools.litmus": herdstyle.Class{
+		id.FromString("herdtools.litmus"): herdstyle.Class{
 			OptCapabilities: backend2.CanProduceExe,
 			Arches:          litmusArches,
-			DefaultRunInfo:  service.RunInfo{Cmd: "litmus7"},
 			Impl:            litmus.Litmus{},
+			ExtClass: service.ExtClass{
+				DefaultRunInfo: service.RunInfo{Cmd: "litmus7"},
+				AltCommands:    []string{"litmus"},
+			},
 		},
-		"rmem": herdstyle.Class{
+		id.FromString("rmem"): herdstyle.Class{
 			OptCapabilities: backend2.CanLiftLitmus,
 			Arches:          rmemArches,
-			DefaultRunInfo:  service.RunInfo{Cmd: "rmem"},
 			Impl:            rmem.Rmem{},
+			ExtClass: service.ExtClass{
+				DefaultRunInfo: service.RunInfo{Cmd: "rmem"},
+			},
 		},
 	}}
 )
@@ -60,7 +68,7 @@ var (
 // Resolver maps backend styles to classes, and implements a resolver accordingly.
 type Resolver struct {
 	// Backends is the raw map from style strings to backend constructors.
-	Backends map[string]backend2.Class
+	Backends map[id.ID]backend2.Class
 }
 
 // Resolve tries to look up the backend specified by b in this resolver.
@@ -69,10 +77,9 @@ func (r *Resolver) Resolve(b backend2.Spec) (backend2.Backend, error) {
 		return nil, ErrNil
 	}
 
-	sstr := b.Style.String()
-	bi, ok := r.Backends[sstr]
+	bi, ok := r.Backends[b.Style]
 	if !ok {
-		return nil, fmt.Errorf("%w: %s", ErrUnknownStyle, sstr)
+		return nil, fmt.Errorf("%w: %s", ErrUnknownStyle, b.Style)
 	}
 	return bi.Instantiate(b), nil
 }
@@ -86,7 +93,7 @@ func (r *Resolver) Probe(ctx context.Context, sr service.Runner) ([]backend2.Nam
 		err error
 	)
 	for style, c := range r.Backends {
-		if cns, err = c.Probe(ctx, sr, id.FromString(style)); err != nil {
+		if cns, err = c.Probe(ctx, sr, style); err != nil {
 			return nil, err
 		}
 		ns = append(ns, cns...)

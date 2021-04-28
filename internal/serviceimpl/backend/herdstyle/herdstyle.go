@@ -49,8 +49,7 @@ type Class struct {
 	// Arches describes the architectures of Litmus test this backend can deal with.
 	Arches []id.ID
 
-	// DefaultRunInfo is the default run information for this backend archetype.
-	DefaultRunInfo service.RunInfo
+	service.ExtClass
 
 	// Impl provides parts of the Backend backend setup that differ between the various tools.
 	Impl BackendImpl
@@ -80,9 +79,31 @@ func (c Class) capabilities() backend2.Capability {
 }
 
 // Probe probes for this particular kind of herdstyle backend.
-func (c Class) Probe(_ context.Context, _ service.Runner, _ id.ID) ([]backend2.NamedSpec, error) {
-	// TODO(@MattWindsor91): implement this
-	return nil, nil
+func (c Class) Probe(ctx context.Context, sr service.Runner, classId id.ID) ([]backend2.NamedSpec, error) {
+	candidates := c.ExtClass.ProbeByVersionCommand(ctx, sr, "-version")
+	specs := make([]backend2.NamedSpec, 0, len(candidates))
+	for k := range candidates {
+		// TODO(@MattWindsor91): check version
+		ns, err := expandProbedCommand(classId, c.DefaultRunInfo.NewIfDifferent(k))
+		if err != nil {
+			return nil, err
+		}
+		specs = append(specs, ns)
+	}
+	// TODO(@MattWindsor91): can this fail?
+	return specs, nil
+}
+
+func expandProbedCommand(classId id.ID, run *service.RunInfo) (backend2.NamedSpec, error) {
+	ns := backend2.NamedSpec{ID: classId, Spec: backend2.Spec{Style: classId, Run: run}}
+	if ns.Run != nil {
+		sid, err := ns.Run.SystematicID()
+		if err != nil {
+			return backend2.NamedSpec{}, err
+		}
+		ns.ID = ns.ID.Join(sid)
+	}
+	return ns, nil
 }
 
 // Backend represents instantiated herd-style backends.

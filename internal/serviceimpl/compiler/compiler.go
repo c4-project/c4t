@@ -11,6 +11,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/c4-project/c4t/internal/id"
+
 	"github.com/c4-project/c4t/internal/stage/mach/interpreter"
 
 	"github.com/c4-project/c4t/internal/helper/stringhelp"
@@ -31,8 +33,8 @@ var (
 	ErrUnknownStyle = errors.New("unknown compiler style")
 
 	// CResolve is a pre-populated compiler resolver.
-	CResolve = Resolver{Compilers: map[string]Compiler{
-		"gcc": gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}}},
+	CResolve = Resolver{Compilers: map[id.ID]Compiler{
+		id.CStyleGCC: gcc.GCC{DefaultRun: service.RunInfo{Cmd: "gcc", Args: []string{"-pthread", "-std=gnu11"}}},
 	}}
 )
 
@@ -47,7 +49,7 @@ type Compiler interface {
 // Resolver maps compiler styles to compilers.
 type Resolver struct {
 	// Compilers is the raw map from style strings to compiler runners.
-	Compilers map[string]Compiler
+	Compilers map[id.ID]Compiler
 }
 
 // Get tries to look up the compiler specified by nc in this resolver.
@@ -55,10 +57,9 @@ func (r *Resolver) Get(c *mdl.Compiler) (Compiler, error) {
 	if c == nil {
 		return nil, ErrNil
 	}
-	sstr := c.Style.String()
-	cp, ok := r.Compilers[sstr]
+	cp, ok := r.Compilers[c.Style]
 	if !ok {
-		return nil, fmt.Errorf("%w: %q", ErrUnknownStyle, sstr)
+		return nil, fmt.Errorf("%w: %q", ErrUnknownStyle, c.Style)
 	}
 	return cp, nil
 }

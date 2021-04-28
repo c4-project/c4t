@@ -53,3 +53,24 @@ func ExampleRunInfo_Interpolate() {
 	// C4_MUTATION=4 gcc -std=c11
 	// C4_MUTATION=3 gcc -std=c99
 }
+
+// ExampleRunInfo_SystematicID is a runnable example for the SystematicID method.
+func ExampleRunInfo_SystematicID() {
+	r := service.RunInfo{
+		Cmd:  "gcc",
+		Args: []string{"-std=c11"},
+		Env:  map[string]string{"C4_MUTATION": "4"},
+	}
+
+	id1, _ := r.SystematicID()
+	fmt.Println(id1)
+
+	// If the command is empty, it doesn't appear in the ID anymore
+	r.Cmd = ""
+	id2, _ := r.SystematicID()
+	fmt.Println(id2)
+
+	// Output:
+	// gcc.-std=c11.c4_mutation=4
+	// -std=c11.c4_mutation=4
+}
