@@ -7,6 +7,8 @@ import (
 
 	backend "github.com/c4-project/c4t/internal/model/service/backend"
 
+	id "github.com/c4-project/c4t/internal/id"
+
 	mock "github.com/stretchr/testify/mock"
 
 	service "github.com/c4-project/c4t/internal/model/service"
@@ -40,22 +42,22 @@ func (_m *Resolver) Probe(ctx context.Context, sr service.Runner) ([]backend.Nam
 	return r0, r1
 }
 
-// Resolve provides a mock function with given fields: s
-func (_m *Resolver) Resolve(s backend.Spec) (backend.Backend, error) {
-	ret := _m.Called(s)
+// Resolve provides a mock function with given fields: cid
+func (_m *Resolver) Resolve(cid id.ID) (backend.Class, error) {
+	ret := _m.Called(cid)
 
-	var r0 backend.Backend
-	if rf, ok := ret.Get(0).(func(backend.Spec) backend.Backend); ok {
-		r0 = rf(s)
+	var r0 backend.Class
+	if rf, ok := ret.Get(0).(func(id.ID) backend.Class); ok {
+		r0 = rf(cid)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(backend.Backend)
+			r0 = ret.Get(0).(backend.Class)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(backend.Spec) error); ok {
-		r1 = rf(s)
+	if rf, ok := ret.Get(1).(func(id.ID) error); ok {
+		r1 = rf(cid)
 	} else {
 		r1 = ret.Error(1)
 	}

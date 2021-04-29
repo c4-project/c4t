@@ -76,7 +76,7 @@ func (r *Runner) Run(ctx context.Context, p *plan.Plan) (*plan.Plan, error) {
 	}
 	observer.OnRunStart(r.quantities, r.observers...)
 
-	b, err := r.resolver.Resolve(p.Backend.Spec)
+	b, err := backend.ResolveAndInstantiate(p.Backend.Spec, r.resolver)
 	if err != nil {
 		return nil, err
 	}

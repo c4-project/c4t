@@ -18,8 +18,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestResolver_Get_capabilities tests that the standard resolver provides the correct capabilities for the known backends.
-func TestResolver_Get_capabilities(t *testing.T) {
+// TestResolver_Resolve_capabilities tests that the standard resolver provides the correct capabilities for the known backends.
+func TestResolver_Resolve_capabilities(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]backend2.Capability{
@@ -33,10 +33,10 @@ func TestResolver_Get_capabilities(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			r, err := backend.Resolve.Resolve(backend2.Spec{Style: id.FromString(name)})
+			r, err := backend.Resolve.Resolve(id.FromString(name))
 			require.NoError(t, err, "resolution should pass")
 
-			assert.Equal(t, c, r.Class().Metadata().Capabilities)
+			assert.Equal(t, c, r.Metadata().Capabilities)
 		})
 	}
 }

@@ -216,7 +216,7 @@ func getBackend(cfg backend.Finder, c backend.Criteria) (backend.Backend, error)
 		return nil, fmt.Errorf("while finding backend: %w", err)
 	}
 
-	b, err := backend2.Resolve.Resolve(spec.Spec)
+	b, err := backend.ResolveAndInstantiate(spec.Spec, &backend2.Resolve)
 	if err != nil {
 		return nil, fmt.Errorf("while resolving backend %s: %w", spec.ID, err)
 	}

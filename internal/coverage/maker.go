@@ -247,7 +247,7 @@ func (m *Maker) knownRunner(p Profile) (Runner, error) {
 	if p.Backend == nil {
 		return nil, ErrNeedBackend
 	}
-	b, err := m.bresolver.Resolve(*p.Backend)
+	b, err := backend.ResolveAndInstantiate(*p.Backend, m.bresolver)
 	if err != nil {
 		return nil, err
 	}

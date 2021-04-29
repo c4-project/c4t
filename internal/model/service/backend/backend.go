@@ -104,11 +104,20 @@ func RunExeAndParse(ctx context.Context, j *RunJob, r service.RunInfo, p ObsPars
 
 // Resolver is the interface of things that can resolve backends.
 type Resolver interface {
-	// Resolve tries to resolve the spec s into a backend.
-	Resolve(s Spec) (Backend, error)
+	// Resolve tries to resolve the class ID cid into a backend class.
+	Resolve(cid id.ID) (Class, error)
 
 	// Probe uses sr to probe for backend specifications on this machine.
 	Probe(ctx context.Context, sr service.Runner) ([]NamedSpec, error)
 }
 
 //go:generate mockery --name=Resolver
+
+// ResolveAndInstantiate uses a Resolver to resolve spec's class ID, then uses spec to instantiate the class.
+func ResolveAndInstantiate(spec Spec, r Resolver) (Backend, error) {
+	class, err := r.Resolve(spec.Style)
+	if err != nil {
+		return nil, err
+	}
+	return class.Instantiate(spec), nil
+}

@@ -117,7 +117,7 @@ func checkPlan(p *plan.Plan) error {
 }
 
 func (l *Lifter) liftCorpus(ctx context.Context, p *plan.Plan) (corpus.Corpus, error) {
-	b, err := l.resolver.Resolve(p.Backend.Spec)
+	b, err := backend.ResolveAndInstantiate(p.Backend.Spec, l.resolver)
 	if err != nil {
 		return nil, err
 	}

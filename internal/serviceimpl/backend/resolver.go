@@ -72,16 +72,16 @@ type Resolver struct {
 }
 
 // Resolve tries to look up the backend specified by b in this resolver.
-func (r *Resolver) Resolve(b backend2.Spec) (backend2.Backend, error) {
+func (r *Resolver) Resolve(cid id.ID) (backend2.Class, error) {
 	if r == nil {
 		return nil, ErrNil
 	}
 
-	bi, ok := r.Backends[b.Style]
+	bi, ok := r.Backends[cid]
 	if !ok {
-		return nil, fmt.Errorf("%w: %s", ErrUnknownStyle, b.Style)
+		return nil, fmt.Errorf("%w: %s", ErrUnknownStyle, cid)
 	}
-	return bi.Instantiate(b), nil
+	return bi, nil
 }
 
 // Probe probes every class in this resolver, and aggregates the specifications.
