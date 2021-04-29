@@ -14,8 +14,6 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	backend2 "github.com/c4-project/c4t/internal/model/service/backend"
-
 	"github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
@@ -233,13 +231,14 @@ func makeGlob(mfilter string) (id.ID, error) {
 	return id.TryFromString(mfilter)
 }
 
-func makeEnv(a *c4f.Runner, c backend2.Finder) director.Env {
+func makeEnv(a *c4f.Runner, c *config.Config) director.Env {
+	cbf := config.BackendFinder{Config: c, Resolver: &backend.Resolve}
 	return director.Env{
 		Fuzzer:     a,
 		BResolver:  &backend.Resolve,
 		CInspector: &compiler.CResolve,
 		Planner: planner.Source{
-			BProbe: c,
+			BProbe: cbf,
 			SProbe: a,
 		},
 	}

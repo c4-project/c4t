@@ -14,6 +14,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/c4-project/c4t/internal/config"
+
 	"github.com/c4-project/c4t/internal/model/litmus"
 
 	"github.com/c4-project/c4t/internal/helper/errhelp"
@@ -79,7 +81,7 @@ func App(outw, errw io.Writer) *c.App {
 			return run(ctx, outw, errw)
 		},
 	}
-	return stdflag.SetPlanAppSettings(a, outw, errw)
+	return stdflag.SetCommonAppSettings(a, outw, errw)
 }
 
 func flags() []c.Flag {
@@ -210,8 +212,9 @@ func inputNameFromCli(ctx *c.Context) (string, error) {
 	return ctx.Args().First(), nil
 }
 
-func getBackend(cfg backend.Finder, c backend.Criteria) (backend.Backend, error) {
-	spec, err := cfg.FindBackend(c)
+func getBackend(cfg *config.Config, c backend.Criteria) (backend.Backend, error) {
+	cbf := config.BackendFinder{Config: cfg, Resolver: &backend2.Resolve}
+	spec, err := cbf.FindBackend(c)
 	if err != nil {
 		return nil, fmt.Errorf("while finding backend: %w", err)
 	}

@@ -30,14 +30,24 @@ type Criteria struct {
 	IDGlob id.ID
 	// StyleGlob is a glob pattern for the style of the backend.
 	StyleGlob id.ID
-
-	// TODO(@MattWindsor91): it'd be nice to have target/source resolution, but doing this without having a dependency
-	// cycle seems difficult.
+	// Capability specifies which capabilities are needed on the backend.
+	Capability Capability
 }
 
 // String outputs a string representation of a set of criteria.
 func (c Criteria) String() string {
-	parts := make([]string, 0, 2)
+	parts := make([]string, 0, 3)
+	parts = c.addGlobParts(parts)
+	if c.Capability != 0 {
+		parts = append(parts, fmt.Sprintf("can=%s", c.Capability))
+	}
+	if len(parts) == 0 {
+		return "any"
+	}
+	return strings.Join(parts, ", ")
+}
+
+func (c Criteria) addGlobParts(parts []string) []string {
 	for _, g := range []struct {
 		name string
 		glob id.ID
@@ -50,14 +60,36 @@ func (c Criteria) String() string {
 		}
 		parts = append(parts, fmt.Sprintf("%s=%s", g.name, g.glob))
 	}
-	if len(parts) == 0 {
-		return "any"
-	}
-	return strings.Join(parts, ", ")
+
+	return parts
 }
 
-// Matches tries to see if s matches this criteria.
-func (c Criteria) Matches(s NamedSpec) (bool, error) {
+// Find tries to find a matching backend in a list of specifications specs, given a resolver r.
+func (c Criteria) Find(specs []NamedSpec, r Resolver) (*NamedSpec, error) {
+	for _, s := range specs {
+		match, err := c.Matches(s, r)
+		if err != nil {
+			return nil, err
+		}
+		if match {
+			return &s, nil
+		}
+	}
+	return nil, fmt.Errorf("%w: %s", ErrNoMatch, c)
+}
+
+// Matches tries to see if s matches this criteria given resolver r.
+func (c Criteria) Matches(s NamedSpec, r Resolver) (bool, error) {
+	// Fail fast if we've got a spec that doesn't match any class.
+	class, err := r.Resolve(s.Style)
+	if err != nil {
+		return false, err
+	}
+	matched, err := c.matchesGlob(s)
+	return matched && c.matchesCapabilities(class), err
+}
+
+func (c Criteria) matchesGlob(s NamedSpec) (bool, error) {
 	for _, g := range []struct{ id, glob id.ID }{
 		{id: s.ID, glob: c.IDGlob},
 		{id: s.Style, glob: c.StyleGlob},
@@ -72,16 +104,6 @@ func (c Criteria) Matches(s NamedSpec) (bool, error) {
 	return true, nil
 }
 
-// Find tries to find a matching backend in a list of specifications specs.
-func (c Criteria) Find(specs []NamedSpec) (*NamedSpec, error) {
-	for _, s := range specs {
-		match, err := c.Matches(s)
-		if err != nil {
-			return nil, err
-		}
-		if match {
-			return &s, nil
-		}
-	}
-	return nil, fmt.Errorf("%w: %s", ErrNoMatch, c)
+func (c Criteria) matchesCapabilities(class Class) bool {
+	return class.Metadata().Capabilities.Satisfies(c.Capability)
 }

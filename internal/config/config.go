@@ -62,9 +62,15 @@ func (c *Config) Machines() (machine.ConfigMap, error) {
 	return ms, nil
 }
 
-// FindBackend uses the configuration to find a backend matching criteria cr.
-func (c *Config) FindBackend(cr backend.Criteria) (*backend.NamedSpec, error) {
-	return cr.Find(c.Backends)
+// BackendFinder lets a config be used to find backends.
+type BackendFinder struct {
+	Config   *Config
+	Resolver backend.Resolver
+}
+
+// FindBackend uses the configuration to find a backend matching criteria cr, given resolver r.
+func (c BackendFinder) FindBackend(cr backend.Criteria) (*backend.NamedSpec, error) {
+	return cr.Find(c.Config.Backends, c.Resolver)
 }
 
 // Dump dumps this configuration to the writer w.

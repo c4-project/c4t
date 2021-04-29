@@ -12,7 +12,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/c4-project/c4t/internal/model/service/backend"
+	backend2 "github.com/c4-project/c4t/internal/serviceimpl/backend"
 
 	"github.com/c4-project/c4t/internal/quantity"
 
@@ -161,11 +161,11 @@ func writePlansToDir(outdir string, ps plan.Map) error {
 	return nil
 }
 
-func makePlanner(ctx *c.Context, bf backend.Finder, errw io.Writer) (*planner.Planner, error) {
+func makePlanner(ctx *c.Context, cfg *config.Config, errw io.Writer) (*planner.Planner, error) {
 	a := stdflag.C4fRunnerFromCli(ctx, errw)
 
 	qs := quantities(ctx)
-	src := source(a, bf)
+	src := source(a, cfg)
 
 	l := log.New(errw, "[planner] ", log.LstdFlags)
 
@@ -177,9 +177,10 @@ func makePlanner(ctx *c.Context, bf backend.Finder, errw io.Writer) (*planner.Pl
 	)
 }
 
-func source(a planner.SubjectProber, bf backend.Finder) planner.Source {
+func source(a planner.SubjectProber, cfg *config.Config) planner.Source {
+	// TODO(@MattWindsor91): clean all of this up across plan, director, etc.
 	return planner.Source{
-		BProbe: bf,
+		BProbe: config.BackendFinder{Config: cfg, Resolver: &backend2.Resolve},
 		SProbe: a,
 	}
 }

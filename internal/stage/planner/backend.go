@@ -11,5 +11,6 @@ import (
 
 func (p *Planner) planBackend() (*backend2.NamedSpec, error) {
 	// TODO(@MattWindsor91): add machine default backends, etc etc.
-	return p.source.BProbe.FindBackend(backend2.Criteria{})
+	// TODO(@MattWindsor91): don't hardcode the capability here?
+	return p.source.BProbe.FindBackend(backend2.Criteria{Capability: backend2.CanLiftLitmus | backend2.CanProduceExe})
 }
