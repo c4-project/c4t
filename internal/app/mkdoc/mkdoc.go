@@ -11,6 +11,8 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/c4-project/c4t/internal/app/mkdb"
+
 	"github.com/c4-project/c4t/internal/app/stat"
 
 	"github.com/c4-project/c4t/internal/app/config"
@@ -80,6 +82,7 @@ var appFuncs = [...]func(io.Writer, io.Writer) *c.App{
 	invoke.App,
 	lift.App,
 	mach.App,
+	mkdb.App,
 	obs.App,
 	perturb.App,
 	plan.App,
