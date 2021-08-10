@@ -150,18 +150,18 @@ func TestSubject_AddCompileResult(t *testing.T) {
 	mcomp := id.FromString("gcc")
 
 	t.Run("initial-add", func(t *testing.T) {
-		t.Parallel()
+		// cannot be parallelised
 		assert.NoError(t, s.AddCompileResult(mcomp, c), "err when adding compile to empty subject")
 	})
 	t.Run("add-get", func(t *testing.T) {
-		t.Parallel()
+		// cannot be parallelised
 		c2, err := s.CompileResult(mcomp)
 		if assert.NoError(t, err, "err when getting added compile") {
 			assert.Equalf(t, c, *c2, "added compile (%v) came back wrong (%v)", c2, c)
 		}
 	})
 	t.Run("add-dupe", func(t *testing.T) {
-		t.Parallel()
+		// cannot be parallelised
 		err := s.AddCompileResult(mcomp, compilation.CompileResult{})
 		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateCompile, "adding compile twice")
 	})
