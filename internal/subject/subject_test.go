@@ -134,7 +134,7 @@ func TestSubject_CompileResult_Missing(t *testing.T) {
 }
 
 // TestSubject_AddCompileResult checks that AddCompileResult is working properly.
-func TestSubject_AddCompileResult(t *testing.T) { //nolint:tparallel
+func TestSubject_AddCompileResult(t *testing.T) {
 	t.Parallel()
 
 	var s subject.Subject
@@ -148,23 +148,15 @@ func TestSubject_AddCompileResult(t *testing.T) { //nolint:tparallel
 	}
 
 	mcomp := id.FromString("gcc")
+	assert.NoError(t, s.AddCompileResult(mcomp, c), "err when adding compile to empty subject")
 
-	t.Run("initial-add", func(t *testing.T) {
-		// cannot be parallelised
-		assert.NoError(t, s.AddCompileResult(mcomp, c), "err when adding compile to empty subject")
-	})
-	t.Run("add-get", func(t *testing.T) {
-		// cannot be parallelised
-		c2, err := s.CompileResult(mcomp)
-		if assert.NoError(t, err, "err when getting added compile") {
-			assert.Equalf(t, c, *c2, "added compile (%v) came back wrong (%v)", c2, c)
-		}
-	})
-	t.Run("add-dupe", func(t *testing.T) {
-		// cannot be parallelised
-		err := s.AddCompileResult(mcomp, compilation.CompileResult{})
-		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateCompile, "adding compile twice")
-	})
+	c2, err := s.CompileResult(mcomp)
+	if assert.NoError(t, err, "err when getting added compile") {
+		assert.Equalf(t, c, *c2, "added compile (%v) came back wrong (%v)", c2, c)
+	}
+
+	err = s.AddCompileResult(mcomp, compilation.CompileResult{})
+	testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateCompile, "adding compile twice")
 }
 
 // TestSubject_Recipe_missing checks that trying to get a recipe for a missing arch triggers
@@ -186,24 +178,16 @@ func TestSubject_AddRecipe(t *testing.T) {
 	}
 
 	march := id.ArchX8664
+	assert.NoError(t, s.AddRecipe(march, h), "err when adding recipe to empty subject")
 
-	t.Run("initial-add", func(t *testing.T) {
-		t.Parallel()
-		assert.NoError(t, s.AddRecipe(march, h), "err when adding recipe to empty subject")
-	})
-	t.Run("add-get", func(t *testing.T) {
-		t.Parallel()
-		m2, h2, err := s.Recipe(march)
-		if assert.NoError(t, err, "err when getting added recipe") {
-			assert.Equal(t, march, m2, "wrong recipe ID")
-			assert.Equalf(t, h, h2, "added recipe (%v) came back wrong (%v)", h2, h)
-		}
-	})
-	t.Run("add-dupe", func(t *testing.T) {
-		t.Parallel()
-		err := s.AddRecipe(march, recipe.Recipe{})
-		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRecipe, "adding recipe twice")
-	})
+	m2, h2, err := s.Recipe(march)
+	if assert.NoError(t, err, "err when getting added recipe") {
+		assert.Equal(t, march, m2, "wrong recipe ID")
+		assert.Equalf(t, h, h2, "added recipe (%v) came back wrong (%v)", h2, h)
+	}
+
+	err = s.AddRecipe(march, recipe.Recipe{})
+	testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRecipe, "adding recipe twice")
 }
 
 // TestSubject_RunOf_Missing checks that trying to get a run for a missing compiler gives
@@ -228,23 +212,15 @@ func TestSubject_AddRun(t *testing.T) {
 	c := compilation.RunResult{Result: compilation.Result{Status: status.RunTimeout}}
 
 	mcomp := id.FromString("gcc")
+	assert.NoError(t, s.AddRun(mcomp, c), "err when adding run to empty subject")
 
-	t.Run("initial-add", func(t *testing.T) {
-		t.Parallel()
-		assert.NoError(t, s.AddRun(mcomp, c), "err when adding run to empty subject")
-	})
-	t.Run("add-get", func(t *testing.T) {
-		t.Parallel()
-		c2, err := s.RunResult(mcomp)
-		if assert.NoError(t, err, "err when getting added run") {
-			assert.Equalf(t, c, *c2, "added run (%v) came back wrong (%v)", c2, c)
-		}
-	})
-	t.Run("add-dupe", func(t *testing.T) {
-		t.Parallel()
-		err := s.AddRun(mcomp, compilation.RunResult{})
-		testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRun, "adding compile twice")
-	})
+	c2, err := s.RunResult(mcomp)
+	if assert.NoError(t, err, "err when getting added run") {
+		assert.Equalf(t, c, *c2, "added run (%v) came back wrong (%v)", c2, c)
+	}
+
+	err = s.AddRun(mcomp, compilation.RunResult{})
+	testhelp.ExpectErrorIs(t, err, subject.ErrDuplicateRun, "adding compile twice")
 }
 
 // TestSubject_BestLitmus tests a few cases of BestLitmus.

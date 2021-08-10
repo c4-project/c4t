@@ -82,8 +82,8 @@ func checkMap(m interface{}) (reflect.Value, reflect.Type, error) {
 	return mv, mt, nil
 }
 
-// LookupPrefix looks up id in map m by starting from the id itself, and progressively taking a smaller and smaller
-// prefix until the id runs out or m has a value.
+// LookupPrefix looks up id in map m by starting from the id itself, progressively taking a smaller and smaller
+// prefix up to and including the empty ID, and returning the first value found.
 // If a lookup succeeded, LookupPrefix returns the matched key as key, the value as val, and true as ok;
 // else, it returns false, and the other two values are undefined.
 func LookupPrefix(m interface{}, id ID) (key ID, val interface{}, ok bool) {

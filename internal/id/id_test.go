@@ -71,16 +71,17 @@ func ExampleID_Uncons() {
 	_, _, ok := id.ID{}.Uncons()
 	fmt.Println("uncons of empty ok?:", ok)
 
-	hd, tl, ok := id.FromString("foo.bar.baz").Uncons()
-	fmt.Println("uncons of foo.bar.baz ok?:", ok)
-	fmt.Println("head of foo.bar.baz:", hd)
-	fmt.Println("tail of foo.bar.baz:", tl)
+	// An uncons of a 1-tag ID returns that tag as the head.
+	hd, tl, ok := id.FromString("foo").Uncons()
+	fmt.Printf("foo: ok=%v, head=%q, tail=%q\n", ok, hd, tl)
+
+	hd, tl, ok = id.FromString("foo.bar.baz").Uncons()
+	fmt.Printf("foo.bar.baz: ok=%v, head=%q, tail=%q\n", ok, hd, tl)
 
 	// Output:
 	// uncons of empty ok?: false
-	// uncons of foo.bar.baz ok?: true
-	// head of foo.bar.baz: foo
-	// tail of foo.bar.baz: bar.baz
+	// foo: ok=true, head="foo", tail=""
+	// foo.bar.baz: ok=true, head="foo", tail="bar.baz"
 }
 
 // ExampleID_Unsnoc is a runnable example for Unsnoc.
@@ -88,16 +89,17 @@ func ExampleID_Unsnoc() {
 	_, _, ok := id.ID{}.Unsnoc()
 	fmt.Println("unsnoc of empty ok?:", ok)
 
-	hd, tl, ok := id.FromString("foo.bar.baz").Unsnoc()
-	fmt.Println("unsnoc of foo.bar.baz ok?:", ok)
-	fmt.Println("head of foo.bar.baz:", hd)
-	fmt.Println("tail of foo.bar.baz:", tl)
+	// An unsnoc of a 1-tag ID returns that tag as the tail.
+	hd, tl, ok := id.FromString("foo").Unsnoc()
+	fmt.Printf("foo: ok=%v, head=%q, tail=%q\n", ok, hd, tl)
+
+	hd, tl, ok = id.FromString("foo.bar.baz").Unsnoc()
+	fmt.Printf("foo.bar.baz: ok=%v, head=%q, tail=%q\n", ok, hd, tl)
 
 	// Output:
 	// unsnoc of empty ok?: false
-	// unsnoc of foo.bar.baz ok?: true
-	// head of foo.bar.baz: foo.bar
-	// tail of foo.bar.baz: baz
+	// foo: ok=true, head="", tail="foo"
+	// foo.bar.baz: ok=true, head="foo.bar", tail="baz"
 }
 
 // ExampleID_Triple is a runnable example for Triple.

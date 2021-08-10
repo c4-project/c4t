@@ -146,6 +146,10 @@ func (i ID) Unsnoc() (hd ID, tl string, ok bool) {
 		return hd, tl, false
 	}
 	splitIx := strings.LastIndex(i.repr, SepTag)
+	if splitIx == -1 {
+		// This ID already only has one tag, which, by the definition above, must go to the tail.
+		return ID{}, i.repr, true
+	}
 	return ID{repr: i.repr[:splitIx]}, i.repr[splitIx+1:], true
 }
 

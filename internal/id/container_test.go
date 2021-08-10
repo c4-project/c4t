@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/c4-project/c4t/internal/helper/testhelp"
 
 	"github.com/c4-project/c4t/internal/id"
@@ -87,6 +89,7 @@ func ExampleMapGlob() {
 // ExampleLookupPrefix is a runnable example for LookupPrefix.
 func ExampleLookupPrefix() {
 	c := map[id.ID]int{
+		id.ID{}:                  0,
 		id.FromString("foo"):     1,
 		id.FromString("bar"):     2,
 		id.FromString("bar.baz"): 3,
@@ -95,15 +98,18 @@ func ExampleLookupPrefix() {
 	k1, v1, _ := id.LookupPrefix(c, id.FromString("bar.baz"))
 	k2, v2, _ := id.LookupPrefix(c, id.FromString("bar.foobaz"))
 	k3, v3, _ := id.LookupPrefix(c, id.FromString("foo.bar.baz"))
+	k4, v4, _ := id.LookupPrefix(c, id.FromString("baz"))
 
-	fmt.Printf("matched bar.baz to %s (%d)\n", k1, v1)
-	fmt.Printf("matched bar.foobaz to %s (%d)\n", k2, v2)
-	fmt.Printf("matched foo.bar.baz to %s (%d)\n", k3, v3)
+	fmt.Printf("matched bar.baz to %q (%d)\n", k1, v1)
+	fmt.Printf("matched bar.foobaz to %q (%d)\n", k2, v2)
+	fmt.Printf("matched foo.bar.baz to %q (%d)\n", k3, v3)
+	fmt.Printf("matched baz to %q (%d)\n", k4, v4)
 
 	// Output:
-	// matched bar.baz to bar.baz (3)
-	// matched bar.foobaz to bar (2)
-	// matched foo.bar.baz to foo (1)
+	// matched bar.baz to "bar.baz" (3)
+	// matched bar.foobaz to "bar" (2)
+	// matched foo.bar.baz to "foo" (1)
+	// matched baz to "" (0)
 }
 
 // ExampleSearchSlice is a runnable example for SearchSlice.
@@ -211,6 +217,29 @@ func TestMapKeys_errors(t *testing.T) {
 
 			_, err := id.MapKeys(c.in)
 			testhelp.ExpectErrorIs(t, err, c.out, "testing MapKeys")
+		})
+	}
+}
+
+// TestLookupPrefix_failures tests various ways in which LookupPrefix can fail.
+func TestLookupPrefix_failures(t *testing.T) {
+	maps := map[string]interface{}{
+		"not-idmap":   3,
+		"empty-idmap": map[id.ID]int{},
+		"not-present-idmap": map[id.ID]int{
+			id.FromString("bar"): 6,
+		},
+		"more-specific-only-idmap": map[id.ID]int{
+			id.FromString("foo.bar"): 6,
+		},
+	}
+
+	i := id.FromString("foo")
+	for n, m := range maps {
+		m := m
+		t.Run(n, func(t *testing.T) {
+			_, _, got := id.LookupPrefix(m, i)
+			assert.False(t, got)
 		})
 	}
 }
