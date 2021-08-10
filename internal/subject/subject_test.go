@@ -134,7 +134,7 @@ func TestSubject_CompileResult_Missing(t *testing.T) {
 }
 
 // TestSubject_AddCompileResult checks that AddCompileResult is working properly.
-func TestSubject_AddCompileResult(t *testing.T) {
+func TestSubject_AddCompileResult(t *testing.T) { //nolint:tparallel
 	t.Parallel()
 
 	var s subject.Subject
