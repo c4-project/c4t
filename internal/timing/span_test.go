@@ -12,6 +12,15 @@ import (
 	"github.com/c4-project/c4t/internal/timing"
 )
 
+// ExampleSpan_String is a testable example for String on Span.
+func ExampleSpan_String() {
+	var zero timing.Span
+	fmt.Println(zero)
+
+	// Output:
+	// (undefined)
+}
+
 // ExampleSpanFromDuration is a testable example for SpanFromDuration.
 func ExampleSpanFromDuration() {
 	ts := timing.SpanFromDuration(time.Date(1990, time.January, 1, 12, 00, 00, 00, time.UTC), 10*time.Minute)

@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	// Name is the name of the backend binary.
+	// Name is the name of the observation file binary.
 	Name  = "c4t-obs"
 	usage = "interpret observation files"
 
