@@ -64,6 +64,7 @@ file issues about its user experience and documentation.
 
 - Install using the usual `go` tools: for example,
  `go get github.com/c4-project/c4t/cmd/...`.  All commands are in the `cmd` directory.
+  You will need `go` 1.17 or later.
 - Make sure that the [c4f](https://github.com/c4-project/c4f) tools are
   in `PATH` on the test-running machine (eg run `make install`)
 - Make sure that at least `c4t-mach` is installed on any remote machine you wish to use for testing.
