@@ -68,20 +68,7 @@ func TestParse_valid(t *testing.T) {
 		t.Helper()
 		t.Parallel()
 
-		pfields := strings.SplitN(name, "-", 2)
-		require.NotEmpty(t, pfields, "malformed test name, should be 'type-*.json'")
-
-		var c parser.Impl
-		switch pfields[0] {
-		case "herd":
-			c = herd.Herd{}
-		case "litmus":
-			c = litmus.Litmus{}
-		case "rmem":
-			c = rmem.Rmem{}
-		default:
-			require.Failf(t, "unsupported parser subtype", "got %q", pfields[0])
-		}
+		c := getImpl(t, name)
 
 		f, err := os.Open(filepath.Join(dir, name+".txt"))
 		require.NoError(t, err, "missing input file")
@@ -100,4 +87,24 @@ func TestParse_valid(t *testing.T) {
 
 		require.JSONEq(t, string(out), b.String(), "observation JSON not as expected")
 	})
+}
+
+func getImpl(t *testing.T, name string) parser.Impl {
+	t.Helper()
+
+	impl, _, ok := strings.Cut(name, "-")
+	require.True(t, ok, "malformed test name, should be 'type-*.json'")
+
+	var c parser.Impl
+	switch impl {
+	case "herd":
+		c = herd.Herd{}
+	case "litmus":
+		c = litmus.Litmus{}
+	case "rmem":
+		c = rmem.Rmem{}
+	default:
+		require.Failf(t, "unsupported parser subtype", "got %q", impl)
+	}
+	return c
 }

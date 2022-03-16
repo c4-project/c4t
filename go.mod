@@ -1,6 +1,6 @@
 module github.com/c4-project/c4t
 
-go 1.17
+go 1.18
 
 require (
 	github.com/1set/gut v0.0.0-20201117175203-a82363231997

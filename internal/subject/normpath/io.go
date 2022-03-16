@@ -96,9 +96,6 @@ func readSubjectFileFromTarReader(tr *tar.Reader, tarFile, rpath string) ([]byte
 
 func getFirstDir(path string) (dir string, ok bool) {
 	// TODO(@MattWindsor91): is this safe?
-	pfrags := strings.SplitN(path, string(filepath.Separator), 2)
-	if len(pfrags) != 2 {
-		return "", false
-	}
-	return pfrags[0], true
+	dir, _, ok = strings.Cut(path, string(filepath.Separator))
+	return dir, ok
 }

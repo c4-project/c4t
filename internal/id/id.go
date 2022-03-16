@@ -126,7 +126,7 @@ func (i ID) Uncons() (hd string, tl ID, ok bool) {
 	if i.IsEmpty() {
 		return hd, tl, false
 	}
-	hd, tls := i.unconsInner()
+	hd, tls, _ := strings.Cut(i.repr, SepTag)
 	return hd, ID{repr: tls}, true
 }
 
@@ -145,6 +145,7 @@ func (i ID) Unsnoc() (hd ID, tl string, ok bool) {
 	if i.IsEmpty() {
 		return hd, tl, false
 	}
+	// We can't use strings.Cut here; it retrieves the first index, not the last.
 	splitIx := strings.LastIndex(i.repr, SepTag)
 	if splitIx == -1 {
 		// This ID already only has one tag, which, by the definition above, must go to the tail.
