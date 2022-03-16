@@ -8,21 +8,15 @@ package coverage
 import (
 	"errors"
 
-	"github.com/c4-project/c4t/internal/model/service/backend"
-
-	"github.com/c4-project/c4t/internal/model/litmus"
-
-	"github.com/mitchellh/go-homedir"
-
-	"github.com/c4-project/c4t/internal/id"
-
-	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
-
-	"github.com/c4-project/c4t/internal/stage/fuzzer"
-
+	"github.com/BurntSushi/toml"
 	"github.com/c4-project/c4t/internal/config"
+	"github.com/c4-project/c4t/internal/id"
+	"github.com/c4-project/c4t/internal/model/litmus"
 	"github.com/c4-project/c4t/internal/model/service"
-	"github.com/pelletier/go-toml"
+	"github.com/c4-project/c4t/internal/model/service/backend"
+	fuzzer2 "github.com/c4-project/c4t/internal/model/service/fuzzer"
+	"github.com/c4-project/c4t/internal/stage/fuzzer"
+	"github.com/mitchellh/go-homedir"
 )
 
 // ErrConfigNil is produced when we supply a null pointer to OptionsFromConfig.
@@ -63,12 +57,8 @@ type Config struct {
 
 // LoadConfigFromFile loads a coverage configuration from the filepath path.
 func LoadConfigFromFile(path string) (*Config, error) {
-	tree, err := toml.LoadFile(path)
-	if err != nil {
-		return nil, err
-	}
 	var c Config
-	err = tree.Unmarshal(&c)
+	_, err := toml.DecodeFile(path, &c)
 	return &c, err
 }
 

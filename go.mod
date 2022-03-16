@@ -11,7 +11,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/mum4k/termdash v0.16.1
-	github.com/pelletier/go-toml v1.9.4
 	github.com/pkg/sftp v1.13.4
 	github.com/stretchr/testify v1.7.1
 	github.com/urfave/cli/v2 v2.4.0
