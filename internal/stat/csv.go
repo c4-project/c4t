@@ -33,12 +33,7 @@ func (s *Set) DumpMutationCSVHeader(w *csv.Writer) error {
 // Each machine record has its lines prefixed by its machine ID, is flushed separately, and appears in ID order.
 // If total is true, the multi-session totals will be dumped; otherwise, this session's totals will be dumped.
 func (s *Set) DumpMutationCSV(w *csv.Writer, total bool) error {
-	mids, err := id.MapKeys(s.Machines)
-	if err != nil {
-		return err
-	}
-
-	for _, mid := range mids {
+	for _, mid := range id.MapKeys(s.Machines) {
 		sm := s.Machines[mid]
 		if err := sm.DumpMutationCSV(w, mid, total); err != nil {
 			return err

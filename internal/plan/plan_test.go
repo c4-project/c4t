@@ -36,8 +36,7 @@ func ExamplePlan_CompilerIDs() {
 		id.FromString("gcc"):       {Compiler: compiler.Compiler{Arch: id.ArchArm}},
 		id.FromString("clang"):     {Compiler: compiler.Compiler{Arch: id.ArchArm}},
 	}}
-	cids, _ := p.CompilerIDs()
-	for _, c := range cids {
+	for _, c := range p.CompilerIDs() {
 		fmt.Println(c)
 	}
 

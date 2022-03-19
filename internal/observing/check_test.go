@@ -26,16 +26,12 @@ func TestCheckObservers(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		in  interface{}
+		in  []observer
 		err error
 	}{
 		"ok": {
 			in:  []observer{&demoObserver{}, &demoObserver{}},
 			err: nil,
-		},
-		"not-a-slice": {
-			in:  3,
-			err: observing.ErrNotSlice,
 		},
 		"nil-observer": {
 			in:  []observer{nil},

@@ -11,23 +11,13 @@ import (
 	"reflect"
 )
 
-var (
-	// ErrNotSlice occurs when CheckObservers is passed something other than a slice.
-	ErrNotSlice = errors.New("not an observer slice")
-
-	// ErrObserverNil occurs when CheckObservers is passed a nil observer.
-	ErrObserverNil = errors.New("observer nil")
-)
+// ErrObserverNil occurs when CheckObservers is passed a nil observer.
+var ErrObserverNil = errors.New("observer nil")
 
 // CheckObservers does some cursory checking of the observer slice obs (currently just nil checking).
-func CheckObservers(obs interface{}) error {
-	rv := reflect.ValueOf(obs)
-	if rv.Kind() != reflect.Slice {
-		return fmt.Errorf("%w: %v", ErrNotSlice, obs)
-	}
-	l := rv.Len()
-	for i := 0; i < l; i++ {
-		if rv.Index(i).IsNil() {
+func CheckObservers[O any](obs []O) error {
+	for i, o := range obs {
+		if !reflect.ValueOf(o).IsValid() {
 			return fmt.Errorf("%w: index %d", ErrObserverNil, i)
 		}
 	}

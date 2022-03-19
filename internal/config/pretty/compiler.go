@@ -23,11 +23,7 @@ func TabulateCompilers(t tabulator.Tabulator, c *config.Config) error {
 	if err != nil {
 		return err
 	}
-	mids, err := ms.IDs()
-	if err != nil {
-		return err
-	}
-	for _, mid := range mids {
+	for _, mid := range ms.IDs() {
 		if err := TabulateCompilersForMachine(t, mid, ms[mid]); err != nil {
 			return err
 		}
@@ -46,14 +42,7 @@ func TabulateCompilersForMachine(t tabulator.Tabulator, mid id.ID, mc machine.Co
 		return err
 	}
 
-	// Trying to force a deterministic order here.
-	cids, err := id.MapKeys(cs)
-	if err != nil {
-		return err
-	}
-
-	// TODO(@MattWindsor91): deterministic order here?
-	for _, cid := range cids {
+	for _, cid := range id.MapKeys(cs) {
 		addCompilerRow(t, mid, cs[cid], cid)
 	}
 

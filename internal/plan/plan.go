@@ -82,10 +82,7 @@ func (p *Plan) RunStage(ctx context.Context, r Runner) (*Plan, error) {
 // These architectures are in order of their string equivalents.
 func (p *Plan) Arches() []id.ID {
 	arches := p.archSet()
-	// Errors here come from the possibility that the arch set is the wrong type, or the strings aren't IDs,
-	// neither of which is statically possible.
-	ids, _ := id.MapKeys(arches)
-	return ids
+	return id.MapKeys(arches)
 }
 
 func (p *Plan) archSet() map[id.ID]struct{} {
@@ -97,8 +94,7 @@ func (p *Plan) archSet() map[id.ID]struct{} {
 }
 
 // CompilerIDs gets a sorted slice of all compiler IDs mentioned in this machine plan.
-// It fails if any of the IDs are invalid.
-func (p *Plan) CompilerIDs() ([]id.ID, error) {
+func (p *Plan) CompilerIDs() []id.ID {
 	return id.MapKeys(p.Compilers)
 }
 

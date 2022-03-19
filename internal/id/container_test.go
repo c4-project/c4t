@@ -56,8 +56,7 @@ func ExampleMapKeys() {
 		id.FromString("foobar.baz"):    3,
 		id.FromString("barbaz.Foobaz"): 4,
 	}
-	ids, _ := id.MapKeys(c)
-	for _, x := range ids {
+	for _, x := range id.MapKeys(c) {
 		fmt.Println(x)
 	}
 
@@ -77,7 +76,7 @@ func ExampleMapGlob() {
 		id.FromString("bar.baz"):     4,
 	}
 	c2, _ := id.MapGlob(c, id.FromString("foo.*.baz"))
-	for k, v := range c2.(map[id.ID]int) {
+	for k, v := range c2 {
 		fmt.Println(k, v)
 	}
 
@@ -137,7 +136,7 @@ func TestMapGlob_errors(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		in   interface{}
+		in   map[id.ID]string
 		glob id.ID
 		out  error
 	}{
@@ -150,21 +149,9 @@ func TestMapGlob_errors(t *testing.T) {
 			glob: id.FromString("a.*"),
 			out:  nil,
 		},
-		"not-a-map": {
-			in:   5,
-			glob: id.FromString("a.*"),
-			out:  id.ErrNotMap,
-		},
-		"not-an-id-map": {
-			in: map[string]int{
-				"fus..ro": 6,
-			},
-			glob: id.FromString("a.*"),
-			out:  id.ErrNotMap,
-		},
 		"glob-not-a-glob": {
-			in: map[id.ID]int{
-				id.FromString("a.b.c"): 6,
+			in: map[id.ID]string{
+				id.FromString("a.b.c"): "D",
 			},
 			glob: id.FromString("a.*.b.*"),
 			out:  id.ErrBadGlob,
@@ -182,54 +169,14 @@ func TestMapGlob_errors(t *testing.T) {
 	}
 }
 
-// TestMapKeys_errors tests MapKeys's error handling.
-func TestMapKeys_errors(t *testing.T) {
-	t.Parallel()
-
-	cases := map[string]struct {
-		in  interface{}
-		out error
-	}{
-		"normal": {
-			in: map[id.ID]string{
-				id.FromString("a"): "A",
-				id.FromString("b"): "B",
-				id.FromString("c"): "C",
-			},
-			out: nil,
-		},
-		"not-a-map": {
-			in:  5,
-			out: id.ErrNotMap,
-		},
-		"not-an-id-map": {
-			in: map[string]int{
-				"fus..ro": 6,
-			},
-			out: id.ErrNotMap,
-		},
-	}
-
-	for name, c := range cases {
-		c := c
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			_, err := id.MapKeys(c.in)
-			testhelp.ExpectErrorIs(t, err, c.out, "testing MapKeys")
-		})
-	}
-}
-
 // TestLookupPrefix_failures tests various ways in which LookupPrefix can fail.
 func TestLookupPrefix_failures(t *testing.T) {
-	maps := map[string]interface{}{
-		"not-idmap":   3,
-		"empty-idmap": map[id.ID]int{},
-		"not-present-idmap": map[id.ID]int{
+	maps := map[string]map[id.ID]int{
+		"empty-idmap": {},
+		"not-present-idmap": {
 			id.FromString("bar"): 6,
 		},
-		"more-specific-only-idmap": map[id.ID]int{
+		"more-specific-only-idmap": {
 			id.FromString("foo.bar"): 6,
 		},
 	}

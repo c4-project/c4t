@@ -88,8 +88,7 @@ func TestPerturber_Run(t *testing.T) {
 	}
 
 	clen := len(pm.Compilers)
-	cids, err := pm.CompilerIDs()
-	require.NoError(t, err, "mock plan CompilerIDs shouldn't error")
+	cids := pm.CompilerIDs()
 
 	mi.On("DefaultMOpts", mock.Anything).Return(dms, nil).Times(clen)
 	mi.On("DefaultOptLevels", mock.Anything).Return(dls, nil).Times(clen)

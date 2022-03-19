@@ -12,6 +12,9 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
+
 	"github.com/c4-project/c4t/internal/helper/errhelp"
 
 	"github.com/c4-project/c4t/internal/id"
@@ -70,8 +73,7 @@ func ArchToLitmus(arch id.ID) (string, error) {
 	f, v, _ := arch.Triple()
 	amap, ok := archMap[f]
 	if !ok {
-		mk, _ := id.MapKeys(archMap)
-		return "", fmt.Errorf("%w: %s (valid: %q)", ErrBadArch, f, mk)
+		return "", fmt.Errorf("%w: %s (valid: %q)", ErrBadArch, f, sortedArches())
 	}
 	spec, ok := amap[v]
 	if !ok {
@@ -79,6 +81,12 @@ func ArchToLitmus(arch id.ID) (string, error) {
 		return amap[""], nil
 	}
 	return spec, nil
+}
+
+func sortedArches() []string {
+	mk := maps.Keys(archMap)
+	slices.Sort(mk)
+	return mk
 }
 
 // ArchOfFile tries to divine the architecture ID of a Litmus test by reading its first line from file fpath.

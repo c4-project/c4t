@@ -9,6 +9,8 @@ import (
 	"math/rand"
 	"time"
 
+	"golang.org/x/exp/maps"
+
 	"github.com/c4-project/c4t/internal/model/service"
 
 	"github.com/c4-project/c4t/internal/mutation"
@@ -133,11 +135,7 @@ func (c *compilerPerturber) perturbCompilerOpt(cfg compiler.Compiler) (*optlevel
 	if err != nil {
 		return nil, err
 	}
-	names, err := stringhelp.MapKeys(opts)
-	if err != nil {
-		return nil, err
-	}
-	return c.chooseOpt(opts, names), nil
+	return c.chooseOpt(opts, maps.Keys(opts)), nil
 }
 
 func (c *compilerPerturber) perturbCompilerMOpt(cfg compiler.Compiler) (string, error) {

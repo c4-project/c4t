@@ -26,8 +26,7 @@ func ExampleConfigMap_IDs() {
 		id.FromString("bar"):       machine.Config{Machine: machine.Machine{Cores: 1}},
 		id.FromString("foo.bar"):   machine.Config{Machine: machine.Machine{Cores: 2}},
 	}
-	ids, _ := cm.IDs()
-	for _, n := range ids {
+	for _, n := range cm.IDs() {
 		fmt.Println(n)
 	}
 
@@ -46,8 +45,7 @@ func ExampleConfigMap_Filter() {
 		id.FromString("foo.baz"):     machine.Config{Machine: machine.Machine{Cores: 4}},
 	}
 	cm, _ = cm.Filter(id.FromString("foo.*.baz"))
-	ids, _ := cm.IDs()
-	for _, n := range ids {
+	for _, n := range cm.IDs() {
 		fmt.Println(n)
 	}
 

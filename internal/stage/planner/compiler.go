@@ -79,7 +79,7 @@ func (c *CompilerPlanner) filterCompilers(in map[id.ID]compiler.Compiler) (map[i
 	if err != nil {
 		return nil, err
 	}
-	return out.(map[id.ID]compiler.Compiler), nil
+	return out, nil
 }
 
 func resolveDisabled(cfgs map[id.ID]compiler.Compiler) (nenabled int) {

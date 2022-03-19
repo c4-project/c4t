@@ -137,11 +137,8 @@ func (c *Compiler) builderConfig(p *plan.Plan) builder.Config {
 func (c *Compiler) prepareDirs(p *plan.Plan) error {
 	// TODO(@MattWindsor91): port this to observers
 	// c.l.Println("preparing directories")
-	cids, err := p.CompilerIDs()
-	if err != nil {
-		return err
-	}
-	return c.paths.Prepare(cids...)
+
+	return c.paths.Prepare(p.CompilerIDs()...)
 }
 
 // instance makes an instance for the named compiler nc, outputting results to resCh.

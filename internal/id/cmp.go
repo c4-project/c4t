@@ -5,20 +5,11 @@
 
 package id
 
+import "golang.org/x/exp/slices"
+
 // Less compares two IDs lexicographically.
 func (i ID) Less(i2 ID) bool {
-	return lessTags(i.Tags(), i2.Tags())
-}
-
-func lessTags(t1 []string, t2 []string) bool {
-	l1, l2 := len(t1), len(t2)
-	for i := 0; i < l1 && i < l2; i++ {
-		if t1[i] == t2[i] {
-			continue
-		}
-		return t1[i] < t2[i]
-	}
-	return l1 < l2
+	return slices.Compare(i.Tags(), i2.Tags()) < 0
 }
 
 // Equal compares two IDs for equality.

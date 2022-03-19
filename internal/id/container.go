@@ -6,13 +6,9 @@
 package id
 
 import (
-	"errors"
-	"reflect"
+	"golang.org/x/exp/maps"
 	"sort"
 )
-
-// ErrNotMap occurs when we try to use an ID map function on something that isn't an ID map.
-var ErrNotMap = errors.New("not a map with ID keys")
 
 // Sort sorts ids.
 func Sort(ids []ID) {
@@ -21,82 +17,37 @@ func Sort(ids []ID) {
 	})
 }
 
-// MapKeys tries to get the keys of an ID-as-string map m as a sorted list.
-// It fails if m is not an ID-as-string map.
-func MapKeys(m interface{}) ([]ID, error) {
-	ids, err := unsortedMapKeys(m)
-	if err != nil {
-		return nil, err
-	}
-
+// MapKeys gets the keys of an ID-as-string map m as a sorted list.
+func MapKeys[V any](m map[ID]V) []ID {
+	ids := maps.Keys(m)
 	Sort(ids)
-	return ids, nil
-}
-
-func unsortedMapKeys(m interface{}) ([]ID, error) {
-	mv, _, err := checkMap(m)
-	if err != nil {
-		return nil, err
-	}
-
-	return unreflectIdSlice(mv.MapKeys()), nil
-}
-
-func unreflectIdSlice(kvs []reflect.Value) []ID {
-	// Assuming we have already checked the type.
-	ids := make([]ID, len(kvs))
-	for i, kv := range kvs {
-		ids[i] = kv.Interface().(ID)
-	}
 	return ids
 }
 
 // MapGlob filters a string map m to those keys that match glob when interpreted as IDs.
-func MapGlob(m interface{}, glob ID) (interface{}, error) {
-	mv, mt, err := checkMap(m)
-	if err != nil {
-		return nil, err
-	}
-	nm := reflect.MakeMap(mt)
-	for _, kv := range mv.MapKeys() {
-		match, err := kv.Interface().(ID).Matches(glob)
+func MapGlob[V any](m map[ID]V, glob ID) (map[ID]V, error) {
+	nm := make(map[ID]V, len(m))
+	for k, v := range m {
+		match, err := k.Matches(glob)
 		if err != nil {
 			return nil, err
 		}
 		if match {
-			nm.SetMapIndex(kv, mv.MapIndex(kv))
+			nm[k] = v
 		}
 	}
-	return nm.Interface(), nil
-}
-
-func checkMap(m interface{}) (reflect.Value, reflect.Type, error) {
-	mv := reflect.ValueOf(m)
-	if mv.Kind() != reflect.Map {
-		return reflect.Value{}, nil, ErrNotMap
-	}
-	mt := mv.Type()
-	if mt.Key() != reflect.TypeOf(ID{}) {
-		return reflect.Value{}, nil, ErrNotMap
-	}
-	return mv, mt, nil
+	return nm, nil
 }
 
 // LookupPrefix looks up id in map m by starting from the id itself, progressively taking a smaller and smaller
 // prefix up to and including the empty ID, and returning the first value found.
 // If a lookup succeeded, LookupPrefix returns the matched key as key, the value as val, and true as ok;
 // else, it returns false, and the other two values are undefined.
-func LookupPrefix(m interface{}, id ID) (key ID, val interface{}, ok bool) {
-	mv, _, err := checkMap(m)
-	if err != nil {
-		return ID{}, nil, false
-	}
-
+func LookupPrefix[V any](m map[ID]V, id ID) (key ID, val interface{}, ok bool) {
 	key = id
 	for ok = true; ok; key, _, ok = key.Unsnoc() {
-		vv := mv.MapIndex(reflect.ValueOf(key))
-		if vv.Kind() != reflect.Invalid {
-			return key, vv.Interface(), true
+		if v, vok := m[key]; vok {
+			return key, v, true
 		}
 	}
 	return ID{}, nil, ok

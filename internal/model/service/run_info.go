@@ -10,12 +10,13 @@ import (
 	"sort"
 	"strings"
 
+	"golang.org/x/exp/maps"
+
 	"github.com/1set/gut/ystring"
 
 	"github.com/c4-project/c4t/internal/id"
 
 	"github.com/buildkite/interpolate"
-	"github.com/c4-project/c4t/internal/helper/stringhelp"
 )
 
 // RunInfo gives hints as to how to run a service.
@@ -75,10 +76,7 @@ func (r *RunInfo) EnvStrings() []string {
 		return nil
 	}
 
-	ks, err := stringhelp.MapKeys(r.Env)
-	if err != nil {
-		return []string{fmt.Sprintf("(err: %s)", err)}
-	}
+	ks := maps.Keys(r.Env)
 	sort.Strings(ks)
 	for i, k := range ks {
 		ks[i] = fmt.Sprintf("%s=%s", k, r.Env[k])

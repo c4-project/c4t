@@ -5,6 +5,8 @@
 
 package stringhelp
 
+import "golang.org/x/exp/maps"
+
 // Set is a string set, implemented in the usual Go way as a map to empty structs.
 type Set map[string]struct{}
 
@@ -31,11 +33,10 @@ func (s Set) Remove(xs ...string) {
 
 // Copy makes a deep copy of this set.
 func (s Set) Copy() Set {
-	return NewSet(s.Slice()...)
+	return maps.Clone(s)
 }
 
 // Slice returns the elements of xs as a sorted slice.
 func (s Set) Slice() []string {
-	sl, _ := MapKeys(s)
-	return sl
+	return maps.Keys(s)
 }

@@ -72,7 +72,7 @@ func TestCompilerPlanner_Plan(t *testing.T) {
 
 	ml.On("Compilers").Return(cfgs, nil).Once()
 
-	keys, _ := id.MapKeys(cfgs)
+	keys := id.MapKeys(cfgs)
 
 	mockOnCompilerConfig(&mo, observing.BatchStart, func(n int, _ *compiler.Named) bool {
 		return n == ncfgs-1

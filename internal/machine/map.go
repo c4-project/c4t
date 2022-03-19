@@ -26,12 +26,12 @@ func (m ConfigMap) Filter(glob id.ID) (ConfigMap, error) {
 	if err != nil {
 		return nil, err
 	}
-	return nm.(ConfigMap), nil
+	return nm, nil
 }
 
 // IDs gets a sorted slice of IDs present in this machine map.
 // It returns an error if any of the configured machines have an invalid ID.
-func (m ConfigMap) IDs() ([]id.ID, error) {
+func (m ConfigMap) IDs() []id.ID {
 	return id.MapKeys(m)
 }
 
@@ -46,10 +46,7 @@ func (m ConfigMap) ListCompilers(_ context.Context, machine id.ID) (map[id.ID]co
 
 // ObserveOn sends this map to obs as a series of machine observations.
 func (m ConfigMap) ObserveOn(obs ...Observer) error {
-	ids, err := m.IDs()
-	if err != nil {
-		return err
-	}
+	ids := m.IDs()
 
 	OnMachinesStart(len(ids), obs...)
 	for i, n := range ids {
