@@ -51,6 +51,7 @@ func (c Corpus) Par(ctx context.Context, nworkers int, f func(context.Context, s
 	eg, ectx := errgroup.WithContext(ctx)
 
 	for _, a := range aux {
+		a := a
 		eg.Go(func() error { return a(ectx) })
 	}
 	c.parInner(eg, ectx, nworkers, f)

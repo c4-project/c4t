@@ -73,6 +73,7 @@ func TestPlan_Arches(t *testing.T) {
 	}
 
 	for name, c := range cases {
+		name := name
 		c := c
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()

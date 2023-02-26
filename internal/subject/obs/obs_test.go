@@ -78,6 +78,7 @@ func TestObs_jsonRoundTrip(t *testing.T) {
 		},
 	}
 	for name, want := range cases {
+		want := want
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			testhelp.TestJSONRoundTrip(t, want, "Obs")

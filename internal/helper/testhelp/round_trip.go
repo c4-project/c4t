@@ -33,7 +33,7 @@ func TestTomlRoundTrip(t *testing.T, want interface{}, context string) {
 	testRoundTrip(t, want, func(w io.Writer, i interface{}) error {
 		return toml.NewEncoder(w).Encode(i)
 	}, func(r io.Reader, i interface{}) error {
-		_, err := toml.DecodeReader(r, i)
+		_, err := toml.NewDecoder(r).Decode(i)
 		return err
 	}, context)
 }
